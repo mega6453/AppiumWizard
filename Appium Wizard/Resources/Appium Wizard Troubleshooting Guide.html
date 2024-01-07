@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+</style>
+</head>
+<body>
+
+    <div style="text-align: center;">
+        <img src="appium Wizard Splash Screen - faq.jpg" alt="Image" style="width:15%;">
+    </div>
+
+    <h2>Troubleshooting Guide</h2>
+
+    <button class="collapsible">Android Device not detecting</button>
+    <div class="content">
+        <p>Enable Developer options in your Android phone. Follow <a href="https://developer.android.com/studio/debug/dev-options" target="_blank">this link</a>.</p>
+    </div>
+
+    <button class="collapsible">Unable to Start iPhone automation</button>
+    <div class="content">
+        <p>Enable Developer Mode in your iPhone and try again. Go to Settings->Privacy & Security->Developer Mode->Turn ON.</p>
+    </div>
+
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

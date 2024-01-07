@@ -1,0 +1,65 @@
+# Compiled output
+/bin/
+/obj/
+
+# Local directory for dotnet MAUI tools
+/.dotnet/
+
+# Visual Studio files
+.vs/
+/*.user
+/*.suo
+/*.sln.docstates
+
+# NuGet Packages
+*.nuget.props
+*.nuget.targets
+/.paket/
+/packages/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+
+# Xamarin.Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.aar
+/bin/*
+/gen/*
+/obj/*
+/*.apk
+/*.ap_
+/*.aab
+/*.dex
+/*.aar
+/*.so
+/*.zipalign
+/*.msi
+
+# Xamarin.iOS
+*.ipa
+*.app
+*.zip
+*.nupkg
+/obj/iPhoneSimulator/
+/obj/iPhone/
+/obj/iPadSimulator/
+/obj/iPad/
+/obj/AppleTVSimulator/
+/obj/AppleTV/
+
+# MAUI
+**/*.appiconset
+**/*.launchimage
+**/*.imageset
+**/*.font
+**/*.storyboard
+**/*.xib
+**/*.xcasset
+**/*.xcconfig
+/Appium Wizard/Resources/iOS/AppiumWizardDistro.vhdx
+*.cache
+/Appium Wizard/ExcludeInInstaller/Installer Script.iss

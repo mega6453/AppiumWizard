@@ -34,26 +34,17 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
-    - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+    - name: Build the solution
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
       env:
-        Appx_Bundle: Always
-        Appx_Bundle_Platforms: x86|x64
-        Appx_Package_Build_Mode: StoreUpload
         Configuration: ${{ matrix.configuration }}
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: Built Files
-        path: ${{ env.Wap_Project_Directory }}
+        name: Build Outputs
+        path: ${{ env.Wap_Project_Directory }} # Replace with the correct path to the build outputs directory
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Built Files
-        path: ${{ github.workspace }}/artifacts
-
-    - name: List downloaded files
+    - name: List uploaded files
       run: |
-        ls ${{ github.workspace }}/artifacts
+        ls ${{ env.Wap_Project_Directory }} # Replace with the correct path to the build outputs directory

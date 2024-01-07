@@ -40,9 +40,7 @@
 /*.msi
 
 # Xamarin.iOS
-*.ipa
 *.app
-*.zip
 *.nupkg
 /obj/iPhoneSimulator/
 /obj/iPhone/

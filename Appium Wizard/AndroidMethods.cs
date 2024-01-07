@@ -12,8 +12,8 @@ namespace Appium_Wizard
         private static readonly object lockObject = new object();
         private string adbFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\adb.exe";
         private string aaptFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\aapt.exe";
-        private string serverAPKFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Android\\uiautomator2-server.apk";
-        private string serverTestAPKFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Android\\uiautomator2-server-androidTest.apk";
+        private string serverAPKFilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+"\\.appium\\node_modules\\appium-uiautomator2-driver\\node_modules\\appium-uiautomator2-server\\apks\\";
+        private string settingsAPKFilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.appium\\node_modules\\appium-uiautomator2-driver\\node_modules\\io.appium.settings\\apks\\";
         private Process adbProcess;
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
 
@@ -217,14 +217,21 @@ namespace Appium_Wizard
         {
             UnInstallApp(udid,"io.appium.uiautomator2.server");
             UnInstallApp(udid,"io.appium.uiautomator2.server.test");
-            InstallApp(udid, serverAPKFilePath);
-            InstallApp(udid, serverTestAPKFilePath);
+            InstallUIAutomator(udid);
         }
 
         public void InstallUIAutomator(string udid)
         {
-            InstallApp(udid, serverAPKFilePath);
-            InstallApp(udid, serverTestAPKFilePath);
+            string[] serverAPKPath = Directory.GetFiles(serverAPKFilePath, "*.apk");
+            foreach (string apkFilePath in serverAPKPath)
+            {
+                InstallApp(udid, apkFilePath);
+            }
+            string[] settingsAPKPath = Directory.GetFiles(settingsAPKFilePath, "*.apk");
+            foreach (string apkFilePath in settingsAPKPath)
+            {
+                InstallApp(udid, apkFilePath);
+            }
         }
 
 

@@ -47,15 +47,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Android\settings_apk-debug.apk">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Android\uiautomator2-server-androidTest.apk">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Android\uiautomator2-server.apk">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Appium Wizard Troubleshooting Guide.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]
     runs-on: windows-latest
     env:
       Solution_Name: Appium Wizard
@@ -40,11 +40,23 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     - name: Upload build artifacts
+      id: upload-artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: build/outputs # Replace with the correct path to the build outputs directory
-    
-    - name: List uploaded files
+        path: Appium Wizard/bin/Debug/net6.0-windows
+
+  download:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: Build Outputs
+        path: ${{ github.workspace }}/build-outputs
+
+    - name: List downloaded files
       run: |
-        Get-ChildItem -Path build/outputs # Replace with the correct path to the build outputs directory
+        ls ${{ github.workspace }}/build-outputs

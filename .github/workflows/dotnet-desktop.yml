@@ -7,15 +7,11 @@ on:
     branches: [ "testyml" ]
 
 jobs:
-
   build:
-
     strategy:
       matrix:
         configuration: [Debug, Release]
-
     runs-on: windows-latest
-
     env:
       Solution_Name: Appium Wizard
 
@@ -47,15 +43,15 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
-        name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}/AppPackages
+        name: Built Files
+        path: ${{ env.Wap_Project_Directory }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v2
       with:
-        name: MSIX Package
+        name: Built Files
         path: ${{ github.workspace }}/artifacts
 
     - name: List downloaded files

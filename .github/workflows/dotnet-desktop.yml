@@ -43,8 +43,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: <path-to-build-outputs-directory> # Replace with the correct path to the build outputs directory
-
+        path: build/outputs # Replace with the correct path to the build outputs directory
+    
     - name: List uploaded files
       run: |
-        ls <path-to-build-outputs-directory> # Replace with the correct path to the build outputs directory
+        Get-ChildItem -Path build/outputs # Replace with the correct path to the build outputs directory

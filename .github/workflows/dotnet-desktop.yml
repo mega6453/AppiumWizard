@@ -43,8 +43,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: ${{ env.Wap_Project_Directory }} # Replace with the correct path to the build outputs directory
+        path: <path-to-build-outputs-directory> # Replace with the correct path to the build outputs directory
 
     - name: List uploaded files
       run: |
-        ls ${{ env.Wap_Project_Directory }} # Replace with the correct path to the build outputs directory
+        ls <path-to-build-outputs-directory> # Replace with the correct path to the build outputs directory

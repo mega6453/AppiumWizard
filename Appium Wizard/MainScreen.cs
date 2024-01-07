@@ -847,7 +847,7 @@ namespace Appium_Wizard
 
         private void fAQToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string faqFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Appium Wizard Troubleshooting Guide.html";
+            string faqFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Docs\\Appium Wizard Troubleshooting Guide.html";
             try
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>appiumlogo.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Images\appiumlogo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appiumlogo.ico" />
     <Content Include="Resources\Data\appiumwizard.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\appiumlogo.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,10 +47,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Appium Wizard Troubleshooting Guide.html">
+    <None Update="Resources\Docs\Appium Wizard Troubleshooting Guide.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\appium Wizard Splash Screen - faq.jpg">
+    <None Update="Resources\Images\appium Wizard Splash Screen - faq.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Executables\aapt.exe">

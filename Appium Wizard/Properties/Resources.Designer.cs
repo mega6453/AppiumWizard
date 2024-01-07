@@ -63,16 +63,6 @@ namespace Appium_Wizard.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap add {
-            get {
-                object obj = ResourceManager.GetObject("add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap android {
             get {
                 object obj = ResourceManager.GetObject("android", resourceCulture);
@@ -96,6 +86,16 @@ namespace Appium_Wizard.Properties {
         internal static System.Drawing.Bitmap appium_Wizard_Splash_Screen {
             get {
                 object obj = ResourceManager.GetObject("appium Wizard Splash Screen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap appium_Wizard_Splash_Screen___faq {
+            get {
+                object obj = ResourceManager.GetObject("appium_Wizard_Splash_Screen___faq", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

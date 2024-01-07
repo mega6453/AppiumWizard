@@ -44,13 +44,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: Appium Wizard/bin/Debug/net6.0-windows
+        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\
 
-  download:
-    needs: build
-    runs-on: windows-latest
-
-    steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v2
       with:

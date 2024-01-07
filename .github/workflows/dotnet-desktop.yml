@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\
+        path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
 
     - name: Download build artifacts
       uses: actions/download-artifact@v2

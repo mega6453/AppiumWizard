@@ -22,7 +22,7 @@ DisableProgramGroupPage=yes
 ;InfoBeforeFile=C:\Users\mc\Desktop\Appium Wizard\Information.txt
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
-OutputDir=D:\a\AppiumWizard\AppiumWizard\
+OutputDir=D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
 OutputBaseFilename=Appium Wizard
 ;SetupIconFile=Release\Resources\Images\appiumlogo.ico
 Compression=lzma

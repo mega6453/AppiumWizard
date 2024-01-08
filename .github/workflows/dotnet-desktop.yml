@@ -70,3 +70,13 @@ jobs:
         & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
       env:
         SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+      
+    - name: Download EXE file
+      uses: actions/download-artifact@v2
+      with:
+        name: Build Outputs
+        path: ${{ github.workspace }}/build-outputs
+
+    - name: List downloaded EXE file
+      run: |
+        ls ${{ github.workspace }}/build-outputs

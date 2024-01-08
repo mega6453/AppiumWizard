@@ -68,7 +68,7 @@ jobs:
       env:
         SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
   
-    - name: Upload build artifacts
+    - name: Upload build artifacts 2
       id: upload-artifacts2
       uses: actions/upload-artifact@v4
       with:

@@ -57,14 +57,16 @@ jobs:
       run: |
         ls ${{ github.workspace }}/build-outputs
 
+    - name: Install Chocolatey
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
     - name: Install Inno Setup
       run: |
-        mkdir C:\InnoSetup
-        Invoke-WebRequest -Uri 'https://github.com/jrsoftware/issrc/releases/download/6.3.0-plain/is-unicode.exe' -OutFile C:\InnoSetup\is-unicode.exe
-        Start-Process -Wait -FilePath C:\InnoSetup\is-unicode.exe -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\InnoSetup"'
+        choco install innosetup -y
 
     - name: Compile and generate EXE file
       run: |
-        "C:\InnoSetup\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
       env:
         SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"

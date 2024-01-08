@@ -36,19 +36,19 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\Appium Wizard.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\appiumlogo.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\D3DCompiler_47_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\PenImc_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\sni.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\SQLite.Interop.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\vcruntime140_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\Release\wpfgfx_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\Appium Wizard.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\appiumlogo.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\D3DCompiler_47_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\PenImc_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\sni.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\SQLite.Interop.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\vcruntime140_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\wpfgfx_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -171,4 +171,3 @@ begin
 end;
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-

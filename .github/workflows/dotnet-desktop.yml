@@ -60,7 +60,7 @@ jobs:
     - name: Install Inno Setup
       run: |
         mkdir C:\InnoSetup
-        Invoke-WebRequest -Uri 'https://jrsoftware.org/download.php/is-unicode.exe' -OutFile C:\InnoSetup\is-unicode.exe
+        Invoke-WebRequest -Uri 'https://github.com/jrsoftware/issrc/releases/download/6.3.0-plain/is-unicode.exe' -OutFile C:\InnoSetup\is-unicode.exe
         Start-Process -Wait -FilePath C:\InnoSetup\is-unicode.exe -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\InnoSetup"'
 
     - name: Compile and generate EXE file

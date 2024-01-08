@@ -45,6 +45,7 @@ jobs:
       with:
         name: Build Outputs
         path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
+        compression-level: 0
 
     - name: Download build artifacts
       uses: actions/download-artifact@v2

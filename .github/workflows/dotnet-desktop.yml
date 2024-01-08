@@ -47,15 +47,15 @@ jobs:
         path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
         compression-level: 9
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Build Outputs
-        path: ${{ github.workspace }}/build-outputs
+    # - name: Download build artifacts
+    #   uses: actions/download-artifact@v2
+    #   with:
+    #     name: Build Outputs
+    #     path: ${{ github.workspace }}/build-outputs
 
-    - name: List downloaded files
-      run: |
-        ls ${{ github.workspace }}/build-outputs
+    # - name: List downloaded files
+    #   run: |
+    #     ls ${{ github.workspace }}/build-outputs
 
     - name: Install Chocolatey
       run: |

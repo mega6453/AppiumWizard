@@ -40,7 +40,6 @@ Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\Appium Wizard.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\appiumlogo.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\D3DCompiler_47_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\PenImc_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion

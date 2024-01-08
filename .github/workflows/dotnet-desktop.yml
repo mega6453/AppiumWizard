@@ -47,16 +47,6 @@ jobs:
         path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
         compression-level: 9
 
-    # - name: Download build artifacts
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     name: Build Outputs
-    #     path: ${{ github.workspace }}/build-outputs
-
-    # - name: List downloaded files
-    #   run: |
-    #     ls ${{ github.workspace }}/build-outputs
-
     - name: Install Chocolatey
       run: |
         Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -67,10 +57,10 @@ jobs:
 
     - name: Compile and generate EXE file
       run: |
-        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
       env:
         SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
-      
+
     - name: Download EXE file
       uses: actions/download-artifact@v2
       with:

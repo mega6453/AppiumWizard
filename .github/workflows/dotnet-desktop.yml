@@ -58,10 +58,13 @@ jobs:
         ls ${{ github.workspace }}/build-outputs
 
     - name: Install Inno Setup
-      uses: softprops/action-setup-inno-setup@v1
+      run: |
+        mkdir C:\InnoSetup
+        Invoke-WebRequest -Uri 'https://jrsoftware.org/download.php/is-unicode.exe' -OutFile C:\InnoSetup\is-unicode.exe
+        Start-Process -Wait -FilePath C:\InnoSetup\is-unicode.exe -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\InnoSetup"'
 
     - name: Compile and generate EXE file
       run: |
-        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+        "C:\InnoSetup\ISCC.exe" /Q /O"Output" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
       env:
         SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"

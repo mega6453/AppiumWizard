@@ -75,8 +75,8 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: Build Outputs
-        path: ${{ github.workspace }}/build-outputs
+        path: D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
 
     - name: List downloaded EXE file
       run: |
-        ls ${{ github.workspace }}/build-outputs
+        ls D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile

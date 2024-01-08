@@ -92,7 +92,7 @@ namespace Appium_Wizard
                     {
                         updatedExpirationDays = "Expired";
                     }
-                    string[] item1 = { profileName, updatedExpirationDays, appId, teamId, "" , folderPath};
+                    string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath};
                     listView1.Items.Add(new ListViewItem(item1));
                 }
                 catch (Exception)

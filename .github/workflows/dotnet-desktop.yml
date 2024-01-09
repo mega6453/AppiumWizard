@@ -21,12 +21,12 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: Install Git LFS
-      run: |
-        git lfs install --skip-smudge
-        git lfs fetch --all
-        git lfs checkout
-      shell: bash
+    # - name: Install Git LFS
+    #   run: |
+    #     git lfs install --skip-smudge
+    #     git lfs fetch --all
+    #     git lfs checkout
+    #   shell: bash
       
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3

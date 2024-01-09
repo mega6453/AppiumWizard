@@ -246,14 +246,14 @@ namespace Appium_Wizard
             // serverSetupToolStripMenuItem
             // 
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(270, 34);
+            serverSetupToolStripMenuItem.Size = new Size(233, 34);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
             // fixInstallationToolStripMenuItem
             // 
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(270, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -465,7 +465,6 @@ namespace Appium_Wizard
             Text = "Appium Wizard";
             WindowState = FormWindowState.Maximized;
             FormClosing += onFormClosing;
-            FormClosed += onFormClosed;
             Load += onFormLoad;
             Shown += afterFormShown;
             contextMenuStrip1.ResumeLayout(false);

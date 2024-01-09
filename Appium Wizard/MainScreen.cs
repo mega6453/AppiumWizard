@@ -5,7 +5,6 @@ namespace Appium_Wizard
 {
     public partial class MainScreen : Form
     {
-        private Process iOSProxyProcess, appiumServerProcess;
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, Width, Height;
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus;
@@ -214,30 +213,6 @@ namespace Appium_Wizard
                 MessageBox.Show(selectedDeviceName + " Device Offline. Please check device connectivity...", "Open Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
-
-        private void onFormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (iOSProxyProcess != null && !iOSProxyProcess.HasExited)
-            {
-                iOSProxyProcess.Kill();
-            }
-            if (appiumServerProcess != null && !appiumServerProcess.HasExited)
-            {
-                appiumServerProcess.Kill();
-            }
-            var processes = Process.GetProcessesByName("msedgewebview2");
-            foreach (var process in processes)
-            {
-                if (!process.HasExited)
-                {
-                    process.Kill();
-                }
-            }
-        }
-
-
 
         public void addToList(string DeviceName, string OSVersion, string udid, string OS, string Model, string status)
         {
@@ -548,7 +523,6 @@ namespace Appium_Wizard
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            Common.TerminateProcess("taskkill /im appiumserver.exe /f");
             Common.TerminateProcess("taskkill /im node.exe /f");
             Common.TerminateProcess("taskkill /im iOSServer.exe /f");
             Common.TerminateProcess("taskkill /im adb.exe /f");
@@ -748,7 +722,7 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("NodeJS not installed OR not added into environment variables.\nPlease Install NodeJs and then try again.\n\nClick OK to open the Troubleshooter to fix the issues.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (result == DialogResult.OK)
                 {
-                    TroubleShooter troubleShooter = new TroubleShooter();   
+                    TroubleShooter troubleShooter = new TroubleShooter();
                     troubleShooter.ShowDialog();
                 }
                 //var result = MessageBox.Show("NodeJS not installed OR not added into environment variables.\nPlease Install NodeJs and then try again.\n\nDo you want to download now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);

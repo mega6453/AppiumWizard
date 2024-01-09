@@ -6,6 +6,12 @@
 
 Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool helps testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows.
 
+## How to Use
+1. Install Appium Wizard and Launch it.<br>
+2. Click Add Device -> Add your iOS/Android device.<br>
+3. For iOS : Go to Tools -> iOS profile management and Add your iOS provisioning profiles.
+4. Click Open device to open the device reflection.<br>
+5. Now start running automation from your automation script. (Make sure you have given the correct appium server port number and device id in your script)
 
 ## Features Available
 

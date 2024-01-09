@@ -70,6 +70,14 @@ begin
   Result := 'C:\Users\' + Username + '\AppData\Local\Microsoft\WindowsApps';
 end;
 
+function IsAppiumInstalled: Boolean;
+var
+  AppiumPath: string;
+begin
+  AppiumPath := ExpandConstant('{userappdata}\npm\appium.cmd');
+  Result := FileExists(AppiumPath);
+end;
+
 procedure InitializeWizard;
 begin
   // Create a custom progress page
@@ -103,7 +111,8 @@ begin
         Result := False;
         Exit;
       end;
-
+      
+    if not RegKeyExists(HKCU, 'Software\Node.js') then
       if not Exec(WindowsAppsPath + '\winget.exe', 'install OpenJS.NodeJS', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
       begin
         MsgBox('Failed to install Node.js using winget. Error code: ' + IntToStr(ResultCode), mbError, MB_OK);
@@ -113,7 +122,8 @@ begin
 
       Progress := 20;
       ProgressPage.SetProgress(Progress, 100);
-
+    if not IsAppiumInstalled then
+    begin
       // Add the command to install Appium globally using npm
       ProgressPage.SetText('Installing Appium Server...','');
       if not Exec('cmd', '/C npm install -g appium', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
@@ -122,6 +132,7 @@ begin
         Result := False;
         Exit;
       end;
+    end;
       Progress := 40;
       ProgressPage.SetProgress(Progress, 100);
 
@@ -169,6 +180,8 @@ begin
     end;
   end;
 end;
+
+
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 

@@ -1,0 +1,38 @@
+Freeware License Agreement
+
+This Freeware License Agreement (the "Agreement") is a legal agreement between you (either an individual or a single entity) and Meganathan C (the "Licensor") for the Appium Wizard software (the "Software").
+
+By installing, copying, or otherwise using the Software, you agree to be bound by the terms and conditions of this Agreement. If you do not agree to the terms and conditions of this Agreement, do not install or use the Software.
+
+1. Grant of License
+Licensor hereby grants you a non-exclusive, non-transferable, revocable license to use the Software for personal or non-commercial purposes, subject to the terms and conditions of this Agreement.
+
+2. Restrictions
+You may not:
+   a. Modify, adapt, translate, or create derivative works of the Software;
+   b. Reverse engineer, decompile, or disassemble the Software;
+   c. Remove any copyright or other proprietary notices from the Software;
+   d. Distribute, sublicense, lease, rent, or lend the Software to any third party;
+   e. Use the Software in any manner that violates any applicable laws or regulations.
+
+3. Ownership
+The Software is licensed, not sold, to you. Licensor retains all right, title, and interest in and to the Software, including all intellectual property rights.
+
+4. Warranty Disclaimer
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS OR THAT THE OPERATION OF THE SOFTWARE WILL BE UNINTERRUPTED OR ERROR-FREE.
+
+5. Limitation of Liability
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+6. Termination
+This Agreement is effective until terminated. Licensor may terminate this Agreement at any time without notice if you fail to comply with any term or condition of this Agreement. Upon termination, you must destroy all copies of the Software in your possession.
+
+7. Governing Law
+This Agreement shall be governed by and construed in accordance with the laws, without regard to its conflict of laws principles.
+
+8. Entire Agreement
+This Agreement constitutes the entire agreement between you and Licensor with respect to the Software and supersedes all prior or contemporaneous understandings or agreements, whether oral or written.
+
+By installing or using the Software, you acknowledge that you have read this Agreement, understand it, and agree to be bound by its terms and conditions.
+
+Meganathan C

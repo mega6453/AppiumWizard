@@ -4,7 +4,7 @@
 
 # Appium Wizard for Mobile Automation Testing
 
-Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool empowers testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows.
+Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool helps testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows.
 
 
 ## Features Available
@@ -31,6 +31,7 @@ Appium Wizard is a Windows software designed to streamline mobile automation usi
 
 ## Known Issues
 * Android Screen control has some issues.
+* Performance issues
 
 ## Built With
 * .Net C# & Windows Forms 
@@ -42,6 +43,7 @@ Appium Wizard is a Windows software designed to streamline mobile automation usi
 * adb
 * Newtonsoft.Json
 * RestSharp
+* Innosetup
 
 ## Thanks To
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".

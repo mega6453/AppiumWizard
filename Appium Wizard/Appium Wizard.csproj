@@ -11,10 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ExcludeInInstaller\appiumlogo.ico" />
     <None Remove="Resources\Data\appiumwizard.db" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="ExcludeInInstaller\appiumlogo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Data\appiumwizard.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -47,11 +51,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ExcludeInInstaller\Freeware License.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcludeInInstaller\Information.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExcludeInInstaller\Installer Script.iss">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Docs\Appium Wizard Troubleshooting Guide.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Images\appium Wizard Splash Screen - faq.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="Resources\Docs\appium Wizard Splash Screen.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Executables\aapt.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

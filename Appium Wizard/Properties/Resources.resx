@@ -145,9 +145,6 @@
   <data name="appium_wizard_small" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\appium wizard small.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="appium_Wizard_Splash_Screen___faq" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Images\appium Wizard Splash Screen - faq.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="backIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\backIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mc\\source\\repos\\Appium Wizard\\Appium Wizard\\Appium Wizard.csproj": {}
+    "C:\\Users\\mc\\Desktop\\Appium Wizard\\Repo\\Appium Wizard\\Appium Wizard.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mc\\source\\repos\\Appium Wizard\\Appium Wizard\\Appium Wizard.csproj": {
+    "C:\\Users\\mc\\Desktop\\Appium Wizard\\Repo\\Appium Wizard\\Appium Wizard.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mc\\source\\repos\\Appium Wizard\\Appium Wizard\\Appium Wizard.csproj",
+        "projectUniqueName": "C:\\Users\\mc\\Desktop\\Appium Wizard\\Repo\\Appium Wizard\\Appium Wizard.csproj",
         "projectName": "Appium Wizard",
-        "projectPath": "C:\\Users\\mc\\source\\repos\\Appium Wizard\\Appium Wizard\\Appium Wizard.csproj",
+        "projectPath": "C:\\Users\\mc\\Desktop\\Appium Wizard\\Repo\\Appium Wizard\\Appium Wizard.csproj",
         "packagesPath": "C:\\Users\\mc\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mc\\source\\repos\\Appium Wizard\\Appium Wizard\\obj\\publish\\win-x64\\",
+        "outputPath": "C:\\Users\\mc\\Desktop\\Appium Wizard\\Repo\\Appium Wizard\\obj\\publish\\win-x64\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

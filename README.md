@@ -8,7 +8,7 @@ Appium Wizard is a Windows software designed to streamline mobile automation usi
 
 ## During Installation
 Please provide necessary permission when system prompts. Because,
-1. If NodeJS not installed in your system, Alpium Wizard will download and install it.
+1. If NodeJS not installed in your system, Appium Wizard will download and install it.
 2. If Appium Sever not installed, Appium Wizard will Install it.
 3. Appium Wizard will Install iOS and Android drivers.
 4. Appium Wizard will Install WSL for iOS app signing and run automation.
@@ -45,6 +45,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION IF YOU ARE OBSERVING ANY ISSUE WHICH
 * etc.
 
 ## Features/Improvements in Queue
+* Update Appium Server and drivers from Appium Wizard
 * Show Action + current element(e.g. Click on //someElement) text in status bar based on appium execution
 * Handle resources on Application exit
 * Highlight element accessed by Appium in Screen Reflection

@@ -64,16 +64,16 @@ jobs:
 
     - name: Compile and generate EXE file
       run: |
-        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"{{ github.workspace }}/Appium Wizard/output" "${{ github.workspace }}/Appium Wizard/Installer Script.iss"
       env:
-        SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+        SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/Installer Script.iss"
   
     - name: Upload build artifacts 2
       id: upload-artifacts2
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: D:/a/AppiumWizard/AppiumWizard/GeneratedExeFile
+        path: "${{ github.workspace }}/Appium Wizard/output"
         compression-level: 9
         
     - name: Download EXE file

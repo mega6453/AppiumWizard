@@ -81,13 +81,13 @@ jobs:
       env:
         SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
 
-    - name: Upload build artifacts
-      id: upload-artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: Build Outputs
-        path: "Appium Wizard/bin/Release/net6.0-windows/output"
-        compression-level: 9  
+    # - name: Upload build artifacts
+    #   id: upload-artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Build Outputs
+    #     path: "Appium Wizard/bin/Release/net6.0-windows/output"
+    #     compression-level: 9  
         
     - name: Create Release
       id: create_release

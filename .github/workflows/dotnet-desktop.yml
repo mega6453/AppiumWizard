@@ -101,16 +101,34 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
 
+    - name: Set Asset Name
+      id: set_asset_name
+      run: echo "::set-output name=asset_name::$(node -p 'encodeURIComponent("Appium Wizard.exe")')"
+      shell: bash
+
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
+        ASSET_NAME: ${{ steps.set_asset_name.outputs.asset_name }}
       with:
-       upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
-       asset_name: "Appium Wizard.exe"
-       asset_content_type: "application/octet-stream"  
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
+        asset_name: ${{ env.ASSET_NAME }}
+        asset_content_type: "application/octet-stream"
+
+
+    # - name: Upload Release Asset
+    #   id: upload-release-asset
+    #   uses: actions/upload-release-asset@v1.0.2
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
+    #   with:
+    #    upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #    asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
+    #    asset_name: "Appium Wizard.exe"
+    #    asset_content_type: "application/octet-stream"  
         
     # - name: Download EXE file
     #   uses: actions/download-artifact@v2

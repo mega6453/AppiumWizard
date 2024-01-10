@@ -89,6 +89,28 @@ jobs:
         path: "Appium Wizard/bin/Release/net6.0-windows/output"
         compression-level: 9  
         
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1.0.6
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.0
+        release_name: Release 1.0.0
+        body: |
+          Release version 1.0.0
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
+        asset_name: Appium Wizard.exe
+        asset_content_type: application/octet-stream   
+        
     # - name: Download EXE file
     #   uses: actions/download-artifact@v2
     #   with:

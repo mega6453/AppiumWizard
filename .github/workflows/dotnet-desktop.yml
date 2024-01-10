@@ -93,7 +93,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: "Appium Wizard/bin/Release/net6.0-windows/output/YourApp.exe"
+        files: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
         tag_name: v1.0.0
         release_name: Release 1.0.0
         body: |

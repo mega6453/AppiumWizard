@@ -66,7 +66,7 @@ jobs:
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"
       env:
-        SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/Installer Script.iss"  
+        SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
     - name: Upload build artifacts 2
       id: upload-artifacts2
       uses: actions/upload-artifact@v2
@@ -75,12 +75,11 @@ jobs:
         path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
         compression-level: 9
         
-    - name: Download EXE file
-      uses: actions/download-artifact@v2
-      with:
-        name: Build Outputs
-        path: D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
-
-    - name: List downloaded EXE file
-      run: |
-        ls D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
+    # - name: Download EXE file
+    #   uses: actions/download-artifact@v2
+    #   with:
+    #     name: Build Outputs
+    #     path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
+    # - name: List downloaded EXE file
+    #   run: |
+    #     ls "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"

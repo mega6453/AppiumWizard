@@ -1,0 +1,87 @@
+name: .NET Core Desktop
+
+on:
+  push:
+    branches: [ "testyml" ]
+  pull_request:
+    branches: [ "testyml" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release]
+    runs-on: windows-latest
+    env:
+      Solution_Name: Appium Wizard
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    # - name: Install Git LFS
+    #   run: |
+    #     git lfs install --skip-smudge
+    #     git lfs fetch --all
+    #     git lfs checkout
+    #   shell: bash
+      
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore the application
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    - name: Build the solution
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # - name: Upload build artifacts
+    #   id: upload-artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Build Outputs
+    #     path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
+    #     compression-level: 9
+
+    - name: Install Chocolatey
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+    - name: Install Inno Setup
+      run: |
+        choco install innosetup -y
+
+    - name: Compile and generate EXE file
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q /O"D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile" "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+      env:
+        SCRIPT_PATH: "${{ github.workspace }}/Appium Wizard/ExcludeInInstaller/Installer Script.iss"
+  
+    - name: Upload build artifacts 2
+      id: upload-artifacts2
+      uses: actions/upload-artifact@v2
+      with:
+        name: Build Outputs
+        path: D:/a/AppiumWizard/AppiumWizard/GeneratedExeFile
+        compression-level: 9
+        
+    - name: Download EXE file
+      uses: actions/download-artifact@v2
+      with:
+        name: Build Outputs
+        path: D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
+
+    - name: List downloaded EXE file
+      run: |
+        ls D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile

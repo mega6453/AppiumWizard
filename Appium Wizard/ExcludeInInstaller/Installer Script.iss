@@ -18,7 +18,6 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
-<<<<<<< HEAD
 LicenseFile=Freeware License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
@@ -26,15 +25,6 @@ SetupIconFile=appiumlogo.ico
 PrivilegesRequired=lowest
 OutputDir=..\output
 OutputBaseFilename=Appium Wizard
-=======
-;LicenseFile=C:\Users\mc\Desktop\Appium Wizard\License.txt
-;InfoBeforeFile=C:\Users\mc\Desktop\Appium Wizard\Information.txt
-; Remove the following line to run in administrative install mode (install for all users.)
-PrivilegesRequired=lowest
-OutputDir=D:\a\AppiumWizard\AppiumWizard\GeneratedExeFile
-OutputBaseFilename=Appium Wizard
-;SetupIconFile=Release\Resources\Images\appiumlogo.ico
->>>>>>> 71bdae76dc0cd58d9b6283bbf3c209ca47513726
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -46,25 +36,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-<<<<<<< HEAD
 Source: "..\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion
-=======
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\D3DCompiler_47_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\PenImc_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\PresentationNative_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\sni.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\SQLite.Interop.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\vcruntime140_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\wpfgfx_cor3.dll"; DestDir: "{app}"; Flags: ignoreversion
->>>>>>> 71bdae76dc0cd58d9b6283bbf3c209ca47513726
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

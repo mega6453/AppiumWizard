@@ -62,18 +62,32 @@ jobs:
       run: |
         choco install innosetup -y
 
+    # - name: Compile and generate EXE file
+    #   run: |
+    #     ISCC /Q "${{ env.SCRIPT_PATH }}"
+    #   env:
+    #     SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
+    # - name: Upload build artifacts 2
+    #   id: upload-artifacts2
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Build Outputs
+    #     path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
+    #     compression-level: 9
+
     - name: Compile and generate EXE file
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"
       env:
-        SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
-    - name: Upload build artifacts 2
-      id: upload-artifacts2
+        SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
+
+    - name: Upload build artifacts
+      id: upload-artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Build Outputs
-        path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
-        compression-level: 9
+        path: "Appium Wizard/bin/Release/net6.0-windows/output"
+        compression-level: 9  
         
     # - name: Download EXE file
     #   uses: actions/download-artifact@v2

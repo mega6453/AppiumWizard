@@ -91,14 +91,15 @@ jobs:
         
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1.0.6
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
+        files: "Appium Wizard/bin/Release/net6.0-windows/output/YourApp.exe"
         tag_name: v1.0.0
         release_name: Release 1.0.0
         body: |
           Release version 1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Release Asset
       id: upload-release-asset

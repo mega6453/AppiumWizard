@@ -24,7 +24,7 @@ SetupIconFile=appiumlogo.ico
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\output
-OutputBaseFilename=Appium Wizard
+OutputBaseFilename=AppiumWizard
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

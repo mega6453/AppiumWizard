@@ -11,7 +11,10 @@ Please provide necessary permission when system prompts. Because,
 1. If NodeJS not installed in your system, Appium Wizard will download and install it.
 2. If Appium Sever not installed, Appium Wizard will Install it.
 3. Appium Wizard will Install iOS and Android drivers.
-4. Appium Wizard will Install WSL for iOS app signing and run automation.
+4. Appium Wizard will Install WSL(Windows Subsystem for Linux) for iOS app signing and run automation.
+  
+  ####  Restart Required. Why?
+   Appium Wizard uses WSL(Windows Subsystem for Linux, Microsoft in-built feature) for signing iOS app. So, during Appium Wizard installation, it enables/installs/updates WSL as well in your system. For WSL to work, the system needs to be restarted. So, Please restart the system once the installation completed.
 
 ## How to Use
 1. Install Appium Wizard and Launch it.<br>
@@ -21,14 +24,15 @@ Please provide necessary permission when system prompts. Because,
 5. Now start running automation from your automation script. (Make sure you have given the correct appium server port number and device id in your script)
 
 ## NOTE
-Appium Wizard is in it's early stage of development.So,expect 
+Appium Wizard is in it's early stage of development. So,expect 
 * Unhandled exceptions
 * Crashes 
 * Performance issues
 * Reliability issues
+  
 The above issues are expected in Appium Wizard software and not in your mobile app under test.
 
-PLEASE CREATE AN ISSUE UNDER ISSUES SECTION IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
+PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
 
 ## Features Available
 
@@ -63,7 +67,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION IF YOU ARE OBSERVING ANY ISSUE WHICH
 * NodeJS
 * Appium
 * go-ios 
-* imobiledevice-net 
+* imobiledevice-net
+* zsign
 * wsl
 * adb
 * Newtonsoft.Json
@@ -72,7 +77,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION IF YOU ARE OBSERVING ANY ISSUE WHICH
 
 ## Thanks To
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
-* [libimobiledevice-win32](https://github.com/libimobiledevice-win32)
+* [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
+* [zhlynn](https://github.com/zhlynn) - For providing way to sign ipa file in linux environment.
 
 ## Authors
 * [**Meganathan C**](https://mega6453.carrd.co)

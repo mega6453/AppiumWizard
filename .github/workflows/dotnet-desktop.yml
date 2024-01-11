@@ -78,8 +78,8 @@ jobs:
 
     - name: Download File
       run: |
-          Set-Location -Path "Appium Wizard/bin/Release/net6.0-windows/"
-          Invoke-WebRequest -Uri "https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx" -OutFile "AppiumWizardDistro.vhdx"
+          Set-Location -Path "Appium Wizard/bin/Release/net6.0-windows/Resources/iOS/"
+          Invoke-WebRequest -Uri "https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx" -OutFile "AppiumWizardDistro.vhdx" -Force
     
     - name: Compile and generate EXE file
       run: |

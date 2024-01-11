@@ -67,6 +67,7 @@ jobs:
     #     ISCC /Q "${{ env.SCRIPT_PATH }}"
     #   env:
     #     SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
+  
     # - name: Upload build artifacts 2
     #   id: upload-artifacts2
     #   uses: actions/upload-artifact@v2
@@ -74,6 +75,9 @@ jobs:
     #     name: Build Outputs
     #     path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
     #     compression-level: 9
+
+    - name: Download File
+      run: wget -P "Appium Wizard/bin/Release/net6.0-windows/" https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx
 
     - name: Compile and generate EXE file
       run: |
@@ -101,16 +105,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
 
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
-        asset_name: "Appium Wizard.exe"
-        asset_content_type: "application/octet-stream"
+    # - name: Upload Release Asset
+    #   id: upload-release-asset
+    #   uses: actions/upload-release-asset@v1.0.2
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
+    #     asset_name: "Appium Wizard.exe"
+    #     asset_content_type: "application/octet-stream"
 
       
     # - name: Set Asset Name

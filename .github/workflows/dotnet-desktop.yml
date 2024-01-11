@@ -77,8 +77,10 @@ jobs:
     #     compression-level: 9
 
     - name: Download File
-      run: wget -P "Appium Wizard/bin/Release/net6.0-windows/" https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx
-
+      run: |
+          Set-Location -Path "Appium Wizard/bin/Release/net6.0-windows/"
+          Invoke-WebRequest -Uri "https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx" -OutFile "Appium Wizard/bin/Release/net6.0-windows/AppiumWizardDistro.vhdx"
+    
     - name: Compile and generate EXE file
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"

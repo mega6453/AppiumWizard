@@ -80,6 +80,10 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For providing way to sign ipa file in linux environment.
 
-## Authors
+## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)
 
+## Want to add features or fix things?
+* Clone the Repo
+* Make changes
+* Create a pull request

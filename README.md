@@ -49,6 +49,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * etc.
 
 ## Features/Improvements in Queue
+* Add cancel button for progress window
 * Update Appium Server and drivers from Appium Wizard
 * Show Action + current element(e.g. Click on //someElement) text in status bar based on appium execution
 * Handle resources on Application exit
@@ -79,6 +80,24 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For providing way to sign ipa file in linux environment.
+
+## Icons
+* <a href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow icons created by Lizel Arina - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/homepage" title="homepage icons">Homepage icons created by Md Tanvirul Haque - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/search" title="search icons">Search icons created by Maxim Basinski Premium - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/pin" title="pin icons">Pin icons created by Pixel perfect - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/toggle-button" title="toggle button icons">Toggle button icons created by Vectorslab - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/android" title="android icons">Android icons created by Roundicons - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/logo" title="logo icons">Logo icons created by Pixel perfect - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/configuration" title="configuration icons">Configuration icons created by mynamepong - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/troubleshooting" title="troubleshooting icons">Troubleshooting icons created by Flat Icons - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/inspector" title="inspector icons">Inspector icons created by HAJICON - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/team-management" title="team management icons">Team management icons created by pojok d - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/docx-file" title="docx file icons">Docx file icons created by Shuvo.Das - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/word-doc" title="word doc icons">Word doc icons created by Roman Káčerek - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/manual" title="manual icons">Manual icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/info" title="info icons">Info icons created by kumakamu - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by Freepik - Flaticon</a>
 
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

@@ -4,7 +4,9 @@ on:
   push:
     branches: [ "testyml" ]
   pull_request:
-    branches: [ "testyml" ]
+    types:
+      - opened
+      - closed
 
 jobs:
   build:
@@ -21,13 +23,6 @@ jobs:
       with:
         fetch-depth: 0
         
-    # - name: Install Git LFS
-    #   run: |
-    #     git lfs install --skip-smudge
-    #     git lfs fetch --all
-    #     git lfs checkout
-    #   shell: bash
-      
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
@@ -45,14 +40,10 @@ jobs:
       run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
-
-    # - name: Upload build artifacts
-    #   id: upload-artifacts
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Build Outputs
-    #     path: D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin
-    #     compression-level: 9
+    
+    - name: Check If Pull Request is Merged
+      id: pr_merged
+      run: echo "PR_MERGED=${{ github.event.pull_request.merged }}" >> $GITHUB_ENV
 
     - name: Install Chocolatey
       run: |
@@ -61,20 +52,6 @@ jobs:
     - name: Install Inno Setup
       run: |
         choco install innosetup -y
-
-    # - name: Compile and generate EXE file
-    #   run: |
-    #     ISCC /Q "${{ env.SCRIPT_PATH }}"
-    #   env:
-    #     SCRIPT_PATH: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
-  
-    # - name: Upload build artifacts 2
-    #   id: upload-artifacts2
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Build Outputs
-    #     path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
-    #     compression-level: 9
 
     - name: Download File
       run: |
@@ -87,14 +64,6 @@ jobs:
       env:
         SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
 
-    # - name: Upload build artifacts
-    #   id: upload-artifacts
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: Build Outputs
-    #     path: "Appium Wizard/bin/Release/net6.0-windows/output"
-    #     compression-level: 9  
-        
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
@@ -106,53 +75,4 @@ jobs:
           Release version 1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
-
-    # - name: Upload Release Asset
-    #   id: upload-release-asset
-    #   uses: actions/upload-release-asset@v1.0.2
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
-    #     asset_name: "Appium Wizard.exe"
-    #     asset_content_type: "application/octet-stream"
-
-      
-    # - name: Set Asset Name
-    #   id: set_asset_name
-    #   run: echo "::set-output name=asset_name::$(node -p 'encodeURIComponent("Appium Wizard.exe")')"
-    #   shell: bash
-
-    # - name: Upload Release Asset
-    #   id: upload-release-asset
-    #   uses: actions/upload-release-asset@v1.0.2
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
-    #     ASSET_NAME: ${{ steps.set_asset_name.outputs.asset_name }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
-    #     asset_name: ${{ env.ASSET_NAME }}
-    #     asset_content_type: "application/octet-stream"
-
-
-    # - name: Upload Release Asset
-    #   id: upload-release-asset
-    #   uses: actions/upload-release-asset@v1.0.2
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}
-    #   with:
-    #    upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #    asset_path: "Appium Wizard/bin/Release/net6.0-windows/output/Appium Wizard.exe"
-    #    asset_name: "Appium Wizard.exe"
-    #    asset_content_type: "application/octet-stream"  
-        
-    # - name: Download EXE file
-    #   uses: actions/download-artifact@v2
-    #   with:
-    #     name: Build Outputs
-    #     path: "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
-    # - name: List downloaded EXE file
-    #   run: |
-    #     ls "D:/a/AppiumWizard/AppiumWizard/Appium Wizard/bin/Release/net6.0-windows/output"
+      if: env.PR_MERGED == 'true'

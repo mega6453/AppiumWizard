@@ -523,5 +523,19 @@ namespace Appium_Wizard
             return output;
             //return output.Contains("The operation completed successfully") | output.Contains("A distribution with the supplied name already exists");
         }
+
+        public static string GetTextBetween(string input)
+        {
+            string pattern = @"-----BEGIN CERTIFICATE-----\r?\n?(.*?)\r?\n?-----END CERTIFICATE-----";
+
+            Match match = Regex.Match(input, pattern, RegexOptions.Singleline);
+            string certificateText = "No certificate found";
+            if (match.Success)
+            {
+                certificateText = match.Groups[1].Value;
+                Console.WriteLine(certificateText);
+            }
+            return certificateText;
+        }
     }
 }

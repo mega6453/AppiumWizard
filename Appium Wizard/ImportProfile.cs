@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Xml;
 using ListView = System.Windows.Forms.ListView;
 
@@ -49,65 +52,67 @@ namespace Appium_Wizard
         {
             string password = maskedTextBox1.Text;
             string command = $"pkcs12 -info -in \"{p12InputFilePath}\" -noout -passin pass:\"{password}\"";
-            string output = ExecuteCommand(opensslFilePath, command,true);
+            string output = ExecuteCommand(opensslFilePath, command, true);
             if (output.Contains("invalid password"))
             {
                 MessageBox.Show("Incorrect password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (output.Contains("MAC verified OK"))
             {
-
-                string folderPath = Path.Combine(ProfilesFilePath, "profile" + folderCounter+"\\");
-
-                if (Directory.Exists(folderPath))
+                string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n","");
+                var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
+                string certificates = provisionDetails["DeveloperCertificates"].ToString();
+                if (!certificates.Contains(certificate))
                 {
-                    MessageBox.Show("Folder already exists.");
+                    MessageBox.Show("P12 file does not match with mobileprovision file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    Directory.CreateDirectory(folderPath);
-                    folderCounter++;
-                    SaveCounter();
-                }
-
-                string p12fileName = Path.GetFileName(p12InputFilePath);
-                string mobileProvisionfileName = Path.GetFileName(mobileProvisionFilePath);
-                string p12DestinationPath = folderPath + p12fileName;
-                File.Copy(p12InputFilePath, p12DestinationPath, true);
-                string mobileProvisionDestinationPath = folderPath + mobileProvisionfileName;
-                File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
-
-                command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
-                output = ExecuteCommand(opensslFilePath, command, true);
-
-                var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionDestinationPath);
-                string profileName = provisionDetails["Name"].ToString();
-                int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                string appId = provisionDetails["application-identifier"].ToString();
-                string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
-                string updatedExpirationDays = expirationDays.ToString() + " days";
-                try
-                {
-                    if (expirationDays <= 0)
+                    string folderPath = Path.Combine(ProfilesFilePath, "profile" + folderCounter + "\\");
+                    if (!Directory.Exists(folderPath))
                     {
-                        updatedExpirationDays = "Expired";
+                        Directory.CreateDirectory(folderPath);
+                        folderCounter++;
+                        SaveCounter();
                     }
-                    string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath};
-                    listView1.Items.Add(new ListViewItem(item1));
+                    string p12fileName = Path.GetFileName(p12InputFilePath);
+                    string mobileProvisionfileName = Path.GetFileName(mobileProvisionFilePath);
+                    string p12DestinationPath = folderPath + p12fileName;
+                    File.Copy(p12InputFilePath, p12DestinationPath, true);
+                    string mobileProvisionDestinationPath = folderPath + mobileProvisionfileName;
+                    File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
+
+                    command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
+                    ExecuteCommand(opensslFilePath, command, true);
+
+                    string profileName = provisionDetails["Name"].ToString();
+                    int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                    string appId = provisionDetails["application-identifier"].ToString();
+                    string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
+                    string updatedExpirationDays = expirationDays.ToString() + " days";
+                    try
+                    {
+                        if (expirationDays <= 0)
+                        {
+                            updatedExpirationDays = "Expired";
+                        }
+                        string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
+                        listView1.Items.Add(new ListViewItem(item1));
+                        Close();
+                        MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        listView1.Refresh();
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
-                catch (Exception)
-                {                   
-                }                           
-                Close();
-                MessageBox.Show(profileName+" Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                listView1.Refresh();
             }
             else
             {
                 MessageBox.Show("Unhandled exception : \n" + output, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-       
+
         private void LoadCounter()
         {
             folderCounter = Database.QueryDataFromProfileCounterTable();
@@ -122,15 +127,41 @@ namespace Appium_Wizard
             Close();
         }
 
-        public static Dictionary<object,object> GetDetailsFromProvisionFile(string mobileProvisionFilePath)
+        public static Dictionary<object, object> GetDetailsFromProvisionFile(string mobileProvisionFilePath)
         {
-            Dictionary<object,object> keyValuePairs = new Dictionary<object, object>();
+            Dictionary<object, object> keyValuePairs = new Dictionary<object, object>();
             string arguments = $"smime -inform der -verify -noverify -in \"{mobileProvisionFilePath}\"";
-            string xmlOutput = ExecuteCommand(opensslFilePath, arguments,false);
+            string xmlOutput = ExecuteCommand(opensslFilePath, arguments, false);
             keyValuePairs = ParseXmlContent(xmlOutput);
             var udids = ExtractUDIDsFromXml(xmlOutput);
             keyValuePairs.Add("DevicesList", udids);
             return keyValuePairs;
+        }
+
+
+
+        public static string GetCertificateFromP12File(string p12File, string password)
+        {
+            string arguments = $"pkcs12 -info -in \"{p12File}\" -passin pass:\"{password}\" -passout pass:\"{password}\"";
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = opensslFilePath,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            Process opensslProcess = new Process();
+            opensslProcess.StartInfo = startInfo;
+            opensslProcess.Start();
+            string output = opensslProcess.StandardOutput.ReadToEnd();
+            opensslProcess.WaitForExit();
+            output = Common.GetTextBetween(output);
+            return output;
         }
 
         static string ExecuteCommand(string fileName, string arguments, bool returnErrorAlso)
@@ -217,7 +248,7 @@ namespace Appium_Wizard
         public static int ExpirationDays(string expirationDateString)
         {
             DateTime expirationDate;
-            int daysRemaining=0;
+            int daysRemaining = 0;
             if (DateTime.TryParseExact(expirationDateString, "yyyy-MM-dd'T'HH:mm:ss'Z'",
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.AssumeUniversal, out expirationDate))

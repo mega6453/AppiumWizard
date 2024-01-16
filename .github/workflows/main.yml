@@ -58,11 +58,17 @@ jobs:
       env:
         SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
 
+    - name: Zip the EXE file
+      run: |
+        $exePath = "Appium Wizard/bin/Release/net6.0-windows/output/AppiumWizard.exe"
+        $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
+        Compress-Archive -Path $exePath -DestinationPath $zipPath
+
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: "Appium Wizard/bin/Release/net6.0-windows/output/AppiumWizard.exe"
+        files: "Appium Wizard/bin/Release/net6.0-windows/output/AppiumWizard.zip"
         tag_name: v1.0.0
         release_name: Release 1.0.0
         body: |

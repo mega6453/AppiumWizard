@@ -288,14 +288,14 @@ namespace Appium_Wizard
                 {
 
                     bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                    if (!isRunning) 
+                    if (!isRunning)
                     {
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                     }
                     else
                     {
                         sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                    }                  
+                    }
                     if (sessionId.Equals("nosession"))
                     {
                         sessionId = CreateSession();
@@ -354,7 +354,7 @@ namespace Appium_Wizard
                 //AndroidAsyncMethods.GetInstance().StopUIAutomator(udid);
                 //AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                 //AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                string sessionId = AndroidAPIMethods.CreateSession(proxyPort,screenPort);
+                string sessionId = AndroidAPIMethods.CreateSession(proxyPort, screenPort);
                 //Common.KillProcessByPortNumber(screenPort);
                 //AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
                 return sessionId;

@@ -78,7 +78,7 @@ namespace Appium_Wizard
                 if (!IsUIAutomatorDriverInstalled)
                 {
                     UpdateStepLabel("Installing UIAutomator2 driver, Please wait...");
-                    Common.InstallUIAutomatorDriver();
+                    //Common.InstallUIAutomatorDriver();
                 }
                 UpdateStepLabel("Checking WSL status, Please wait...");
                 bool isWSLEnabled = Common.IsWSLImportInPlaceSupported();

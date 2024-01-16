@@ -66,7 +66,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackgroundImage = Properties.Resources.appium_Wizard_Splash_Screen;
+            BackgroundImage = Properties.Resources.AppiumWizardSplashScreen;
             ClientSize = new Size(971, 539);
             Controls.Add(firstTimeRunLabel);
             Controls.Add(productVersion);

@@ -130,7 +130,7 @@
             toolStripButton1.Alignment = ToolStripItemAlignment.Right;
             toolStripButton1.BackColor = SystemColors.HighlightText;
             toolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButton1.Image = Properties.Resources.homeIcon;
+            toolStripButton1.Image = Properties.Resources.home;
             toolStripButton1.ImageTransparentColor = Color.Magenta;
             toolStripButton1.Name = "toolStripButton1";
             toolStripButton1.Size = new Size(34, 28);
@@ -141,7 +141,7 @@
             // 
             BackButton.Alignment = ToolStripItemAlignment.Right;
             BackButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            BackButton.Image = Properties.Resources.backIcon;
+            BackButton.Image = Properties.Resources.left_arrow;
             BackButton.ImageTransparentColor = Color.Magenta;
             BackButton.Name = "BackButton";
             BackButton.Size = new Size(34, 28);
@@ -154,7 +154,7 @@
             controlCenter.BackColor = SystemColors.ControlLightLight;
             controlCenter.CheckOnClick = true;
             controlCenter.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            controlCenter.Image = Properties.Resources.iOSControlCenterColor;
+            controlCenter.Image = Properties.Resources.toggle_button;
             controlCenter.ImageTransparentColor = Color.Magenta;
             controlCenter.Name = "controlCenter";
             controlCenter.Size = new Size(34, 28);
@@ -176,7 +176,7 @@
             // 
             unlockToolStripMenuItem.Image = Properties.Resources.Unlock;
             unlockToolStripMenuItem.Name = "unlockToolStripMenuItem";
-            unlockToolStripMenuItem.Size = new Size(270, 34);
+            unlockToolStripMenuItem.Size = new Size(168, 34);
             unlockToolStripMenuItem.Text = "Unlock";
             unlockToolStripMenuItem.Click += unlockToolStripMenuItem_Click;
             // 

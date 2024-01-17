@@ -70,7 +70,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Built With
 * .Net C# & Windows Forms 
 * NodeJS
-* Appium
+* Appium, XCUITest, UIAutomator2
 * go-ios 
 * imobiledevice-net
 * zsign
@@ -83,7 +83,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Thanks To
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
-* [zhlynn](https://github.com/zhlynn) - For providing way to sign ipa file in linux environment.
+* [zhlynn](https://github.com/zhlynn) - For zsign script which provides way to sign ipa file in linux environment.
 
 ## Icons
 * <a href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow icons created by Lizel Arina - Flaticon</a>

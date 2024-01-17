@@ -29,9 +29,9 @@ jobs:
     #- name: Setup MSBuild.exe
     #  uses: microsoft/setup-msbuild@v1.0.2
 
-     - name: Build the solution with self-contained deployment
-       run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
-       env:
+    - name: Build the solution with self-contained deployment
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
+      env:
         Configuration: ${{ matrix.configuration }}
 
     - name: Restore the application

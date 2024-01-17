@@ -30,7 +30,7 @@ jobs:
     #  uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Build the solution with self-contained deployment
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
+      run: microsoft/setup-msbuild@v1.0.2  $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
       env:
         Configuration: ${{ matrix.configuration }}
 

@@ -22,7 +22,7 @@ Please provide necessary permission when system prompts. Because,
 
   ####  During first launch
   First launch will verify the installation of the software components(i.e. WSL, Appium Server and drivers).  If any of the component installation is not proper, then Appium Wizard will try 
-to install it during the first time launch.  
+to install it during the first time launch which may take sometime to complete it.
 
 ## How to Use
 1. Install Appium Wizard and Launch it.<br>

@@ -30,8 +30,10 @@ jobs:
     #  uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Build the solution with self-contained deployment
-      run: microsoft/setup-msbuild@v1.0.2  $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
+      run: microsoft/setup-msbuild@v1.0.2 $env:Solution_Name "/p:Configuration=${{ matrix.configuration }}" /p:PublishSingleFile=true /p:PublishTrimmed=true
       env:
+        Solution_Name: Appium Wizard
+        DOTNET_ROOT: C:\Program Files\dotnet
         Configuration: ${{ matrix.configuration }}
 
     - name: Restore the application

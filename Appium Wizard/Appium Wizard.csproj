@@ -51,7 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ExcludeInInstaller\Freeware License.txt">
+    <None Update="ExcludeInInstaller\License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExcludeInInstaller\Information.txt">

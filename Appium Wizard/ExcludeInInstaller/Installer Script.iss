@@ -18,7 +18,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
-LicenseFile=Freeware License.txt
+LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
 ; Remove the following line to run in administrative install mode (install for all users.)

@@ -20,6 +20,10 @@ Please provide necessary permission when system prompts. Because,
   ####  Restart Required. Why?
    Appium Wizard uses WSL(Windows Subsystem for Linux, Microsoft in-built feature) for signing iOS app. So, during Appium Wizard installation, it enables/installs/updates WSL as well in your system. For WSL to work, the system needs to be restarted. So, Please restart the system once the installation completed.
 
+  ####  During first launch
+  First launch will verify the installation of the software components(i.e. WSL, Appium Server and drivers).  If any of the component installation is not proper, then Appium Wizard will try 
+to install it during the first time launch which may take sometime to complete it.
+
 ## How to Use
 1. Install Appium Wizard and Launch it.<br>
 2. Click Add Device -> Add your iOS/Android device.<br>

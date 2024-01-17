@@ -26,8 +26,13 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+    #- name: Setup MSBuild.exe
+    #  uses: microsoft/setup-msbuild@v1.0.2
+
+     - name: Build the solution with self-contained deployment
+       run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:PublishSingleFile=true /p:PublishTrimmed=true
+       env:
+        Configuration: ${{ matrix.configuration }}
 
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration

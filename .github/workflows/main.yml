@@ -30,10 +30,10 @@ jobs:
     #  uses: microsoft/setup-msbuild@v1.0.2
 
 
-   - name: Build and Publish
-     run: |
+    - name: Build and Publish
+      run: |
        dotnet publish $env:Solution_Name/$env:Solution_Name.csproj -c $env:Configuration -r win10-x64 --self-contained
-     env:
+      env:
        Solution_Name: Appium Wizard
        Configuration: Release
 

@@ -32,20 +32,22 @@ jobs:
 
     - name: Build and Publish
       run: |
+       dotnet restore $env:Solution_Name/$env:Solution_Name.csproj --configuration $env:Configuration
+       dotnet build $env:Solution_Name/$env:Solution_Name.csproj --configuration $env:Configuration
        dotnet publish $env:Solution_Name/$env:Solution_Name.csproj -c $env:Configuration -r win10-x64 --self-contained
       env:
        Solution_Name: Appium Wizard
        Configuration: Release
 
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    # - name: Restore the application
+    #   run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+    #   env:
+    #     Configuration: ${{ matrix.configuration }}
 
-    - name: Build the solution
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    # - name: Build the solution
+    #   run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
+    #   env:
+    #     Configuration: ${{ matrix.configuration }}
 
     - name: Install Chocolatey
       run: |

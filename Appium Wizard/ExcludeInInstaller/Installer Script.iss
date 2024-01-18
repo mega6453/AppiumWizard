@@ -104,7 +104,7 @@ begin
       end;
       
     if not RegKeyExists(HKCU, 'Software\Node.js') then
-      if not Exec(WindowsAppsPath + '\winget.exe', 'install OpenJS.NodeJS', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+      if not Exec(WindowsAppsPath + '\winget.exe', 'install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
       begin
         MsgBox('Failed to install Node.js using winget. Error code: ' + IntToStr(ResultCode), mbError, MB_OK);
         Result := False;

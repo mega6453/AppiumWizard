@@ -1,3 +1,8 @@
-# These are supported funding model platforms
-github:[mega6453]
-
+github: mega6453
+tiers:
+  - name: Tier 1
+    description: Basic Sponsorship
+    monthly_price: 5
+  - name: Tier 2
+    description: Premium Sponsorship
+    monthly_price: 10

@@ -73,18 +73,18 @@ jobs:
 
     - name: Download File
       run: |
-          Set-Location -Path "Appium Wizard/bin/Release/net6.0-windows/Resources/iOS/"
+          Set-Location -Path "Appium Wizard/bin/Release/net6.0-windows/win-x64/Resources/iOS/"
           Invoke-WebRequest -Uri "https://github.com/mega6453/SignIPAInWindows/releases/download/firstrelease/AppiumWizardDistro.vhdx" -OutFile "AppiumWizardDistro.vhdx"
     
     - name: Compile and generate EXE file
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"
       env:
-        SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/ExcludeInInstaller/Installer Script.iss"  
+        SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/win-x64/ExcludeInInstaller/Installer Script.iss"  
 
     - name: Zip the EXE file
       run: |
-        $exePath = "Appium Wizard/bin/Release/net6.0-windows/output/AppiumWizard.exe"
+        $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/output/AppiumWizard.exe"
         $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
         Compress-Archive -Path $exePath -DestinationPath $zipPath
 
@@ -92,7 +92,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: "Appium Wizard/bin/Release/net6.0-windows/output/AppiumWizard.zip"
+        files: "Appium Wizard/bin/Release/net6.0-windows/win-x64/output/AppiumWizard.zip"
         tag_name: v1.0.0
         release_name: Release 1.0.0
         body: |

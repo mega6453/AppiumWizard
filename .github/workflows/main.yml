@@ -50,8 +50,10 @@ jobs:
     #     Configuration: ${{ matrix.configuration }}
 
     - name: Restore the application
-      run: dotnet restore $env:Solution_Name --configuration $env:Configuration
-  
+      run: dotnet restore $env:Solution_Name
+      env:
+        Solution_Name: Appium Wizard
+
     - name: Build the solution
       run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:SelfContained=true /p:PublishSingleFile=true /p:ReadyToRun=true
       env:

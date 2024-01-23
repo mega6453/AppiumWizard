@@ -78,7 +78,7 @@ namespace Appium_Wizard
                 if (!IsUIAutomatorDriverInstalled)
                 {
                     UpdateStepLabel("Installing UIAutomator2 driver, Please wait...");
-                    //Common.InstallUIAutomatorDriver();
+                    Common.InstallUIAutomatorDriver();
                 }
                 UpdateStepLabel("Checking WSL status, Please wait...");
                 bool isWSLEnabled = Common.IsWSLImportInPlaceSupported();
@@ -91,6 +91,14 @@ namespace Appium_Wizard
                     {
                         MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and  Launch Appium Wizard again.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         Environment.Exit(0);
+                    }
+                }
+                else
+                {
+                    string wslList = Common.WSLList();
+                    if (!wslList.Contains("AppiumWizard"))
+                    {
+                        Common.RegisterWSLDistro();
                     }
                 }
                 firstTimeRunLabel.Text = "";               

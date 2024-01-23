@@ -280,43 +280,57 @@ namespace Appium_Wizard
 
         public static bool IsNodeInstalled()
         {
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
-            string[] paths = pathVariable.Split(';');
-            foreach (string path in paths)
+            try
             {
-                string nodePath = System.IO.Path.Combine(path, "node.exe");
-                if (System.IO.File.Exists(nodePath))
+                string pathVariable = Environment.GetEnvironmentVariable("PATH");
+                string[] paths = pathVariable.Split(';');
+                foreach (string path in paths)
                 {
-                    return true;
+                    string nodePath = System.IO.Path.Combine(path, "node.exe");
+                    if (System.IO.File.Exists(nodePath))
+                    {
+                        return true;
+                    }
                 }
+                return false;
             }
-
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public static bool IsAppiumInstalled()
         {
-            string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
+            try
+            {
+                string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
 
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.WorkingDirectory = appiumInstallationPath;
-            process.StartInfo.Arguments = "/c appium --version";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            if (error.Contains("'appium' is not recognized as an internal or external command"))
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = appiumInstallationPath;
+                process.StartInfo.Arguments = "/c appium --version";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                if (error.Contains("'appium' is not recognized as an internal or external command"))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+
+            }
+            catch (Exception)
             {
                 return false;
-            }
-            else
-            {
-                return true;
             }
         }
 
@@ -366,26 +380,34 @@ namespace Appium_Wizard
 
         public static string AppiumInstalledDriverList()
         {
-            string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
+            try
+            {
+                string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
 
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            process.StartInfo.WorkingDirectory = appiumInstallationPath;
-            process.StartInfo.Arguments = "/c appium driver list";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                process.StartInfo.WorkingDirectory = appiumInstallationPath;
+                process.StartInfo.Arguments = "/c appium driver list";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
 
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            process.WaitForExit();
-            output = Regex.Replace(output, @"\x1B\[[^@-~]*[@-~]", string.Empty);
-            error = Regex.Replace(error, @"\x1B\[[^@-~]*[@-~]", string.Empty);
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                process.WaitForExit();
+                output = Regex.Replace(output, @"\x1B\[[^@-~]*[@-~]", string.Empty);
+                error = Regex.Replace(error, @"\x1B\[[^@-~]*[@-~]", string.Empty);
 
-            return output + error;
+                return output + error;
+
+            }
+            catch (Exception)
+            {
+                return "exception";
+            }
         }
 
 

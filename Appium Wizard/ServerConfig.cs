@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Appium_Wizard
+﻿namespace Appium_Wizard
 {
     public partial class ServerConfig : Form
     {

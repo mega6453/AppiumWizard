@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Remote;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;

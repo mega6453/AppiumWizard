@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Xml;
 using ListView = System.Windows.Forms.ListView;
 

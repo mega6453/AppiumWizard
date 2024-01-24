@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace Appium_Wizard
 {

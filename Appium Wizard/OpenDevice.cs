@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Appium_Wizard
+﻿namespace Appium_Wizard
 {
     public class OpenDevice
     {

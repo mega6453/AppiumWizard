@@ -14,7 +14,7 @@ namespace Appium_Wizard
             InitializeComponent();
             main = this;
             RefreshDeviceListView();
-            this.Text = "Appium Wizard " + ProductVersion;
+            this.Text = "Appium Wizard " + VersionInfo.VersionNumber;
             USBWatcher usb = new USBWatcher(listView1);
             usb.Start();
         }

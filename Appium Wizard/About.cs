@@ -9,7 +9,7 @@
 
         private void About_Load(object sender, EventArgs e)
         {
-            label1.Text = "Version : " + ProductVersion;
+            label1.Text = "Version : " + VersionInfo.VersionNumber;
         }
     }
 }

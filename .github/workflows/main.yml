@@ -67,9 +67,13 @@ jobs:
     - name: Get Version
       id: get_version
       run: |
-        $versionFilePath = "$(github.workspace)\Appium Wizard\VersionInfo.cs"
+        $versionFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\VersionInfo.cs"
         $version = Select-String -Pattern 'VersionNumber\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
         echo "::set-output name=version::$version"
+      shell: pwsh
+      env:
+        Solution_Name: Appium Wizard
+        DOTNET_ROOT: C:\Program Files\dotnet
         
     - name: Create Release
       id: create_release

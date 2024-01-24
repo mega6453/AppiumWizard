@@ -126,6 +126,8 @@ namespace Appium_Wizard
             Task.Run(() =>
             {
                 serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1);
+                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
+                MainScreen.runningProcessesPortNumbers.Add(WDAproxyPort);
                 DialogResult result = DialogResult.None;
                 if (Common.IsNodeInstalled())
                 {
@@ -155,15 +157,6 @@ namespace Appium_Wizard
         {
             statusLabel.Text = stepText;
             statusLabel.Refresh();
-        }
-
-        private void TerminateAllProcess()
-        {
-            Common.TerminateProcess("taskkill /im appiumserver.exe /f");
-            Common.TerminateProcess("taskkill /im node.exe /f");
-            Common.TerminateProcess("taskkill /im iOSServer.exe /f");
-            Common.TerminateProcess("taskkill /im msedgewebview2.exe /f");
-            Common.TerminateProcess("taskkill /im adb.exe /f");
         }
 
     }

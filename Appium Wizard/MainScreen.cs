@@ -8,6 +8,7 @@ namespace Appium_Wizard
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, Width, Height;
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus;
+        public static List<int> runningProcessesPortNumbers = new List<int>();
         public MainScreen()
         {
             InitializeComponent();
@@ -523,9 +524,11 @@ namespace Appium_Wizard
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            Common.TerminateProcess("taskkill /im node.exe /f");
-            Common.TerminateProcess("taskkill /im iOSServer.exe /f");
-            Common.TerminateProcess("taskkill /im adb.exe /f");
+            foreach (var item in runningProcessesPortNumbers)
+            {
+                Common.KillProcessByPortNumber(item);
+            }
+
             List<Form> childFormsToClose = new List<Form>();
             foreach (Form form in Application.OpenForms)
             {

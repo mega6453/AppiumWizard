@@ -600,6 +600,7 @@ namespace Appium_Wizard
                 iOSAsyncProcess.Start();
                 var processId = iOSAsyncProcess.Id;
                 PortProcessId.Add(localPort, processId);
+                MainScreen.runningProcessesPortNumbers.Add(localPort);
             }
             catch (Exception ex)
             {

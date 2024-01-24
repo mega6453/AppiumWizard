@@ -144,6 +144,7 @@ namespace Appium_Wizard
                 {
                     statusLabel.Text = "Running";
                     Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
+                    MainScreen.runningProcessesPortNumbers.Add(portNumber);
                 }
             }
             commonProgress.Close();

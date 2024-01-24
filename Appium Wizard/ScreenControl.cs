@@ -6,7 +6,7 @@ namespace Appium_Wizard
 {
     public partial class ScreenControl : Form
     {
-        public static string sessionId = "", tempSessionId = "", URL;
+        public string sessionId = "", tempSessionId = "", URL;
         int pressX; int pressY; int moveToX; int moveToY;
         int x, y, width, height;
         private Point pressStartPoint;
@@ -192,7 +192,11 @@ namespace Appium_Wizard
                 pressX = pressStartPoint.X;
                 pressY = pressStartPoint.Y;
             }
-            //ScreenWebView.Reload();
+            if (OSType.Equals("Android"))
+            {
+                ScreenWebView.Reload();
+            }
+
         }
 
 

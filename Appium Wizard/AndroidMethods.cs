@@ -236,6 +236,10 @@ namespace Appium_Wizard
             }
         }
 
+        public void StartSettingsApp(string udid)
+        {
+            ExecuteCommand("-s " + udid + " -P 5037 -s R5CN3172FHT shell am start -n io.appium.settings/.Settings -a android.intent.action.MAIN -c android.intent.category.LAUNCHER");
+        }
 
         public void AddToWhiteList(string udid)
         {
@@ -386,7 +390,7 @@ namespace Appium_Wizard
             //UninstallUIAutomator(udid);
             if (!AndroidMethods.GetInstance().isUIAutomatorInstalled(udid))
             {
-                InstallUIAutomator(udid);
+                AndroidMethods.GetInstance().InstallUIAutomator(udid);
             }
             else
             {
@@ -415,6 +419,7 @@ namespace Appium_Wizard
             Thread.Sleep(1000);
             //ExecuteCommand("-s " + udid + " shell am start -n io.appium.settings/.Settings");
             //ExecuteCommand("-s " + udid + " shell am instrument -w io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner", false);
+            AndroidMethods.GetInstance().StartSettingsApp(udid);
             ExecuteCommand("-s " + udid + " shell am instrument -w -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner", false);
             Thread.Sleep(5000);
         }
@@ -425,16 +430,6 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server", false);
         }
 
-        public void InstallUIAutomator(string udid)
-        {
-            string username = Environment.UserName;
-            string settingsPath = "C:\\Users\\" + username + "\\node_modules\\appium-uiautomator2-driver\\node_modules\\io.appium.settings\\apks\\settings_apk-debug.apk";
-            AndroidMethods.GetInstance().ExecuteCommand("-s " + udid + " install " + settingsPath);
-            string testPath = "C:\\Users\\mc\\node_modules\\appium-uiautomator2-driver\\node_modules\\appium-uiautomator2-server\\apks\\appium-uiautomator2-server-debug-androidTest.apk";
-            AndroidMethods.GetInstance().ExecuteCommand("-s " + udid + " install " + testPath);
-            string serverPath = "C:\\Users\\mc\\node_modules\\appium-uiautomator2-driver\\node_modules\\appium-uiautomator2-server\\apks\\appium-uiautomator2-server-v5.12.2.apk";
-            AndroidMethods.GetInstance().ExecuteCommand("-s " + udid + " install " + serverPath);
-        }
 
         public void UninstallUIAutomator(string udid)
         {

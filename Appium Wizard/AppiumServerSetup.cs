@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenQA.Selenium.Remote;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
@@ -122,7 +123,7 @@ namespace Appium_Wizard
                     {
                         ScreenControl.screenControl.UpdateStatusLabel(statusText);
                     }
-                }
+                }                
                 if (e.Data.Contains("Using device:"))
                 {
                     string input = e.Data;
@@ -135,30 +136,46 @@ namespace Appium_Wizard
                         ScreenControl.screenControl.UpdateStatusLabel(statusText);
                     }
                 }
-                //if (e.Data.Contains("DELETE /session/"))
+                if (e.Data.Contains("DELETE /session/"))
+                {
+                    if (ScreenControl.screenControl != null)
+                    {
+                        statusText = "Session Deleted";
+                        ScreenControl.screenControl.UpdateStatusLabel(statusText);
+                        string input = e.Data;
+                        string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
+                        Regex regex = new Regex(pattern);
+                        Match match = regex.Match(input);
+                        string sessionId = "";
+                        if (match.Success)
+                        {
+                            sessionId = match.Groups[1].Value;
+                        }
+                        try
+                        {
+                            string deviceUDID = keyValuePairs[sessionId];
+                            int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
+                            int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
+                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
+                            AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                }
+                //if (e.Data.Contains("/window/rect 500") | e.Data.Contains("Could not proxy command to the remote server"))
                 //{
-                //    statusText = "Session Deleted";
-                //    ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                //    string input = e.Data;
-                //    string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
-                //    Regex regex = new Regex(pattern);
-                //    Match match = regex.Match(input);
-                //    string sessionId="";
+                //    string pattern = @"\/session\/([a-fA-F0-9-]+)\/";
+
+                //    Match match = Regex.Match(e.Data, pattern);
                 //    if (match.Success)
                 //    {
-                //        sessionId =  match.Groups[1].Value;
-                //    }
-                //    try
-                //    {
+                //        string sessionId = match.Groups[1].Value;
                 //        string deviceUDID = keyValuePairs[sessionId];
-                //        int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
-                //        int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
+                //        AndroidMethods.GetInstance().StopUIAutomator(deviceUDID);
                 //        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                //        AndroidAPIMethods.CreateSession(proxyPort,screenServerPort);
-                //    }
-                //    catch (Exception)
-                //    {
-                //    }
+                //    }                  
                 //}
                 if (e.Data.Contains("xcuitest"))
                 {
@@ -177,7 +194,7 @@ namespace Appium_Wizard
                 }
                 else if (e.Data.Contains("address already in use"))
                 {
-                    statusText = "address already in use 0.0.0.0:4723";
+                            statusText = "address already in use 0.0.0.0:4723";
                 }
                 else
                 {

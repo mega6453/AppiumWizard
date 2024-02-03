@@ -205,7 +205,7 @@ namespace Appium_Wizard
         public static bool IsLocalhostLoaded(string URL)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-            request.Timeout = 2000;
+            request.Timeout = 5000;
             HttpWebResponse response = null;
             try
             {

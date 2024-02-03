@@ -113,12 +113,18 @@ namespace Appium_Wizard
             try
             {
                 ScreenWebView.Reload();
+                Thread.Sleep(500);
                 ScreenWebView.Reload();
+                Thread.Sleep(500);
                 ScreenWebView.Reload();
                 Thread.Sleep(500);
                 ScreenWebView.Reload();
                 Thread.Sleep(500);
                 ScreenWebView.Reload();
+                Thread.Sleep(500);
+                ScreenWebView.Reload();
+                //Thread.Sleep(500);
+                //ScreenWebView.Reload();
                 reloadTimer.Stop();
             }
             catch (Exception)
@@ -149,10 +155,10 @@ namespace Appium_Wizard
                     ScreenWebView.Reload();
                     Thread.Sleep(200);
                     ScreenWebView.Reload();
-                    //Thread.Sleep(500);
-                    //ScreenWebView.Reload();
-                    //Thread.Sleep(500);
-                    //ScreenWebView.Reload();
+                    Thread.Sleep(500);
+                    ScreenWebView.Reload();
+                    Thread.Sleep(500);
+                    ScreenWebView.Reload();
                     //Thread.Sleep(500);
                     //ScreenWebView.Reload();
                 }
@@ -192,11 +198,10 @@ namespace Appium_Wizard
                 pressX = pressStartPoint.X;
                 pressY = pressStartPoint.Y;
             }
-            if (OSType.Equals("Android"))
-            {
-                ScreenWebView.Reload();
-            }
-
+            //if (OSType.Equals("Android"))
+            //{
+            //    ScreenWebView.Reload();
+            //}
         }
 
 
@@ -288,31 +293,32 @@ namespace Appium_Wizard
             }
             else
             {
+                //return AndroidAPIMethods.GetSessionID(proxyPort);
                 try
                 {
-
                     bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
                     if (!isRunning)
                     {
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                     }
-                    else
-                    {
-                        sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                    }
-                    if (sessionId.Equals("nosession"))
-                    {
-                        sessionId = CreateSession();
-                        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
-                        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
-                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                        return sessionId;
-                    }
-                    else
-                    {
-                        return sessionId;
-                    }
+                    return string.Empty;
+                    //else
+                    //{
+                    //    sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+                    //}
+                    //if (sessionId.Equals("nosession"))
+                    //{
+                    //    //sessionId = CreateSession();
+                    //    //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
+                    //    AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+                    //    //AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                    //    AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
+                    //    return sessionId;
+                    //}
+                    //else
+                    //{
+                    //    return sessionId;
+                    //}
                 }
                 catch (Exception)
                 {
@@ -442,34 +448,34 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Task.Run(() =>
-            {
-                try
-                {
-                    //Common.KillProcessByPortNumber(proxyPort);
-                    //Common.KillProcessByPortNumber(screenPort);
-                    if (OSType.Equals("iOS"))
-                    {
-                        // if we kill, then it will create issue when automation running..
-                        //Common.KillProcessById(iOSAsyncMethods.PortProcessId[proxyPort]);
-                        //Common.KillProcessById(iOSAsyncMethods.PortProcessId[screenPort]);
-                    }
-                    else
-                    {
-                        //AndroidAPIMethods.DeleteSession(proxyPort);
-                        //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
-                        //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
-                        //Common.KillProcessById(AndroidMethods.PortProcessId[proxyPort]);
-                        //Common.KillProcessById(AndroidMethods.PortProcessId[screenPort]);
-                        //AndroidMethods.PortProcessId.Remove(proxyPort);
-                        //AndroidMethods.PortProcessId.Remove(screenPort);  
-                    }
-                }
-                catch (Exception)
-                {
-                }
+            //Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        //Common.KillProcessByPortNumber(proxyPort);
+            //        //Common.KillProcessByPortNumber(screenPort);
+            //        if (OSType.Equals("iOS"))
+            //        {
+            //            // if we kill, then it will create issue when automation running..
+            //            //Common.KillProcessById(iOSAsyncMethods.PortProcessId[proxyPort]);
+            //            //Common.KillProcessById(iOSAsyncMethods.PortProcessId[screenPort]);
+            //        }
+            //        else
+            //        {
+            //            //AndroidAPIMethods.DeleteSession(proxyPort);
+            //            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
+            //            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            //            //Common.KillProcessById(AndroidMethods.PortProcessId[proxyPort]);
+            //            //Common.KillProcessById(AndroidMethods.PortProcessId[screenPort]);
+            //            //AndroidMethods.PortProcessId.Remove(proxyPort);
+            //            //AndroidMethods.PortProcessId.Remove(screenPort);  
+            //        }
+            //    }
+            //    catch (Exception)
+            //    {
+            //    }
 
-            });
+            //});
             //foreach (Process proc in Process.GetProcessesByName("msedgewebview2"))
             //{
             //    try

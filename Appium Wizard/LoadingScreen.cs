@@ -112,7 +112,6 @@
             MainScreen mainForm = new MainScreen();
             Hide();
             mainForm.ShowDialog();
-            Close();
         }
 
         private Task ExecuteBackgroundMethod()

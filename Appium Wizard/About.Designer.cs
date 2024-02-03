@@ -32,6 +32,8 @@
             label1 = new Label();
             pictureBox1 = new PictureBox();
             label2 = new Label();
+            label3 = new Label();
+            linkLabel1 = new LinkLabel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -62,6 +64,26 @@
             label2.TabIndex = 2;
             label2.Text = "Developed By : Meganathan C";
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(25, 281);
+            label3.Name = "label3";
+            label3.Size = new Size(111, 25);
+            label3.TabIndex = 3;
+            label3.Text = "Repository : ";
+            // 
+            // linkLabel1
+            // 
+            linkLabel1.AutoSize = true;
+            linkLabel1.Location = new Point(132, 281);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(380, 25);
+            linkLabel1.TabIndex = 4;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "https://github.com/mega6453/AppiumWizard";
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+            // 
             // About
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -69,6 +91,8 @@
             BackColor = SystemColors.ControlLightLight;
             BackgroundImageLayout = ImageLayout.None;
             ClientSize = new Size(515, 315);
+            Controls.Add(linkLabel1);
+            Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(pictureBox1);
             Controls.Add(label1);
@@ -90,5 +114,7 @@
         private Label label1;
         private PictureBox pictureBox1;
         private Label label2;
+        private Label label3;
+        private LinkLabel linkLabel1;
     }
 }

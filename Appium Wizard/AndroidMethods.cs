@@ -238,7 +238,7 @@ namespace Appium_Wizard
 
         public void StartSettingsApp(string udid)
         {
-            ExecuteCommand("-s " + udid + " -P 5037 -s R5CN3172FHT shell am start -n io.appium.settings/.Settings -a android.intent.action.MAIN -c android.intent.category.LAUNCHER");
+            ExecuteCommand("-s " + udid + " shell am start -n io.appium.settings/.Settings -a android.intent.action.MAIN -c android.intent.category.LAUNCHER");
         }
 
         public void AddToWhiteList(string udid)
@@ -246,11 +246,22 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell dumpsys deviceidle whitelist +io.appium.settings ; dumpsys deviceidle whitelist +io.appium.uiautomator2.server ; dumpsys deviceidle whitelist +io.appium.uiautomator2.server.test ;");
         }
 
+        public void RelaxHiddenAPIPolicy(string udid)
+        {
+            ExecuteCommand("-s " + udid + " shell 'settings put global hidden_api_policy_pre_p_apps 1;settings put global hidden_api_policy_p_apps 1;settings put global hidden_api_policy 1'");
+        }
+
         public void UnInstallApp(string udid, string packageName)
         {
             ExecuteCommand("-s " + udid + " uninstall " + packageName);
         }
 
+        public void UninstallUIAutomator(string udid)
+        {
+            AndroidMethods.GetInstance().UnInstallApp(udid, "io.appium.uiautomator2.server");
+            AndroidMethods.GetInstance().UnInstallApp(udid, "io.appium.uiautomator2.server.test");
+            AndroidMethods.GetInstance().UnInstallApp(udid, "com.experitest.uiautomator.test");
+        }
         public string ExecuteCommand(string arguments, bool waitForExit = true)
         {
             try
@@ -394,7 +405,7 @@ namespace Appium_Wizard
             }
             else
             {
-                StopUIAutomator(udid);
+                AndroidMethods.GetInstance().StopUIAutomator(udid);
             }
             AndroidMethods.GetInstance().AddToWhiteList(udid);
             Thread.Sleep(1000);
@@ -424,19 +435,7 @@ namespace Appium_Wizard
             Thread.Sleep(5000);
         }
 
-        public void StopUIAutomator(string udid)
-        {
-            ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server.test", false);
-            ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server", false);
-        }
-
-
-        public void UninstallUIAutomator(string udid)
-        {
-            AndroidMethods.GetInstance().UnInstallApp(udid, "io.appium.uiautomator2.server");
-            AndroidMethods.GetInstance().UnInstallApp(udid, "io.appium.uiautomator2.server.test");
-            AndroidMethods.GetInstance().UnInstallApp(udid, "com.experitest.uiautomator.test");
-        }
+      
 
         public void ExecuteCommand(string arguments, bool waitForExit = true)
         {
@@ -572,8 +571,8 @@ namespace Appium_Wizard
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
-            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
+            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
+            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""appium:newCommandTimeout"":0,""mjpegServerPort"":{screenPort},""mjpegScreenshotUrl"":""http://localhost:{screenPort}""}}}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);

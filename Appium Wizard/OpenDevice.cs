@@ -22,7 +22,7 @@
             title = "Opening " + deviceName;
         }
 
-        public (int,int) getDeviceScreenSize(string udid)
+        public (int, int) getDeviceScreenSize(string udid)
         {
             var devicesList = Database.QueryDataFromDevicesTable();
             foreach (var dictionary in devicesList)
@@ -34,7 +34,7 @@
                     return (Width, Height);
                 }
             }
-            return (0,0);
+            return (0, 0);
         }
 
         public async void StartBackgroundTasks()
@@ -44,7 +44,7 @@
             commonProgress.UpdateStepLabel(title, "Initializing...");
             if (OSType.Equals("Android"))
             {
-                await ExecuteAndroid();
+                await ExAndroid();
             }
             else
             {
@@ -55,6 +55,11 @@
                 commonProgress.UpdateStepLabel(title, "Screen server started...");
                 commonProgress.Close();
                 await ExecuteBackgroundMethod2();
+            }
+            else
+            {
+                commonProgress.Close();
+                MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -234,33 +239,109 @@
         }
 
 
+        private Task ExAndroid()
+        {
+            try
+            {
+                commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...");
+                bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid);
+                if (!isUIAutomatorInstalled)
+                {
+                    commonProgress.UpdateStepLabel(title, "Installing UIAutomator...");
+                    AndroidMethods.GetInstance().InstallUIAutomator(udid);
+                }
+            }
+            catch (Exception e)
+            {
+                 MessageBox.Show(e.Message,"Error installing UIAutomator",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+
+            try
+            {
+                commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...");
+                bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                if (!IsUIAutomatorRunning)
+                {
+                    commonProgress.UpdateStepLabel(title, "Starting UIAutomator...");
+                    AndroidMethods.GetInstance().StopUIAutomator(udid);
+                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                    Thread.Sleep(2000);
+                }
+                else
+                {
+                    commonProgress.UpdateStepLabel(title, "Checking for existing session...");
+                    proxyPort = Common.GetFreePort(8221, 8299);
+                    string sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+                    bool isSessionCreated = !sessionId.Equals("nosession");
+                    if (!isSessionCreated)
+                    {
+                        commonProgress.UpdateStepLabel(title, "Starting UIAutomator...");
+                        AndroidMethods.GetInstance().StopUIAutomator(udid);
+                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                        Thread.Sleep(1000);
+                    }
+                }
+                screenServerPort = Common.GetFreePort();
+                commonProgress.UpdateStepLabel(title, "Starting Android Screen Server...");
+                AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid); // 7810 default mjpeg server port on device
+                Thread.Sleep(1000);
+                bool isScreenLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
+                if (isScreenLoaded)
+                {
+                    isScreenServerStarted = true;
+                }
+                else
+                {
+                    isScreenServerStarted = false;
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return Task.Delay(100);
+        }
+
+
+
+
         private Task ExecuteAndroid()
         {
             keyValuePairs = new Dictionary<object, object>();
+            commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...");
+            bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid);
+            if (!isUIAutomatorInstalled)
+            {
+                commonProgress.UpdateStepLabel(title, "Installing UIAutomator...");
+                AndroidMethods.GetInstance().InstallUIAutomator(udid);
+            }
             try
             {               
                 if (!deviceDetails.ContainsKey(udid))
                 {
-                    proxyPort = Common.GetFreePort(8221, 8299);
+                    commonProgress.UpdateStepLabel(title, "Starting UIAutomator...");
+                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                    //proxyPort = Common.GetFreePort(8221, 8299);
                     screenServerPort = Common.GetFreePort();
-                    commonProgress.UpdateStepLabel(title, "Starting Android Proxy Server...");
-                    AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid); //6790 default uiautomator server port on device
+                    commonProgress.UpdateStepLabel(title, "Starting Android Screen Server...");
+               //     AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid); //6790 default uiautomator server port on device
                     AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid); // 7810 default mjpeg server port on device
+                    Thread.Sleep(3000);
                 }
                 else
                 {
-                    proxyPort = (int)deviceDetails[udid]["proxyPort"];
+                   // proxyPort = (int)deviceDetails[udid]["proxyPort"];
                     screenServerPort = (int)deviceDetails[udid]["screenPort"];
                     width = (int)deviceDetails[udid]["width"];
                     height = (int)deviceDetails[udid]["height"];
                 }
-                bool isProxyLoaded = Common.IsLocalhostLoaded("http://localhost:" + proxyPort + "/sessions");
-                if (!isProxyLoaded)
-                {
-                    Common.KillProcessByPortNumber(proxyPort);
-                    AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                }
-                string sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+              //  bool isProxyLoaded = Common.IsLocalhostLoaded("http://localhost:" + proxyPort + "/sessions");
+                //if (!isProxyLoaded)
+                //{
+                //    Common.KillProcessByPortNumber(proxyPort);
+                //    AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                //}
+                string sessionId = AndroidAPIMethods.GetSessionID(proxyPort);     
                 bool isSessionCreated = !sessionId.Equals("nosession");
                 if (isSessionCreated)
                 {
@@ -269,9 +350,9 @@
                         AndroidMethods.GetInstance().StopUIAutomator(udid);
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                         Thread.Sleep(1000);
-                        AndroidAPIMethods.CreateSession(proxyPort,screenServerPort);
+                        AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
                     }
-                    
+
                     //AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid); // 7810 default mjpeg server port on device
                     bool isScreenLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
                     if (!isScreenLoaded)
@@ -281,10 +362,19 @@
                         AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                         Thread.Sleep(1000);
                     }
+                    isScreenLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
+                    if (isScreenLoaded)
+                    {
+                        isScreenServerStarted = true;
+                    }
+                    else
+                    {
+                        isScreenServerStarted = false;
+                    }
                     //var screenSize = AndroidMethods.GetInstance().GetScreenSize(udid);
                     //width = screenSize.Item1;
                     //height = screenSize.Item2;
-                    isScreenServerStarted = true;
+                    //isScreenServerStarted = true;
                 }
                 else
                 {
@@ -292,6 +382,8 @@
                     //AndroidMethods.GetInstance().ReInstallUIAutomator(udid);
                     if (!AndroidMethods.GetInstance().IsUIAutomatorRunning(udid))
                     {
+                        Common.KillProcessByPortNumber(proxyPort);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                         Thread.Sleep(1000);
                     }                   

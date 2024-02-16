@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenQA.Selenium.Remote;
 using RestSharp;
 using System.Diagnostics;
@@ -13,12 +14,12 @@ namespace Appium_Wizard
         private string AppiumServerFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\appiumserver.exe";
         public bool serverStarted = false;
         public string statusText = "";
-        public static string deviceList = "", deviceInfo = "", tempFolder="", logFilePath="";
-        public static Dictionary<int, Tuple<Process,string>> listOfProcess = new Dictionary<int,Tuple<Process, string>>();
+        public static string deviceList = "", deviceInfo = "", tempFolder = "", logFilePath = "";
+        public static Dictionary<int, Tuple<Process, string>> listOfProcess = new Dictionary<int, Tuple<Process, string>>();
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static List<string> listOfSessionIDs = new List<string>();
-        public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber)
+        public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport = 5555)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
             tempFolder = Path.GetTempPath();
@@ -38,7 +39,7 @@ namespace Appium_Wizard
                     WorkingDirectory = appiumInstallationPath,
                     //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
 
 
                     //working
@@ -58,9 +59,9 @@ namespace Appium_Wizard
                 //appiumServerProcess.ErrorDataReceived += AppiumServer_OutputDataReceived;
                 appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
                 appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
-                
+
                 appiumServerProcess.EnableRaisingEvents = true;
-                
+
                 appiumServerProcess.Start();
                 appiumServerProcess.BeginOutputReadLine();
 
@@ -72,15 +73,15 @@ namespace Appium_Wizard
                 {
                     listOfProcess.Add(appiumPort, Tuple.Create(appiumServerProcess, logFilePath));
                 }
-                
+
                 if (portServerNumberAndFilePath.ContainsKey(serverNumber))
                 {
-                    portServerNumberAndFilePath[serverNumber] = Tuple.Create(appiumPort,logFilePath);
+                    portServerNumberAndFilePath[serverNumber] = Tuple.Create(appiumPort, logFilePath);
                 }
                 else
                 {
                     portServerNumberAndFilePath.Add(serverNumber, Tuple.Create(appiumPort, logFilePath));
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -90,8 +91,8 @@ namespace Appium_Wizard
             }
         }
 
-        Dictionary<string,string> keyValuePairs = new Dictionary<string,string>();
-        string tempsessionId;
+        Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+        string tempsessionId = string.Empty, deviceId = string.Empty;
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -117,20 +118,20 @@ namespace Appium_Wizard
                         string sessionId = match.Groups[1].Value;
                         listOfSessionIDs.Add(sessionId);
                         tempsessionId = sessionId;
-                    }                   
+                    }
                     statusText = "Session Created";
                     if (ScreenControl.screenControl != null)
                     {
                         ScreenControl.screenControl.UpdateStatusLabel(statusText);
                     }
-                }                
+                }
                 if (e.Data.Contains("Using device:"))
                 {
                     string input = e.Data;
                     int startIndex = input.IndexOf(":") + 2;
-                    string deviceCode = input.Substring(startIndex);
-                    keyValuePairs.Add(tempsessionId, deviceCode);
-                    statusText = "Set Device "+ deviceCode;
+                    deviceId = input.Substring(startIndex);
+                    keyValuePairs.Add(tempsessionId, deviceId);
+                    statusText = "Set Device " + deviceId;
                     if (ScreenControl.screenControl != null)
                     {
                         ScreenControl.screenControl.UpdateStatusLabel(statusText);
@@ -164,19 +165,11 @@ namespace Appium_Wizard
                         }
                     }
                 }
-                //if (e.Data.Contains("/window/rect 500") | e.Data.Contains("Could not proxy command to the remote server"))
-                //{
-                //    string pattern = @"\/session\/([a-fA-F0-9-]+)\/";
-
-                //    Match match = Regex.Match(e.Data, pattern);
-                //    if (match.Success)
-                //    {
-                //        string sessionId = match.Groups[1].Value;
-                //        string deviceUDID = keyValuePairs[sessionId];
-                //        AndroidMethods.GetInstance().StopUIAutomator(deviceUDID);
-                //        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                //    }                  
-                //}
+                if (e.Data.Contains("Could not proxy command to the remote server"))
+                {
+                    AndroidMethods.GetInstance().StopUIAutomator(deviceId);
+                    MessageBox.Show("Session creation failed. Please retry again.\nIf issue persists, restart your device and try again.", "Failed to create session", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 if (e.Data.Contains("xcuitest"))
                 {
                     statusText = "Attempting to load xcuitest(iOS) driver...";
@@ -194,7 +187,7 @@ namespace Appium_Wizard
                 }
                 else if (e.Data.Contains("address already in use"))
                 {
-                            statusText = "address already in use 0.0.0.0:4723";
+                    statusText = "address already in use 0.0.0.0:4723";
                 }
                 else
                 {
@@ -249,7 +242,7 @@ namespace Appium_Wizard
             {
                 try
                 {
-                    Process process = listOfProcess[port].Item1;                   
+                    Process process = listOfProcess[port].Item1;
                     Common.KillProcessByPortNumber(port);
                     process.CloseMainWindow();
                     process.Close();
@@ -263,8 +256,8 @@ namespace Appium_Wizard
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e) ;
-                }             
+                    Console.WriteLine(e);
+                }
             }
         }
 
@@ -303,7 +296,7 @@ namespace Appium_Wizard
 
             return false;
         }
-    
+
 
         public string GetOnlyJson(string text)
         {
@@ -335,7 +328,7 @@ namespace Appium_Wizard
 
         public bool IsAppiumServerRunning(int port)
         {
-            var options = new RestClientOptions("http://localhost:"+port)
+            var options = new RestClientOptions("http://localhost:" + port)
             {
                 MaxTimeout = -1,
             };
@@ -350,8 +343,102 @@ namespace Appium_Wizard
             else
             {
                 return false;
-            }           
+            }
         }
 
+        public static bool isExpectedDataAvailableInSessionDetails(string data)
+        {
+            Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
+            int port = 0;
+            for (int i = 1; i <= 5; i++)
+            {
+                var PortNumber = readPortData["PortNumber" + i];
+                if (PortNumber != "")
+                {
+                    port = int.Parse(PortNumber);
+                }
+                else
+                {
+                    continue;
+                }
+
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/sessions", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    if (response.Content.Equals("{\"value\":[]}"))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        JObject responseObj = JObject.Parse(response.Content);
+                        string sessionId = responseObj["value"][0]["id"].ToString();
+                        string androidId = GetAndroidIdFromAppiumServer(4723, sessionId);
+                        if (androidId.Equals(data))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+
+            return false;
+        }
+        public static string GetAndroidId(int port, string sessionId)
+        {
+            var options = new RestClientOptions("http://127.0.0.1:"+port)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/appium/device/info", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            JObject responseObj = JObject.Parse(response.Content);
+            string androidId = responseObj["value"]["androidId"].ToString();
+            return androidId;
+        }
+
+        public static string GetAndroidIdFromAppiumServer(int appiumPort, string appiumSessionId)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + appiumPort)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + appiumSessionId + "/execute", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                var body = @"{""script"":""mobile:deviceInfo"",""args"":[]}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                JObject responseObj = JObject.Parse(response.Content);
+                string androidId = responseObj["value"]["androidId"].ToString();
+                return androidId;
+
+            }
+            catch (Exception)
+            {
+                return "error";
+            }
+        }
     }
 }

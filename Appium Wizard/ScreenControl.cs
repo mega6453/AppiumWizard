@@ -12,11 +12,11 @@ namespace Appium_Wizard
         private Point pressStartPoint;
         private DateTime pressStartTime;
         private const int PressThresholdMilliseconds = 500;
-        public string IPAddress = "localhost";
+        public string IPAddress = "127.0.0.1";
         string deviceName, udid, OSType;
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
-        private Timer reloadTimer, reloadTimer1;
+        Dictionary<string,string> deviceSessionId = new Dictionary<string,string>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -31,20 +31,20 @@ namespace Appium_Wizard
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();
+            deviceSessionId.Add(udid,session);
             Task.Run(() =>
             {
                 while (true)
                 {
                     sessionId = GetSessionID();
-                    //if (os.Equals("Android"))
-                    //{
-                    //    bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                    //    if (!isLoaded)
-                    //    {
-                    //        Common.KillProcessByPortNumber(screenPort);
-                    //        AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                    //    }
-                    //}
+                    BeginInvoke(new Action(() =>
+                    {
+                        if (tempSessionId != sessionId)
+                        {
+                            ScreenWebView.Reload();
+                            tempSessionId = sessionId;
+                        }
+                    }));
                     Thread.Sleep(1000);
                 }
             });
@@ -73,7 +73,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void ScreenControl_Load(object sender, EventArgs e)
+        private async void ScreenControl_Load(object sender, EventArgs e)
         {
             this.ClientSize = new Size(width, height + toolStrip1.Height + toolStrip2.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -86,85 +86,47 @@ namespace Appium_Wizard
             toolStrip1.Refresh();
             toolStrip2.Refresh();
             Activate();
-            if (OSType.Equals("Android"))
-            {
-                try
-                {
-                    reloadTimer = new Timer();
-                    reloadTimer.Interval = 3000;
-                    reloadTimer.Tick += ReloadTimer_Tick;
-                    reloadTimer.Start();
-
-                    reloadTimer1 = new Timer();
-                    reloadTimer1.Interval = 1000;
-                    reloadTimer1.Tick += ReloadTimer_Tick1;
-                    reloadTimer1.Start();
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Please try again...");
-                    Close();
-                }
-            }
+            await ScreenWebView.EnsureCoreWebView2Async();
+            LoadScreen(ScreenWebView);
         }
 
-        private void ReloadTimer_Tick(object sender, EventArgs e)
+        private void LoadScreen(WebView2 ScreenWebView)
         {
-            try
-            {
-                ScreenWebView.Reload();
-                Thread.Sleep(500);
-                ScreenWebView.Reload();
-                Thread.Sleep(500);
-                ScreenWebView.Reload();
-                Thread.Sleep(500);
-                ScreenWebView.Reload();
-                Thread.Sleep(500);
-                ScreenWebView.Reload();
-                Thread.Sleep(500);
-                ScreenWebView.Reload();
-                //Thread.Sleep(500);
-                //ScreenWebView.Reload();
-                reloadTimer.Stop();
-            }
-            catch (Exception)
-            {
-
-            }
-
-        }
-        private void ReloadTimer_Tick1(object sender, EventArgs e)
-        {
-            //bool isScreenLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-            //if (!isScreenLoaded)
-            //{
-            //    Common.KillProcessByPortNumber(screenPort);
-            //    AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-            //}
+            string imageUrl = "http://" + IPAddress + ":" + screenPort;
+            int imageWidth = width;
+            int imageHeight = height;
+            var htmlContent = $@"
+                                    <html>
+                                        <head>
+                                            <style>
+                                                body {{
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }}
+                                                img {{
+                                                    display: block;
+                                                    max-width: 100%;
+                                                    height: auto;
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }}
+                                            </style>
+                                        </head>
+                                        <body>
+                                            <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
+                                        </body>
+                                    </html>
+                                ";
 
             try
             {
-                //if (OSType.Equals("Android"))
-                if (OSType.Equals("Android") && !sessionId.Equals(tempSessionId))
-                {
-                    tempSessionId = sessionId;
-                    ScreenWebView.Reload();
-                    Thread.Sleep(200);
-                    ScreenWebView.Reload();
-                    Thread.Sleep(200);
-                    ScreenWebView.Reload();
-                    Thread.Sleep(200);
-                    ScreenWebView.Reload();
-                    Thread.Sleep(500);
-                    ScreenWebView.Reload();
-                    Thread.Sleep(500);
-                    ScreenWebView.Reload();
-                    //Thread.Sleep(500);
-                    //ScreenWebView.Reload();
-                }
+                ScreenWebView.NavigateToString(htmlContent);
             }
             catch (Exception)
             {
+                string tempFilePath = Path.GetTempFileName() + ".html";
+                File.WriteAllText(tempFilePath, htmlContent);
+                ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
 
         }
@@ -173,7 +135,6 @@ namespace Appium_Wizard
         {
             SetWebViewSize(width, height);
             Controls.Add(ScreenWebView);
-            ScreenWebView.Source = new Uri("http://" + IPAddress + ":" + screenPort);
         }
 
         private void SetWebViewSize(int width, int height)
@@ -198,10 +159,7 @@ namespace Appium_Wizard
                 pressX = pressStartPoint.X;
                 pressY = pressStartPoint.Y;
             }
-            //if (OSType.Equals("Android"))
-            //{
-            //    ScreenWebView.Reload();
-            //}
+            //ScreenWebView.Reload();
         }
 
 
@@ -293,32 +251,25 @@ namespace Appium_Wizard
             }
             else
             {
-                //return AndroidAPIMethods.GetSessionID(proxyPort);
                 try
                 {
-                    bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                    if (!isRunning)
+                    sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+                    if (sessionId.Equals("nosession"))
                     {
-                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                        bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                        if (!isRunning)
+                        {
+                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                        }
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
+                        sessionId = CreateSession();
+                        return sessionId;
                     }
-                    return string.Empty;
-                    //else
-                    //{
-                    //    sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                    //}
-                    //if (sessionId.Equals("nosession"))
-                    //{
-                    //    //sessionId = CreateSession();
-                    //    //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
-                    //    AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
-                    //    //AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                    //    AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                    //    return sessionId;
-                    //}
-                    //else
-                    //{
-                    //    return sessionId;
-                    //}
+                    else
+                    {
+                        return sessionId;
+                    }
                 }
                 catch (Exception)
                 {
@@ -389,7 +340,7 @@ namespace Appium_Wizard
         private void buttonAlwaysOnTop_Click(object sender, EventArgs e)
         {
             this.TopMost = !this.TopMost;
-            buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
+            //buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
             buttonAlwaysOnTop.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
         }
 
@@ -401,13 +352,13 @@ namespace Appium_Wizard
                 if (isControlCenterOpen == false)
                 {
                     iOSAPIMethods.OpenControlCenter(URL, sessionId, width, height);
-                    controlCenter.Text = "Close Control Center";
+                    //controlCenter.Text = "Close Control Center";
                     isControlCenterOpen = true;
                 }
                 else
                 {
                     iOSAPIMethods.CloseControlCenter(URL, sessionId, width);
-                    controlCenter.Text = "Open Control Center";
+                    //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
 
@@ -417,13 +368,13 @@ namespace Appium_Wizard
                 if (isControlCenterOpen == false)
                 {
                     AndroidMethods.GetInstance().Swipe(udid, 0, 0, 0, 300, 100);
-                    controlCenter.Text = "Close Control Center";
+                    //controlCenter.Text = "Close Control Center";
                     isControlCenterOpen = true;
                 }
                 else
                 {
                     AndroidMethods.GetInstance().Swipe(udid, 0, 300, 0, 0, 100);
-                    controlCenter.Text = "Open Control Center";
+                    //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
             }
@@ -448,6 +399,25 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
+            //Hide();
+            //try
+            //{
+            //    bool isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(screenPort.ToString());
+            //    if (!isItValidSession)
+            //    {
+            //        AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
+                    OpenDevice.deviceSessionId.Remove(udid);
+            //        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
+            //        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            //        AndroidMethods.GetInstance().StopUIAutomator(udid);
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //}
+            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
+            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            //Close();
             //Task.Run(() =>
             //{
             //    try
@@ -463,8 +433,6 @@ namespace Appium_Wizard
             //        else
             //        {
             //            //AndroidAPIMethods.DeleteSession(proxyPort);
-            //            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
-            //            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
             //            //Common.KillProcessById(AndroidMethods.PortProcessId[proxyPort]);
             //            //Common.KillProcessById(AndroidMethods.PortProcessId[screenPort]);
             //            //AndroidMethods.PortProcessId.Remove(proxyPort);
@@ -537,6 +505,14 @@ namespace Appium_Wizard
         private void unlockToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
+            //OpenDevice.deviceSessionId.Remove(udid);
+            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
+            //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
         }
     }
 }

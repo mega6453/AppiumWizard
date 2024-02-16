@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 using System.Text;
@@ -67,8 +68,8 @@ namespace Appium_Wizard
 
         public void StopUIAutomator(string udid)
         {
-            ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server.test", false);
             ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server", false);
+            ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server.test", false);
         }
 
         public List<string> GetListOfDevicesUDID()
@@ -129,7 +130,16 @@ namespace Appium_Wizard
         public (int, int) GetScreenSizeInPixel(string udid)
         {
             string output = ExecuteCommand("-s " + udid + " shell wm size");
-            string pattern = @"Override size: (\d+)x(\d+)";
+            string pattern = string.Empty;
+            if (output.Contains("Override"))
+            {
+                pattern = @"Override size: (\d+)x(\d+)";
+            }
+            else
+            {
+                pattern = @"(\d+)x(\d+)";
+            }
+            
             Match match = Regex.Match(output, pattern);
 
             if (match.Success)
@@ -351,6 +361,50 @@ namespace Appium_Wizard
             return apkInfo;
         }
 
+        public int GetForwardedPort(string udid, int port)
+        {
+            try
+            {
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = adbFilePath,
+                    Arguments = "-s " + udid + " forward --list",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(processStartInfo))
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string[] lines = output.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string line in lines)
+                    {
+                        string[] parts = line.Split(' ');
+                        string device = parts[0];
+                        int sourcePort = int.Parse(parts[2].Split(':')[1]);
+                        int destinationPort = int.Parse(parts[1].Split(':')[1]);
+
+                        if (device == udid)
+                        {
+                            if (port == sourcePort)
+                            {
+                                return destinationPort;
+                            }
+                        }                       
+                    }
+                    process.Close();
+                    return -1;
+                }
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
+
+
         public static AndroidMethods GetInstance()
         {
             if (instance == null)
@@ -430,9 +484,9 @@ namespace Appium_Wizard
             Thread.Sleep(1000);
             //ExecuteCommand("-s " + udid + " shell am start -n io.appium.settings/.Settings");
             //ExecuteCommand("-s " + udid + " shell am instrument -w io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner", false);
-            AndroidMethods.GetInstance().StartSettingsApp(udid);
+            //AndroidMethods.GetInstance().StartSettingsApp(udid);
             ExecuteCommand("-s " + udid + " shell am instrument -w -e disableAnalytics true io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner", false);
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
         }
 
       
@@ -572,8 +626,11 @@ namespace Appium_Wizard
             var request = new RestRequest("/session", Method.Post);
             request.AddHeader("Content-Type", "application/json");
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
-            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
-            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""appium:newCommandTimeout"":0,""mjpegServerPort"":{screenPort},""mjpegScreenshotUrl"":""http://localhost:{screenPort}""}}}}";
+             var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
+            //var body = "{\"capabilities\":{\"firstMatch\":[{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\",\"platform\":\"LINUX\",\"webStorageEnabled\":false,\"takesScreenshot\":true,\"javascriptEnabled\":true,\"databaseEnabled\":false,\"networkConnectionEnabled\":true,\"locationContextEnabled\":false,\"warnings\":{},\"desired\":{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\"}},\"deviceName\":\"R5CN3172FHT\",\"deviceUDID\":\"R5CN3172FHT\"}],\"alwaysMatch\":{}}";
+
+            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
+            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""appium:newCommandTimeout"":0,""mjpegServerPort"":{screenPort},""mjpegScreenshotUrl"":""http://localhost:{screenPort}/mjpeg""}}}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -643,6 +700,19 @@ namespace Appium_Wizard
             }
         }
 
+
+        public static void DeleteSession(int proxyPort, string sessionId)
+        {
+            //string sessionId = GetSessionID(proxyPort);
+            var options = new RestClientOptions("http://localhost:" + proxyPort)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId, Method.Delete);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
 
         public static void DeleteSession(int proxyPort)
         {

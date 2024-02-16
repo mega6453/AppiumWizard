@@ -524,9 +524,15 @@ namespace Appium_Wizard
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            foreach (var item in runningProcessesPortNumbers)
+            try
             {
-                Common.KillProcessByPortNumber(item);
+                foreach (var item in runningProcessesPortNumbers)
+                {
+                    Common.KillProcessByPortNumber(item);
+                }
+            }
+            catch (Exception)
+            {
             }
 
             List<Form> childFormsToClose = new List<Form>();

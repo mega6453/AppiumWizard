@@ -119,10 +119,10 @@
             WDAproxyPort = Common.GetFreePort();
             UiAutomatorPort = Common.GetFreePort(8200, 8220);
             //AndroidMethods.GetInstance().StartAndroidProxyServer(UiAutomatorPort, 6790);
-
+            int screenport = Common.GetFreePort();
             Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1);
+                serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1,screenport);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 MainScreen.runningProcessesPortNumbers.Add(WDAproxyPort);
                 DialogResult result = DialogResult.None;

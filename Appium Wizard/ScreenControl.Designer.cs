@@ -86,7 +86,6 @@
             buttonAlwaysOnTop.ImageTransparentColor = Color.Magenta;
             buttonAlwaysOnTop.Name = "buttonAlwaysOnTop";
             buttonAlwaysOnTop.Size = new Size(34, 28);
-            buttonAlwaysOnTop.Text = "Always on Top";
             buttonAlwaysOnTop.Click += buttonAlwaysOnTop_Click;
             // 
             // toolStripSeparator4
@@ -109,8 +108,6 @@
             ObjectSpy.ImageTransparentColor = Color.Magenta;
             ObjectSpy.Name = "ObjectSpy";
             ObjectSpy.Size = new Size(34, 28);
-            ObjectSpy.Text = "Object Spy";
-            ObjectSpy.ToolTipText = "Object Spy";
             ObjectSpy.Click += ObjectSpy_Click;
             // 
             // toolStripSeparator2
@@ -134,7 +131,6 @@
             toolStripButton1.ImageTransparentColor = Color.Magenta;
             toolStripButton1.Name = "toolStripButton1";
             toolStripButton1.Size = new Size(34, 28);
-            toolStripButton1.Text = "Home";
             toolStripButton1.Click += Home;
             // 
             // BackButton
@@ -145,7 +141,6 @@
             BackButton.ImageTransparentColor = Color.Magenta;
             BackButton.Name = "BackButton";
             BackButton.Size = new Size(34, 28);
-            BackButton.Text = "Back";
             BackButton.Click += BackButton_Click;
             // 
             // controlCenter
@@ -158,7 +153,6 @@
             controlCenter.ImageTransparentColor = Color.Magenta;
             controlCenter.Name = "controlCenter";
             controlCenter.Size = new Size(34, 28);
-            controlCenter.Text = "Control Center";
             controlCenter.Click += controlCenter_Click;
             // 
             // toolStripDropDownButton1
@@ -216,6 +210,7 @@
             StartPosition = FormStartPosition.WindowsDefaultBounds;
             Text = "ScreenControl";
             FormClosing += ScreenControl_FormClosing;
+            FormClosed += ScreenControl_FormClosed;
             Load += ScreenControl_Load;
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).EndInit();
             toolStrip1.ResumeLayout(false);

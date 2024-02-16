@@ -159,7 +159,6 @@ namespace Appium_Wizard
                 pressX = pressStartPoint.X;
                 pressY = pressStartPoint.Y;
             }
-            //ScreenWebView.Reload();
         }
 
 
@@ -282,20 +281,6 @@ namespace Appium_Wizard
                         return "nosession";
                     }
                 }
-
-                //bool isUIAutomatorStarted = AndroidAPIMethods.isUIAutomatorSessionStarted(proxyPort);
-                //if (!isUIAutomatorStarted) 
-                //{
-                //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                //    AndroidAPIMethods.CreateSession(proxyPort, screenPort);
-                //}
-
-                //bool isUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                //if (!isUIAutomatorRunning)
-                //{
-                //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                //}
-                //return "";
             }
         }
 
@@ -307,18 +292,7 @@ namespace Appium_Wizard
             }
             else
             {
-                //bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                //if (!isRunning)
-                //{
-                //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                //}
-                //AndroidAsyncMethods.GetInstance().StopUIAutomator(udid);
-                //AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                //AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                string sessionId = AndroidAPIMethods.CreateSession(proxyPort, screenPort);
-                //Common.KillProcessByPortNumber(screenPort);
-                //AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                return sessionId;
+                return AndroidAPIMethods.CreateSession(proxyPort, screenPort);
             }
         }
 

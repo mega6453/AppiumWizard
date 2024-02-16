@@ -90,7 +90,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(515, 315);
+            ClientSize = new Size(566, 348);
             Controls.Add(linkLabel1);
             Controls.Add(label3);
             Controls.Add(label2);

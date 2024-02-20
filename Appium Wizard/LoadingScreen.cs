@@ -12,7 +12,7 @@
             {
                 MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and Launch Appium Wizard again.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(0);
-            }           
+            }
             InitializeComponent();
             try
             {
@@ -46,7 +46,7 @@
         private void StartBackgroundTasks()
         {
             Show();
-            productVersion.Text = "Version " + ProductVersion;
+            productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
@@ -99,7 +99,7 @@
                         Common.RegisterWSLDistro();
                     }
                 }
-                firstTimeRunLabel.Text = "";               
+                firstTimeRunLabel.Text = "";
             }
             Database.UpdateDataIntoFirstTimeRunTable("No");
             UpdateStepLabel("Starting Appium Server...");
@@ -122,7 +122,7 @@
             int screenport = Common.GetFreePort();
             Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1,screenport);
+                serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1, screenport);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 MainScreen.runningProcessesPortNumbers.Add(WDAproxyPort);
                 DialogResult result = DialogResult.None;

@@ -11,7 +11,7 @@ namespace Appium_Wizard
 {
     public class Common
     {
-        private static string ffmpegFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\ffmpeg.exe";
+        private static string executablesFolderPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\";
         public static void TerminateProcess(string command)
         {
             try
@@ -52,35 +52,11 @@ namespace Appium_Wizard
             }
         }
 
-
-        public static void StartFFmpegServer(string IPAddress, int port)
+        public static void SetAndroidHomeEnvironmentVariable()
         {
-            string inputAddress = "tcp:" + IPAddress + ":" + port;
-            //string inputAddress = "tcp:127.0.0.1:9100";
-
-
-            // ffmpeg -i tcp:127.0.0.1:9100 -c:v libx264 -crf 23 -preset ultrafast output.mp4
-            // ffmpeg -i tcp:127.0.0.1:9100 
-            //string arguments = $"-i {inputAddress} -c:v libx264 -crf 23 -preset ultrafast {outputFilePath}";
-            string arguments = "-f mjpeg -reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 181 -i " + inputAddress + " -vcodec mjpeg";
-
-            ProcessStartInfo startInfo = new ProcessStartInfo(ffmpegFilePath, arguments);
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-
-            using (Process process = new Process())
-            {
-                process.StartInfo = startInfo;
-                process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-                process.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-            }
+            Environment.SetEnvironmentVariable("ANDROID_HOME", executablesFolderPath, EnvironmentVariableTarget.User);
         }
+
 
         public static int GetFreePort()
         {

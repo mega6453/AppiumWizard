@@ -46,6 +46,7 @@
         private void StartBackgroundTasks()
         {
             Show();
+            Common.SetAndroidHomeEnvironmentVariable();
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");

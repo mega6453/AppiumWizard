@@ -8,12 +8,12 @@ namespace Appium_Wizard
 {
     public class AndroidMethods
     {
-        private static AndroidMethods instance;
+        private static AndroidMethods? instance;
         private static readonly object lockObject = new object();
-        private string adbFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\adb.exe";
-        private string aaptFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\aapt.exe";
-        private string serverAPKFilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+"\\.appium\\node_modules\\appium-uiautomator2-driver\\node_modules\\appium-uiautomator2-server\\apks\\";
-        private string settingsAPKFilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.appium\\node_modules\\appium-uiautomator2-driver\\node_modules\\io.appium.settings\\apks\\";
+        private string adbFilePath = FilesPath.adbFilePath;
+        private string aaptFilePath = FilesPath.aaptFilePath;
+        private string serverAPKFilePath = FilesPath.serverAPKFilePath;
+        private string settingsAPKFilePath = FilesPath.settingsAPKFilePath;
         private Process adbProcess;
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
 
@@ -444,9 +444,9 @@ namespace Appium_Wizard
 
     public class AndroidAsyncMethods
     {
-        private static AndroidAsyncMethods instance;
+        private static AndroidAsyncMethods? instance;
         private static readonly object lockObject = new object();
-        private string adbFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\adb.exe";
+        private string adbFilePath = FilesPath.adbFilePath;
         private Process adbAsyncProcess;
         public void StartUIAutomatorServer(string udid,bool stop)
         {

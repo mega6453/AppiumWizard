@@ -9,12 +9,12 @@ namespace Appium_Wizard
 {
     public class iOSMethods
     {
-        private static iOSMethods instance;
+        private static iOSMethods? instance;
         private static readonly object lockObject = new object();
 
-        private string iOSFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\iOSServer.exe";
-        private string pListUtilFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\plistutil.exe";
-        string ProfilesFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\Profiles\\";
+        private string iOSFilePath = FilesPath.iOSFilePath;
+        private string pListUtilFilePath = FilesPath.pListUtilFilePath;
+        string ProfilesFilePath = FilesPath.ProfilesFilePath;
         private Process iOSProcess;
         public bool serverStarted = false;
         public string statusText = "";
@@ -536,15 +536,15 @@ namespace Appium_Wizard
 
     public class iOSAsyncMethods
     {
-        private string iOSFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\iOSServer.exe";
-        private string iProxyFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\iproxy.exe";
+        private string iOSFilePath = FilesPath.iOSFilePath;
+        private string iProxyFilePath = FilesPath.iProxyFilePath;
 
-        private static iOSAsyncMethods instance;
+        private static iOSAsyncMethods? instance;
         private static readonly object lockObject = new object();
         private Process iOSAsyncProcess;
         private StringBuilder outputBuffer;
-        public static Dictionary<int, int> PortProcessId;
-        private iOSAsyncMethods()
+        public static Dictionary<int, int>? PortProcessId;
+        public iOSAsyncMethods()
         {
             InitializeProcess();
             PortProcessId = new Dictionary<int, int>();

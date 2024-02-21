@@ -10,7 +10,7 @@
             bool isRestartRequired = Common.WSLHelp().Contains("1603");
             if (isRestartRequired)
             {
-                MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and Launch Appium Wizard again.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and Launch Appium Wizard again.\n\nDuring restart, windows will enable WSL in the system. This may take few minutes extra than regular restart. So, Please be patient.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(0);
             }
             InitializeComponent();

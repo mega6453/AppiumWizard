@@ -2,7 +2,7 @@
 {
     public partial class iOSProfileManagement : Form
     {
-        string ProfilesFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\Profiles\\";
+        string ProfilesFilePath = FilesPath.ProfilesFilePath;
         string selectedProfileName, selectedProfilePath;
         ListViewItem selectedItem;
         public iOSProfileManagement()

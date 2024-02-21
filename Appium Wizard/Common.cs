@@ -11,7 +11,7 @@ namespace Appium_Wizard
 {
     public class Common
     {
-        private static string executablesFolderPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\";
+        private static string executablesFolderPath = FilesPath.executablesFolderPath;
         public static void TerminateProcess(string command)
         {
             try

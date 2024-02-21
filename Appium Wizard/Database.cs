@@ -4,7 +4,7 @@ namespace Appium_Wizard
 {
     public class Database
     {
-        static string databaseFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Data\\appiumwizard.db";
+        static string databaseFilePath = FilesPath.databaseFilePath;
         static string connectionString = $"Data Source=\"{databaseFilePath}\";Version=3;";
 
 

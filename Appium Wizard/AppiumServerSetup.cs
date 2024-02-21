@@ -10,7 +10,6 @@ namespace Appium_Wizard
 {
     internal class AppiumServerSetup
     {
-        private string AppiumServerFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\appiumserver.exe";
         public bool serverStarted = false;
         public string statusText = "";
         public static string deviceList = "", deviceInfo = "", tempFolder = "", logFilePath = "";

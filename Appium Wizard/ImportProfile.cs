@@ -6,10 +6,10 @@ namespace Appium_Wizard
 {
     public partial class ImportProfile : Form
     {
-        static string opensslFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\openssl.exe";
+        static string opensslFilePath = FilesPath.opensslFilePath;
         string p12InputFilePath = "";
         string mobileProvisionFilePath = "";
-        string ProfilesFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\Profiles\\";
+        string ProfilesFilePath = FilesPath.ProfilesFilePath;
         private int folderCounter;
         ListView listView1;
         public ImportProfile(ListView listView)

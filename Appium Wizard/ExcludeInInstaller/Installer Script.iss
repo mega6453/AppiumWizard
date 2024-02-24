@@ -117,7 +117,7 @@ begin
     begin
       // Add the command to install Appium globally using npm
       ProgressPage.SetText('Installing Appium Server...','');
-      if not Exec('cmd', '/C "C:\Program Files\nodejs\npm" install -g appium', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
+      if not Exec('cmd', '/C set "PATH=%PATH%;C:\Program Files\nodejs" && npm i --location=global appium', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       begin
         MsgBox('Failed to install Appium globally. After installation completed, Run Appium Wizard to retry the appium installation.', mbError, MB_OK);
         Result := False;
@@ -132,7 +132,7 @@ begin
 
       // Install Appium drivers
       ProgressPage.SetText('Installing XCUITest driver for iOS...','');
-      if not Exec('cmd', '/C "' + AppiumPath + ' driver install xcuitest"', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
+      if not Exec('cmd', '/C set "PATH=%PATH%;C:\Program Files\nodejs" && ' + AppiumPath + ' driver install xcuitest', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       begin
         MsgBox('Failed to install XCUITest. After installation completed, Run Appium Wizard to retry the xcuitest installation.', mbError, MB_OK);
         Result := False;
@@ -142,7 +142,7 @@ begin
       ProgressPage.SetProgress(Progress, 100);
 
       ProgressPage.SetText('Installing UIAutomator2 driver for Android...','');
-      if not Exec('cmd', '/C "' + AppiumPath + ' driver install uiautomator2"', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
+      if not Exec('cmd', '/C set "PATH=%PATH%;C:\Program Files\nodejs" && ' + AppiumPath + ' driver install uiautomator2', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       begin
         MsgBox('Failed to install UIAutomator2. After installation completed, Run Appium Wizard to retry the UIAutomator2 installation.', mbError, MB_OK);
         Result := False;

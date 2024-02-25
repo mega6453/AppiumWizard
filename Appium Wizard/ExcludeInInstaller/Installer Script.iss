@@ -21,7 +21,7 @@ DisableProgramGroupPage=yes
 LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
-IconFilename=appiumlogo.ico
+UninstallDisplayIcon=appiumlogo.ico
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\output

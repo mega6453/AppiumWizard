@@ -12,6 +12,7 @@ AlwaysRestart = yes
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
 AppName={#MyAppName}
+UninstallDisplayName = Appium Wizard
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}

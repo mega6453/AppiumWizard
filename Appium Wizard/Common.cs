@@ -293,7 +293,8 @@ namespace Appium_Wizard
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
-                if (error.Contains("'appium' is not recognized as an internal or external command"))
+                if (error.Contains("'appium' is not recognized as an internal or external command") |
+                    error.Contains("throw err"))
                 {
                     return false;
                 }

@@ -117,7 +117,7 @@ begin
     begin
       // Add the command to install Appium globally using npm
       ProgressPage.SetText('Installing Appium Server...','');
-      if not Exec('cmd', '/C "C:\Program Files\nodejs\npm" install -g appium', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
+      if not Exec('cmd', '/C npm install -g appium', '',  SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       begin
         MsgBox('Failed to install Appium globally. After installation completed, Run Appium Wizard to retry the appium installation.', mbError, MB_OK);
         Result := False;

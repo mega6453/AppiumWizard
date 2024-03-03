@@ -12,7 +12,8 @@ namespace Appium_Wizard
         private static iOSMethods? instance;
         private static readonly object lockObject = new object();
 
-        private string iOSFilePath = FilesPath.iOSFilePath;
+        private string iOSServerFilePath = FilesPath.iOSServerFilePath;
+        private string iOSFilesPath = FilesPath.iOSFilesPath;
         private string pListUtilFilePath = FilesPath.pListUtilFilePath;
         string ProfilesFilePath = FilesPath.ProfilesFilePath;
         private Process iOSProcess;
@@ -224,7 +225,7 @@ namespace Appium_Wizard
             }
         }
 
-        public string SignIPA(string udid, string IPAFilePath)
+        public string SignIPAusingWSL(string udid, string IPAFilePath)
         {
             var output = isProfileAvailableToSign(udid);
             bool isProfileAvailable = output.Item1;
@@ -296,6 +297,81 @@ namespace Appium_Wizard
                 return "notsigned";
             }
         }
+
+        public string SignIPA(string udid, string IPAFilePath)
+        {
+            var output = isProfileAvailableToSign(udid);
+            bool isProfileAvailable = output.Item1;
+            string certificatPath = output.Item2;
+            if (isProfileAvailable)
+            {
+                string tempFolder = Path.GetTempPath();
+                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                Directory.CreateDirectory(tempFolder);
+                string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
+                string[] pemFiles = Directory.GetFiles(certificatPath, "*.pem");
+                string[] mobileprovisionFiles = Directory.GetFiles(certificatPath, "*.mobileprovision");
+                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
+                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
+                string[] commands = {
+                $"set PATH=\"{iOSFilesPath}\";%PATH%",
+                $"cd \"{certificatPath}\"",
+                $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\" -z 9 -o \"{signedIPAFilePath}\" \"{IPAFilePath}\""
+            };
+
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/K";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardInput = true;
+
+
+                // Subscribe to the event handlers for capturing output
+                process.OutputDataReceived += Process_OutputDataReceived;
+                process.ErrorDataReceived += Process_ErrorDataReceived;
+
+                // Start the process
+                process.Start();
+
+                // Begin capturing output
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                // Run the commands
+                foreach (string command in commands)
+                {
+                    process.StandardInput.WriteLine(command);
+                    process.StandardInput.WriteLine("echo Command completed");
+                }
+
+                // Close the standard input stream to signal the end of commands
+                process.StandardInput.Close();
+
+                // Wait for the process to exit
+                process.WaitForExit();
+
+                // Get the exit code
+                int exitCode = process.ExitCode;
+
+                // Close the process
+                process.Close();
+
+                // Display the exit code
+                Console.WriteLine($"Exit Code: {exitCode}");
+
+                return signedIPAFilePath;
+
+            }
+            else
+            {
+                return "notsigned";
+            }
+        }
+
+
         private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -520,7 +596,7 @@ namespace Appium_Wizard
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = iOSFilePath,
+                FileName = iOSServerFilePath,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -536,7 +612,7 @@ namespace Appium_Wizard
 
     public class iOSAsyncMethods
     {
-        private string iOSFilePath = FilesPath.iOSFilePath;
+        private string iOSServerFilePath = FilesPath.iOSServerFilePath;
         private string iProxyFilePath = FilesPath.iProxyFilePath;
 
         private static iOSAsyncMethods? instance;
@@ -570,7 +646,7 @@ namespace Appium_Wizard
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = iOSFilePath,
+                FileName = iOSServerFilePath,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -668,14 +744,14 @@ namespace Appium_Wizard
 
         }
 
-         string runwdaOutput = "", runwdaError = "";
+        string runwdaOutput = "", runwdaError = "";
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             // Create a new process
             Process process = new Process();
 
             // Configure the process
-            process.StartInfo.FileName = iOSFilePath;
+            process.StartInfo.FileName = iOSServerFilePath;
             process.StartInfo.Arguments = "runwda";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -701,7 +777,7 @@ namespace Appium_Wizard
             //process.Close();
             bool isPasscodeRequired = false;
             int count = 6;
-            string sessionId=string.Empty;
+            string sessionId = string.Empty;
             while (!process.HasExited)
             {
                 if (!string.IsNullOrEmpty(runwdaError))

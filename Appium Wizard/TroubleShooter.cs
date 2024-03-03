@@ -67,17 +67,6 @@
                     }
                 }
             }
-            string wslList = Common.WSLList();
-            if (!wslList.Contains("AppiumWizard"))
-            {
-                WSLStatusLabel.Text = "Not OK";
-                FixWSLbutton.Enabled = true;
-            }
-            else
-            {
-                WSLStatusLabel.Text = "OK";
-                FixWSLbutton.Enabled = false;
-            }
             commonProgress.Close();
         }
 
@@ -118,16 +107,6 @@
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install UIAutomator2", "Installing UIAutomator2(android) driver, Please wait...");
             Common.InstallUIAutomatorDriver();
-            commonProgress.Close();
-            FindIssues();
-        }
-
-        private void FixWSLbutton_Click(object sender, EventArgs e)
-        {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install WSL", "Installing WSL for iOS App Signing, Please wait...");
-            Common.InstallWSL();
             commonProgress.Close();
             FindIssues();
         }

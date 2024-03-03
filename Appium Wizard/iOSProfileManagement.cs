@@ -23,15 +23,7 @@
 
         private void iOSProfileManagement_Load(object sender, EventArgs e)
         {
-            string output = Common.RegisterWSLDistro();
-            if (output.Contains("Update failed (exit code: 1603)"))
-            {
-                MessageBox.Show("Please Restart system and Try again.\nIf you tried Restart already, Please Re-Install Appium Wizard.","Restart Requried",MessageBoxButtons.OK,MessageBoxIcon.Error);
-            }
-            else
-            {
-                RefreshProfileListView();
-            }
+            RefreshProfileListView();
         }
 
         private void button3_Click(object sender, EventArgs e)

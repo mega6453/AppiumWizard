@@ -30,18 +30,15 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TroubleShooter));
             FixNodeJSButton = new Button();
-            FixWSLbutton = new Button();
             FixAppiumButton = new Button();
             FixXCUITestButton = new Button();
             FixUIAutomatorButton = new Button();
-            WSLLabel = new Label();
             NodeJSLabel = new Label();
             AppiumLabel = new Label();
             XCUITestLabel = new Label();
             UIAutomatorLabel = new Label();
             ComponentsLabel = new Label();
             StatusLabel = new Label();
-            WSLStatusLabel = new Label();
             NodeJSStatusLabel = new Label();
             AppiumStatusLabel = new Label();
             XCUITestStatusLabel = new Label();
@@ -60,17 +57,6 @@
             FixNodeJSButton.Text = "Fix NodeJS";
             FixNodeJSButton.UseVisualStyleBackColor = true;
             FixNodeJSButton.Click += FixNodeJSButton_Click;
-            // 
-            // FixWSLbutton
-            // 
-            FixWSLbutton.Enabled = false;
-            FixWSLbutton.Location = new Point(583, 322);
-            FixWSLbutton.Name = "FixWSLbutton";
-            FixWSLbutton.Size = new Size(154, 34);
-            FixWSLbutton.TabIndex = 1;
-            FixWSLbutton.Text = "Fix WSL";
-            FixWSLbutton.UseVisualStyleBackColor = true;
-            FixWSLbutton.Click += FixWSLbutton_Click;
             // 
             // FixAppiumButton
             // 
@@ -104,16 +90,6 @@
             FixUIAutomatorButton.Text = "Fix UIAutomator";
             FixUIAutomatorButton.UseVisualStyleBackColor = true;
             FixUIAutomatorButton.Click += FixUIAutomatorButton_Click;
-            // 
-            // WSLLabel
-            // 
-            WSLLabel.AutoSize = true;
-            WSLLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            WSLLabel.Location = new Point(29, 327);
-            WSLLabel.Name = "WSLLabel";
-            WSLLabel.Size = new Size(194, 25);
-            WSLLabel.TabIndex = 5;
-            WSLLabel.Text = "WSL (iOS App Signing)";
             // 
             // NodeJSLabel
             // 
@@ -175,14 +151,6 @@
             StatusLabel.TabIndex = 11;
             StatusLabel.Text = "Status";
             // 
-            // WSLStatusLabel
-            // 
-            WSLStatusLabel.AutoSize = true;
-            WSLStatusLabel.Location = new Point(360, 327);
-            WSLStatusLabel.Name = "WSLStatusLabel";
-            WSLStatusLabel.Size = new Size(0, 25);
-            WSLStatusLabel.TabIndex = 12;
-            // 
             // NodeJSStatusLabel
             // 
             NodeJSStatusLabel.AutoSize = true;
@@ -227,7 +195,7 @@
             // 
             // checkForIssues
             // 
-            checkForIssues.Location = new Point(322, 381);
+            checkForIssues.Location = new Point(312, 335);
             checkForIssues.Name = "checkForIssues";
             checkForIssues.Size = new Size(151, 34);
             checkForIssues.TabIndex = 18;
@@ -239,25 +207,22 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(769, 427);
+            ClientSize = new Size(769, 381);
             Controls.Add(checkForIssues);
             Controls.Add(FixLabel);
             Controls.Add(UIAutomatorStatusLabel);
             Controls.Add(XCUITestStatusLabel);
             Controls.Add(AppiumStatusLabel);
             Controls.Add(NodeJSStatusLabel);
-            Controls.Add(WSLStatusLabel);
             Controls.Add(StatusLabel);
             Controls.Add(ComponentsLabel);
             Controls.Add(UIAutomatorLabel);
             Controls.Add(XCUITestLabel);
             Controls.Add(AppiumLabel);
             Controls.Add(NodeJSLabel);
-            Controls.Add(WSLLabel);
             Controls.Add(FixUIAutomatorButton);
             Controls.Add(FixXCUITestButton);
             Controls.Add(FixAppiumButton);
-            Controls.Add(FixWSLbutton);
             Controls.Add(FixNodeJSButton);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -272,18 +237,15 @@
         #endregion
 
         private Button FixNodeJSButton;
-        private Button FixWSLbutton;
         private Button FixAppiumButton;
         private Button FixXCUITestButton;
         private Button FixUIAutomatorButton;
-        private Label WSLLabel;
         private Label NodeJSLabel;
         private Label AppiumLabel;
         private Label XCUITestLabel;
         private Label UIAutomatorLabel;
         private Label ComponentsLabel;
         private Label StatusLabel;
-        private Label WSLStatusLabel;
         private Label NodeJSStatusLabel;
         private Label AppiumStatusLabel;
         private Label XCUITestStatusLabel;

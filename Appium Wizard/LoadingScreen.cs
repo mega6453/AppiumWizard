@@ -7,12 +7,6 @@
         public int appiumPort = 4723;
         public LoadingScreen()
         {
-            bool isRestartRequired = Common.WSLHelp().Contains("1603");
-            if (isRestartRequired)
-            {
-                MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and Launch Appium Wizard again.\n\nDuring restart, windows will enable WSL in the system. This may take few minutes extra than regular restart. So, Please be patient.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(0);
-            }
             InitializeComponent();
             try
             {
@@ -78,27 +72,6 @@
                 {
                     UpdateStepLabel("Installing UIAutomator2 driver, Please wait...");
                     Common.InstallUIAutomatorDriver();
-                }
-                UpdateStepLabel("Checking WSL status, Please wait...");
-                bool isWSLEnabled = Common.IsWSLImportInPlaceSupported();
-                if (!isWSLEnabled)
-                {
-                    UpdateStepLabel("Installing WSL(for iOS app signing), Please provide required permission when system prompts...");
-                    Common.InstallWSL();
-                    bool isRestartRequired = Common.WSLHelp().Contains("1603");
-                    if (isRestartRequired)
-                    {
-                        MessageBox.Show("System Restart is required to complete the installation. Please Restart the system and  Launch Appium Wizard again.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        Environment.Exit(0);
-                    }
-                }
-                else
-                {
-                    string wslList = Common.WSLList();
-                    if (!wslList.Contains("AppiumWizard"))
-                    {
-                        Common.RegisterWSLDistro();
-                    }
                 }
                 firstTimeRunLabel.Text = "";
             }

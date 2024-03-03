@@ -7,7 +7,7 @@
 #define MyAppExeName "Appium Wizard.exe"
 
 [Setup]
-AlwaysRestart = yes 
+AlwaysRestart = no 
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
@@ -74,7 +74,7 @@ end;
 procedure InitializeWizard;
 begin
   // Create a custom progress page
-  ProgressPage := CreateOutputProgressPage('Installing', 'Please wait while Installing WSL, Node.js, Appium Server and Appium drivers. Please provide necessary permission when system prompts.');
+  ProgressPage := CreateOutputProgressPage('Installing', 'Please wait while Installing Node.js, Appium Server and Appium drivers. Please provide necessary permission when system prompts.');
   ProgressPage.SetProgress(0, 100);
 end;
 
@@ -126,7 +126,7 @@ begin
         Exit;
       end;
     end;
-      Progress := 40;
+      Progress := 50;
       ProgressPage.SetProgress(Progress, 100);
 
       // Get the full path to the appium executable
@@ -140,7 +140,7 @@ begin
         Result := False;
         Exit;
       end;
-      Progress := 60;
+      Progress := 75;
       ProgressPage.SetProgress(Progress, 100);
 
       ProgressPage.SetText('Installing UIAutomator2 driver for Android...','');
@@ -150,20 +150,8 @@ begin
         Result := False;
         Exit;
       end;
-      Progress := 80;
-      ProgressPage.SetProgress(Progress, 100);
-
-      ProgressPage.SetText('Installing WSL (for iOS app signing), Please provide necessary permission when system prompts...','');
-      if not Exec('cmd', '/C C:\Windows\Sysnative\wsl.exe --install --no-distribution', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
-      begin
-        MsgBox('Failed to install WSL.', mbError, MB_OK);
-        Result := False;
-        Exit;
-      end;
       Progress := 100;
-      ProgressPage.SetProgress(Progress, 100);         
-      //ProgressPage.SetText('Installation completed!','');
-      //MsgBox('Please Restart the system and Launch Appium Wizard.', mbInformation, MB_OK);
+      ProgressPage.SetProgress(Progress, 100);
       Result := True;   
       progressPage.Hide;
     end

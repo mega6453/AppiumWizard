@@ -296,6 +296,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(749, 427);
             Controls.Add(StatusLabel5);
             Controls.Add(StatusLabel4);

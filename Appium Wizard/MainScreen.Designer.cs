@@ -227,6 +227,7 @@ namespace Appium_Wizard
             // 
             // menuStrip1
             // 
+            menuStrip1.BackColor = Color.WhiteSmoke;
             menuStrip1.GripStyle = ToolStripGripStyle.Visible;
             menuStrip1.ImageScalingSize = new Size(24, 24);
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem });
@@ -460,6 +461,7 @@ namespace Appium_Wizard
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1407, 631);
             Controls.Add(tabControl1);
             Controls.Add(menuStrip1);

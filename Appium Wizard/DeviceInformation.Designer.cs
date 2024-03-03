@@ -80,6 +80,7 @@
             // DeviceInformation
             // 
             AutoScaleMode = AutoScaleMode.None;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(591, 345);
             Controls.Add(Add);
             Controls.Add(Cancel);

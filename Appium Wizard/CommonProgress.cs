@@ -11,7 +11,7 @@
         public void UpdateStepLabel(string title, string stepText)
         {
             this.Text = title;
-            commonProgressLabel.ForeColor = Color.Black;           
+            commonProgressLabel.ForeColor = Color.Black;
             commonProgressLabel.Text = stepText;
             commonProgressLabel.Refresh();
         }
@@ -19,7 +19,7 @@
         public void UpdateStepLabel(string stepText)
         {
             commonProgressLabel.ForeColor = Color.Red;
-            commonProgressLabel.Text = stepText;           
+            commonProgressLabel.Text = stepText;
             commonProgressLabel.Refresh();
         }
     }

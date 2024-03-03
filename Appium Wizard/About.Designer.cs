@@ -86,6 +86,7 @@
             // 
             // About
             // 
+            AccessibleRole = AccessibleRole.None;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;

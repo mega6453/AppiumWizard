@@ -47,6 +47,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(527, 128);
             Controls.Add(label1);
             Icon = (Icon)resources.GetObject("$this.Icon");

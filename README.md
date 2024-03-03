@@ -15,13 +15,9 @@ Please provide necessary permission when system prompts. Because,
 1. If NodeJS not installed in your system, Appium Wizard will download and install it.
 2. If Appium Sever not installed, Appium Wizard will Install it.
 3. Appium Wizard will Install iOS and Android drivers.
-4. Appium Wizard will Install WSL(Windows Subsystem for Linux) for iOS app signing and run automation.
   
-  ####  Restart Required. Why?
-   Appium Wizard uses WSL(Windows Subsystem for Linux, Microsoft in-built feature) for signing iOS app. So, during Appium Wizard installation, it enables/installs/updates WSL as well in your system. For WSL to work, the system needs to be restarted. So, Please restart the system once the installation completed.
-
   ####  During first launch
-  First launch will verify the installation of the software components(i.e. WSL, Appium Server and drivers).  If any of the component installation is not proper, then Appium Wizard will try 
+  First launch will verify the installation of the software components(i.e.Appium Server and drivers).  If any of the component installation is not proper, then Appium Wizard will try 
 to install it during the first time launch which may take sometime to complete it.
 
 ## How to Use
@@ -67,7 +63,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Error handling
 
 ## Known Issues (fix in progress)
-* Android Screen control has some issues.
 * iOS 17 not supported 
 * Performance issues
 
@@ -78,7 +73,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * go-ios 
 * imobiledevice-net
 * zsign
-* wsl
 * adb
 * Newtonsoft.Json
 * RestSharp
@@ -87,7 +81,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Thanks To
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
-* [zhlynn](https://github.com/zhlynn) - For zsign script which provides way to sign ipa file in linux environment.
+* [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
+* [Dadoum](https://github.com/Dadoum/zsign-Windows) - For providing zsign windows executable.
 
 ## Icons
 * <a href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow icons created by Lizel Arina - Flaticon</a>
@@ -112,6 +107,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * [**Meganathan C**](https://mega6453.carrd.co)
 
 ## Want to add features or fix things?
-* Clone the Repo
+* Fork the Repo
 * Make changes
 * Create a pull request

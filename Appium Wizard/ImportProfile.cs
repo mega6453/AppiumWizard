@@ -56,7 +56,7 @@ namespace Appium_Wizard
             }
             else if (output.Contains("MAC verified OK"))
             {
-                string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n","");
+                string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
                 var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
                 string certificates = provisionDetails["DeveloperCertificates"].ToString();
                 if (!certificates.Contains(certificate))

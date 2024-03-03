@@ -59,7 +59,7 @@
             else
             {
                 commonProgress.Close();
-                MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -16,7 +16,7 @@ namespace Appium_Wizard
         string deviceName, udid, OSType;
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
-        Dictionary<string,string> deviceSessionId = new Dictionary<string,string>();
+        Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -31,7 +31,7 @@ namespace Appium_Wizard
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();
-            deviceSessionId.Add(udid,session);
+            deviceSessionId.Add(udid, session);
             Task.Run(() =>
             {
                 while (true)
@@ -380,7 +380,7 @@ namespace Appium_Wizard
             //    if (!isItValidSession)
             //    {
             //        AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
-                    OpenDevice.deviceSessionId.Remove(udid);
+            OpenDevice.deviceSessionId.Remove(udid);
             //        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
             //        AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
             //        AndroidMethods.GetInstance().StopUIAutomator(udid);

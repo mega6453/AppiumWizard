@@ -4,7 +4,7 @@ namespace Appium_Wizard
 {
     public partial class InstallApp : Form
     {
-        string filePath,fileName;
+        string filePath, fileName;
         string selectedUDID;
         string selectedDeviceName;
         InstallApp installApp;
@@ -36,7 +36,7 @@ namespace Appium_Wizard
                 commonProgress.Close();
                 if (signediPAPath.Equals("notsigned"))
                 {
-                    MessageBox.Show("No profile found for device "+selectedDeviceName+"(" + selectedUDID + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("No profile found for device " + selectedDeviceName + "(" + selectedUDID + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {

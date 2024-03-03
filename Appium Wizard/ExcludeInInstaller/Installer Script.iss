@@ -13,6 +13,7 @@ AlwaysRestart = no
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
 AppName={#MyAppName}
 UninstallDisplayName = Appium Wizard
+UninstallDisplayIcon={app}\{#MyAppExeName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -22,7 +23,6 @@ DisableProgramGroupPage=yes
 LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
-UninstallDisplayIcon=appiumlogo.ico
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\output

@@ -301,7 +301,7 @@ namespace Appium_Wizard
             // 
             capabilitiesToolStripMenuItem.Image = Properties.Resources.link;
             capabilitiesToolStripMenuItem.Name = "capabilitiesToolStripMenuItem";
-            capabilitiesToolStripMenuItem.Size = new Size(270, 34);
+            capabilitiesToolStripMenuItem.Size = new Size(218, 34);
             capabilitiesToolStripMenuItem.Text = "Capabilities";
             capabilitiesToolStripMenuItem.Click += capabilitiesToolStripMenuItem_Click;
             // 
@@ -309,7 +309,7 @@ namespace Appium_Wizard
             // 
             xCUITestToolStripMenuItem.Image = Properties.Resources.link;
             xCUITestToolStripMenuItem.Name = "xCUITestToolStripMenuItem";
-            xCUITestToolStripMenuItem.Size = new Size(270, 34);
+            xCUITestToolStripMenuItem.Size = new Size(218, 34);
             xCUITestToolStripMenuItem.Text = "XCUITest";
             xCUITestToolStripMenuItem.Click += xCUITestToolStripMenuItem_Click;
             // 
@@ -317,7 +317,7 @@ namespace Appium_Wizard
             // 
             uIAutomatorToolStripMenuItem.Image = Properties.Resources.link;
             uIAutomatorToolStripMenuItem.Name = "uIAutomatorToolStripMenuItem";
-            uIAutomatorToolStripMenuItem.Size = new Size(270, 34);
+            uIAutomatorToolStripMenuItem.Size = new Size(218, 34);
             uIAutomatorToolStripMenuItem.Text = "UIAutomator";
             uIAutomatorToolStripMenuItem.Click += uIAutomatorToolStripMenuItem_Click;
             // 

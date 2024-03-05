@@ -17,7 +17,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static List<string> listOfSessionIDs = new List<string>();
-        public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport = 5555)
+        public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
             tempFolder = Path.GetTempPath();

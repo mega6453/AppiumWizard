@@ -117,7 +117,8 @@
             else
             {
                 int wdaLocalPort = Common.GetFreePort();
-                serverSetup.StartAppiumServer(portNumber, wdaLocalPort, serverNumber);
+                int screenport = Common.GetFreePort();
+                serverSetup.StartAppiumServer(portNumber, wdaLocalPort, serverNumber, screenport);
                 int count = 1;
                 while (!serverSetup.serverStarted)
                 {

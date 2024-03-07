@@ -163,11 +163,11 @@ namespace Appium_Wizard
                         }
                     }
                 }
-                if (e.Data.Contains("Could not proxy command to the remote server"))
-                {
-                    AndroidMethods.GetInstance().StopUIAutomator(deviceId);
-                    MessageBox.Show("Session creation failed. Please retry again.\nIf issue persists, restart your device and try again.", "Failed to create session", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                //if (e.Data.Contains("Could not proxy command to the remote server"))
+                //{
+                //    AndroidMethods.GetInstance().StopUIAutomator(deviceId);
+                //    MessageBox.Show("Session creation failed. Please retry again.\nIf issue persists, restart your device and try again.", "Failed to create session", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //}
                 if (e.Data.Contains("xcuitest"))
                 {
                     statusText = "Attempting to load xcuitest(iOS) driver...";

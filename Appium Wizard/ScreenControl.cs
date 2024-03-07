@@ -41,6 +41,7 @@ namespace Appium_Wizard
                     {
                         if (tempSessionId != sessionId)
                         {
+                            ScreenWebView.EnsureCoreWebView2Async();
                             ScreenWebView.Reload();
                             tempSessionId = sessionId;
                         }

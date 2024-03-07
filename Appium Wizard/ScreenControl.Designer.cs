@@ -104,7 +104,7 @@
             // 
             ObjectSpy.Alignment = ToolStripItemAlignment.Right;
             ObjectSpy.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            ObjectSpy.Image = Properties.Resources.search;
+            ObjectSpy.Image = Properties.Resources.inspector;
             ObjectSpy.ImageTransparentColor = Color.Magenta;
             ObjectSpy.Name = "ObjectSpy";
             ObjectSpy.Size = new Size(34, 28);

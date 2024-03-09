@@ -192,6 +192,7 @@ namespace Appium_Wizard
                 {
                     if (ScreenControl.screenControl != null)
                     {
+                        string element = string.Empty;
                         if (e.Data.Contains("[POST /element]") | e.Data.Contains("[POST /elements]"))
                         {
                             string json = GetOnlyJson(e.Data);
@@ -200,7 +201,8 @@ namespace Appium_Wizard
                                 if (IsValidJson(json))
                                 {
                                     var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                                    statusText = "Find Element " + dictionary["value"];
+                                    element = dictionary["value"];
+                                    statusText = "Find Element " + element;
                                     ScreenControl.screenControl.UpdateStatusLabel(statusText);
                                 }
                             }
@@ -208,6 +210,11 @@ namespace Appium_Wizard
                             {
                             }
                         }
+                        //else if (e.Data.Contains("POST /session/") && e.Data.Contains("/click]"))
+                        //{
+                        //    statusText = "Click " + element;
+                        //    ScreenControl.screenControl.UpdateStatusLabel(statusText);
+                        //}
                         else if (e.Data.Contains("Got response with status"))
                         {
                             try

@@ -63,7 +63,13 @@ namespace Appium_Wizard
                             string udid = item.SubItems[4].Text;
                             if (OS.Equals("iOS"))
                             {
-                                iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                //iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                //int proxyPort = LoadingScreen.WDAproxyPort;
+                                //int screenServerPort = Common.GetFreePort();
+                                //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
+                                //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
+                                //Thread.Sleep(5000);
+                                //ScreenControl.screenControl.LoadScreen(udid);
                             }
                             //else   // not sure needed or not...
                             //{
@@ -92,6 +98,12 @@ namespace Appium_Wizard
                         string udidFromList = Regex.Replace(item.SubItems[4].Text, "[^a-zA-Z0-9]", "");
                         if (udidFromList.Equals(deviceId,StringComparison.InvariantCultureIgnoreCase))
                         {
+                            string OS = item.SubItems[2].Text;
+                            string udid = item.SubItems[4].Text;
+                            if (OS.Equals("iOS"))
+                            {
+                                ScreenControl.screenControl.LoadDeviceDisconnected(udid);
+                            }
                             item.SubItems[3].Text = "Offline";
                         }
                     }

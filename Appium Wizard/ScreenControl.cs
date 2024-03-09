@@ -17,6 +17,7 @@ namespace Appium_Wizard
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
+        Dictionary<string,WebView2> webview2 = new Dictionary<string,WebView2>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -31,21 +32,25 @@ namespace Appium_Wizard
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();
+            webview2.Add(udid, ScreenWebView);
             deviceSessionId.Add(udid, session);
             Task.Run(() =>
             {
                 while (true)
                 {
                     sessionId = GetSessionID();
-                    BeginInvoke(new Action(() =>
+                    if (OSType.Equals("Android"))
                     {
-                        if (tempSessionId != sessionId)
+                        BeginInvoke(new Action(() =>
                         {
-                            ScreenWebView.EnsureCoreWebView2Async();
-                            ScreenWebView.Reload();
-                            tempSessionId = sessionId;
-                        }
-                    }));
+                            if (tempSessionId != sessionId)
+                            {
+                                ScreenWebView.EnsureCoreWebView2Async();
+                                ScreenWebView.Reload();
+                                tempSessionId = sessionId;
+                            }
+                        }));
+                    }
                     Thread.Sleep(1000);
                 }
             });
@@ -88,11 +93,12 @@ namespace Appium_Wizard
             toolStrip2.Refresh();
             Activate();
             await ScreenWebView.EnsureCoreWebView2Async();
-            LoadScreen(ScreenWebView);
+            LoadScreen(udid);
         }
 
-        private void LoadScreen(WebView2 ScreenWebView)
+        public void LoadScreen(string udid)
         {
+            ScreenWebView = webview2[udid];
             string imageUrl = "http://" + IPAddress + ":" + screenPort;
             int imageWidth = width;
             int imageHeight = height;
@@ -130,6 +136,52 @@ namespace Appium_Wizard
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
 
+        }
+
+        public async void LoadDeviceDisconnected(string udid)
+        {
+            ScreenWebView = webview2[udid];
+            string htmlContent = @"<!DOCTYPE html>
+                                    <html>
+                                    <head>
+                                        <title>Device Disconnected</title>
+                                        <style>
+                                            body {
+                                                display: flex;
+                                                justify-content: center;
+                                                align-items: center;
+                                                height: 100vh;
+                                                margin: 0;
+                                                background-color: #f0f0f0;
+                                            }
+                                            h3 {
+                                                font-size: 24px;
+                                                font-weight: bold;
+                                                animation: colorChange 2s infinite;
+                                            }
+                                            @keyframes colorChange {
+                                                0% { color: red; }
+                                                50% { color: blue; }
+                                                100% { color: green; }
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <h3>Device disconnected</h3>
+                                    </body>
+                                    </html>";
+
+            await ScreenWebView.EnsureCoreWebView2Async();
+            try
+            {
+                ScreenWebView.NavigateToString(htmlContent);
+            }
+            catch (Exception)
+            {
+                string tempFilePath = Path.GetTempFileName() + ".html";
+                File.WriteAllText(tempFilePath, htmlContent);
+                ScreenWebView.CoreWebView2.Navigate(tempFilePath);
+            }
         }
 
         private void InitializeWebView()

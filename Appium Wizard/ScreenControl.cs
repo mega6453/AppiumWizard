@@ -18,6 +18,7 @@ namespace Appium_Wizard
         public static ScreenControl? screenControl;
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string,WebView2> webview2 = new Dictionary<string,WebView2>();
+        public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -29,6 +30,14 @@ namespace Appium_Wizard
             this.deviceName = selectedDeviceName;
             this.proxyPort = proxyPort;
             this.screenPort = screenPort;
+            if (devicePorts.ContainsKey(udid))
+            {
+                devicePorts[udid] = new Tuple<int, int>(screenPort, proxyPort);
+            }
+            else
+            {
+                devicePorts.Add(udid, new Tuple<int, int>(screenPort, proxyPort));
+            }
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();

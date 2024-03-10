@@ -63,13 +63,25 @@ namespace Appium_Wizard
                             string udid = item.SubItems[4].Text;
                             if (OS.Equals("iOS"))
                             {
-                                //iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                //int proxyPort = LoadingScreen.WDAproxyPort;
-                                //int screenServerPort = Common.GetFreePort();
-                                //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
-                                //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
-                                //Thread.Sleep(5000);
-                                //ScreenControl.screenControl.LoadScreen(udid);
+                                int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                int proxyPort = ScreenControl.devicePorts[udid].Item2;
+                                bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
+                                if (!isRunning)
+                                {
+                                    iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                }
+                                bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                int count = 0;
+                                while (!isLoaded && count == 5)
+                                {
+                                    isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                    if (!isLoaded)
+                                    {
+                                        Thread.Sleep(2000);
+                                    }                                   
+                                    count++;
+                                }
+                                ScreenControl.screenControl.LoadScreen(udid, screenPort);
                             }
                             else   
                             {

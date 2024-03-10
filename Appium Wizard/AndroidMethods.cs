@@ -716,14 +716,17 @@ namespace Appium_Wizard
         public static void DeleteSession(int proxyPort)
         {
             string sessionId = GetSessionID(proxyPort);
-            var options = new RestClientOptions("http://localhost:" + proxyPort)
+            if (!sessionId.Equals("nosession"))
             {
-                MaxTimeout = -1,
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId, Method.Delete);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+                var options = new RestClientOptions("http://localhost:" + proxyPort)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId, Method.Delete);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+            }
         }
 
     }

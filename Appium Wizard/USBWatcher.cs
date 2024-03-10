@@ -61,37 +61,49 @@ namespace Appium_Wizard
                         {
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
-                            if (OS.Equals("iOS"))
+                            if (ScreenControl.webview2.ContainsKey(udid))
                             {
-                                int screenPort = ScreenControl.devicePorts[udid].Item1;
-                                int proxyPort = ScreenControl.devicePorts[udid].Item2;
-                                bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
-                                if (!isRunning)
+                                if (OS.Equals("iOS"))
                                 {
-                                    iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                }
-                                bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                int count = 0;
-                                while (!isLoaded && count == 5)
-                                {
-                                    isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                    if (!isLoaded)
+                                    int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                    int proxyPort = ScreenControl.devicePorts[udid].Item2;
+                                    bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
+                                    if (!isRunning)
                                     {
-                                        Thread.Sleep(2000);
-                                    }                                   
-                                    count++;
+                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                    }
+                                    bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                    int count = 0;
+                                    while (!isLoaded && count == 5)
+                                    {
+                                        isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                        if (!isLoaded)
+                                        {
+                                            Thread.Sleep(2000);
+                                        }
+                                        count++;
+                                    }
+                                    ScreenControl.screenControl.LoadScreen(udid, screenPort);
                                 }
-                                ScreenControl.screenControl.LoadScreen(udid, screenPort);
-                            }
-                            else   
-                            {
-                                if (ScreenControl.webview2.ContainsKey(udid))
+                                else
                                 {
-                                    AndroidMethods.GetInstance().StopUIAutomator(udid);
-                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                                    int screenServerPort = Common.GetFreePort();
-                                    AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
-
+                                    //int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                    //int proxyPort = ScreenControl.devicePorts[udid].Item2;
+                                    //AndroidMethods.GetInstance().StopUIAutomator(udid);
+                                    //AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                                    //AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                                    //AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
+                                    //AndroidAPIMethods.DeleteSession(proxyPort);
+                                    //string sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenPort);
+                                    //if (OpenDevice.deviceSessionId.ContainsKey(udid))
+                                    //{
+                                    //    OpenDevice.deviceSessionId[udid] = sessionIdCreatedForScreenServer;
+                                    //}
+                                    //else
+                                    //{
+                                    //    OpenDevice.deviceSessionId.Add(udid, sessionIdCreatedForScreenServer);
+                                    //}
+                                    //---------------------------------------
                                     //int screenServerPort = 0;
                                     //int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
                                     //if (forwardedScreenPort != -1)
@@ -103,9 +115,47 @@ namespace Appium_Wizard
                                     //    screenServerPort = Common.GetFreePort();
                                     //    AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                                     //}
-                                    Thread.Sleep(1000);
-                                    ScreenControl.screenControl.LoadScreen(udid, screenServerPort);
-                                    //ScreenControl.screenControl.LoadScreen(udid, ScreenControl.tempport);
+                                    //---------------------------------------
+                                    //bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                                    //if (isRunning)
+                                    //{                                    
+                                    //    AndroidAPIMethods.DeleteSession(proxyPort);
+                                    //    string sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenPort);
+                                    //    if (!sessionIdCreatedForScreenServer.Equals("nosession"))
+                                    //    {
+                                    //        if (OpenDevice.deviceSessionId.ContainsKey(udid))
+                                    //        {
+                                    //            OpenDevice.deviceSessionId[udid] = sessionIdCreatedForScreenServer;
+                                    //        }
+                                    //        else
+                                    //        {
+                                    //            OpenDevice.deviceSessionId.Add(udid, sessionIdCreatedForScreenServer);
+                                    //        }
+                                    //    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                                    //}  
+                                    //---------------------------------------
+                                    int proxyPort = Common.GetFreePort();
+                                    int screenPort = Common.GetFreePort();
+                                    AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                                    AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
+                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                                    Thread.Sleep(5000);
+                                    //bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                    //int count = 0;
+                                    //while (!isLoaded && count == 5)
+                                    //{
+                                    //    isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                                    //    if (!isLoaded)
+                                    //    {
+                                    //        Thread.Sleep(2000);
+                                    //    }
+                                    //    count++;
+                                    //}
+                                    ScreenControl.screenControl.LoadScreen(udid, screenPort);
                                 }
                             }
                             item.SubItems[3].Text = "Online";

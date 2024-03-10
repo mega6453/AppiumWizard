@@ -17,7 +17,7 @@ namespace Appium_Wizard
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        Dictionary<string,WebView2> webview2 = new Dictionary<string,WebView2>();
+        public static Dictionary<string,WebView2> webview2 = new Dictionary<string,WebView2>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -32,8 +32,15 @@ namespace Appium_Wizard
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();
-            webview2.Add(udid, ScreenWebView);
             deviceSessionId.Add(udid, session);
+            if (!webview2.ContainsKey(udid))
+            {
+                webview2.Add(udid, ScreenWebView);
+            }
+            else
+            {
+                webview2[udid] = ScreenWebView;
+            }
             Task.Run(() =>
             {
                 while (true)
@@ -79,7 +86,7 @@ namespace Appium_Wizard
             }
         }
 
-        private async void ScreenControl_Load(object sender, EventArgs e)
+        private void ScreenControl_Load(object sender, EventArgs e)
         {
             this.ClientSize = new Size(width, height + toolStrip1.Height + toolStrip2.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -91,43 +98,55 @@ namespace Appium_Wizard
             }
             toolStrip1.Refresh();
             toolStrip2.Refresh();
-            Activate();
-            await ScreenWebView.EnsureCoreWebView2Async();
-            LoadScreen(udid);
+            Activate();           
+            LoadScreen(udid, screenPort);
         }
 
-        public void LoadScreen(string udid)
+        public async void LoadScreen(string udid, int screenPort)
         {
+            //ScreenWebView = webview2[udid];
+            //if (!ScreenWebView.Equals(webview2[udid]))
+            //{
+            //    ScreenWebView = webview2[udid];
+            //}
             ScreenWebView = webview2[udid];
+            //if (Controls.Contains(ScreenWebView))
+            //{
+            //    Controls.Remove(ScreenWebView);
+            //    Controls.Add(ScreenWebView);
+            //}
             string imageUrl = "http://" + IPAddress + ":" + screenPort;
             int imageWidth = width;
             int imageHeight = height;
             var htmlContent = $@"
-                                    <html>
-                                        <head>
-                                            <style>
-                                                body {{
-                                                    margin: 0;
-                                                    padding: 0;
-                                                }}
-                                                img {{
-                                                    display: block;
-                                                    max-width: 100%;
-                                                    height: auto;
-                                                    margin: 0;
-                                                    padding: 0;
-                                                }}
-                                            </style>
-                                        </head>
-                                        <body>
-                                            <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
-                                        </body>
-                                    </html>
-                                ";
-
+                                <html>
+                                    <head>
+                                        <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate' />
+                                        <meta http-equiv='pragma' content='no-cache' />
+                                        <meta http-equiv='expires' content='0' />
+                                        <style>
+                                            body {{
+                                                margin: 0;
+                                                padding: 0;
+                                            }}
+                                            img {{
+                                                display: block;
+                                                max-width: 100%;
+                                                height: auto;
+                                                margin: 0;
+                                                padding: 0;
+                                            }}
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
+                                    </body>
+                                </html>
+                            ";
+            await ScreenWebView.EnsureCoreWebView2Async();
             try
             {
-                ScreenWebView.NavigateToString(htmlContent);
+                ScreenWebView.NavigateToString(htmlContent);                            
             }
             catch (Exception)
             {
@@ -135,7 +154,6 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -144,7 +162,6 @@ namespace Appium_Wizard
             string htmlContent = @"<!DOCTYPE html>
                                     <html>
                                     <head>
-                                        <title>Device Disconnected</title>
                                         <style>
                                             body {
                                                 display: flex;
@@ -426,6 +443,7 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
+            webview2.Remove(udid);
             //Hide();
             //try
             //{

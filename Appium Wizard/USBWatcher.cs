@@ -71,11 +71,32 @@ namespace Appium_Wizard
                                 //Thread.Sleep(5000);
                                 //ScreenControl.screenControl.LoadScreen(udid);
                             }
-                            //else   // not sure needed or not...
-                            //{
-                            //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                            //}
-                            item.SubItems[3].Text = "Online";                           
+                            else   
+                            {
+                                if (ScreenControl.webview2.ContainsKey(udid))
+                                {
+                                    AndroidMethods.GetInstance().StopUIAutomator(udid);
+                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                                    int screenServerPort = Common.GetFreePort();
+                                    AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
+
+                                    //int screenServerPort = 0;
+                                    //int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                                    //if (forwardedScreenPort != -1)
+                                    //{
+                                    //    screenServerPort = forwardedScreenPort;
+                                    //}
+                                    //else
+                                    //{
+                                    //    screenServerPort = Common.GetFreePort();
+                                    //    AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
+                                    //}
+                                    Thread.Sleep(1000);
+                                    ScreenControl.screenControl.LoadScreen(udid, screenServerPort);
+                                    //ScreenControl.screenControl.LoadScreen(udid, ScreenControl.tempport);
+                                }
+                            }
+                            item.SubItems[3].Text = "Online";
                         }
                     }
                 });
@@ -100,11 +121,11 @@ namespace Appium_Wizard
                         {
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
-                            if (OS.Equals("iOS"))
+                            item.SubItems[3].Text = "Offline";
+                            if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 ScreenControl.screenControl.LoadDeviceDisconnected(udid);
-                            }
-                            item.SubItems[3].Text = "Offline";
+                            }                            
                         }
                     }
                 });

@@ -180,21 +180,23 @@
             toolStrip2.GripStyle = ToolStripGripStyle.Hidden;
             toolStrip2.ImageScalingSize = new Size(24, 24);
             toolStrip2.Items.AddRange(new ToolStripItem[] { statusLabel });
-            toolStrip2.Location = new Point(0, 547);
+            toolStrip2.Location = new Point(0, 544);
             toolStrip2.Name = "toolStrip2";
             toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(371, 25);
+            toolStrip2.Size = new Size(371, 28);
             toolStrip2.TabIndex = 2;
+            toolStrip2.TabStop = true;
             toolStrip2.Text = "toolStrip2";
             // 
             // statusLabel
             // 
-            statusLabel.AutoToolTip = true;
             statusLabel.BackgroundImageLayout = ImageLayout.None;
             statusLabel.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            statusLabel.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
+            statusLabel.Font = new Font("Arial Narrow", 9F, FontStyle.Regular, GraphicsUnit.Point);
             statusLabel.Name = "statusLabel";
-            statusLabel.Size = new Size(0, 20);
+            statusLabel.Overflow = ToolStripItemOverflow.Never;
+            statusLabel.Size = new Size(0, 23);
+            statusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // ScreenControl
             // 

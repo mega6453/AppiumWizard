@@ -17,6 +17,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static List<string> listOfSessionIDs = new List<string>();
+        string element = string.Empty;
         public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
@@ -38,7 +39,7 @@ namespace Appium_Wizard
                     //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info:info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
 
 
                     //working
@@ -164,26 +165,27 @@ namespace Appium_Wizard
                         }
                     }
                 }
+
                 //if (e.Data.Contains("Could not proxy command to the remote server"))
                 //{
                 //    AndroidMethods.GetInstance().StopUIAutomator(deviceId);
                 //    MessageBox.Show("Session creation failed. Please retry again.\nIf issue persists, restart your device and try again.", "Failed to create session", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //}
-                if (e.Data.Contains("xcuitest"))
-                {
-                    statusText = "Attempting to load xcuitest(iOS) driver...";
-                }
-                else if (e.Data.Contains("uiautomator2"))
-                {
-                    statusText = "Attempting to load uiautomator2(Android) driver...";
-                }
-                else if (e.Data.Contains("Appium REST http interface listener started"))
-                {
-                    statusText = "Appium Server Started";
-                    serverStarted = true;
-                    //int port = int.Parse(GetPortFromInput(e.Data));
-                    //appiumServerRunningList.Add(port,true);
-                }
+                //if (e.Data.Contains("xcuitest"))
+                //{
+                //    statusText = "Attempting to load xcuitest(iOS) driver...";
+                //}
+                //else if (e.Data.Contains("uiautomator2"))
+                //{
+                //    statusText = "Attempting to load uiautomator2(Android) driver...";
+                //}
+                //else if (e.Data.Contains("Appium REST http interface listener started"))
+                //{
+                //    statusText = "Appium Server Started";
+                //    serverStarted = true;
+                //    //int port = int.Parse(GetPortFromInput(e.Data));
+                //    //appiumServerRunningList.Add(port,true);
+                //}
                 else if (e.Data.Contains("address already in use"))
                 {
                     statusText = "address already in use 0.0.0.0:4723";
@@ -192,8 +194,8 @@ namespace Appium_Wizard
                 {
                     if (ScreenControl.screenControl != null)
                     {
-                        string element = string.Empty;
-                        if (e.Data.Contains("[POST /element]") | e.Data.Contains("[POST /elements]"))
+                        //if (e.Data.Contains("[POST /element]") | e.Data.Contains("[POST /elements]"))
+                        if (e.Data.Contains("{\"using\":"))
                         {
                             string json = GetOnlyJson(e.Data);
                             try
@@ -210,11 +212,30 @@ namespace Appium_Wizard
                             {
                             }
                         }
-                        //else if (e.Data.Contains("POST /session/") && e.Data.Contains("/click]"))
-                        //{
-                        //    statusText = "Click " + element;
-                        //    ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                        //}
+                        else if (e.Data.Contains("POST /session/") && e.Data.Contains("/click"))
+                        {
+                            statusText = "Click " + element;
+                            ScreenControl.screenControl.UpdateStatusLabel(statusText);
+                        }
+                        //else if (e.Data.Contains("POST /session/") && e.Data.Contains("/value"))
+                        else if (e.Data.Contains("{\"text\":"))
+                        {
+                            string text;
+                            string json = GetOnlyJson(e.Data);
+                            try
+                            {
+                                if (IsValidJson(json))
+                                {
+                                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
+                                    text = jsonObject.text;
+                                    statusText = "Send text \"" + text + "\" to "+element;
+                                    ScreenControl.screenControl.UpdateStatusLabel(statusText);
+                                }
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
                         else if (e.Data.Contains("Got response with status"))
                         {
                             try

@@ -17,7 +17,7 @@ namespace Appium_Wizard
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        public static Dictionary<string,WebView2> webview2 = new Dictionary<string,WebView2>();
+        public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
         public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
@@ -78,9 +78,9 @@ namespace Appium_Wizard
             string truncatedText = string.Empty;
             try
             {
-                if (actualText.Length > 45)
+                if (actualText.Length > 55)
                 {
-                    truncatedText = actualText.Substring(0, 45) + "...";
+                    truncatedText = actualText.Substring(0, 55) + "...";
                     statusLabel.Text = truncatedText;
                 }
                 else
@@ -107,7 +107,7 @@ namespace Appium_Wizard
             }
             toolStrip1.Refresh();
             toolStrip2.Refresh();
-            Activate();           
+            Activate();
             LoadScreen(udid, screenPort);
         }
 
@@ -155,7 +155,7 @@ namespace Appium_Wizard
             await ScreenWebView.EnsureCoreWebView2Async();
             try
             {
-                ScreenWebView.NavigateToString(htmlContent);                            
+                ScreenWebView.NavigateToString(htmlContent);
             }
             catch (Exception)
             {

@@ -50,12 +50,13 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * APK Installation
 * Server Management
 * Troubleshooter
+* Element Interaction status (Find element, Click and Send text)
 * etc.
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window
 * Update Appium Server and drivers from Appium Wizard
-* Show Action + current element(e.g. Click on //someElement) text in status bar based on appium execution
+* Element Interaction status (WaitForElement, Swipe, etc.)
 * Handle resources on Application exit
 * Highlight element accessed by Appium in Screen Reflection
 * Unlock Mobile using Screen Control

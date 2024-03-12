@@ -524,6 +524,9 @@ namespace Appium_Wizard
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Exiting","Please wait while closing all resources and exiting...");
             try
             {
                 foreach (var item in runningProcessesPortNumbers)

@@ -81,6 +81,6 @@ jobs:
         tag_name: v${{ steps.get_version.outputs.version }}
         release_name: Release ${{ steps.get_version.outputs.version }}
         body: |
-          Release version ${{ steps.get_version.outputs.releaseNotes }}
+          ${{ steps.get_version.outputs.releaseNotes }}
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}

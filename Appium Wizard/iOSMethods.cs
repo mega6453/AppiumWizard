@@ -698,6 +698,9 @@ namespace Appium_Wizard
                 StartInfo = startInfo
             };
             iProxyProcess.Start();
+            var processId = iProxyProcess.Id;
+            PortProcessId.Add(localPort, processId);
+            MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
         public void InstallApp(string udid, string path)

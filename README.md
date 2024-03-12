@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/mega6453/AppiumWizard/blob/master/Appium%20Wizard/Resources/Images/appium%20wizard%20small.jpg" alt="Appium Wizard Logo">
+  <img src="logo.jpg" alt="Appium Wizard Logo">
 </p>
 
 # Appium Wizard for Mobile Automation Testing

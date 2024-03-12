@@ -65,8 +65,9 @@ jobs:
       run: |
         $versionFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\VersionInfo.cs"
         $version = Select-String -Pattern 'VersionNumber\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
-        $releasenotes = Select-String -Pattern 'ReleaseNotes\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
+        $releaseNotes = Select-String -Pattern 'ReleaseNotes\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
         echo "::set-output name=version::$version"
+        echo "::set-output name=releasenotes::$releaseNotes"
       shell: pwsh
       env:
         Solution_Name: Appium Wizard
@@ -80,6 +81,6 @@ jobs:
         tag_name: v${{ steps.get_version.outputs.version }}
         release_name: Release ${{ steps.get_version.outputs.version }}
         body: |
-          Release version ${{ steps.get_version.outputs.releasenotes }}
+          Release version ${{ steps.get_version.outputs.releaseNotes }}
       env:
         GITHUB_TOKEN: ${{ secrets.APPIUMWIZARD_TOKEN }}

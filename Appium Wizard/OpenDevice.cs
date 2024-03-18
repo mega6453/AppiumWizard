@@ -82,8 +82,8 @@
                         commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...");
                         proxyPort = LoadingScreen.WDAproxyPort;
                         screenServerPort = Common.GetFreePort();
-                        iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
-                        iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
+                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
 
                         commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...");
                         bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
@@ -159,7 +159,7 @@
                         {
                             commonProgress.UpdateStepLabel(title, "Starting screen server...");
                             Common.KillProcessByPortNumber(screenServerPort);
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
                         }
                         if (WDAsessionId.Equals("nosession"))
                         {

@@ -16,8 +16,6 @@ namespace Appium_Wizard
         public static Dictionary<int, Tuple<Process, string>> listOfProcess = new Dictionary<int, Tuple<Process, string>>();
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
-        public static List<string> listOfSessionIDs = new List<string>();
-        string element = string.Empty;
         public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
@@ -91,8 +89,6 @@ namespace Appium_Wizard
             }
         }
 
-        Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-        string tempsessionId = string.Empty, deviceId = string.Empty;
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -106,163 +102,13 @@ namespace Appium_Wizard
                         streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                     }
                 }
-                if (e.Data.Contains("Session created with session id:"))
+                if (ScreenControl.screenControl != null)
                 {
-                    string input = e.Data;
-                    string pattern = @"session id: (\w+-\w+-\w+-\w+-\w+)";
-                    Regex regex = new Regex(pattern);
-                    Match match = regex.Match(input);
-
-                    if (match.Success)
-                    {
-                        string sessionId = match.Groups[1].Value;
-                        listOfSessionIDs.Add(sessionId);
-                        tempsessionId = sessionId;
-                    }
-                    statusText = "Session Created";
-                    if (ScreenControl.screenControl != null)
-                    {
-                        ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                    }
-                }
-                if (e.Data.Contains("Using device:"))
-                {
-                    string input = e.Data;
-                    int startIndex = input.IndexOf(":") + 2;
-                    deviceId = input.Substring(startIndex);
-                    keyValuePairs.Add(tempsessionId, deviceId);
-                    statusText = "Set Device " + deviceId;
-                    if (ScreenControl.screenControl != null)
-                    {
-                        ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                    }
-                }
-                if (e.Data.Contains("DELETE /session/"))
-                {
-                    if (ScreenControl.screenControl != null)
-                    {
-                        statusText = "Session Deleted";
-                        ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                        string input = e.Data;
-                        string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
-                        Regex regex = new Regex(pattern);
-                        Match match = regex.Match(input);
-                        string sessionId = "";
-                        if (match.Success)
-                        {
-                            sessionId = match.Groups[1].Value;
-                        }
-                        try
-                        {
-                            string deviceUDID = keyValuePairs[sessionId];
-                            int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
-                            int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
-                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                            AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-
-                //if (e.Data.Contains("Could not proxy command to the remote server"))
-                //{
-                //    AndroidMethods.GetInstance().StopUIAutomator(deviceId);
-                //    MessageBox.Show("Session creation failed. Please retry again.\nIf issue persists, restart your device and try again.", "Failed to create session", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //}
-                //if (e.Data.Contains("xcuitest"))
-                //{
-                //    statusText = "Attempting to load xcuitest(iOS) driver...";
-                //}
-                //else if (e.Data.Contains("uiautomator2"))
-                //{
-                //    statusText = "Attempting to load uiautomator2(Android) driver...";
-                //}
-                //else if (e.Data.Contains("Appium REST http interface listener started"))
-                //{
-                //    statusText = "Appium Server Started";
-                //    serverStarted = true;
-                //    //int port = int.Parse(GetPortFromInput(e.Data));
-                //    //appiumServerRunningList.Add(port,true);
-                //}
-                else if (e.Data.Contains("address already in use"))
-                {
-                    statusText = "address already in use 0.0.0.0:4723";
-                }
-                else
-                {
-                    if (ScreenControl.screenControl != null)
-                    {
-                        //if (e.Data.Contains("[POST /element]") | e.Data.Contains("[POST /elements]"))
-                        if (e.Data.Contains("{\"using\":"))
-                        {
-                            string json = GetOnlyJson(e.Data);
-                            try
-                            {
-                                if (IsValidJson(json))
-                                {
-                                    var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                                    element = dictionary["value"];
-                                    statusText = "Find Element " + element;
-                                    ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                                }
-                            }
-                            catch (Exception)
-                            {
-                            }
-                        }
-                        else if (e.Data.Contains("POST /session/") && e.Data.Contains("/click"))
-                        {
-                            statusText = "Click " + element;
-                            ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                        }
-                        //else if (e.Data.Contains("POST /session/") && e.Data.Contains("/value"))
-                        else if (e.Data.Contains("{\"text\":"))
-                        {
-                            string text;
-                            string json = GetOnlyJson(e.Data);
-                            try
-                            {
-                                if (IsValidJson(json))
-                                {
-                                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
-                                    text = jsonObject.text;
-                                    statusText = "Send text \"" + text + "\" to "+element;
-                                    ScreenControl.screenControl.UpdateStatusLabel(statusText);
-                                }
-                            }
-                            catch (Exception)
-                            {
-                            }
-                        }
-                        else if (e.Data.Contains("Got response with status"))
-                        {
-                            try
-                            {
-                                ScreenControl.screenControl.UpdateStatusLabel("");
-                            }
-                            catch (Exception)
-                            {
-
-                            }
-                        }
-                    }
-                }
+                    ExecutionStatus.UpdateStatus(e.Data);
+                }                
             }
         }
-        static string GetPortFromInput(string input)
-        {
-            string pattern = @":(\d+)$";
-            Match match = Regex.Match(input, pattern);
 
-            if (match.Success)
-            {
-                return match.Groups[1].Value;
-            }
-
-            return null;
-        }
         public void StopAppiumServer(int port)
         {
             if (listOfProcess.ContainsKey(port))

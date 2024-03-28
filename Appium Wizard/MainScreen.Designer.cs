@@ -202,6 +202,7 @@ namespace Appium_Wizard
             checkBox1.TabIndex = 7;
             checkBox1.Text = "Auto Scroll";
             checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += AutoScrollCheckbox_CheckedChanged;
             // 
             // label1
             // 
@@ -273,7 +274,7 @@ namespace Appium_Wizard
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
             inspectorToolStripMenuItem1.Size = new Size(307, 34);
             inspectorToolStripMenuItem1.Text = "Inspector";
-            inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem1_Click;
+            inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem_Click;
             // 
             // iOSProfileManagementToolStripMenuItem
             // 
@@ -479,7 +480,7 @@ namespace Appium_Wizard
             WindowState = FormWindowState.Maximized;
             FormClosing += onFormClosing;
             Load += onFormLoad;
-            Shown += afterFormShown;
+            Shown += MainScreen_Shown;
             contextMenuStrip1.ResumeLayout(false);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

@@ -1,4 +1,6 @@
-﻿namespace Appium_Wizard
+﻿using System.Reflection;
+
+namespace Appium_Wizard
 {
     public partial class DeviceInformation : Form
     {
@@ -16,6 +18,7 @@
         private void Cancel_Click(object sender, EventArgs e)
         {
             Close();
+            GoogleAnalytics.SendEvent("DeviceInformation_Cancel_Clicked");
         }
 
         private void Add_Click(object sender, EventArgs e)
@@ -58,7 +61,25 @@
             Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height);
             mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online");
             Close();
+            if (OSType.ToLower().Contains("ios"))
+            {
+                Dictionary<string, string> dic = new Dictionary<string, string>();
+                dic.Add("Model",Model);
+                dic.Add("OSVersion", OSVersion);
+                GoogleAnalytics.SendEvent("Device_Added_iOS",dic);
+            }
+            else
+            {
+                Dictionary<string, string> dic = new Dictionary<string, string>();
+                dic.Add("Model", Model);
+                dic.Add("OSVersion", OSVersion);
+                GoogleAnalytics.SendEvent("Device_Added_Android", dic);
+            }
         }
 
+        private void DeviceInformation_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
     }
 }

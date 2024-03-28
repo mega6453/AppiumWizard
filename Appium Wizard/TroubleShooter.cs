@@ -1,4 +1,6 @@
-﻿namespace Appium_Wizard
+﻿using System.Reflection;
+
+namespace Appium_Wizard
 {
     public partial class TroubleShooter : Form
     {
@@ -25,6 +27,7 @@
                 XCUITestStatusLabel.Text = "Appium Required";
                 UIAutomatorStatusLabel.Text = "Appium Required";
                 FixNodeJSButton.Enabled = true;
+                GoogleAnalytics.SendEvent("Trouble_NodeJS_Not_Installed");
             }
             else
             {
@@ -37,6 +40,7 @@
                     XCUITestStatusLabel.Text = "Appium Required";
                     UIAutomatorStatusLabel.Text = "Appium Required";
                     FixAppiumButton.Enabled = true;
+                    GoogleAnalytics.SendEvent("Trouble_Appium_Not_Installed");
                 }
                 else
                 {
@@ -49,6 +53,7 @@
                     {
                         XCUITestStatusLabel.Text = "Not OK";
                         FixXCUITestButton.Enabled = true;
+                        GoogleAnalytics.SendEvent("Trouble_XCUITest_Not_Installed");
                     }
                     else
                     {
@@ -59,6 +64,7 @@
                     {
                         UIAutomatorStatusLabel.Text = "Not OK";
                         FixUIAutomatorButton.Enabled = true;
+                        GoogleAnalytics.SendEvent("Trouble_UIAutomator_Not_Installed");
                     }
                     else
                     {
@@ -79,6 +85,7 @@
             Common.InstallNodeJs();
             commonProgress.Close();
             FindIssues();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void FixAppiumButton_Click(object sender, EventArgs e)
@@ -89,6 +96,7 @@
             Common.InstallAppiumGlobally();
             commonProgress.Close();
             FindIssues();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void FixXCUITestButton_Click(object sender, EventArgs e)
@@ -99,6 +107,7 @@
             Common.InstallXCUITestDriver();
             commonProgress.Close();
             FindIssues();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void FixUIAutomatorButton_Click(object sender, EventArgs e)
@@ -109,11 +118,18 @@
             Common.InstallUIAutomatorDriver();
             commonProgress.Close();
             FindIssues();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void checkForIssues_Click(object sender, EventArgs e)
         {
             FindIssues();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
+
+        private void TroubleShooter_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
     }
 }

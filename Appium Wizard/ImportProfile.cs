@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Xml;
 using ListView = System.Windows.Forms.ListView;
 
@@ -12,6 +13,7 @@ namespace Appium_Wizard
         string ProfilesFilePath = FilesPath.ProfilesFilePath;
         private int folderCounter;
         ListView listView1;
+
         public ImportProfile(ListView listView)
         {
             InitializeComponent();
@@ -47,66 +49,78 @@ namespace Appium_Wizard
 
         private void button3_Click(object sender, EventArgs e)
         {
-            string password = maskedTextBox1.Text;
-            string command = $"pkcs12 -info -in \"{p12InputFilePath}\" -noout -passin pass:\"{password}\"";
-            string output = ExecuteCommand(opensslFilePath, command, true);
-            if (output.Contains("invalid password"))
+            //GoogleAnalytics.SendEvent("ImportProfileButton_Clicked");
+            try
             {
-                MessageBox.Show("Incorrect password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (output.Contains("MAC verified OK"))
-            {
-                string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
-                var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
-                string certificates = provisionDetails["DeveloperCertificates"].ToString();
-                if (!certificates.Contains(certificate))
+                string password = maskedTextBox1.Text;
+                string command = $"pkcs12 -info -in \"{p12InputFilePath}\" -noout -passin pass:\"{password}\"";
+                string output = ExecuteCommand(opensslFilePath, command, true);
+                if (output.Contains("invalid password"))
                 {
-                    MessageBox.Show("P12 file does not match with mobileprovision file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Incorrect password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //GoogleAnalytics.SendEvent("iOS_Profile_Password_Wrong");
+                }
+                else if (output.Contains("MAC verified OK"))
+                {
+                    string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
+                    var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
+                    string certificates = provisionDetails["DeveloperCertificates"].ToString();
+                    if (!certificates.Contains(certificate))
+                    {
+                        MessageBox.Show("P12 file does not match with mobileprovision file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //GoogleAnalytics.SendEvent("iOS_P12_Provision_Not_Matching");
+                    }
+                    else
+                    {
+                        string folderPath = Path.Combine(ProfilesFilePath, "profile" + folderCounter + "\\");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                            folderCounter++;
+                            SaveCounter();
+                        }
+                        string p12fileName = Path.GetFileName(p12InputFilePath);
+                        string mobileProvisionfileName = Path.GetFileName(mobileProvisionFilePath);
+                        string p12DestinationPath = folderPath + p12fileName;
+                        File.Copy(p12InputFilePath, p12DestinationPath, true);
+                        string mobileProvisionDestinationPath = folderPath + mobileProvisionfileName;
+                        File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
+
+                        command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
+                        ExecuteCommand(opensslFilePath, command, true);
+
+                        string profileName = provisionDetails["Name"].ToString();
+                        int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                        string appId = provisionDetails["application-identifier"].ToString();
+                        string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
+                        string updatedExpirationDays = expirationDays.ToString() + " days";
+                        try
+                        {
+                            if (expirationDays <= 0)
+                            {
+                                updatedExpirationDays = "Expired";
+                            }
+                            string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
+                            listView1.Items.Add(new ListViewItem(item1));
+                            Close();
+                            MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            listView1.Refresh();
+                            GoogleAnalytics.SendEvent("iOS_Profile_Added_Successfully");
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
                 }
                 else
                 {
-                    string folderPath = Path.Combine(ProfilesFilePath, "profile" + folderCounter + "\\");
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                        folderCounter++;
-                        SaveCounter();
-                    }
-                    string p12fileName = Path.GetFileName(p12InputFilePath);
-                    string mobileProvisionfileName = Path.GetFileName(mobileProvisionFilePath);
-                    string p12DestinationPath = folderPath + p12fileName;
-                    File.Copy(p12InputFilePath, p12DestinationPath, true);
-                    string mobileProvisionDestinationPath = folderPath + mobileProvisionfileName;
-                    File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
-
-                    command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
-                    ExecuteCommand(opensslFilePath, command, true);
-
-                    string profileName = provisionDetails["Name"].ToString();
-                    int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                    string appId = provisionDetails["application-identifier"].ToString();
-                    string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
-                    string updatedExpirationDays = expirationDays.ToString() + " days";
-                    try
-                    {
-                        if (expirationDays <= 0)
-                        {
-                            updatedExpirationDays = "Expired";
-                        }
-                        string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
-                        listView1.Items.Add(new ListViewItem(item1));
-                        Close();
-                        MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        listView1.Refresh();
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    MessageBox.Show("Unhandled exception : \n" + output, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("ImportProfileButton_Clicked_Unhandled", "Unhandled Scenario");
                 }
             }
-            else
+            catch (Exception exception)
             {
-                MessageBox.Show("Unhandled exception : \n" + output, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendExceptionEvent("ImportProfileButton_Clicked", exception.Message);
             }
         }
 
@@ -122,6 +136,7 @@ namespace Appium_Wizard
         private void button4_Click(object sender, EventArgs e)
         {
             Close();
+            GoogleAnalytics.SendEvent("ImportProfile_Cancel_Clicked");
         }
 
         public static Dictionary<object, object> GetDetailsFromProvisionFile(string mobileProvisionFilePath)
@@ -139,26 +154,35 @@ namespace Appium_Wizard
 
         public static string GetCertificateFromP12File(string p12File, string password)
         {
-            string arguments = $"pkcs12 -info -in \"{p12File}\" -passin pass:\"{password}\" -passout pass:\"{password}\"";
-
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            try
             {
-                FileName = opensslFilePath,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
+                string arguments = $"pkcs12 -info -in \"{p12File}\" -passin pass:\"{password}\" -passout pass:\"{password}\"";
 
-            Process opensslProcess = new Process();
-            opensslProcess.StartInfo = startInfo;
-            opensslProcess.Start();
-            string output = opensslProcess.StandardOutput.ReadToEnd();
-            opensslProcess.WaitForExit();
-            output = Common.GetTextBetween(output);
-            return output;
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = opensslFilePath,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                Process opensslProcess = new Process();
+                opensslProcess.StartInfo = startInfo;
+                opensslProcess.Start();
+                string output = opensslProcess.StandardOutput.ReadToEnd();
+                opensslProcess.WaitForExit();
+                output = Common.GetTextBetween(output);
+                return output;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while getting pem from p12", "Error in openssl", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendExceptionEvent("GetCertificateFromP12File", e.Message);
+                return "exception";
+            }
         }
 
         static string ExecuteCommand(string fileName, string arguments, bool returnErrorAlso)
@@ -196,9 +220,10 @@ namespace Appium_Wizard
                     return output;
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 MessageBox.Show("Error while getting pem from p12", "Error in openssl", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendExceptionEvent("Error_while_getting_pem_from_p12", exception.Message);
                 return "exception";
             }
         }
@@ -258,9 +283,14 @@ namespace Appium_Wizard
             }
             else
             {
-                Console.WriteLine("Failed to parse expiration date.");
+                GoogleAnalytics.SendExceptionEvent("Profile_Failed_to_parse_expiration_date");
             }
             return daysRemaining;
+        }
+
+        private void ImportProfile_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Appium_Wizard
 {
-    partial class InstallApp
+    partial class InstalliOSApp
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InstallApp));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InstalliOSApp));
             label1 = new Label();
             button1 = new Button();
             button2 = new Button();
@@ -80,7 +80,8 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Install iOS App";
-            HelpButtonClicked += InstallApp_HelpButtonClicked;
+            HelpButtonClicked += InstallApp_HelpButton_Clicked;
+            Shown += InstallApp_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

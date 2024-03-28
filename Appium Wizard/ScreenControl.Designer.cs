@@ -86,7 +86,7 @@
             buttonAlwaysOnTop.ImageTransparentColor = Color.Magenta;
             buttonAlwaysOnTop.Name = "buttonAlwaysOnTop";
             buttonAlwaysOnTop.Size = new Size(34, 28);
-            buttonAlwaysOnTop.Click += buttonAlwaysOnTop_Click;
+            buttonAlwaysOnTop.Click += AlwaysOnTop_Click;
             // 
             // toolStripSeparator4
             // 
@@ -131,7 +131,7 @@
             toolStripButton1.ImageTransparentColor = Color.Magenta;
             toolStripButton1.Name = "toolStripButton1";
             toolStripButton1.Size = new Size(34, 28);
-            toolStripButton1.Click += Home;
+            toolStripButton1.Click += HomeButton_Click;
             // 
             // BackButton
             // 
@@ -180,10 +180,10 @@
             toolStrip2.GripStyle = ToolStripGripStyle.Hidden;
             toolStrip2.ImageScalingSize = new Size(24, 24);
             toolStrip2.Items.AddRange(new ToolStripItem[] { statusLabel });
-            toolStrip2.Location = new Point(0, 544);
+            toolStrip2.Location = new Point(0, 547);
             toolStrip2.Name = "toolStrip2";
             toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(371, 28);
+            toolStrip2.Size = new Size(371, 25);
             toolStrip2.TabIndex = 2;
             toolStrip2.TabStop = true;
             toolStrip2.Text = "toolStrip2";
@@ -195,7 +195,7 @@
             statusLabel.Font = new Font("Arial Narrow", 9F, FontStyle.Regular, GraphicsUnit.Point);
             statusLabel.Name = "statusLabel";
             statusLabel.Overflow = ToolStripItemOverflow.Never;
-            statusLabel.Size = new Size(0, 23);
+            statusLabel.Size = new Size(0, 20);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // ScreenControl
@@ -214,6 +214,7 @@
             FormClosing += ScreenControl_FormClosing;
             FormClosed += ScreenControl_FormClosed;
             Load += ScreenControl_Load;
+            Shown += ScreenControl_Shown;
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).EndInit();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();

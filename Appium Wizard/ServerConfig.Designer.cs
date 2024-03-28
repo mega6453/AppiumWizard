@@ -331,6 +331,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Server Setup";
+            Shown += ServerConfig_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

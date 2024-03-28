@@ -58,9 +58,11 @@ namespace Appium_Wizard
                     {
                         string udidFromList = Regex.Replace(item.SubItems[4].Text, "[^a-zA-Z0-9]", "");
                         if (udidFromList.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))
-                        {
+                        {                            
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
+                            string version = item.SubItems[1].Text;
+                            string OSVersion = OS + " " + version;
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 if (OS.Equals("iOS"))
@@ -163,6 +165,7 @@ namespace Appium_Wizard
                                 }
                             }
                             item.SubItems[3].Text = "Online";
+                            GoogleAnalytics.SendEvent("UsbDeviceConnected", OSVersion);
                         }
                     }
                 });
@@ -187,11 +190,14 @@ namespace Appium_Wizard
                         {
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
+                            string version = item.SubItems[1].Text;
+                            string OSVersion = OS + " " + version;
                             item.SubItems[3].Text = "Offline";
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 ScreenControl.screenControl.LoadDeviceDisconnected(udid);
-                            }                            
+                            }
+                            GoogleAnalytics.SendEvent("UsbDeviceDisconnected", OSVersion);
                         }
                     }
                 });

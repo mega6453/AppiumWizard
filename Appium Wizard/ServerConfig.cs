@@ -1,4 +1,6 @@
-﻿namespace Appium_Wizard
+﻿using System.Reflection;
+
+namespace Appium_Wizard
 {
     public partial class ServerConfig : Form
     {
@@ -92,6 +94,7 @@
                     if (isRunning)
                     {
                         Invoke(new Action(() => StatusLabel1.Text = "Running"));
+                        GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
                         break;
                     }
                     Thread.Sleep(2000);
@@ -111,8 +114,9 @@
             if (result)
             {
                 statusLabel.Text = "Not Running";
-                MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(portNumber).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //MessageBox.Show("Failed to start Server on port " + portNumber + ".\nPlease try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendEvent("StartServer_Port_Busy");
             }
             else
             {
@@ -133,6 +137,7 @@
                         else if (count == 10)
                         {
                             MessageBox.Show("Timed out after 30 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            GoogleAnalytics.SendEvent("StartServer_30Sec_Timedout");
                             break;
                         }
                     }
@@ -144,6 +149,7 @@
                     statusLabel.Text = "Running";
                     Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
                     MainScreen.runningProcessesPortNumbers.Add(portNumber);
+                    GoogleAnalytics.SendEvent("ServerStarted");
                 }
             }
             commonProgress.Close();
@@ -158,6 +164,7 @@
             serverSetup.StopAppiumServer(portNumber);
             CheckPortAndUpdateLabel(portNumber, statusLabel);
             commonProgress.Close();
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
 
@@ -165,26 +172,31 @@
         private void StartButton1_Click(object sender, EventArgs e)
         {
             StartServer(PortTextBox1, StatusLabel1, 1);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void StartButton2_Click(object sender, EventArgs e)
         {
             StartServer(PortTextBox2, StatusLabel2, 2);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void StartButton3_Click(object sender, EventArgs e)
         {
             StartServer(PortTextBox3, StatusLabel3, 3);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void StartButton4_Click(object sender, EventArgs e)
         {
             StartServer(PortTextBox4, StatusLabel4, 4);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void StartButton5_Click(object sender, EventArgs e)
         {
             StartServer(PortTextBox5, StatusLabel5, 5);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         //---------------------------------------------------------
@@ -313,6 +325,11 @@
             {
                 statusLabel.Text = "Not Running";
             }
+        }
+
+        private void ServerConfig_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
     }
 }

@@ -36,7 +36,6 @@
             columnHeader3 = new ColumnHeader();
             columnHeader4 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
-            button2 = new Button();
             deleteProfileButton = new Button();
             SuspendLayout();
             // 
@@ -86,16 +85,6 @@
             // 
             columnHeader6.Width = 0;
             // 
-            // button2
-            // 
-            button2.Location = new Point(1058, 404);
-            button2.Name = "button2";
-            button2.Size = new Size(112, 34);
-            button2.TabIndex = 2;
-            button2.Text = "Close";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
-            // 
             // deleteProfileButton
             // 
             deleteProfileButton.Enabled = false;
@@ -114,7 +103,6 @@
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(819, 388);
             Controls.Add(deleteProfileButton);
-            Controls.Add(button2);
             Controls.Add(listView1);
             Controls.Add(button1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -126,6 +114,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "iOS Profile Management";
             Load += iOSProfileManagement_Load;
+            Shown += iOSProfileManagement_Shown;
             ResumeLayout(false);
         }
 
@@ -133,7 +122,6 @@
 
         private Button button1;
         private ListView listView1;
-        private Button button2;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
         private ColumnHeader columnHeader3;

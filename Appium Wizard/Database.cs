@@ -196,5 +196,42 @@ namespace Appium_Wizard
                 connection.Close();
             }
         }
+
+        public static string QueryDataFromGUIDTable()
+        {
+            string output = string.Empty;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM GUID", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            output = reader.GetString(0);
+                        }
+                    }
+                }
+                connection.Close();
+                return output;
+            }
+        }
+
+        public static void UpdateDataIntoGUIDTable(string GUID)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE GUID SET ('clientID') = ('" + GUID + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
     }
 }

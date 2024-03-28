@@ -105,6 +105,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "About";
             Load += About_Load;
+            Shown += About_Shown;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();

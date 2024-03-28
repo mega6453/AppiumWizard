@@ -231,6 +231,7 @@
             Name = "TroubleShooter";
             Text = "Troubleshooter";
             Load += TroubleShooter_Load;
+            Shown += TroubleShooter_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

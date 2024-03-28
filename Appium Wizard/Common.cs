@@ -535,5 +535,18 @@ namespace Appium_Wizard
             }
             return certificateText;
         }
+
+        public static string GetDuration(DateTime fromTime, DateTime endTime)
+        {
+            var duration = endTime - fromTime;
+            if (duration.TotalSeconds < 60)
+            {
+                return Math.Round(duration.TotalSeconds).ToString() + " sec";
+            }
+            else
+            {
+                return Math.Round(duration.TotalMinutes).ToString() + " min";
+            }
+        }
     }
 }

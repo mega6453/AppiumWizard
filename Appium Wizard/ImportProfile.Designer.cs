@@ -156,6 +156,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Import iOS Profile";
+            Shown += ImportProfile_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

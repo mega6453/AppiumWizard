@@ -7,14 +7,15 @@
         public string WDAsessionId = "", UIAutomatorSessionId = "", URL;
         int width, height, proxyPort, screenServerPort;
         public string IPAddress = "localhost";
-        string deviceName, udid, OSType;
+        string deviceName, udid, OSType, OSVersion;
         bool isScreenServerStarted = false;
         string title;
-        public OpenDevice(string udid, string selectedOS, string selectedDeviceName)
+        public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName)
         {
             this.udid = udid;
             this.deviceName = selectedDeviceName;
             this.OSType = selectedOS;
+            this.OSVersion = selectedVersion;
             var screeSize = getDeviceScreenSize(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
@@ -58,7 +59,7 @@
             else
             {
                 commonProgress.Close();
-               // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -237,7 +238,7 @@
             return Task.Delay(500);
         }
 
-        public static Dictionary<string,string> deviceSessionId = new Dictionary<string,string>();
+        public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         private Task ExecuteAndroid()
         {
             string sessionIdCreatedForScreenServer = string.Empty;
@@ -254,13 +255,13 @@
             }
             catch (Exception e)
             {
-                 MessageBox.Show(e.Message,"Error installing UIAutomator",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                 isScreenServerStarted = false;
-                 return Task.Delay(100);
+                MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                isScreenServerStarted = false;
+                return Task.Delay(100);
             }
             try
             {
-                int forwardedProxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid,6790);
+                int forwardedProxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
                 if (forwardedProxyPort != -1)
                 {
                     proxyPort = forwardedProxyPort;
@@ -293,7 +294,7 @@
                 else
                 {
                     commonProgress.UpdateStepLabel(title, "Checking for existing session...");
-                    bool isSessionCreated =false, isItValidSession = false;
+                    bool isSessionCreated = false, isItValidSession = false;
                     if (deviceSessionId.ContainsKey(udid))
                     {
                         AndroidAPIMethods.DeleteSession(proxyPort);
@@ -305,7 +306,7 @@
                     }
                     if (isSessionCreated)
                     {
-                        string androidId =AppiumServerSetup.GetAndroidId(proxyPort, sessionIdAvailableForAutomation);
+                        string androidId = AppiumServerSetup.GetAndroidId(proxyPort, sessionIdAvailableForAutomation);
                         isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(androidId);
                         if (isItValidSession == false)
                         {
@@ -348,11 +349,11 @@
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort);
             }
             else
             {
-                screenForm = new ScreenControl(OSType, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort);
             }
             screenForm.Name = udid;
             screenForm.Show();

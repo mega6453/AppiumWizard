@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace Appium_Wizard
 {
@@ -16,6 +17,7 @@ namespace Appium_Wizard
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            string eventName = "GithubRepo_Link_Clicked";
             try
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo
@@ -27,8 +29,14 @@ namespace Appium_Wizard
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent(eventName, exception.Message);
             }
+            GoogleAnalytics.SendEvent(eventName);
+        }
+
+        private void About_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
     }
 }

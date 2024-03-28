@@ -93,6 +93,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Device Information";
+            Shown += DeviceInformation_Shown;
             ResumeLayout(false);
         }
 

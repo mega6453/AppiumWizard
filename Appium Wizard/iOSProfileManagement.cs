@@ -1,4 +1,6 @@
-﻿namespace Appium_Wizard
+﻿using System.Reflection;
+
+namespace Appium_Wizard
 {
     public partial class iOSProfileManagement : Form
     {
@@ -16,10 +18,6 @@
             importProfile.ShowDialog();
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
 
         private void iOSProfileManagement_Load(object sender, EventArgs e)
         {
@@ -35,6 +33,7 @@
                 MessageBox.Show(selectedProfileName + " removed successfully.", "Delete Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView1.Items.Remove(selectedItem);
             }
+            GoogleAnalytics.SendEvent("iOSProfileManage_DeleteProfile_Clicked");
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -96,6 +95,12 @@
                     }
                 }
             }
+            //GoogleAnalytics.SendEvent("RefreshProfilesListView");
+        }
+
+        private void iOSProfileManagement_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
     }
 }

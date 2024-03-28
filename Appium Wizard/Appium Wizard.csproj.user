@@ -19,7 +19,7 @@
     <Compile Update="ImportProfile.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="InstallApp.cs">
+    <Compile Update="InstalliOSApp.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="iOSProfileManagement.cs">

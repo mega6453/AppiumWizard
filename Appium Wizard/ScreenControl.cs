@@ -1,5 +1,8 @@
 ﻿using Microsoft.Web.WebView2.WinForms;
+using System;
+using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
+using System.Reflection;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
@@ -13,15 +16,16 @@ namespace Appium_Wizard
         private DateTime pressStartTime;
         private const int PressThresholdMilliseconds = 500;
         public string IPAddress = "127.0.0.1";
-        string deviceName, udid, OSType;
+        string deviceName, udid, OSType, OSVersion;
         int screenPort, proxyPort;
         public static ScreenControl? screenControl;
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
-        public ScreenControl(string os, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
+        public ScreenControl(string os,string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
+            this.OSVersion = Version;
             this.udid = udid;
             this.width = width;
             this.height = height;
@@ -163,6 +167,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -208,6 +213,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void InitializeWebView()
@@ -257,10 +263,12 @@ namespace Appium_Wizard
                         if (OSType.Equals("Android"))
                         {
                             AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                            GoogleAnalytics.SendEvent("Tap_Screen", "Android");
                         }
                         else
                         {
                             iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                            GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
                         }
                     }
                     else
@@ -271,10 +279,12 @@ namespace Appium_Wizard
                         if (OSType.Equals("Android"))
                         {
                             AndroidMethods.GetInstance().Swipe(udid, pressX, pressY, moveToX, moveToY, waitDuration);
+                            GoogleAnalytics.SendEvent("Press_Hold_Screen", "Android");
                         }
                         else
                         {
                             iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
+                            GoogleAnalytics.SendEvent("Press_Hold_Screen", "iOS");
                         }
                     }
                 }
@@ -292,10 +302,12 @@ namespace Appium_Wizard
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.SendText(URL, sessionId, text);
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
             }
             else
             {
                 AndroidMethods.GetInstance().SendText(udid, text);
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
             }
         }
 
@@ -375,26 +387,30 @@ namespace Appium_Wizard
             }
         }
 
-        private void Home(object sender, EventArgs e)
+        private void HomeButton_Click(object sender, EventArgs e)
         {
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.GoToHome(URL);
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"iOS");
             }
             else
             {
                 AndroidMethods.GetInstance().GoToHome(udid);
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"Android");
             }
         }
         private void BackButton_Click(object sender, EventArgs e)
         {
             AndroidMethods.GetInstance().Back(udid);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
-        private void buttonAlwaysOnTop_Click(object sender, EventArgs e)
+        private void AlwaysOnTop_Click(object sender, EventArgs e)
         {
             this.TopMost = !this.TopMost;
             //buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
             buttonAlwaysOnTop.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         bool isControlCenterOpen = false;
@@ -414,7 +430,7 @@ namespace Appium_Wizard
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
-
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"iOS");
             }
             else
             {
@@ -430,6 +446,7 @@ namespace Appium_Wizard
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"Android");
             }
         }
 
@@ -443,10 +460,12 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
             }
             catch (Exception exception)
             {
                 Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent(MethodBase.GetCurrentMethod().Name,exception.Message);
             }
         }
 
@@ -567,6 +586,13 @@ namespace Appium_Wizard
             //OpenDevice.deviceSessionId.Remove(udid);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
+
+        private void ScreenControl_Shown(object sender, EventArgs e)
+        {
+            string OS = OSType + " " + OSVersion;
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,OS);
         }
     }
 }

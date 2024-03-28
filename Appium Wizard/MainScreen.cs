@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using File = System.IO.File;
 
 namespace Appium_Wizard
@@ -7,7 +8,7 @@ namespace Appium_Wizard
     {
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, Width, Height;
         public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus;
+        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion;
         public static List<int> runningProcessesPortNumbers = new List<int>();
         public MainScreen()
         {
@@ -35,7 +36,7 @@ namespace Appium_Wizard
         DateTime lastWriteTime3 = new DateTime();
         DateTime lastWriteTime4 = new DateTime();
         DateTime lastWriteTime5 = new DateTime();
-        private void afterFormShown(object sender, EventArgs e)
+        private void MainScreen_Shown(object sender, EventArgs e)
         {
             Task.Run(() =>
             {
@@ -96,6 +97,7 @@ namespace Appium_Wizard
                     Thread.Sleep(1000);
                 }
             });
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         private void UpdateRichTextbox(int tabNumber)
@@ -174,6 +176,7 @@ namespace Appium_Wizard
                 selectedOS = selectedItem.SubItems[2].Text;
                 selectedUDID = getDeviceUdidByName(selectedDeviceName);
                 selectedDeviceStatus = selectedItem.SubItems[3].Text;
+                selectedDeviceVersion = selectedItem.SubItems[1].Text;
                 Open.Enabled = true;
                 InstallButton.Enabled = true;
                 DeleteDevice.Enabled = true;
@@ -198,7 +201,7 @@ namespace Appium_Wizard
                         return;
                     }
                 }
-                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceName);
+                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion,selectedDeviceName);
                 openDevice.StartBackgroundTasks();
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
@@ -211,8 +214,10 @@ namespace Appium_Wizard
             }
             else
             {
+                GoogleAnalytics.SendEvent("OpenDevice_Device_Offline");
                 MessageBox.Show(selectedDeviceName + " Device Offline. Please check device connectivity...", "Open Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("OpenDevice_Clicked");
         }
 
         public void addToList(string DeviceName, string OSVersion, string udid, string OS, string Model, string status)
@@ -226,6 +231,7 @@ namespace Appium_Wizard
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid };
                 listView1.Items.Add(new ListViewItem(item1));
             }
+            GoogleAnalytics.SendEvent("Device_Added_To_List");
         }
         public void RefreshDeviceListView()
         {
@@ -269,7 +275,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                GoogleAnalytics.SendExceptionEvent("RefreshDeviceListView", e.Message);
             }
         }
 
@@ -278,6 +284,7 @@ namespace Appium_Wizard
         {
             Point screenPoint = AddDevice.PointToScreen(new Point(0, AddDevice.Height));
             contextMenuStrip1.Show(screenPoint);
+            //GoogleAnalytics.SendEvent("AddDevice_Clicked");
         }
 
         public bool isDeviceAlreadyAdded(string udid)
@@ -310,7 +317,6 @@ namespace Appium_Wizard
 
         private void DeleteDevice_Click(object sender, EventArgs e)
         {
-
             DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedDeviceName + " device?", "Delete Device", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
@@ -342,10 +348,12 @@ namespace Appium_Wizard
                     {
                     }
                     MessageBox.Show(selectedDeviceName + " removed successfully.", "Delete Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    GoogleAnalytics.SendEvent("Device_Deleted");
                 }
                 else
                 {
                     MessageBox.Show("Device not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("DeleteDevice_Device_Not_Found_Error");
                 }
             }
         }
@@ -353,15 +361,16 @@ namespace Appium_Wizard
 
         private void iOSToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for iOS device...");
             try
             {
-                DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for iOS device...");
                 deviceLookUp.Show();
                 List<string> deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
                 if (deviceList.Contains("ITunes not installed"))
                 {
                     deviceLookUp.Close();
                     var result = MessageBox.Show("Apple Mobile Device Service required for iOS automation. Please Install ITunes and try again.\n\nDo you want to download now?", "Add iOS Device", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("iTunes_Not_Installed_Error");
                     if (result == DialogResult.Yes)
                     {
                         try
@@ -372,11 +381,16 @@ namespace Appium_Wizard
                                 UseShellExecute = true
                             };
                             Process.Start(psInfo);
+                            GoogleAnalytics.SendEvent("Download_iTunes","Yes");
                         }
                         catch (Exception exception)
                         {
-                            Console.WriteLine("Exception" + exception);
+                            GoogleAnalytics.SendExceptionEvent("Download_iTunes", exception.Message);
                         }
+                    }
+                    else
+                    {
+                        GoogleAnalytics.SendEvent("Download_iTunes", "No");
                     }
                 }
                 else
@@ -415,6 +429,7 @@ namespace Appium_Wizard
                                     deviceLookUp.Hide();
                                     deviceInformation.ShowDialog();
                                     deviceLookUp.Close();
+                                    GoogleAnalytics.SendEvent("DeviceInformation_iOS");
                                     break;
                                 }
                             }
@@ -425,6 +440,7 @@ namespace Appium_Wizard
                                     deviceLookUp.Hide();
                                     MessageBox.Show("No New iOS Device available. Please check device connectivity.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     deviceLookUp.Close();
+                                    GoogleAnalytics.SendEvent("No_iOS_Device_Available");
                                 }
                             }
                         }
@@ -435,7 +451,9 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
+                deviceLookUp.Hide();
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendExceptionEvent("AddDevice_iOS_Clicked", ex.Message);
             }
         }
 
@@ -499,6 +517,7 @@ namespace Appium_Wizard
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
                                 deviceLookUp.Hide();
                                 deviceInformation.ShowDialog();
+                                GoogleAnalytics.SendEvent("DeviceInformation_Android");
                                 break;
                             }
                         }
@@ -508,6 +527,7 @@ namespace Appium_Wizard
                             {
                                 deviceLookUp.Hide();
                                 MessageBox.Show("No New Android Device available. Please check device connectivity.", "Add Android Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                GoogleAnalytics.SendEvent("No_Android_Device_Available");
                             }
                         }
                     }
@@ -519,14 +539,15 @@ namespace Appium_Wizard
             {
                 deviceLookUp.Hide();
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendExceptionEvent("AddDevice_Android_Clicked", ex.Message);
             }
         }
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
-        {
+        {         
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Exiting","Please wait while closing all resources and exiting...");
+            commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
             try
             {
                 foreach (var item in runningProcessesPortNumbers)
@@ -550,7 +571,7 @@ namespace Appium_Wizard
             {
                 formToClose.Close();
             }
-
+            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         private void InstallButton_Click(object sender, EventArgs e)
@@ -567,8 +588,9 @@ namespace Appium_Wizard
                     {
                         string filePath = dialog.FileName;
                         string fileName = Path.GetFileName(filePath);
-                        InstallApp installApp = new InstallApp(selectedDeviceName, selectedUDID, filePath, fileName);
+                        InstalliOSApp installApp = new InstalliOSApp(selectedDeviceName, selectedUDID, filePath, fileName);
                         installApp.ShowDialog();
+                        //GoogleAnalytics.SendEvent("InstallApp_iOS");
                     }
                 }
                 else
@@ -597,8 +619,9 @@ namespace Appium_Wizard
                             version = APKInfo["Version"];
                             isAPKInfoRead = true;
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            GoogleAnalytics.SendExceptionEvent("GetApkInformation",ex.Message);
                             isAPKInfoRead = false;
                         }
                         bool isInstalled = false;
@@ -626,25 +649,34 @@ namespace Appium_Wizard
                                 if (result == DialogResult.Yes)
                                 {
                                     AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App","Yes");
+                                }
+                                else
+                                {
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App","No");
                                 }
                             }
                             else
                             {
                                 DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                GoogleAnalytics.SendEvent("InstallApp_Android_App_Launch_Option_NA");
                             }
                         }
                         commonProgress.Close();
+                        //GoogleAnalytics.SendEvent("InstallApp_Android");
                     }
                 }
             }
             else
             {
+                GoogleAnalytics.SendEvent("InstallApp_Device_Offline");
                 MessageBox.Show("Please check device connectivity...", "Device Offline", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("InstallApp_Clicked");
         }
 
 
-        public static void InstalliOSApp(string selectedDeviceName, string selectedUDID, string filePath, InstallApp installApp)
+        public static void InstalliOSApp(string selectedDeviceName, string selectedUDID, string filePath, InstalliOSApp installApp)
         {
             installApp.Close();
             CommonProgress commonProgress = new CommonProgress();
@@ -695,12 +727,23 @@ namespace Appium_Wizard
                         if (output.Contains("profile has not been explicitly trusted by the user"))
                         {
                             MessageBox.Show("Unable to launch " + appName + " because it has an invalid code signature, inadequate entitlements or its profile has not been explicitly trusted by the user.\n\nTo trust a profile on the device, go to Settings-> General-> VPN & Device Management-> Select Profile-> Trust.", "Launch Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            GoogleAnalytics.SendEvent("Launch_iOS_App_Profile_Not_Trusted");
                         }
+                        else if (output.Contains("Process started successfully"))
+                        {
+                            GoogleAnalytics.SendEvent("InstallApp_iOS_App_Launched");
+                        }
+                        GoogleAnalytics.SendEvent("Launch_Installed_iOS_App", "Yes");
+                    }
+                    else
+                    {
+                        GoogleAnalytics.SendEvent("Launch_Installed_iOS_App", "No");
                     }
                 }
                 else
                 {
                     DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Launch_Option_NA");
                 }
             }
             else
@@ -708,18 +751,17 @@ namespace Appium_Wizard
                 if (iOSAsyncMethods.installationProgress.Contains("MismatchedApplicationIdentifierEntitlement"))
                 {
                     MessageBox.Show("Uninstall the existing " + appName + " app and Try again...", "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Failed", "MismatchedApplicationIdentifierEntitlement");
                 }
                 else
                 {
                     MessageBox.Show(iOSAsyncMethods.installationProgress, "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Failed");
                 }
             }
             iOSAsyncMethods.installationProgress = "0";
             commonProgress.Close();
-
         }
-
-
 
 
         private void serverSetupToolStripMenuItem_Click(object sender, EventArgs e)
@@ -736,7 +778,9 @@ namespace Appium_Wizard
                 {
                     TroubleShooter troubleShooter = new TroubleShooter();
                     troubleShooter.ShowDialog();
+                    GoogleAnalytics.SendEvent("Server_Node_Not_Installed_Show_Trouble");
                 }
+                GoogleAnalytics.SendEvent("Server_Config_Node_Not_Installed");
                 //var result = MessageBox.Show("NodeJS not installed OR not added into environment variables.\nPlease Install NodeJs and then try again.\n\nDo you want to download now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 //if (result == DialogResult.Yes)
                 //{
@@ -755,6 +799,7 @@ namespace Appium_Wizard
                 //    }
                 //}
             }
+            GoogleAnalytics.SendEvent("Server_Configuration_Clicked");
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -773,10 +818,11 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("InspectorToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent("InspectorToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -790,10 +836,11 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("CapabilitiesToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendEvent("CapabilitiesToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -807,10 +854,11 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("XCUITestToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendEvent("XCUITestToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -824,10 +872,11 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("UIAutomatorToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent("UIAutomatorToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -842,10 +891,11 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("FAQToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent("FAQToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -855,22 +905,6 @@ namespace Appium_Wizard
             iOSProfileManagement.ShowDialog();
         }
 
-        private void inspectorToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo
-                {
-                    FileName = "https://inspector.appiumpro.com/",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception" + exception);
-            }
-        }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
@@ -961,6 +995,7 @@ namespace Appium_Wizard
             {
                 string udid = listView1.SelectedItems[0].SubItems[4].Text;
                 Clipboard.SetText(udid);
+                GoogleAnalytics.SendEvent("Copy_UDID");
             }
         }
 
@@ -968,6 +1003,18 @@ namespace Appium_Wizard
         {
             TroubleShooter troubleShooter = new TroubleShooter();
             troubleShooter.ShowDialog();
+        }
+
+        private void AutoScrollCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Checked");
+            }
+            else
+            {
+                GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Unchecked");
+            }
         }
     }
 }

@@ -78,6 +78,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "LoadingScreen";
             Load += LoadingScreen_Load;
+            Shown += LoadingScreen_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

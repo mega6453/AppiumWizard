@@ -13,8 +13,10 @@ namespace Appium_Wizard
     {
         //static string APISecret = "buMhNs8dTx-oAmn7qcvBxg";
         //static string MeasurementID = "G-ZD94XZM110";
-        static string APISecret = "9hfGBu6GTEmQepGUwGKK7g";
-        static string MeasurementID = "G-ZEK1LV1JRJ";
+        //static string APISecret = "9hfGBu6GTEmQepGUwGKK7g";
+        //static string MeasurementID = "G-ZEK1LV1JRJ";
+        static string APISecret = "{GOOGLEANALYTICSAPISECRET}";
+        static string MeasurementID = "{GOOGLEANALYTICSMEASUREMENTID}";
         public static string clientId = string.Empty;
 
 

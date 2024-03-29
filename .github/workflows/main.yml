@@ -23,9 +23,11 @@ jobs:
     
     - name: Update Google Analytics Secrets
       run: |
+        $APISecret = ${{ secrets.GOOGLEANALYTICSAPISECRET }}
+        $MeasurementId = ${{ secrets.GOOGLEANALYTICSMEASUREMENTID }}
         $googleAnalyticsFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\GoogleAnalytics.cs"
-        (Get-Content -Path $googleAnalyticsFilePath) -replace {GOOGLEANALYTICSAPISECRET}, ${{ secrets.GOOGLEANALYTICSAPISECRET }} | Set-Content -Path $googleAnalyticsFilePath
-        (Get-Content -Path $googleAnalyticsFilePath) -replace {GOOGLEANALYTICSMEASUREMENTID}, ${{ secrets.GOOGLEANALYTICSMEASUREMENTID }} | Set-Content -Path $googleAnalyticsFilePath
+        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSAPISECRET}",  $APISecret| Set-Content -Path $googleAnalyticsFilePath
+        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSMEASUREMENTID}", $MeasurementId | Set-Content -Path $googleAnalyticsFilePath
       shell: pwsh
       env:
         Solution_Name: Appium Wizard

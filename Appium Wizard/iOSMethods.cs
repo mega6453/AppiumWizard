@@ -51,6 +51,18 @@ namespace Appium_Wizard
             return result;
         }
 
+        public static string iOSConnectedVia(bool HostAttached)
+        {
+            if (HostAttached.Equals(true))
+            {
+                return "USB";
+            }
+            else
+            {
+                return "Wi-Fi";
+            }
+        }
+
         public string InstalledAppsList(string udid)
         {
             return ExecuteCommand("apps --list", udid);

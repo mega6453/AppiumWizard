@@ -52,7 +52,7 @@
             },
             "Microsoft.Web.WebView2": {
               "target": "Package",
-              "version": "[1.0.2088.41, )"
+              "version": "[1.0.2420.47, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -72,7 +72,7 @@
             },
             "System.Management": {
               "target": "Package",
-              "version": "[7.0.2, )"
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

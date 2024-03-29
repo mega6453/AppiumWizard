@@ -28,12 +28,12 @@
 
   <ItemGroup>
     <PackageReference Include="Appium.WebDriver" Version="4.4.5" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2088.41" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

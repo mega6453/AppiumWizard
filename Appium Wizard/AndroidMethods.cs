@@ -245,6 +245,22 @@ namespace Appium_Wizard
             }
         }
 
+        public string GetAndroidIPAddress(string udid)
+        {
+            string output = ExecuteCommand("-s " + udid + " shell ifconfig");
+            return Common.GetTextBetween(output, "inet addr:", "  Bcast").Trim();
+        }
+
+        public void EnableWirelssADB(string udid)
+        {
+            ExecuteCommand("-s " + udid + " tcpip 5555");
+        }
+
+        public void ConnectToAndroidWirelessly(string udid, string IPAddress)
+        {
+            ExecuteCommand("-s " + udid + " connect "+IPAddress+":5555");
+        }
+
         public void StartSettingsApp(string udid)
         {
             ExecuteCommand("-s " + udid + " shell am start -n io.appium.settings/.Settings -a android.intent.action.MAIN -c android.intent.category.LAUNCHER");

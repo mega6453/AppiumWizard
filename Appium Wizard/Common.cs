@@ -522,7 +522,7 @@ namespace Appium_Wizard
             //return output.Contains("The operation completed successfully") | output.Contains("A distribution with the supplied name already exists");
         }
 
-        public static string GetTextBetween(string input)
+        public static string GetCertificateText(string input)
         {
             string pattern = @"-----BEGIN CERTIFICATE-----\r?\n?(.*?)\r?\n?-----END CERTIFICATE-----";
 
@@ -534,6 +534,15 @@ namespace Appium_Wizard
                 Console.WriteLine(certificateText);
             }
             return certificateText;
+        }
+
+        public static string GetTextBetween(string STR, string FirstString, string LastString)
+        {
+            string FinalString;
+            int Pos1 = STR.IndexOf(FirstString) + FirstString.Length;
+            int Pos2 = STR.IndexOf(LastString);
+            FinalString = STR.Substring(Pos1, Pos2 - Pos1);
+            return FinalString.Trim();
         }
 
         public static string GetDuration(DateTime fromTime, DateTime endTime)

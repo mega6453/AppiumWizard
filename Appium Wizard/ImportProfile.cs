@@ -174,7 +174,7 @@ namespace Appium_Wizard
                 opensslProcess.Start();
                 string output = opensslProcess.StandardOutput.ReadToEnd();
                 opensslProcess.WaitForExit();
-                output = Common.GetTextBetween(output);
+                output = Common.GetCertificateText(output);
                 return output;
             }
             catch (Exception e)

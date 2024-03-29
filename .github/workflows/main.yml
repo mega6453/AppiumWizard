@@ -22,16 +22,15 @@ jobs:
         fetch-depth: 0
     
     - name: Update Google Analytics Secrets
-      run: |
-        $APISecret = ${{ secrets.GOOGLEANALYTICSAPISECRET }}
-        $MeasurementId = ${{ secrets.GOOGLEANALYTICSMEASUREMENTID }}
-        $googleAnalyticsFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\GoogleAnalytics.cs"
-        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSAPISECRET}",  $APISecret| Set-Content -Path $googleAnalyticsFilePath
-        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSMEASUREMENTID}", $MeasurementId | Set-Content -Path $googleAnalyticsFilePath
       shell: pwsh
       env:
-        Solution_Name: Appium Wizard
-
+        APISecret: ${{ secrets.GOOGLEANALYTICSAPISECRET }}
+        MeasurementId: ${{ secrets.GOOGLEANALYTICSMEASUREMENTID }}
+      run: |
+        $googleAnalyticsFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\GoogleAnalytics.cs"
+        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSAPISECRET}",   "$env:APISecret" | Set-Content -Path $googleAnalyticsFilePath
+        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSMEASUREMENTID}",  "$env:MeasurementId" | Set-Content -Path $googleAnalyticsFilePath
+      
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:

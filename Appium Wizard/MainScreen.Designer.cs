@@ -74,6 +74,7 @@ namespace Appium_Wizard
             richTextBox5 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
+            androidWiFiToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -140,15 +141,15 @@ namespace Appium_Wizard
             // contextMenuStrip1
             // 
             contextMenuStrip1.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { androidToolStripMenuItem, iOSToolStripMenuItem });
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { iOSToolStripMenuItem, androidToolStripMenuItem, androidWiFiToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(158, 68);
+            contextMenuStrip1.Size = new Size(249, 133);
             // 
             // androidToolStripMenuItem
             // 
             androidToolStripMenuItem.Image = Properties.Resources.android;
             androidToolStripMenuItem.Name = "androidToolStripMenuItem";
-            androidToolStripMenuItem.Size = new Size(157, 32);
+            androidToolStripMenuItem.Size = new Size(248, 32);
             androidToolStripMenuItem.Text = "Android";
             androidToolStripMenuItem.Click += androidToolStripMenuItem_Click;
             // 
@@ -156,7 +157,7 @@ namespace Appium_Wizard
             // 
             iOSToolStripMenuItem.Image = Properties.Resources.apple;
             iOSToolStripMenuItem.Name = "iOSToolStripMenuItem";
-            iOSToolStripMenuItem.Size = new Size(157, 32);
+            iOSToolStripMenuItem.Size = new Size(248, 32);
             iOSToolStripMenuItem.Text = "iOS";
             iOSToolStripMenuItem.Click += iOSToolStripMenuItem_Click;
             // 
@@ -458,6 +459,14 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
+            // androidWiFiToolStripMenuItem
+            // 
+            androidWiFiToolStripMenuItem.Image = (Image)resources.GetObject("androidWiFiToolStripMenuItem.Image");
+            androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
+            androidWiFiToolStripMenuItem.Size = new Size(248, 32);
+            androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
+            androidWiFiToolStripMenuItem.Click += androidWiFiToolStripMenuItem_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -539,5 +548,6 @@ namespace Appium_Wizard
         private ContextMenuStrip contextMenuStrip2;
         private ToolStripMenuItem copyUDIDToolStripMenuItem;
         private ToolStripMenuItem fixInstallationToolStripMenuItem;
+        private ToolStripMenuItem androidWiFiToolStripMenuItem;
     }
 }

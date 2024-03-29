@@ -201,7 +201,7 @@ namespace Appium_Wizard
                         return;
                     }
                 }
-                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion,selectedDeviceName);
+                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName);
                 openDevice.StartBackgroundTasks();
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
@@ -381,7 +381,7 @@ namespace Appium_Wizard
                                 UseShellExecute = true
                             };
                             Process.Start(psInfo);
-                            GoogleAnalytics.SendEvent("Download_iTunes","Yes");
+                            GoogleAnalytics.SendEvent("Download_iTunes", "Yes");
                         }
                         catch (Exception exception)
                         {
@@ -422,7 +422,7 @@ namespace Appium_Wizard
                                     string[] os = { "Version", OSVersion };
                                     string[] UniqueDeviceID = { "Udid", udid };
                                     string[] DeviceModel = { "Model", Model };
-                                    string[] Connection = {"Connection",connectedVia };
+                                    string[] Connection = { "Connection", connectedVia };
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(os));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(version));
@@ -547,7 +547,7 @@ namespace Appium_Wizard
         }
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
-        {         
+        {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
@@ -624,7 +624,7 @@ namespace Appium_Wizard
                         }
                         catch (Exception ex)
                         {
-                            GoogleAnalytics.SendExceptionEvent("GetApkInformation",ex.Message);
+                            GoogleAnalytics.SendExceptionEvent("GetApkInformation", ex.Message);
                             isAPKInfoRead = false;
                         }
                         bool isInstalled = false;
@@ -652,11 +652,11 @@ namespace Appium_Wizard
                                 if (result == DialogResult.Yes)
                                 {
                                     AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
-                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App","Yes");
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "Yes");
                                 }
                                 else
                                 {
-                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App","No");
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "No");
                                 }
                             }
                             else
@@ -1018,6 +1018,12 @@ namespace Appium_Wizard
             {
                 GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Unchecked");
             }
+        }
+
+        private void androidWiFiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AndroidWireless androidWireless = new AndroidWireless(main);
+            androidWireless.ShowDialog();
         }
     }
 }

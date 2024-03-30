@@ -10,7 +10,7 @@
         string deviceName, udid, OSType, OSVersion;
         bool isScreenServerStarted = false;
         string title;
-        public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName)
+        public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress)
         {
             this.udid = udid;
             this.deviceName = selectedDeviceName;
@@ -20,6 +20,10 @@
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
             title = "Opening " + deviceName;
+            if (OSType.Equals("Android") && connectionType.Equals("Wi-Fi"))
+            {
+                this.udid = deviceIPAddress;
+            }
         }
 
         public (int, int) getDeviceScreenSize(string udid)

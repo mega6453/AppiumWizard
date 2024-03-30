@@ -41,8 +41,7 @@
             DeviceInfolistView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
             DeviceInfolistView.Location = new Point(0, 2);
             DeviceInfolistView.Name = "DeviceInfolistView";
-            DeviceInfolistView.Scrollable = false;
-            DeviceInfolistView.Size = new Size(590, 260);
+            DeviceInfolistView.Size = new Size(584, 332);
             DeviceInfolistView.TabIndex = 0;
             DeviceInfolistView.UseCompatibleStateImageBehavior = false;
             DeviceInfolistView.View = View.Details;
@@ -50,16 +49,16 @@
             // columnHeader1
             // 
             columnHeader1.Text = "";
-            columnHeader1.Width = 300;
+            columnHeader1.Width = 250;
             // 
             // columnHeader2
             // 
             columnHeader2.Text = "";
-            columnHeader2.Width = 300;
+            columnHeader2.Width = 320;
             // 
             // Cancel
             // 
-            Cancel.Location = new Point(146, 280);
+            Cancel.Location = new Point(144, 340);
             Cancel.Name = "Cancel";
             Cancel.Size = new Size(112, 34);
             Cancel.TabIndex = 1;
@@ -69,7 +68,7 @@
             // 
             // Add
             // 
-            Add.Location = new Point(323, 280);
+            Add.Location = new Point(321, 340);
             Add.Name = "Add";
             Add.Size = new Size(112, 34);
             Add.TabIndex = 2;
@@ -81,7 +80,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(591, 345);
+            ClientSize = new Size(573, 406);
             Controls.Add(Add);
             Controls.Add(Cancel);
             Controls.Add(DeviceInfolistView);

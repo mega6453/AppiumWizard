@@ -304,7 +304,11 @@ namespace Appium_Wizard
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
                 JObject responseObj = JObject.Parse(response.Content);
-                string androidId = responseObj["value"]["androidId"].ToString();
+                string androidId = "noId";
+                if (responseObj.ContainsKey("androidId"))
+                {
+                    androidId = responseObj["value"]["androidId"].ToString();
+                }                
                 return androidId;
 
             }

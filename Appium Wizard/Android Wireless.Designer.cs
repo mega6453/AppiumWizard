@@ -35,6 +35,7 @@
             PortTextBox = new TextBox();
             FindDeviceButton = new Button();
             TryAlternativeLinkLabel = new LinkLabel();
+            label3 = new Label();
             SuspendLayout();
             // 
             // label1
@@ -94,11 +95,23 @@
             TryAlternativeLinkLabel.Text = "Try Alternative";
             TryAlternativeLinkLabel.LinkClicked += TryAlternative_LinkClicked;
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            label3.ForeColor = Color.Red;
+            label3.Location = new Point(12, 309);
+            label3.Name = "label3";
+            label3.Size = new Size(552, 25);
+            label3.TabIndex = 6;
+            label3.Text = "Note : Device connected over Wi-Fi will be slower comparing to USB.";
+            // 
             // AndroidWireless
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(611, 310);
+            ClientSize = new Size(611, 343);
+            Controls.Add(label3);
             Controls.Add(TryAlternativeLinkLabel);
             Controls.Add(FindDeviceButton);
             Controls.Add(PortTextBox);
@@ -124,5 +137,6 @@
         private TextBox PortTextBox;
         private Button FindDeviceButton;
         private LinkLabel TryAlternativeLinkLabel;
+        private Label label3;
     }
 }

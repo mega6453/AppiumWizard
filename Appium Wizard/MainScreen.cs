@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using File = System.IO.File;
 
@@ -8,7 +9,7 @@ namespace Appium_Wizard
     {
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, Width, Height;
         public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion;
+        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection;
         public static List<int> runningProcessesPortNumbers = new List<int>();
         public MainScreen()
         {
@@ -173,19 +174,31 @@ namespace Appium_Wizard
             {
                 ListViewItem selectedItem = listView1.SelectedItems[0];
                 selectedDeviceName = selectedItem.SubItems[0].Text;
-                selectedOS = selectedItem.SubItems[2].Text;
-                selectedUDID = getDeviceUdidByName(selectedDeviceName);
-                selectedDeviceStatus = selectedItem.SubItems[3].Text;
                 selectedDeviceVersion = selectedItem.SubItems[1].Text;
+                selectedOS = selectedItem.SubItems[2].Text;
+                selectedDeviceStatus = selectedItem.SubItems[3].Text;
+                selectedUDID = getDeviceUdidByName(selectedDeviceName);
+                selectedDeviceConnection = selectedItem.SubItems[5].Text;
+                selectedDeviceIP = selectedItem.SubItems[6].Text;
                 Open.Enabled = true;
                 InstallButton.Enabled = true;
                 DeleteDevice.Enabled = true;
+                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi"))
+                {
+                    label2.MaximumSize = new Size(panel1.Width, 0);
+                    label2.Visible = true;
+                    label3.Visible = true;
+                    label2.Text = "To establish an Appium session for a device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
+                    label3.Text = selectedDeviceIP;
+                }
             }
             else
             {
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 InstallButton.Enabled = false;
+                label2.Visible = false;
+                label3.Visible = false;
             }
         }
 
@@ -195,17 +208,17 @@ namespace Appium_Wizard
             {
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           // brings foreground if opened already
-                    if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase))
+                    if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
                     {
                         screenForm.Activate();
                         return;
                     }
                 }
-                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName);
+                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
                 openDevice.StartBackgroundTasks();
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
-                    if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase))
+                    if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
                     {
                         screenForm.Activate();
                         return;
@@ -220,7 +233,7 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("OpenDevice_Clicked");
         }
 
-        public void addToList(string DeviceName, string OSVersion, string udid, string OS, string Model, string status)
+        public void addToList(string DeviceName, string OSVersion, string udid, string OS, string Model, string status, string connection, string IPAddress)
         {
             if (OS.Equals("iPhone OS", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -228,7 +241,7 @@ namespace Appium_Wizard
             }
             if (DeviceName != null | DeviceName != string.Empty)
             {
-                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid };
+                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
                 listView1.Items.Add(new ListViewItem(item1));
             }
             GoogleAnalytics.SendEvent("Device_Added_To_List");
@@ -268,7 +281,7 @@ namespace Appium_Wizard
                                 status = "Offline";
                             }
                         }
-                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"] };
+                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"] };
                         listView1.Items.Add(new ListViewItem(item1));
                     }
                 }
@@ -287,7 +300,7 @@ namespace Appium_Wizard
             //GoogleAnalytics.SendEvent("AddDevice_Clicked");
         }
 
-        public bool isDeviceAlreadyAdded(string udid)
+        public static bool isDeviceAlreadyAdded(string udid)
         {
             bool isDeviceAvailable = false;
             var devicesList = Database.QueryDataFromDevicesTable();
@@ -422,7 +435,7 @@ namespace Appium_Wizard
                                     string[] os = { "Version", OSVersion };
                                     string[] UniqueDeviceID = { "Udid", udid };
                                     string[] DeviceModel = { "Model", Model };
-                                    string[] Connection = { "Connection", connectedVia };
+                                    string[] Connection = { "Connection Type", connectedVia };
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(os));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(version));
@@ -511,6 +524,7 @@ namespace Appium_Wizard
                                 string[] DeviceModel = { "Model", BrandPlusModel };
                                 string[] ScreenWidth = { "Width", Width };
                                 string[] ScreenHeight = { "Height", Height };
+                                string[] Connection = { "Connection Type", "USB" };
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(os));
@@ -518,6 +532,7 @@ namespace Appium_Wizard
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(UniqueDeviceID));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenWidth));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
+                                deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
                                 deviceLookUp.Hide();
                                 deviceInformation.ShowDialog();
                                 GoogleAnalytics.SendEvent("DeviceInformation_Android");
@@ -1024,6 +1039,20 @@ namespace Appium_Wizard
         {
             AndroidWireless androidWireless = new AndroidWireless(main);
             androidWireless.ShowDialog();
+        }
+
+        private void label3_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                contextMenuStrip3.Show(Cursor.Position);
+            }
+        }
+
+        private void copyIPAddressToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(label3.Text);
+            GoogleAnalytics.SendEvent("Copy_IPAddress");
         }
     }
 }

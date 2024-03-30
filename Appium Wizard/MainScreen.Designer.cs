@@ -39,9 +39,12 @@ namespace Appium_Wizard
             columnHeader3 = new ColumnHeader();
             columnHeader1 = new ColumnHeader();
             columnHeader5 = new ColumnHeader();
+            columnHeader6 = new ColumnHeader();
+            columnHeader7 = new ColumnHeader();
             contextMenuStrip1 = new ContextMenuStrip(components);
-            androidToolStripMenuItem = new ToolStripMenuItem();
             iOSToolStripMenuItem = new ToolStripMenuItem();
+            androidToolStripMenuItem = new ToolStripMenuItem();
+            androidWiFiToolStripMenuItem = new ToolStripMenuItem();
             AddDevice = new Button();
             DeleteDevice = new Button();
             richTextBox1 = new RichTextBox();
@@ -74,7 +77,11 @@ namespace Appium_Wizard
             richTextBox5 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
-            androidWiFiToolStripMenuItem = new ToolStripMenuItem();
+            label2 = new Label();
+            panel1 = new Panel();
+            label3 = new Label();
+            contextMenuStrip3 = new ContextMenuStrip(components);
+            copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -84,6 +91,8 @@ namespace Appium_Wizard
             tabPage4.SuspendLayout();
             tabPage5.SuspendLayout();
             contextMenuStrip2.SuspendLayout();
+            panel1.SuspendLayout();
+            contextMenuStrip3.SuspendLayout();
             SuspendLayout();
             // 
             // Open
@@ -99,11 +108,10 @@ namespace Appium_Wizard
             // 
             // listView1
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5 });
+            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
             listView1.FullRowSelect = true;
             listView1.Location = new Point(30, 122);
             listView1.Name = "listView1";
-            listView1.Scrollable = false;
             listView1.Size = new Size(583, 181);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
@@ -114,7 +122,7 @@ namespace Appium_Wizard
             // columnHeader4
             // 
             columnHeader4.Text = "Name";
-            columnHeader4.Width = 300;
+            columnHeader4.Width = 230;
             // 
             // columnHeader2
             // 
@@ -138,28 +146,45 @@ namespace Appium_Wizard
             columnHeader5.Text = "udid";
             columnHeader5.Width = 0;
             // 
+            // columnHeader6
+            // 
+            columnHeader6.Text = "Connection";
+            // 
+            // columnHeader7
+            // 
+            columnHeader7.Text = "IPAddress";
+            columnHeader7.Width = 0;
+            // 
             // contextMenuStrip1
             // 
             contextMenuStrip1.ImageScalingSize = new Size(24, 24);
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { iOSToolStripMenuItem, androidToolStripMenuItem, androidWiFiToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(249, 133);
-            // 
-            // androidToolStripMenuItem
-            // 
-            androidToolStripMenuItem.Image = Properties.Resources.android;
-            androidToolStripMenuItem.Name = "androidToolStripMenuItem";
-            androidToolStripMenuItem.Size = new Size(248, 32);
-            androidToolStripMenuItem.Text = "Android";
-            androidToolStripMenuItem.Click += androidToolStripMenuItem_Click;
+            contextMenuStrip1.Size = new Size(204, 100);
             // 
             // iOSToolStripMenuItem
             // 
             iOSToolStripMenuItem.Image = Properties.Resources.apple;
             iOSToolStripMenuItem.Name = "iOSToolStripMenuItem";
-            iOSToolStripMenuItem.Size = new Size(248, 32);
+            iOSToolStripMenuItem.Size = new Size(203, 32);
             iOSToolStripMenuItem.Text = "iOS";
             iOSToolStripMenuItem.Click += iOSToolStripMenuItem_Click;
+            // 
+            // androidToolStripMenuItem
+            // 
+            androidToolStripMenuItem.Image = Properties.Resources.android;
+            androidToolStripMenuItem.Name = "androidToolStripMenuItem";
+            androidToolStripMenuItem.Size = new Size(203, 32);
+            androidToolStripMenuItem.Text = "Android";
+            androidToolStripMenuItem.Click += androidToolStripMenuItem_Click;
+            // 
+            // androidWiFiToolStripMenuItem
+            // 
+            androidWiFiToolStripMenuItem.Image = (Image)resources.GetObject("androidWiFiToolStripMenuItem.Image");
+            androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
+            androidWiFiToolStripMenuItem.Size = new Size(203, 32);
+            androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
+            androidWiFiToolStripMenuItem.Click += androidWiFiToolStripMenuItem_Click;
             // 
             // AddDevice
             // 
@@ -459,13 +484,48 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
-            // androidWiFiToolStripMenuItem
+            // label2
             // 
-            androidWiFiToolStripMenuItem.Image = (Image)resources.GetObject("androidWiFiToolStripMenuItem.Image");
-            androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
-            androidWiFiToolStripMenuItem.Size = new Size(248, 32);
-            androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
-            androidWiFiToolStripMenuItem.Click += androidWiFiToolStripMenuItem_Click;
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label2.AutoSize = true;
+            label2.ForeColor = Color.IndianRed;
+            label2.Location = new Point(3, 12);
+            label2.Name = "label2";
+            label2.Size = new Size(0, 25);
+            label2.TabIndex = 12;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(label3);
+            panel1.Controls.Add(label2);
+            panel1.Location = new Point(30, 366);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(583, 150);
+            panel1.TabIndex = 13;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(3, 102);
+            label3.Name = "label3";
+            label3.Size = new Size(0, 25);
+            label3.TabIndex = 14;
+            label3.MouseUp += label3_MouseUp;
+            // 
+            // contextMenuStrip3
+            // 
+            contextMenuStrip3.ImageScalingSize = new Size(24, 24);
+            contextMenuStrip3.Items.AddRange(new ToolStripItem[] { copyIPAddressToolStripMenuItem });
+            contextMenuStrip3.Name = "contextMenuStrip3";
+            contextMenuStrip3.Size = new Size(225, 36);
+            // 
+            // copyIPAddressToolStripMenuItem
+            // 
+            copyIPAddressToolStripMenuItem.Image = Properties.Resources.files;
+            copyIPAddressToolStripMenuItem.Name = "copyIPAddressToolStripMenuItem";
+            copyIPAddressToolStripMenuItem.Size = new Size(224, 32);
+            copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
+            copyIPAddressToolStripMenuItem.Click += copyIPAddressToolStripMenuItem_Click;
             // 
             // MainScreen
             // 
@@ -473,6 +533,7 @@ namespace Appium_Wizard
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1407, 631);
+            Controls.Add(panel1);
             Controls.Add(tabControl1);
             Controls.Add(menuStrip1);
             Controls.Add(InstallButton);
@@ -500,6 +561,9 @@ namespace Appium_Wizard
             tabPage4.ResumeLayout(false);
             tabPage5.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            contextMenuStrip3.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -549,5 +613,12 @@ namespace Appium_Wizard
         private ToolStripMenuItem copyUDIDToolStripMenuItem;
         private ToolStripMenuItem fixInstallationToolStripMenuItem;
         private ToolStripMenuItem androidWiFiToolStripMenuItem;
+        private ColumnHeader columnHeader6;
+        private ColumnHeader columnHeader7;
+        private Label label2;
+        private Panel panel1;
+        private Label label3;
+        private ContextMenuStrip contextMenuStrip3;
+        private ToolStripMenuItem copyIPAddressToolStripMenuItem;
     }
 }

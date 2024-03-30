@@ -23,10 +23,14 @@ namespace Appium_Wizard
 
         private void Add_Click(object sender, EventArgs e)
         {
-            string DeviceName = "", OSVersion = "", OSType = "", udid = "", Model = "";
+            string DeviceName = "", OSVersion = "", OSType = "", udid = "", Model = "", Connection = "", IPAddress = "";
             int Width = 0, Height = 0;
             foreach (ListViewItem item in infoListView.Items)
             {
+                if (!infoListView.Items.ContainsKey("IP Address"))
+                {
+                    IPAddress = "";
+                }
                 string key = item.SubItems[0].Text;
                 string value = item.SubItems[1].Text;
                 if (key.Equals("Name"))
@@ -57,22 +61,32 @@ namespace Appium_Wizard
                 {
                     Height = int.Parse(value);
                 }
+                else if (key.Equals("Connection Type"))
+                {
+                    Connection = value;
+                }
+                else if (key.Equals("IP Address"))
+                {
+                    IPAddress = value;
+                }
             }
-            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height);
-            mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online");
+            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height, Connection, IPAddress);
+            mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
             Close();
             if (OSType.ToLower().Contains("ios"))
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>();
-                dic.Add("Model",Model);
+                dic.Add("Model", Model);
                 dic.Add("OSVersion", OSVersion);
-                GoogleAnalytics.SendEvent("Device_Added_iOS",dic);
+                dic.Add("ConnectionType", Connection);
+                GoogleAnalytics.SendEvent("Device_Added_iOS", dic);
             }
             else
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>();
                 dic.Add("Model", Model);
                 dic.Add("OSVersion", OSVersion);
+                dic.Add("ConnectionType", Connection);
                 GoogleAnalytics.SendEvent("Device_Added_Android", dic);
             }
         }

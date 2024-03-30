@@ -89,8 +89,6 @@ namespace Appium_Wizard
             return list;
         }
 
-       
-
         public void StartAndroidProxyServer(int localPort, int AndroidPort, string udid = "firstDevice")
         {
             if (udid.Equals("firstDevice"))
@@ -264,6 +262,11 @@ namespace Appium_Wizard
         public void ConnectToAndroidWirelessly(string IPAddress, string Port)
         {
             ExecuteCommand(" connect " + IPAddress + ":" + Port);
+        }
+
+        public void DisconnectAndroidWireless(string IPAddress)
+        {
+            ExecuteCommand(" disconnect " + IPAddress);
         }
 
         public void StartSettingsApp(string udid)

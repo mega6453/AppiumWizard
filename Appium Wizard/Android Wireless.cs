@@ -5,12 +5,15 @@ namespace Appium_Wizard
     public partial class AndroidWireless : Form
     {
         MainScreen mainScreen;
+        string networkPortion = string.Empty;
         public AndroidWireless(MainScreen mainScreen)
         {
             this.mainScreen = mainScreen;
             InitializeComponent();
             IPAddressTextBox.TextChanged += TextBox_TextChanged;
             PortTextBox.TextChanged += TextBox_TextChanged;
+            networkPortion = Common.GetOnlyNetworkPortion();
+            IPAddressTextBox.Text = networkPortion;
         }
 
         private void TextBox_TextChanged(object sender, EventArgs e)

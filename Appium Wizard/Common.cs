@@ -557,5 +557,51 @@ namespace Appium_Wizard
                 return Math.Round(duration.TotalMinutes).ToString() + " min";
             }
         }
+
+        private static string GetIPAddress()
+        {
+            try
+            {
+                string hostname = Dns.GetHostName();
+                IPHostEntry host = Dns.GetHostEntry(hostname);
+                IPAddress ipAddress = null;
+                foreach (IPAddress ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        ipAddress = ip;
+                        break;
+                    }
+                }
+                if (ipAddress != null)
+                {
+                    return ipAddress.ToString();
+                }
+                else
+                {
+                    return "NoValidAddress";
+                }
+            }
+            catch (Exception)
+            {
+                return "NoValidAddress";
+            }
+        }
+
+        public static string GetOnlyNetworkPortion()
+        {
+            try
+            {
+                string ip = GetIPAddress();
+                string[] octets = ip.Split('.');
+                string network = string.Join(".", octets.Take(3));
+                return network;
+            }
+            catch (Exception)
+            {
+                return "NotValid";  
+            }
+
+        }
     }
 }

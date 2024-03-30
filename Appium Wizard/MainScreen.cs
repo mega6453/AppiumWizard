@@ -191,6 +191,16 @@ namespace Appium_Wizard
                     label2.Text = "To establish an Appium session for a device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
                     label3.Text = selectedDeviceIP;
                 }
+                if (selectedDeviceStatus.Equals("Offline"))
+                {
+                    Open.Enabled = false;
+                    InstallButton.Enabled = false;
+                }
+                else
+                {
+                    Open.Enabled = true;
+                    InstallButton.Enabled = true;
+                }
             }
             else
             {
@@ -350,6 +360,10 @@ namespace Appium_Wizard
                     {
                         ListViewItem selectedItem = listView1.SelectedItems[0];
                         listView1.Items.Remove(selectedItem);
+                    }
+                    if (selectedOS.Equals("Android"))
+                    {
+                        AndroidMethods.GetInstance().DisconnectAndroidWireless(selectedDeviceIP);
                     }
                     DeleteDevice.Enabled = false;
                     Open.Enabled = false;

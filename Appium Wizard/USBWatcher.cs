@@ -63,6 +63,9 @@ namespace Appium_Wizard
                             string udid = item.SubItems[4].Text;
                             string version = item.SubItems[1].Text;
                             string OSVersion = OS + " " + version;
+                            item.SubItems[3].Text = "Online";
+                            item.SubItems[5].Text = "USB";
+
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 if (OS.Equals("iOS"))
@@ -164,7 +167,6 @@ namespace Appium_Wizard
                                     ScreenControl.screenControl.LoadScreen(udid, screenPort);
                                 }
                             }
-                            item.SubItems[3].Text = "Online";
                             GoogleAnalytics.SendEvent("UsbDeviceConnected", OSVersion);
                         }
                     }
@@ -192,7 +194,56 @@ namespace Appium_Wizard
                             string udid = item.SubItems[4].Text;
                             string version = item.SubItems[1].Text;
                             string OSVersion = OS + " " + version;
-                            item.SubItems[3].Text = "Offline";
+                            string IPAddress = item.SubItems[6].Text;
+                            if (OS.Equals("iOS"))
+                            {
+                                List<string> deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                                if (deviceList.Contains(udid))
+                                {
+                                    item.SubItems[3].Text = "Online";
+                                    item.SubItems[5].Text = "Wi-Fi";
+                                }
+                                else
+                                {
+                                    item.SubItems[3].Text = "Offline";
+                                    item.SubItems[5].Text = "";
+                                }
+
+                                //var deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(udid);
+                                //if (deviceInfo.ContainsKey("HostAttached"))
+                                //{
+                                //    string connectedVia = iOSMethods.iOSConnectedVia((bool)deviceInfo["HostAttached"]);
+                                //    item.SubItems[5].Text = connectedVia;
+                                //    if (connectedVia.Equals("Wi-Fi"))
+                                //    {
+                                //        item.SubItems[3].Text = "Online";
+                                //    }
+                                //    else
+                                //    {
+                                //        item.SubItems[3].Text = "Offline";
+                                //        item.SubItems[5].Text = "";
+                                //    }
+                                //}
+                                //else
+                                //{
+                                //    item.SubItems[3].Text = "Offline";
+                                //    item.SubItems[5].Text = "";
+                                //}
+                            }
+                            else
+                            {
+                                List<string> deviceList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
+                                if (deviceList.Contains(IPAddress))
+                                {
+                                    item.SubItems[3].Text = "Online";
+                                    item.SubItems[5].Text = "Wi-Fi";
+                                }
+                                else
+                                {
+                                    item.SubItems[3].Text = "Offline";
+                                    item.SubItems[5].Text = "";
+                                }                               
+                            }
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 ScreenControl.screenControl.LoadDeviceDisconnected(udid);

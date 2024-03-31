@@ -103,6 +103,10 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/info" title="info icons">Info icons created by kumakamu - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/linked" title="linked icons">Linked icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/launch" title="launch icons">Launch icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/install" title="install icons">Install icons created by NajmunNahar - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/restart" title="restart icons">Restart icons created by Paul J. - Flaticon</a>
 
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

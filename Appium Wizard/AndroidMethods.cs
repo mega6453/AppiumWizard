@@ -136,7 +136,7 @@ namespace Appium_Wizard
             {
                 pattern = @"(\d+)x(\d+)";
             }
-            
+
             Match match = Regex.Match(output, pattern);
 
             if (match.Success)
@@ -207,13 +207,23 @@ namespace Appium_Wizard
 
         public bool InstallApp(string udid, string path)
         {
-           var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");
-           return output.Contains("Success");
+            var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");
+            return output.Contains("Success");
         }
-        
-        public void LaunchApp(string udid,string packageName,string activityName)
+
+        public string GetAppActivity(string udid, string packageName)
         {
-            ExecuteCommand("-s " + udid + " shell am start -n " +packageName+"/"+activityName);
+            return ExecuteCommand("-s " + udid + " shell \"cmd package resolve-activity --brief "+packageName+" | tail -n 1\"").Replace("\r","").Replace("\n","");
+        }
+
+        public void LaunchApp(string udid, string packageName, string activityName)
+        {
+            ExecuteCommand("-s " + udid + " shell am start -n " + packageName + "/" + activityName);
+        }
+
+        public void LaunchApp(string udid, string activityName)
+        {
+            ExecuteCommand("-s " + udid + " shell am start -n " + activityName);
         }
 
         public bool isUIAutomatorInstalled(string udid)
@@ -224,8 +234,8 @@ namespace Appium_Wizard
 
         public void ReInstallUIAutomator(string udid)
         {
-            UnInstallApp(udid,"io.appium.uiautomator2.server");
-            UnInstallApp(udid,"io.appium.uiautomator2.server.test");
+            UnInstallApp(udid, "io.appium.uiautomator2.server");
+            UnInstallApp(udid, "io.appium.uiautomator2.server.test");
             InstallUIAutomator(udid);
         }
 
@@ -261,7 +271,7 @@ namespace Appium_Wizard
 
         public void ConnectToAndroidWirelessly(string udid, string IPAddress, string Port)
         {
-            ExecuteCommand("-s " + udid + " connect "+IPAddress+":"+Port);
+            ExecuteCommand("-s " + udid + " connect " + IPAddress + ":" + Port);
         }
 
         public void ConnectToAndroidWirelessly(string IPAddress, string Port)
@@ -292,6 +302,23 @@ namespace Appium_Wizard
         public void UnInstallApp(string udid, string packageName)
         {
             ExecuteCommand("-s " + udid + " uninstall " + packageName);
+        }
+
+        public List<string> GetListOfInstalledApps(string udid)
+        {
+            var output = ExecuteCommand("-s " + udid + " shell pm list packages -3");
+            List<string> packageNames = new List<string>();
+            string[] lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("package:"))
+                {
+                    string packageName = line.Substring(8);
+                    packageNames.Add(packageName);
+                }
+            }
+            return packageNames;
         }
 
         public void UninstallUIAutomator(string udid)
@@ -420,7 +447,7 @@ namespace Appium_Wizard
                             {
                                 return destinationPort;
                             }
-                        }                       
+                        }
                     }
                     process.Close();
                     return -1;
@@ -477,7 +504,7 @@ namespace Appium_Wizard
         private static readonly object lockObject = new object();
         private string adbFilePath = FilesPath.adbFilePath;
         private Process adbAsyncProcess;
-        public void StartUIAutomatorServer(string udid,bool stop)
+        public void StartUIAutomatorServer(string udid, bool stop)
         {
             // if fails, then only need to uninstall.. need to add a condition here..
             //UninstallUIAutomator(udid);
@@ -517,7 +544,7 @@ namespace Appium_Wizard
             //Thread.Sleep(5000);
         }
 
-      
+
 
         public void ExecuteCommand(string arguments, bool waitForExit = true)
         {
@@ -555,8 +582,8 @@ namespace Appium_Wizard
             string deviceName = AndroidMethods.GetInstance().ExecuteCommand("-s " + udid + " shell settings get global device_name").Replace("\r\n", "");
             deviceInfo.Add("deviceName", deviceName);
             var screenSize = AndroidMethods.GetInstance().GetScreenSize(udid);
-            deviceInfo.Add("Width",screenSize.Item1.ToString());
-            deviceInfo.Add("Height",screenSize.Item2.ToString());
+            deviceInfo.Add("Width", screenSize.Item1.ToString());
+            deviceInfo.Add("Height", screenSize.Item2.ToString());
             return deviceInfo;
         }
         public string ExecuteCommand2(string arguments, bool waitForExit = true)
@@ -644,7 +671,7 @@ namespace Appium_Wizard
     public class AndroidAPIMethods
     {
 
-        public static string CreateSession(int proxyPort,int screenPort)
+        public static string CreateSession(int proxyPort, int screenPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
@@ -654,7 +681,7 @@ namespace Appium_Wizard
             var request = new RestRequest("/session", Method.Post);
             request.AddHeader("Content-Type", "application/json");
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
-             var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
+            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
             //var body = "{\"capabilities\":{\"firstMatch\":[{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\",\"platform\":\"LINUX\",\"webStorageEnabled\":false,\"takesScreenshot\":true,\"javascriptEnabled\":true,\"databaseEnabled\":false,\"networkConnectionEnabled\":true,\"locationContextEnabled\":false,\"warnings\":{},\"desired\":{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\"}},\"deviceName\":\"R5CN3172FHT\",\"deviceUDID\":\"R5CN3172FHT\"}],\"alwaysMatch\":{}}";
 
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";

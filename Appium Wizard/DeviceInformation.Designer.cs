@@ -39,6 +39,7 @@
             // DeviceInfolistView
             // 
             DeviceInfolistView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            DeviceInfolistView.GridLines = true;
             DeviceInfolistView.Location = new Point(0, 2);
             DeviceInfolistView.Name = "DeviceInfolistView";
             DeviceInfolistView.Size = new Size(584, 332);

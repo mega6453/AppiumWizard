@@ -85,7 +85,6 @@ namespace Appium_Wizard
             contextMenuStrip4 = new ContextMenuStrip(components);
             installAppToolStripMenuItem = new ToolStripMenuItem();
             launchAppToolStripMenuItem = new ToolStripMenuItem();
-            uninstallAppToolStripMenuItem = new ToolStripMenuItem();
             refreshStatusToolStripMenuItem = new ToolStripMenuItem();
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
@@ -117,6 +116,7 @@ namespace Appium_Wizard
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
             listView1.FullRowSelect = true;
+            listView1.GridLines = true;
             listView1.Location = new Point(30, 122);
             listView1.Name = "listView1";
             listView1.Size = new Size(583, 181);
@@ -536,15 +536,15 @@ namespace Appium_Wizard
             // contextMenuStrip4
             // 
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, uninstallAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem });
+            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(208, 164);
+            contextMenuStrip4.Size = new Size(307, 165);
             // 
             // installAppToolStripMenuItem
             // 
             installAppToolStripMenuItem.Image = Properties.Resources.Install;
             installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
-            installAppToolStripMenuItem.Size = new Size(207, 32);
+            installAppToolStripMenuItem.Size = new Size(306, 32);
             installAppToolStripMenuItem.Text = "Install App";
             installAppToolStripMenuItem.Click += installAppToolStripMenuItem_Click;
             // 
@@ -552,23 +552,15 @@ namespace Appium_Wizard
             // 
             launchAppToolStripMenuItem.Image = Properties.Resources.Launch;
             launchAppToolStripMenuItem.Name = "launchAppToolStripMenuItem";
-            launchAppToolStripMenuItem.Size = new Size(207, 32);
-            launchAppToolStripMenuItem.Text = "Launch App";
+            launchAppToolStripMenuItem.Size = new Size(306, 32);
+            launchAppToolStripMenuItem.Text = "Launch App | Uninstall App";
             launchAppToolStripMenuItem.Click += launchAppToolStripMenuItem_Click;
-            // 
-            // uninstallAppToolStripMenuItem
-            // 
-            uninstallAppToolStripMenuItem.Image = Properties.Resources.Uninstall;
-            uninstallAppToolStripMenuItem.Name = "uninstallAppToolStripMenuItem";
-            uninstallAppToolStripMenuItem.Size = new Size(207, 32);
-            uninstallAppToolStripMenuItem.Text = "Uninstall App";
-            uninstallAppToolStripMenuItem.Click += uninstallAppToolStripMenuItem_Click;
             // 
             // refreshStatusToolStripMenuItem
             // 
             refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
             refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
-            refreshStatusToolStripMenuItem.Size = new Size(207, 32);
+            refreshStatusToolStripMenuItem.Size = new Size(306, 32);
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
             refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
             // 
@@ -576,7 +568,7 @@ namespace Appium_Wizard
             // 
             rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
             rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
-            rebootDeviceToolStripMenuItem.Size = new Size(207, 32);
+            rebootDeviceToolStripMenuItem.Size = new Size(306, 32);
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
@@ -679,6 +671,5 @@ namespace Appium_Wizard
         private ToolStripMenuItem rebootDeviceToolStripMenuItem;
         private ToolStripMenuItem refreshStatusToolStripMenuItem;
         private ToolStripMenuItem launchAppToolStripMenuItem;
-        private ToolStripMenuItem uninstallAppToolStripMenuItem;
     }
 }

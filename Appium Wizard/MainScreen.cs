@@ -208,7 +208,7 @@ namespace Appium_Wizard
                         {
                             toolStripItem.Enabled = true;
                         }
-                    }                   
+                    }
                 }
             }
             else
@@ -1112,14 +1112,10 @@ namespace Appium_Wizard
             RefreshDeviceListView();
         }
 
-        private void uninstallAppToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            InstalledAppsList installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
+            installedAppsList.ShowDialog();
         }
     }
 }

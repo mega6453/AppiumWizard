@@ -4,6 +4,7 @@ using RestSharp;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
 {
@@ -63,14 +64,28 @@ namespace Appium_Wizard
             }
         }
 
-        public string InstalledAppsList(string udid)
+        public List<string> GetListOfInstalledApps(string udid)
         {
-            return ExecuteCommand("apps --list", udid);
+            var output = ExecuteCommand("apps --list", udid);
+            List<string> packageList = new List<string>();
+
+            string pattern = @"(\w+(\.\w+)*)\s";
+            MatchCollection matches = Regex.Matches(output, pattern);
+
+            foreach (Match match in matches)
+            {
+                bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
+                if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                {
+                    packageList.Add(match.Groups[1].Value);
+                }
+            }
+            return packageList;
         }
 
         public bool iSWDAInstalled(string udid)
         {
-            bool isInstalled = InstalledAppsList(udid).Contains("com.facebook.WebDriverAgentRunner.xctrunner");
+            bool isInstalled = GetListOfInstalledApps(udid).Contains("com.facebook.WebDriverAgentRunner.xctrunner");
             return isInstalled;
         }
 
@@ -89,6 +104,11 @@ namespace Appium_Wizard
         public void RebootDevice(string udid)
         {
             ExecuteCommand("reboot", udid);
+        }
+
+        public void UninstallApp(string udid, string bundleId)
+        {
+            ExecuteCommand("uninstall "+bundleId,udid);
         }
 
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)

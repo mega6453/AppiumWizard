@@ -50,7 +50,7 @@ namespace Appium_Wizard
             richTextBox1 = new RichTextBox();
             checkBox1 = new CheckBox();
             label1 = new Label();
-            InstallButton = new Button();
+            MoreButton = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             serverSetupToolStripMenuItem = new ToolStripMenuItem();
@@ -82,6 +82,12 @@ namespace Appium_Wizard
             label3 = new Label();
             contextMenuStrip3 = new ContextMenuStrip(components);
             copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
+            contextMenuStrip4 = new ContextMenuStrip(components);
+            installAppToolStripMenuItem = new ToolStripMenuItem();
+            launchAppToolStripMenuItem = new ToolStripMenuItem();
+            uninstallAppToolStripMenuItem = new ToolStripMenuItem();
+            refreshStatusToolStripMenuItem = new ToolStripMenuItem();
+            rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -93,6 +99,7 @@ namespace Appium_Wizard
             contextMenuStrip2.SuspendLayout();
             panel1.SuspendLayout();
             contextMenuStrip3.SuspendLayout();
+            contextMenuStrip4.SuspendLayout();
             SuspendLayout();
             // 
             // Open
@@ -241,16 +248,15 @@ namespace Appium_Wizard
             label1.TabIndex = 8;
             label1.Text = "Appium Server Logs";
             // 
-            // InstallButton
+            // MoreButton
             // 
-            InstallButton.Enabled = false;
-            InstallButton.Location = new Point(501, 70);
-            InstallButton.Name = "InstallButton";
-            InstallButton.Size = new Size(112, 34);
-            InstallButton.TabIndex = 9;
-            InstallButton.Text = "Install App";
-            InstallButton.UseVisualStyleBackColor = true;
-            InstallButton.Click += InstallButton_Click;
+            MoreButton.Location = new Point(501, 70);
+            MoreButton.Name = "MoreButton";
+            MoreButton.Size = new Size(112, 34);
+            MoreButton.TabIndex = 9;
+            MoreButton.Text = "More...";
+            MoreButton.UseVisualStyleBackColor = true;
+            MoreButton.Click += MoreButton_Click;
             // 
             // menuStrip1
             // 
@@ -527,6 +533,53 @@ namespace Appium_Wizard
             copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
             copyIPAddressToolStripMenuItem.Click += copyIPAddressToolStripMenuItem_Click;
             // 
+            // contextMenuStrip4
+            // 
+            contextMenuStrip4.ImageScalingSize = new Size(24, 24);
+            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, uninstallAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem });
+            contextMenuStrip4.Name = "contextMenuStrip4";
+            contextMenuStrip4.Size = new Size(208, 164);
+            // 
+            // installAppToolStripMenuItem
+            // 
+            installAppToolStripMenuItem.Image = Properties.Resources.Install;
+            installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
+            installAppToolStripMenuItem.Size = new Size(207, 32);
+            installAppToolStripMenuItem.Text = "Install App";
+            installAppToolStripMenuItem.Click += installAppToolStripMenuItem_Click;
+            // 
+            // launchAppToolStripMenuItem
+            // 
+            launchAppToolStripMenuItem.Image = Properties.Resources.Launch;
+            launchAppToolStripMenuItem.Name = "launchAppToolStripMenuItem";
+            launchAppToolStripMenuItem.Size = new Size(207, 32);
+            launchAppToolStripMenuItem.Text = "Launch App";
+            launchAppToolStripMenuItem.Click += launchAppToolStripMenuItem_Click;
+            // 
+            // uninstallAppToolStripMenuItem
+            // 
+            uninstallAppToolStripMenuItem.Image = Properties.Resources.Uninstall;
+            uninstallAppToolStripMenuItem.Name = "uninstallAppToolStripMenuItem";
+            uninstallAppToolStripMenuItem.Size = new Size(207, 32);
+            uninstallAppToolStripMenuItem.Text = "Uninstall App";
+            uninstallAppToolStripMenuItem.Click += uninstallAppToolStripMenuItem_Click;
+            // 
+            // refreshStatusToolStripMenuItem
+            // 
+            refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
+            refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
+            refreshStatusToolStripMenuItem.Size = new Size(207, 32);
+            refreshStatusToolStripMenuItem.Text = "Refresh Status";
+            refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
+            // 
+            // rebootDeviceToolStripMenuItem
+            // 
+            rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
+            rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
+            rebootDeviceToolStripMenuItem.Size = new Size(207, 32);
+            rebootDeviceToolStripMenuItem.Text = "Reboot Device";
+            rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -536,7 +589,7 @@ namespace Appium_Wizard
             Controls.Add(panel1);
             Controls.Add(tabControl1);
             Controls.Add(menuStrip1);
-            Controls.Add(InstallButton);
+            Controls.Add(MoreButton);
             Controls.Add(label1);
             Controls.Add(checkBox1);
             Controls.Add(DeleteDevice);
@@ -564,6 +617,7 @@ namespace Appium_Wizard
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             contextMenuStrip3.ResumeLayout(false);
+            contextMenuStrip4.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -585,7 +639,7 @@ namespace Appium_Wizard
         private RichTextBox richTextBox1;
         private CheckBox checkBox1;
         private Label label1;
-        private Button InstallButton;
+        private Button MoreButton;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem serverSetupToolStripMenuItem;
@@ -620,5 +674,11 @@ namespace Appium_Wizard
         private Label label3;
         private ContextMenuStrip contextMenuStrip3;
         private ToolStripMenuItem copyIPAddressToolStripMenuItem;
+        private ContextMenuStrip contextMenuStrip4;
+        private ToolStripMenuItem installAppToolStripMenuItem;
+        private ToolStripMenuItem rebootDeviceToolStripMenuItem;
+        private ToolStripMenuItem refreshStatusToolStripMenuItem;
+        private ToolStripMenuItem launchAppToolStripMenuItem;
+        private ToolStripMenuItem uninstallAppToolStripMenuItem;
     }
 }

@@ -86,6 +86,11 @@ namespace Appium_Wizard
             return isDevModeDisabled;
         }
 
+        public void RebootDevice(string udid)
+        {
+            ExecuteCommand("reboot", udid);
+        }
+
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             string sessionId = "nosession";

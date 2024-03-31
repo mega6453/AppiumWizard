@@ -23,6 +23,33 @@ namespace Appium_Wizard
             }
         }
 
+        public static void UpdateDataInDevicesTable(string Name, string OS, string Version, string Status, string UDID, int Width, int Height, string ConnectionType, string IPAddress)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE Devices SET OS = '" + OS + "', Version = '" + Version + "', Status = '" + Status + "', Width = '" + Width + "', Height = '" + Height + "', Connection = '" + ConnectionType + "', IPAddress = '" + IPAddress + "' WHERE UDID = '" + UDID + "'";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
+
+        public static void UpdateDataInDevicesTable(string UDID, string key, string value)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE Devices SET " + key + " = '" + value + "' WHERE UDID = '" + UDID + "'";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+        }
 
         public static void UpdateDataIntoProfileCounterTable(int count)
         {

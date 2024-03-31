@@ -34,7 +34,6 @@
             IPAddressTextBox = new TextBox();
             PortTextBox = new TextBox();
             FindDeviceButton = new Button();
-            TryAlternativeLinkLabel = new LinkLabel();
             label3 = new Label();
             SuspendLayout();
             // 
@@ -84,17 +83,6 @@
             FindDeviceButton.UseVisualStyleBackColor = true;
             FindDeviceButton.Click += FindDeviceButton_Click;
             // 
-            // TryAlternativeLinkLabel
-            // 
-            TryAlternativeLinkLabel.AutoSize = true;
-            TryAlternativeLinkLabel.Location = new Point(465, 117);
-            TryAlternativeLinkLabel.Name = "TryAlternativeLinkLabel";
-            TryAlternativeLinkLabel.Size = new Size(123, 25);
-            TryAlternativeLinkLabel.TabIndex = 5;
-            TryAlternativeLinkLabel.TabStop = true;
-            TryAlternativeLinkLabel.Text = "Try Alternative";
-            TryAlternativeLinkLabel.LinkClicked += TryAlternative_LinkClicked;
-            // 
             // label3
             // 
             label3.AutoSize = true;
@@ -112,7 +100,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(611, 343);
             Controls.Add(label3);
-            Controls.Add(TryAlternativeLinkLabel);
             Controls.Add(FindDeviceButton);
             Controls.Add(PortTextBox);
             Controls.Add(IPAddressTextBox);
@@ -136,7 +123,6 @@
         private TextBox IPAddressTextBox;
         private TextBox PortTextBox;
         private Button FindDeviceButton;
-        private LinkLabel TryAlternativeLinkLabel;
         private Label label3;
     }
 }

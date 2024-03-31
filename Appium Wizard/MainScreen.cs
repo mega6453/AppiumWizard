@@ -181,32 +181,41 @@ namespace Appium_Wizard
                 selectedDeviceConnection = selectedItem.SubItems[5].Text;
                 selectedDeviceIP = selectedItem.SubItems[6].Text;
                 Open.Enabled = true;
-                InstallButton.Enabled = true;
+                MoreButton.Enabled = true;
                 DeleteDevice.Enabled = true;
-                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi"))
+                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi") && selectedDeviceStatus.Equals("Online"))
                 {
                     label2.MaximumSize = new Size(panel1.Width, 0);
                     label2.Visible = true;
                     label3.Visible = true;
-                    label2.Text = "To establish an Appium session for a device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
+                    label2.Text = "To establish an Appium session for the device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
                     label3.Text = selectedDeviceIP;
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
                     Open.Enabled = false;
-                    InstallButton.Enabled = false;
+                    contextMenuStrip4.Items[0].Enabled = false;
+                    contextMenuStrip4.Items[1].Enabled = false;
+                    contextMenuStrip4.Items[2].Enabled = false;
+                    contextMenuStrip4.Items[4].Enabled = false;
                 }
                 else
                 {
                     Open.Enabled = true;
-                    InstallButton.Enabled = true;
+                    foreach (var item in contextMenuStrip4.Items)
+                    {
+                        if (item is ToolStripItem toolStripItem)
+                        {
+                            toolStripItem.Enabled = true;
+                        }
+                    }                   
                 }
             }
             else
             {
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
-                InstallButton.Enabled = false;
+                MoreButton.Enabled = false;
                 label2.Visible = false;
                 label3.Visible = false;
             }
@@ -270,7 +279,7 @@ namespace Appium_Wizard
                         if (device["OS"].Equals("Android"))
                         {
                             var connectedList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
-                            if (connectedList.Contains(device["UDID"]))
+                            if (connectedList.Contains(device["UDID"]) | connectedList.Contains(device["IPAddress"]))
                             {
                                 status = "Online";
                             }
@@ -606,105 +615,10 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
-        private void InstallButton_Click(object sender, EventArgs e)
+        private void MoreButton_Click(object sender, EventArgs e)
         {
-            if (selectedDeviceStatus.Equals("Online"))
-            {
-                OpenFileDialog dialog = new OpenFileDialog();
-                if (selectedOS.Equals("iOS"))
-                {
-                    dialog.Filter = "IPA files (*.ipa)|*.ipa";
-                    dialog.Title = "Select an IPA file";
-
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string filePath = dialog.FileName;
-                        string fileName = Path.GetFileName(filePath);
-                        InstalliOSApp installApp = new InstalliOSApp(selectedDeviceName, selectedUDID, filePath, fileName);
-                        installApp.ShowDialog();
-                        //GoogleAnalytics.SendEvent("InstallApp_iOS");
-                    }
-                }
-                else
-                {
-                    CommonProgress commonProgress = new CommonProgress();
-                    dialog.Filter = "APK files (*.apk)|*.apk";
-                    dialog.Title = "Select an APK file";
-
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string filePath = dialog.FileName;
-                        string fileName = Path.GetFileName(filePath);
-                        commonProgress.Text = "Install App";
-                        commonProgress.Show();
-                        commonProgress.UpdateStepLabel("Install App", "Starting Installation...");
-                        bool completed = false;
-                        Dictionary<string, string> APKInfo = new Dictionary<string, string>();
-                        string appName = "", packageName = "", activityName = "", version = "";
-                        bool isAPKInfoRead;
-                        try
-                        {
-                            APKInfo = AndroidMethods.GetInstance().GetApkInformation(filePath);
-                            appName = APKInfo["AppName"];
-                            packageName = APKInfo["PackageName"];
-                            activityName = APKInfo["ActivityName"];
-                            version = APKInfo["Version"];
-                            isAPKInfoRead = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            GoogleAnalytics.SendExceptionEvent("GetApkInformation", ex.Message);
-                            isAPKInfoRead = false;
-                        }
-                        bool isInstalled = false;
-                        Task.Run(() =>
-                        {
-                            isInstalled = AndroidMethods.GetInstance().InstallApp(selectedUDID, filePath);
-                            completed = true;
-                        });
-                        while (completed == false)
-                        {
-                            if (isAPKInfoRead)
-                            {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName);
-                            }
-                            else
-                            {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName);
-                            }
-                        }
-                        if (isInstalled)
-                        {
-                            if (isAPKInfoRead)
-                            {
-                                DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                                if (result == DialogResult.Yes)
-                                {
-                                    AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
-                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "Yes");
-                                }
-                                else
-                                {
-                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "No");
-                                }
-                            }
-                            else
-                            {
-                                DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                GoogleAnalytics.SendEvent("InstallApp_Android_App_Launch_Option_NA");
-                            }
-                        }
-                        commonProgress.Close();
-                        //GoogleAnalytics.SendEvent("InstallApp_Android");
-                    }
-                }
-            }
-            else
-            {
-                GoogleAnalytics.SendEvent("InstallApp_Device_Offline");
-                MessageBox.Show("Please check device connectivity...", "Device Offline", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            GoogleAnalytics.SendEvent("InstallApp_Clicked");
+            Point screenPoint = MoreButton.PointToScreen(new Point(0, MoreButton.Height));
+            contextMenuStrip4.Show(screenPoint);
         }
 
 
@@ -1067,6 +981,145 @@ namespace Appium_Wizard
         {
             Clipboard.SetText(label3.Text);
             GoogleAnalytics.SendEvent("Copy_IPAddress");
+        }
+
+        private void rebootDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to Reboot the following device?\n\n" + selectedDeviceName, "Reboot Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                var finalconfirm = MessageBox.Show("After rebooting, you will need to manually enter the passcode/trust the computer/allow permission to use the device with Appium Wizard. Therefore, only reboot the device if you are nearby and able to perform these operations.\n\nStill do you want to Reboot the following device?\n" + selectedDeviceName, "Reboot Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (finalconfirm == DialogResult.Yes)
+                {
+                    if (selectedOS.Equals("iOS"))
+                    {
+                        iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                        GoogleAnalytics.SendExceptionEvent("Reboot_iOS");
+                    }
+                    else
+                    {
+                        AndroidMethods.GetInstance().RebootDevice(selectedUDID);
+                        GoogleAnalytics.SendExceptionEvent("Reboot_Android");
+                    }
+                }
+            }
+        }
+
+        private void installAppToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedDeviceStatus.Equals("Online"))
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                if (selectedOS.Equals("iOS"))
+                {
+                    dialog.Filter = "IPA files (*.ipa)|*.ipa";
+                    dialog.Title = "Select an IPA file";
+
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = dialog.FileName;
+                        string fileName = Path.GetFileName(filePath);
+                        InstalliOSApp installApp = new InstalliOSApp(selectedDeviceName, selectedUDID, filePath, fileName);
+                        installApp.ShowDialog();
+                        //GoogleAnalytics.SendEvent("InstallApp_iOS");
+                    }
+                }
+                else
+                {
+                    CommonProgress commonProgress = new CommonProgress();
+                    dialog.Filter = "APK files (*.apk)|*.apk";
+                    dialog.Title = "Select an APK file";
+
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = dialog.FileName;
+                        string fileName = Path.GetFileName(filePath);
+                        commonProgress.Text = "Install App";
+                        commonProgress.Show();
+                        commonProgress.UpdateStepLabel("Install App", "Starting Installation...");
+                        bool completed = false;
+                        Dictionary<string, string> APKInfo = new Dictionary<string, string>();
+                        string appName = "", packageName = "", activityName = "", version = "";
+                        bool isAPKInfoRead;
+                        try
+                        {
+                            APKInfo = AndroidMethods.GetInstance().GetApkInformation(filePath);
+                            appName = APKInfo["AppName"];
+                            packageName = APKInfo["PackageName"];
+                            activityName = APKInfo["ActivityName"];
+                            version = APKInfo["Version"];
+                            isAPKInfoRead = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            GoogleAnalytics.SendExceptionEvent("GetApkInformation", ex.Message);
+                            isAPKInfoRead = false;
+                        }
+                        bool isInstalled = false;
+                        Task.Run(() =>
+                        {
+                            isInstalled = AndroidMethods.GetInstance().InstallApp(selectedUDID, filePath);
+                            completed = true;
+                        });
+                        while (completed == false)
+                        {
+                            if (isAPKInfoRead)
+                            {
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName);
+                            }
+                            else
+                            {
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName);
+                            }
+                        }
+                        if (isInstalled)
+                        {
+                            if (isAPKInfoRead)
+                            {
+                                DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result == DialogResult.Yes)
+                                {
+                                    AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "Yes");
+                                }
+                                else
+                                {
+                                    GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "No");
+                                }
+                            }
+                            else
+                            {
+                                DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                GoogleAnalytics.SendEvent("InstallApp_Android_App_Launch_Option_NA");
+                            }
+                        }
+                        commonProgress.Close();
+                        //GoogleAnalytics.SendEvent("InstallApp_Android");
+                    }
+                }
+            }
+            else
+            {
+                GoogleAnalytics.SendEvent("InstallApp_Device_Offline");
+                MessageBox.Show("Please check device connectivity...", "Device Offline", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            GoogleAnalytics.SendEvent("InstallApp_Clicked");
+
+        }
+
+        private void refreshStatusToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RefreshDeviceListView();
+        }
+
+        private void uninstallAppToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

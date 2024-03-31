@@ -80,8 +80,10 @@ namespace Appium_Wizard
                         deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
                         deviceInformation.infoListView.Items.Add(new ListViewItem(IPAddress));
                         deviceLookUp.Hide();
+                        Hide();
                         deviceInformation.ShowDialog();
                         GoogleAnalytics.SendEvent("DeviceInformation_Android_Wireless");
+                        deviceLookUp.Close();
                         Close();
                     }
                 }
@@ -95,24 +97,6 @@ namespace Appium_Wizard
             {
                 deviceLookUp.Close();
                 MessageBox.Show("No Android Device available. Please check if the device is on the same network as this PC.\nMake sure Wireless debugging option enabled in your phone's Developer options.\nMake sure you've entered valid IP Address and Port number.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void TryAlternative_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            try
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo
-                {
-                    FileName = "https://play.google.com/work/apps/details?id=moe.haruue.wadb&hl=en&gl=US",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
-                GoogleAnalytics.SendEvent("TryAlternative_LinkClicked");
-            }
-            catch (Exception exception)
-            {
-                GoogleAnalytics.SendExceptionEvent("TryAlternative_LinkClicked", exception.Message);
             }
         }
     }

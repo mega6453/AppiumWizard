@@ -65,7 +65,7 @@ namespace Appium_Wizard
                             string OSVersion = OS + " " + version;
                             item.SubItems[3].Text = "Online";
                             item.SubItems[5].Text = "USB";
-
+                            Database.UpdateDataInDevicesTable(udid, "Connection","USB");
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
                                 if (OS.Equals("iOS"))
@@ -202,11 +202,13 @@ namespace Appium_Wizard
                                 {
                                     item.SubItems[3].Text = "Online";
                                     item.SubItems[5].Text = "Wi-Fi";
+                                    Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
                                 }
                                 else
                                 {
                                     item.SubItems[3].Text = "Offline";
                                     item.SubItems[5].Text = "";
+                                    Database.UpdateDataInDevicesTable(udid, "Connection", "");
                                 }
 
                                 //var deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(udid);
@@ -237,11 +239,13 @@ namespace Appium_Wizard
                                 {
                                     item.SubItems[3].Text = "Online";
                                     item.SubItems[5].Text = "Wi-Fi";
+                                    Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
                                 }
                                 else
                                 {
                                     item.SubItems[3].Text = "Offline";
                                     item.SubItems[5].Text = "";
+                                    Database.UpdateDataInDevicesTable(udid, "Connection", "");
                                 }                               
                             }
                             if (ScreenControl.webview2.ContainsKey(udid))

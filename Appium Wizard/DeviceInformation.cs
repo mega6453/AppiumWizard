@@ -70,9 +70,9 @@ namespace Appium_Wizard
                     IPAddress = value;
                 }
             }
+            Hide();
             Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height, Connection, IPAddress);
             mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
-            Close();
             if (OSType.ToLower().Contains("ios"))
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -89,6 +89,7 @@ namespace Appium_Wizard
                 dic.Add("ConnectionType", Connection);
                 GoogleAnalytics.SendEvent("Device_Added_Android", dic);
             }
+            Close();
         }
 
         private void DeviceInformation_Shown(object sender, EventArgs e)

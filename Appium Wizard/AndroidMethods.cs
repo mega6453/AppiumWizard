@@ -243,6 +243,11 @@ namespace Appium_Wizard
             }
         }
 
+        public void RebootDevice(string udid)
+        {
+            ExecuteCommand("-s " + udid + " reboot");
+        }
+
         public string GetAndroidIPAddress(string udid)
         {
             string output = ExecuteCommand("-s " + udid + " shell ifconfig");

@@ -34,6 +34,7 @@
             LaunchButton = new Button();
             UninstallButton = new Button();
             textBoxSearch = new TextBox();
+            KillAppButton = new Button();
             SuspendLayout();
             // 
             // listView1
@@ -58,7 +59,7 @@
             // LaunchButton
             // 
             LaunchButton.Enabled = false;
-            LaunchButton.Location = new Point(107, 378);
+            LaunchButton.Location = new Point(37, 378);
             LaunchButton.Name = "LaunchButton";
             LaunchButton.Size = new Size(126, 34);
             LaunchButton.TabIndex = 1;
@@ -69,7 +70,7 @@
             // UninstallButton
             // 
             UninstallButton.Enabled = false;
-            UninstallButton.Location = new Point(273, 378);
+            UninstallButton.Location = new Point(325, 378);
             UninstallButton.Name = "UninstallButton";
             UninstallButton.Size = new Size(138, 34);
             UninstallButton.TabIndex = 2;
@@ -86,11 +87,23 @@
             textBoxSearch.TabIndex = 3;
             textBoxSearch.TextChanged += textBox1_TextChanged;
             // 
+            // KillAppButton
+            // 
+            KillAppButton.Enabled = false;
+            KillAppButton.Location = new Point(190, 378);
+            KillAppButton.Name = "KillAppButton";
+            KillAppButton.Size = new Size(112, 34);
+            KillAppButton.TabIndex = 4;
+            KillAppButton.Text = "Kill App";
+            KillAppButton.UseVisualStyleBackColor = true;
+            KillAppButton.Click += KillAppButton_Click;
+            // 
             // InstalledAppsList
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(508, 418);
+            Controls.Add(KillAppButton);
             Controls.Add(textBoxSearch);
             Controls.Add(UninstallButton);
             Controls.Add(LaunchButton);
@@ -104,6 +117,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Installed Apps List";
             Load += InstalledAppsList_Load;
+            Shown += InstalledAppsList_Shown;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -115,5 +129,6 @@
         private Button LaunchButton;
         private Button UninstallButton;
         private TextBox textBoxSearch;
+        private Button KillAppButton;
     }
 }

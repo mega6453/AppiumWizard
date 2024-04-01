@@ -87,6 +87,7 @@ namespace Appium_Wizard
             launchAppToolStripMenuItem = new ToolStripMenuItem();
             refreshStatusToolStripMenuItem = new ToolStripMenuItem();
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
+            takeScreenshotToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -536,31 +537,31 @@ namespace Appium_Wizard
             // contextMenuStrip4
             // 
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem });
+            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem, takeScreenshotToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(307, 165);
+            contextMenuStrip4.Size = new Size(324, 197);
             // 
             // installAppToolStripMenuItem
             // 
             installAppToolStripMenuItem.Image = Properties.Resources.Install;
             installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
-            installAppToolStripMenuItem.Size = new Size(306, 32);
+            installAppToolStripMenuItem.Size = new Size(303, 32);
             installAppToolStripMenuItem.Text = "Install App";
             installAppToolStripMenuItem.Click += installAppToolStripMenuItem_Click;
             // 
             // launchAppToolStripMenuItem
             // 
-            launchAppToolStripMenuItem.Image = Properties.Resources.Launch;
+            launchAppToolStripMenuItem.Image = Properties.Resources.application;
             launchAppToolStripMenuItem.Name = "launchAppToolStripMenuItem";
-            launchAppToolStripMenuItem.Size = new Size(306, 32);
-            launchAppToolStripMenuItem.Text = "Launch App | Uninstall App";
+            launchAppToolStripMenuItem.Size = new Size(323, 32);
+            launchAppToolStripMenuItem.Text = "Apps - Launch | Kill | Uninstall";
             launchAppToolStripMenuItem.Click += launchAppToolStripMenuItem_Click;
             // 
             // refreshStatusToolStripMenuItem
             // 
             refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
             refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
-            refreshStatusToolStripMenuItem.Size = new Size(306, 32);
+            refreshStatusToolStripMenuItem.Size = new Size(303, 32);
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
             refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
             // 
@@ -568,9 +569,17 @@ namespace Appium_Wizard
             // 
             rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
             rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
-            rebootDeviceToolStripMenuItem.Size = new Size(306, 32);
+            rebootDeviceToolStripMenuItem.Size = new Size(303, 32);
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
+            // 
+            // takeScreenshotToolStripMenuItem
+            // 
+            takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
+            takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
+            takeScreenshotToolStripMenuItem.Size = new Size(303, 32);
+            takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
+            takeScreenshotToolStripMenuItem.Click += takeScreenshotToolStripMenuItem_Click;
             // 
             // MainScreen
             // 
@@ -671,5 +680,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem rebootDeviceToolStripMenuItem;
         private ToolStripMenuItem refreshStatusToolStripMenuItem;
         private ToolStripMenuItem launchAppToolStripMenuItem;
+        private ToolStripMenuItem takeScreenshotToolStripMenuItem;
     }
 }

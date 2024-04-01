@@ -21,6 +21,7 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Installed Apps List", "Please wait while fetching list of installed apps...");
             GetListOfAppsAndUpdateListView();
+            commonProgress.Close();
         }
 
         public void GetListOfAppsAndUpdateListView(bool update = false)
@@ -48,11 +49,13 @@ namespace Appium_Wizard
                 selectedPackageName = selectedItem.SubItems[0].Text;
                 UninstallButton.Enabled = true;
                 LaunchButton.Enabled = true;
+                KillAppButton.Enabled = true;
             }
             else
             {
                 UninstallButton.Enabled = false;
                 LaunchButton.Enabled = false;
+                KillAppButton.Enabled = false;
             }
         }
 
@@ -78,10 +81,12 @@ namespace Appium_Wizard
             {
                 string activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
                 AndroidMethods.GetInstance().LaunchApp(udid, activityName);
+                GoogleAnalytics.SendEvent("Android_App_Launched");
             }
             else
             {
                 iOSMethods.GetInstance().LaunchApp(udid, selectedPackageName);
+                GoogleAnalytics.SendEvent("iOS_App_Launched");
             }
         }
 
@@ -93,6 +98,7 @@ namespace Appium_Wizard
                 if (result == DialogResult.Yes)
                 {
                     AndroidMethods.GetInstance().UnInstallApp(udid, selectedPackageName);
+                    GoogleAnalytics.SendEvent("Android_App_Uninstalled");
                 }
             }
             else
@@ -101,13 +107,41 @@ namespace Appium_Wizard
                 if (result == DialogResult.Yes)
                 {
                     iOSMethods.GetInstance().UninstallApp(udid, selectedPackageName);
-
+                    GoogleAnalytics.SendEvent("iOS_App_Uninstalled");
                 }
             }
             GetListOfAppsAndUpdateListView();
             textBoxSearch.Clear();
             UninstallButton.Enabled = false;
             LaunchButton.Enabled = false;
+            KillAppButton.Enabled = false;
+        }
+
+        private void KillAppButton_Click(object sender, EventArgs e)
+        {
+            if (os.Equals("Android"))
+            {
+                var result = MessageBox.Show("Are you sure you want to kill " + selectedPackageName + " in " + deviceName + "?", "Kill App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    AndroidMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    GoogleAnalytics.SendEvent("Android_App_Killed");
+                }
+            }
+            else
+            {
+                var result = MessageBox.Show("Are you sure you want to kill " + selectedPackageName + " in " + deviceName + "?", "Kill App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    iOSMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    GoogleAnalytics.SendEvent("iOS_App_Killed");
+                }
+            }
+        }
+
+        private void InstalledAppsList_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent("InstalledAppsList_Shown");
         }
     }
 }

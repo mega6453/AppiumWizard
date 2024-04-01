@@ -111,6 +111,11 @@ namespace Appium_Wizard
             ExecuteCommand("uninstall "+bundleId,udid);
         }
 
+        public void TakeScreenshot(string udid, string path)
+        {
+            ExecuteCommand("screenshot  --output="+path,udid);
+        }
+
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             string sessionId = "nosession";

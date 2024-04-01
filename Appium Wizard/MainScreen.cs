@@ -198,6 +198,7 @@ namespace Appium_Wizard
                     contextMenuStrip4.Items[1].Enabled = false;
                     contextMenuStrip4.Items[2].Enabled = false;
                     contextMenuStrip4.Items[4].Enabled = false;
+                    contextMenuStrip4.Items[5].Enabled = false;
                 }
                 else
                 {
@@ -677,7 +678,7 @@ namespace Appium_Wizard
                         }
                         else if (output.Contains("Process started successfully"))
                         {
-                            GoogleAnalytics.SendEvent("InstallApp_iOS_App_Launched");
+                            GoogleAnalytics.SendEvent("Install_iOS_App_Launched");
                         }
                         GoogleAnalytics.SendEvent("Launch_Installed_iOS_App", "Yes");
                     }
@@ -689,20 +690,22 @@ namespace Appium_Wizard
                 else
                 {
                     DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Launch_Option_NA");
+                    GoogleAnalytics.SendEvent("Install_iOS_App_Launch_Option_NA");
                 }
+                GoogleAnalytics.SendEvent("Install_iOS_App_Success");
+
             }
             else
             {
                 if (iOSAsyncMethods.installationProgress.Contains("MismatchedApplicationIdentifierEntitlement"))
                 {
                     MessageBox.Show("Uninstall the existing " + appName + " app and Try again...", "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Failed", "MismatchedApplicationIdentifierEntitlement");
+                    GoogleAnalytics.SendEvent("Install_iOS_App_Failed", "MismatchedApplicationIdentifierEntitlement");
                 }
                 else
                 {
                     MessageBox.Show(iOSAsyncMethods.installationProgress, "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    GoogleAnalytics.SendEvent("InstallApp_iOS_App_Failed");
+                    GoogleAnalytics.SendEvent("Install_iOS_App_Failed");
                 }
             }
             iOSAsyncMethods.installationProgress = "0";
@@ -1002,6 +1005,14 @@ namespace Appium_Wizard
                         GoogleAnalytics.SendExceptionEvent("Reboot_Android");
                     }
                 }
+                else
+                {
+                    GoogleAnalytics.SendExceptionEvent("Reboot_Cancelled_SecondPopup");
+                }
+            }
+            else
+            {
+                GoogleAnalytics.SendExceptionEvent("Reboot_Cancelled_FirstPopup");
             }
         }
 
@@ -1021,7 +1032,6 @@ namespace Appium_Wizard
                         string fileName = Path.GetFileName(filePath);
                         InstalliOSApp installApp = new InstalliOSApp(selectedDeviceName, selectedUDID, filePath, fileName);
                         installApp.ShowDialog();
-                        //GoogleAnalytics.SendEvent("InstallApp_iOS");
                     }
                 }
                 else
@@ -1090,11 +1100,11 @@ namespace Appium_Wizard
                             else
                             {
                                 DialogResult result = MessageBox.Show("Installation Successful. Launch option not available. Please launch the app manually.", "Install App", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                GoogleAnalytics.SendEvent("InstallApp_Android_App_Launch_Option_NA");
+                                GoogleAnalytics.SendEvent("Install_Android_App_Launch_Option_NA");
                             }
+                            GoogleAnalytics.SendEvent("Install_Android_App_Success");
                         }
                         commonProgress.Close();
-                        //GoogleAnalytics.SendEvent("InstallApp_Android");
                     }
                 }
             }
@@ -1104,18 +1114,54 @@ namespace Appium_Wizard
                 MessageBox.Show("Please check device connectivity...", "Device Offline", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             GoogleAnalytics.SendEvent("InstallApp_Clicked");
-
         }
 
         private void refreshStatusToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RefreshDeviceListView();
+            GoogleAnalytics.SendEvent("Refresh_Status");
         }
 
         private void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstalledAppsList installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
             installedAppsList.ShowDialog();
+        }
+
+        private void takeScreenshotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "PNG Files (*.png)|*.png";
+            saveFileDialog.Title = "Save PNG File";
+            saveFileDialog.ShowDialog();
+
+            if (selectedOS.Equals("Android"))
+            {
+                if (saveFileDialog.FileName != "")
+                {
+                    string filePath = saveFileDialog.FileName;
+                    filePath = "\"" + filePath + "\"";
+                    if (selectedDeviceConnection.Equals("Wi-Fi"))
+                    {
+                        AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
+                    }
+                    else
+                    {
+                        AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                    }
+                    GoogleAnalytics.SendEvent("Android_TakeScreenshot");
+                }
+            }
+            else
+            {
+                if (saveFileDialog.FileName != "")
+                {
+                    string filePath = saveFileDialog.FileName;
+                    filePath = "\"" + filePath + "\"";
+                    iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                    GoogleAnalytics.SendEvent("iOS_TakeScreenshot");
+                }
+            }
         }
     }
 }

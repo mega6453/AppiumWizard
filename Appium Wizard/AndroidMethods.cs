@@ -304,6 +304,16 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " uninstall " + packageName);
         }
 
+        public void KillApp(string udid, string packageName)
+        {
+            ExecuteCommand("-s " + udid + " shell am force-stop " + packageName);
+        }
+
+        public void TakeScreenshot(string udid, string path)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > " + path);
+        }
+
         public List<string> GetListOfInstalledApps(string udid)
         {
             var output = ExecuteCommand("-s " + udid + " shell pm list packages -3");
@@ -339,6 +349,36 @@ namespace Appium_Wizard
                 }
                 string output = adbProcess.StandardOutput.ReadToEnd();
                 string error = adbProcess.StandardError.ReadToEnd();
+                return output + "\n" + error;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while executing argument " + arguments + ": " + ex.Message);
+                return "Exception";
+            }
+        }
+
+        public string ExecuteCommandWithCmd(string arguments, bool waitForExit = true)
+        {
+            try
+            {
+                ProcessStartInfo processStartInfo = new ProcessStartInfo();
+                processStartInfo.FileName = "cmd.exe";
+                processStartInfo.Arguments = "/C adb.exe "+arguments;
+                processStartInfo.RedirectStandardOutput = true;
+                processStartInfo.WorkingDirectory = FilesPath.executablesFolderPath;
+                processStartInfo.RedirectStandardError = true;
+                processStartInfo.UseShellExecute = false;
+                processStartInfo.CreateNoWindow = true;
+                Process process = new Process();
+                process.StartInfo = processStartInfo;
+                process.Start();
+                if (waitForExit)
+                {
+                    process.WaitForExit();
+                }
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
                 return output + "\n" + error;
             }
             catch (Exception ex)

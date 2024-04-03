@@ -196,9 +196,9 @@ namespace Appium_Wizard
                     Open.Enabled = false;
                     contextMenuStrip4.Items[0].Enabled = false;
                     contextMenuStrip4.Items[1].Enabled = false;
-                    contextMenuStrip4.Items[2].Enabled = false;
+                    contextMenuStrip4.Items[2].Enabled = true; // Refresh
+                    contextMenuStrip4.Items[3].Enabled = false;
                     contextMenuStrip4.Items[4].Enabled = false;
-                    contextMenuStrip4.Items[5].Enabled = false;
                 }
                 else
                 {

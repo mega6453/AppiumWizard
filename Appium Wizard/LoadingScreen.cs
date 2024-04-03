@@ -112,7 +112,15 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, info);
             MainScreen mainForm = new MainScreen();
             Hide();
-            mainForm.ShowDialog();
+            try
+            {
+                mainForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Close();
+                GoogleAnalytics.SendEvent("App_Crashed",ex.Message);
+            }
         }
 
         private Task ExecuteBackgroundMethod()

@@ -251,6 +251,7 @@ namespace Appium_Wizard
             // 
             // MoreButton
             // 
+            MoreButton.Enabled = false;
             MoreButton.Location = new Point(501, 70);
             MoreButton.Name = "MoreButton";
             MoreButton.Size = new Size(112, 34);
@@ -537,7 +538,7 @@ namespace Appium_Wizard
             // contextMenuStrip4
             // 
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, rebootDeviceToolStripMenuItem, takeScreenshotToolStripMenuItem });
+            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
             contextMenuStrip4.Size = new Size(324, 197);
             // 
@@ -545,7 +546,7 @@ namespace Appium_Wizard
             // 
             installAppToolStripMenuItem.Image = Properties.Resources.Install;
             installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
-            installAppToolStripMenuItem.Size = new Size(303, 32);
+            installAppToolStripMenuItem.Size = new Size(323, 32);
             installAppToolStripMenuItem.Text = "Install App";
             installAppToolStripMenuItem.Click += installAppToolStripMenuItem_Click;
             // 
@@ -561,7 +562,7 @@ namespace Appium_Wizard
             // 
             refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
             refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
-            refreshStatusToolStripMenuItem.Size = new Size(303, 32);
+            refreshStatusToolStripMenuItem.Size = new Size(323, 32);
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
             refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
             // 
@@ -569,7 +570,7 @@ namespace Appium_Wizard
             // 
             rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
             rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
-            rebootDeviceToolStripMenuItem.Size = new Size(303, 32);
+            rebootDeviceToolStripMenuItem.Size = new Size(323, 32);
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
@@ -577,7 +578,7 @@ namespace Appium_Wizard
             // 
             takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
             takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
-            takeScreenshotToolStripMenuItem.Size = new Size(303, 32);
+            takeScreenshotToolStripMenuItem.Size = new Size(323, 32);
             takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
             takeScreenshotToolStripMenuItem.Click += takeScreenshotToolStripMenuItem_Click;
             // 

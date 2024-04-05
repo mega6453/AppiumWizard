@@ -43,6 +43,9 @@
     <Compile Update="ServerConfig.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="SignIPA.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="TroubleShooter.cs">
       <SubType>Form</SubType>
     </Compile>

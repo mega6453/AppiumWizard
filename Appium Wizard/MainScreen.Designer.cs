@@ -86,8 +86,9 @@ namespace Appium_Wizard
             installAppToolStripMenuItem = new ToolStripMenuItem();
             launchAppToolStripMenuItem = new ToolStripMenuItem();
             refreshStatusToolStripMenuItem = new ToolStripMenuItem();
-            rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             takeScreenshotToolStripMenuItem = new ToolStripMenuItem();
+            rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
+            signIPAToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -297,7 +298,7 @@ namespace Appium_Wizard
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(69, 29);
             toolsToolStripMenuItem.Text = "Tools";
@@ -540,7 +541,7 @@ namespace Appium_Wizard
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
             contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(324, 197);
+            contextMenuStrip4.Size = new Size(324, 164);
             // 
             // installAppToolStripMenuItem
             // 
@@ -566,6 +567,14 @@ namespace Appium_Wizard
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
             refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
             // 
+            // takeScreenshotToolStripMenuItem
+            // 
+            takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
+            takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
+            takeScreenshotToolStripMenuItem.Size = new Size(323, 32);
+            takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
+            takeScreenshotToolStripMenuItem.Click += takeScreenshotToolStripMenuItem_Click;
+            // 
             // rebootDeviceToolStripMenuItem
             // 
             rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
@@ -574,13 +583,13 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
-            // takeScreenshotToolStripMenuItem
+            // signIPAToolStripMenuItem
             // 
-            takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
-            takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
-            takeScreenshotToolStripMenuItem.Size = new Size(323, 32);
-            takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
-            takeScreenshotToolStripMenuItem.Click += takeScreenshotToolStripMenuItem_Click;
+            signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
+            signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
+            signIPAToolStripMenuItem.Size = new Size(307, 34);
+            signIPAToolStripMenuItem.Text = "Sign IPA";
+            signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
             // 
             // MainScreen
             // 
@@ -682,5 +691,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem refreshStatusToolStripMenuItem;
         private ToolStripMenuItem launchAppToolStripMenuItem;
         private ToolStripMenuItem takeScreenshotToolStripMenuItem;
+        private ToolStripMenuItem signIPAToolStripMenuItem;
     }
 }

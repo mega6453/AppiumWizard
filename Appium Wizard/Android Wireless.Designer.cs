@@ -98,6 +98,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(611, 343);
             Controls.Add(label3);
             Controls.Add(FindDeviceButton);

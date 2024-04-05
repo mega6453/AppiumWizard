@@ -47,7 +47,7 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(728, 156);
+            ClientSize = new Size(728, 176);
             ControlBox = false;
             Controls.Add(commonProgressLabel);
             Icon = (Icon)resources.GetObject("$this.Icon");

@@ -1163,5 +1163,20 @@ namespace Appium_Wizard
                 }
             }
         }
+
+        private void signIPAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var profilesList = iOSProfileManagement.FetchProfiles();
+            if (profilesList.Count == 0)
+            {
+                MessageBox.Show("Provisioning Profiles not found. First Import profile in Tools->iOS Profile Management and then try again.", "Provisioning Profiles not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendEvent("Profiles_Not_Available_Popup");
+            }
+            else
+            {
+                SignIPA signIPA = new SignIPA(profilesList);
+                signIPA.ShowDialog();
+            }
+        }
     }
 }

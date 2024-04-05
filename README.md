@@ -106,8 +106,9 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/install" title="install icons">Install icons created by NajmunNahar - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/restart" title="restart icons">Restart icons created by Paul J. - Flaticon</a>
-*<a href="https://www.flaticon.com/free-icons/screenshot" title="screenshot icons">Screenshot icons created by icon_small - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/screenshot" title="screenshot icons">Screenshot icons created by icon_small - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/more" title="more icons">More icons created by Anggara - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/signature" title="signature icons">Signature icons created by srip - Flaticon</a>
 
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

@@ -4,7 +4,7 @@ namespace Appium_Wizard
 {
     public partial class iOSProfileManagement : Form
     {
-        string ProfilesFilePath = FilesPath.ProfilesFilePath;
+        static string ProfilesFilePath = FilesPath.ProfilesFilePath;
         string selectedProfileName, selectedProfilePath;
         ListViewItem selectedItem;
         public iOSProfileManagement()
@@ -21,7 +21,8 @@ namespace Appium_Wizard
 
         private void iOSProfileManagement_Load(object sender, EventArgs e)
         {
-            RefreshProfileListView();
+            //RefreshProfileListView();
+            UpdateProfilesList(listView1);
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -51,8 +52,9 @@ namespace Appium_Wizard
             }
         }
 
-        public void RefreshProfileListView()
+        public static List<string[]> FetchProfiles()
         {
+            List<string[]> profilesList = new List<string[]>();
             if (!Directory.Exists(ProfilesFilePath))
             {
                 Directory.CreateDirectory(ProfilesFilePath);
@@ -87,7 +89,8 @@ namespace Appium_Wizard
                                 updatedExpirationDays = "Expired";
                             }
                             string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
-                            listView1.Items.Add(new ListViewItem(item1));
+                            // listView1.Items.Add(new ListViewItem(item1));
+                            profilesList.Add(item1); 
                         }
                         catch (Exception)
                         {
@@ -95,7 +98,17 @@ namespace Appium_Wizard
                     }
                 }
             }
+            return profilesList;
             //GoogleAnalytics.SendEvent("RefreshProfilesListView");
+        }
+
+        private void UpdateProfilesList(ListView listView)
+        {
+            List<string[]> profilesList = FetchProfiles();
+            foreach (var item in profilesList)
+            {
+                listView.Items.Add(new ListViewItem(item));
+            }
         }
 
         private void iOSProfileManagement_Shown(object sender, EventArgs e)

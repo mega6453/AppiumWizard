@@ -108,12 +108,12 @@ namespace Appium_Wizard
 
         public void UninstallApp(string udid, string bundleId)
         {
-            ExecuteCommand("uninstall "+bundleId,udid);
+            ExecuteCommand("uninstall " + bundleId, udid);
         }
 
         public void TakeScreenshot(string udid, string path)
         {
-            ExecuteCommand("screenshot  --output="+path,udid);
+            ExecuteCommand("screenshot  --output=" + path, udid);
         }
 
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
@@ -267,79 +267,39 @@ namespace Appium_Wizard
             }
         }
 
-        public string SignIPAusingWSL(string udid, string IPAFilePath)
+        public bool isProfileHasUDID(string profileFolder, string udid)
         {
-            var output = isProfileAvailableToSign(udid);
-            bool isProfileAvailable = output.Item1;
-            string certificatPath = output.Item2;
-            if (isProfileAvailable)
+            try
             {
-                string tempFolder = Path.GetTempPath();
-                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
-                Directory.CreateDirectory(tempFolder);
-                string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                string LinuxOutputIPAFilePath = GetLinuxPathFromInput(signedIPAFilePath);
-                string[] pemFiles = Directory.GetFiles(certificatPath, "*.pem");
-                string[] mobileprovisionFiles = Directory.GetFiles(certificatPath, "*.mobileprovision");
-                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
-                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
-                string LinuxInputIPAFilePath = GetLinuxPathFromInput(IPAFilePath);
-                string[] commands = {
-            @"cd "+certificatPath,
-            @"wsl ~/zsignbuilt/build/zsign -k "+pemFileName+" -m "+mobileprovisionFileName+" -z 9 -o "+LinuxOutputIPAFilePath+" "+LinuxInputIPAFilePath };
-
-                Process process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = "/K";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardInput = true;
-
-
-                // Subscribe to the event handlers for capturing output
-                process.OutputDataReceived += Process_OutputDataReceived;
-                process.ErrorDataReceived += Process_ErrorDataReceived;
-
-                // Start the process
-                process.Start();
-
-                // Begin capturing output
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-
-                // Run the commands
-                foreach (string command in commands)
+                string certificatPath = "";
+                List<string> deviceList; int expirationDays;
+                bool flag = false;
+                string[] provisioningFiles = Directory.EnumerateFiles(profileFolder, "*.mobileprovision").ToArray();
+                if (provisioningFiles.Length > 0)
                 {
-                    process.StandardInput.WriteLine(command);
-                    process.StandardInput.WriteLine("echo Command completed");
+                    foreach (string provisioningFile in provisioningFiles)
+                    {
+                        var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
+                        deviceList = (List<string>)provisionDetails["DevicesList"];
+                        expirationDays = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                        if (deviceList.Contains(udid) && expirationDays > 0)
+                        {
+                            flag = true;
+                            certificatPath = profileFolder;
+                            break;
+                        }
+                    }
                 }
-
-                // Close the standard input stream to signal the end of commands
-                process.StandardInput.Close();
-
-                // Wait for the process to exit
-                process.WaitForExit();
-
-                // Get the exit code
-                int exitCode = process.ExitCode;
-
-                // Close the process
-                process.Close();
-
-                // Display the exit code
-                Console.WriteLine($"Exit Code: {exitCode}");
-
-                return signedIPAFilePath;
-
+                return flag;
             }
-            else
+            catch (Exception)
             {
-                return "notsigned";
+                return false;
             }
         }
 
+
+        static string stackTrace = "";
         public string SignIPA(string udid, string IPAFilePath)
         {
             var output = isProfileAvailableToSign(udid);
@@ -351,74 +311,97 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                string[] pemFiles = Directory.GetFiles(certificatPath, "*.pem");
-                string[] mobileprovisionFiles = Directory.GetFiles(certificatPath, "*.mobileprovision");
-                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
-                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
-                string[] commands = {
-                $"set PATH=\"{iOSFilesPath}\";%PATH%",
-                $"cd \"{certificatPath}\"",
-                $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\" -z 9 -o \"{signedIPAFilePath}\" \"{IPAFilePath}\""
-            };
-
-                Process process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = "/K";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardInput = true;
-
-
-                // Subscribe to the event handlers for capturing output
-                process.OutputDataReceived += Process_OutputDataReceived;
-                process.ErrorDataReceived += Process_ErrorDataReceived;
-
-                // Start the process
-                process.Start();
-
-                // Begin capturing output
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-
-                // Run the commands
-                foreach (string command in commands)
-                {
-                    process.StandardInput.WriteLine(command);
-                    process.StandardInput.WriteLine("echo Command completed");
-                }
-
-                // Close the standard input stream to signal the end of commands
-                process.StandardInput.Close();
-
-                // Wait for the process to exit
-                process.WaitForExit();
-
-                // Get the exit code
-                int exitCode = process.ExitCode;
-
-                // Close the process
-                process.Close();
-
-                // Display the exit code
-                Console.WriteLine($"Exit Code: {exitCode}");
-
-                return signedIPAFilePath;
-
+                return SignIPA(certificatPath,IPAFilePath,signedIPAFilePath);
             }
             else
             {
-                return "notsigned";
+                return "ProfileNotAvailable";
             }
         }
 
+
+        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid)
+        {
+            if (udid != "")
+            {
+                bool isProfileAvailable = isProfileHasUDID(profilePath, udid);
+                if (isProfileAvailable)
+                {
+                    return SignIPA(profilePath, IPAFilePath, outputPath);
+                }
+                else
+                {
+                    return "ProfileNotAvailable";
+                }
+            }
+            else
+            {
+                return SignIPA(profilePath, IPAFilePath, outputPath);
+            }
+        }
+
+        private string SignIPA(string profilePath, string IPAFilePath, string outputPath)
+        {
+            string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
+            string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
+            string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
+            string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
+            string[] commands = {
+                $"set PATH=\"{iOSFilesPath}\";%PATH%",
+                $"cd \"{profilePath}\"",
+                $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\" -z 9 -o \"{outputPath}\" \"{IPAFilePath}\""
+                 };
+
+            Process process = new Process();
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/K";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardInput = true;
+
+            process.OutputDataReceived += Process_OutputDataReceived;
+            process.ErrorDataReceived += Process_ErrorDataReceived;
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            foreach (string command in commands)
+            {
+                process.StandardInput.WriteLine(command);
+                process.StandardInput.WriteLine("echo Command completed");
+            }
+            process.StandardInput.Close();
+            process.WaitForExit();
+            int exitCode = process.ExitCode;
+            process.Close();
+
+            if (stackTrace == "Archive Failed")
+            {
+                return "Sign_IPA_Failed";
+            }
+            else if (stackTrace == "Archive OK")
+            {
+                return outputPath;               
+            }
+            else
+            {
+                return "Sign_IPA_Failed";
+            }
+        }
 
         private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                Console.WriteLine($"Output: {e.Data}");
+                if (e.Data.Contains("Archive Failed"))
+                {
+                    stackTrace = "Sign IPA Archive Failed";
+                }
+                if (e.Data.Contains("Archive OK"))
+                {
+                    stackTrace = "Archive OK";
+                }
             }
         }
 
@@ -426,7 +409,14 @@ namespace Appium_Wizard
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                Console.WriteLine($"Error: {e.Data}");
+                if (e.Data.Contains("Archive Failed"))
+                {
+                    stackTrace = "Sign IPA Archive Failed";
+                }
+                if (e.Data.Contains("Archive OK"))
+                {
+                    stackTrace = "Archive OK";
+                }
             }
         }
 

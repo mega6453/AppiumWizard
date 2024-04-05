@@ -44,11 +44,11 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 if (UDIDTextbox.Text == "")
                 {
-                    commonProgress.UpdateStepLabel("Sign App", "Attempting to Sign " + IPAFilePathTextBox.Name + " file. Please wait, this may take some time...\n\nProfile : " + profilesListComboBox.SelectedItem);
+                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign given IPA file. Please wait, this may take some time...\n\nIPA file : "+ IPAFilePathTextBox.Name +"\nProfile : " + profilesListComboBox.SelectedItem);
                 }
                 else
                 {
-                    commonProgress.UpdateStepLabel("Sign App", "Attempting to Sign " + IPAFilePathTextBox.Name + " file. Please wait, this may take some time...\n\nDevice : " + UDIDTextbox.Text + "\nProfile : " + profilesListComboBox.SelectedItem);
+                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nDevice : " + UDIDTextbox.Text + "\nProfile : " + profilesListComboBox.SelectedItem);
                 }
                 string output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text);
                 commonProgress.Hide();
@@ -58,7 +58,7 @@ namespace Appium_Wizard
                     if (dialogResult == DialogResult.Yes)
                     {
                         commonProgress.Show();
-                        commonProgress.UpdateStepLabel("Sign App", "Attempting to Sign " + IPAFilePathTextBox.Name + " file. Please wait, this may take some time...\n\nProfile : " + profilesListComboBox.SelectedItem);
+                        commonProgress.UpdateStepLabel("Sign App", "Attempting to sign given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem);
                         output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, "");
                         GoogleAnalytics.SendEvent("ProfileNotAvailable_Yes_Sign");
                     }

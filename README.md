@@ -111,6 +111,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/signature" title="signature icons">Signature icons created by srip - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/virus" title="virus icons">Virus icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/discussion" title="discussion icons">Discussion icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/upgrade" title="upgrade icons">Upgrade icons created by Arkinasi - Flaticon</a>
 
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

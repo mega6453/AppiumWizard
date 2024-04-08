@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json.Linq;
+using RestSharp;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using File = System.IO.File;
@@ -1213,6 +1215,70 @@ namespace Appium_Wizard
             {
                 GoogleAnalytics.SendExceptionEvent("StartADiscussionToolStripMenuItem_Click", exception.Message);
             }
+        }
+
+        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var releaseInfo = GetLatestReleaseInfo();
+                JObject release = JObject.Parse(releaseInfo);
+                string tagName = (string)release["tag_name"];
+
+                Version thisAppVersion = new Version(VersionInfo.VersionNumber);
+                Version latestVersionObj = new Version(tagName.Substring(1));
+
+                bool isLatestRelease = latestVersionObj > thisAppVersion;
+
+                if (isLatestRelease)
+                {
+                    var result = MessageBox.Show("New version " + tagName + " is available.\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            ProcessStartInfo psInfo = new ProcessStartInfo
+                            {
+                                FileName = "https://github.com/mega6453/AppiumWizard/releases",
+                                UseShellExecute = true
+                            };
+                            Process.Start(psInfo);
+                            GoogleAnalytics.SendEvent("DownloadUpdate_Yes");
+                        }
+                        catch (Exception exception)
+                        {
+                            GoogleAnalytics.SendExceptionEvent("DownloadUpdate_Yes", exception.Message);
+                        }
+                    }
+                    else
+                    {
+                        GoogleAnalytics.SendEvent("DownloadUpdate_No");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unhandled Exception", "Check for Updates...");
+                GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
+            }
+        }
+
+        private string GetLatestReleaseInfo()
+        {
+            var options = new RestClientOptions("https://api.github.com")
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.Content;
         }
     }
 }

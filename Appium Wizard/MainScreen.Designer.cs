@@ -66,8 +66,9 @@ namespace Appium_Wizard
             uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
             reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
-            aboutToolStripMenuItem = new ToolStripMenuItem();
             startADiscussionToolStripMenuItem = new ToolStripMenuItem();
+            checkForUpdatesToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
@@ -331,7 +332,7 @@ namespace Appium_Wizard
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, aboutToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(65, 29);
             helpToolStripMenuItem.Text = "Help";
@@ -384,14 +385,6 @@ namespace Appium_Wizard
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
-            // aboutToolStripMenuItem
-            // 
-            aboutToolStripMenuItem.Image = Properties.Resources.information;
-            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(376, 34);
-            aboutToolStripMenuItem.Text = "About";
-            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
-            // 
             // startADiscussionToolStripMenuItem
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
@@ -399,6 +392,22 @@ namespace Appium_Wizard
             startADiscussionToolStripMenuItem.Size = new Size(376, 34);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
+            // 
+            // checkForUpdatesToolStripMenuItem
+            // 
+            checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
+            checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+            checkForUpdatesToolStripMenuItem.Size = new Size(376, 34);
+            checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
+            checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Image = Properties.Resources.information;
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(376, 34);
+            aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // tabControl1
             // 
@@ -712,5 +721,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem signIPAToolStripMenuItem;
         private ToolStripMenuItem reportAnIssueToolStripMenuItem;
         private ToolStripMenuItem startADiscussionToolStripMenuItem;
+        private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
     }
 }

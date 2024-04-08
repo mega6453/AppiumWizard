@@ -58,13 +58,16 @@ namespace Appium_Wizard
             toolsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
+            signIPAToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             appiumDocsToolStripMenuItem = new ToolStripMenuItem();
             capabilitiesToolStripMenuItem = new ToolStripMenuItem();
             xCUITestToolStripMenuItem = new ToolStripMenuItem();
             uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
+            reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
+            startADiscussionToolStripMenuItem = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
@@ -88,7 +91,6 @@ namespace Appium_Wizard
             refreshStatusToolStripMenuItem = new ToolStripMenuItem();
             takeScreenshotToolStripMenuItem = new ToolStripMenuItem();
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
-            signIPAToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -319,9 +321,17 @@ namespace Appium_Wizard
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
+            // signIPAToolStripMenuItem
+            // 
+            signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
+            signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
+            signIPAToolStripMenuItem.Size = new Size(307, 34);
+            signIPAToolStripMenuItem.Text = "Sign IPA";
+            signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
+            // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, aboutToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(65, 29);
             helpToolStripMenuItem.Text = "Help";
@@ -331,7 +341,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(294, 34);
+            appiumDocsToolStripMenuItem.Size = new Size(376, 34);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -362,17 +372,33 @@ namespace Appium_Wizard
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(294, 34);
+            troubleshootToolStripMenuItem.Size = new Size(376, 34);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
+            // 
+            // reportAnIssueToolStripMenuItem
+            // 
+            reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
+            reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
+            reportAnIssueToolStripMenuItem.Size = new Size(376, 34);
+            reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
+            reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(294, 34);
+            aboutToolStripMenuItem.Size = new Size(376, 34);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            // 
+            // startADiscussionToolStripMenuItem
+            // 
+            startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
+            startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
+            startADiscussionToolStripMenuItem.Size = new Size(376, 34);
+            startADiscussionToolStripMenuItem.Text = "Start a Discussion";
+            startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
             // tabControl1
             // 
@@ -583,14 +609,6 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
-            // signIPAToolStripMenuItem
-            // 
-            signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
-            signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
-            signIPAToolStripMenuItem.Size = new Size(307, 34);
-            signIPAToolStripMenuItem.Text = "Sign IPA";
-            signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
-            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -692,5 +710,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem launchAppToolStripMenuItem;
         private ToolStripMenuItem takeScreenshotToolStripMenuItem;
         private ToolStripMenuItem signIPAToolStripMenuItem;
+        private ToolStripMenuItem reportAnIssueToolStripMenuItem;
+        private ToolStripMenuItem startADiscussionToolStripMenuItem;
     }
 }

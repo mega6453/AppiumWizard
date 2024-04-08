@@ -1178,5 +1178,41 @@ namespace Appium_Wizard
                 signIPA.ShowDialog();
             }
         }
+
+        private void reportAnIssueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/issues/new/choose",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("ReportAnIssueToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("ReportAnIssueToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void startADiscussionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/discussions/new/choose",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("StartADiscussionToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("StartADiscussionToolStripMenuItem_Click", exception.Message);
+            }
+        }
     }
 }

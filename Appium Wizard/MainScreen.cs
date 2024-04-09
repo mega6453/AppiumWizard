@@ -1219,12 +1219,12 @@ namespace Appium_Wizard
 
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click");
             try
             {
-                var releaseInfo = GetLatestReleaseInfo();
-                JObject release = JObject.Parse(releaseInfo);
-                string tagName = (string)release["tag_name"];
-
+                var releaseInfo = Common.GetLatestReleaseInfo();
+                string tagName = releaseInfo["tag_name"];
+                string releaseNotes = releaseInfo["body"].Trim();
                 Version thisAppVersion = new Version(VersionInfo.VersionNumber);
                 Version latestVersionObj = new Version(tagName.Substring(1));
 
@@ -1232,14 +1232,14 @@ namespace Appium_Wizard
 
                 if (isLatestRelease)
                 {
-                    var result = MessageBox.Show("New version " + tagName + " is available.\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    var result = MessageBox.Show("Appium Wizard New version " + tagName + " is available.\n\nRelease Notes: "+releaseNotes+" \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         try
                         {
                             ProcessStartInfo psInfo = new ProcessStartInfo
                             {
-                                FileName = "https://github.com/mega6453/AppiumWizard/releases",
+                                FileName = "https://github.com/mega6453/AppiumWizard/releases/latest",
                                 UseShellExecute = true
                             };
                             Process.Start(psInfo);
@@ -1268,17 +1268,6 @@ namespace Appium_Wizard
             }
         }
 
-        private string GetLatestReleaseInfo()
-        {
-            var options = new RestClientOptions("https://api.github.com")
-            {
-                MaxTimeout = -1,
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
-            return response.Content;
-        }
+
     }
 }

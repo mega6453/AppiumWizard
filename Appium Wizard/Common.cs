@@ -1,4 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -601,7 +603,24 @@ namespace Appium_Wizard
             {
                 return "NotValid";  
             }
+        }
 
+        public static Dictionary<string, string> GetLatestReleaseInfo()
+        {
+            var options = new RestClientOptions("https://api.github.com")
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);
+            RestResponse response = client.Execute(request);
+            Dictionary<string, string> responseDictionary = new Dictionary<string, string>();
+            var responseObject = JObject.Parse(response.Content);
+            foreach (var property in responseObject.Properties())
+            {
+                responseDictionary.Add(property.Name, property.Value.ToString());
+            }
+            return responseDictionary;
         }
     }
 }

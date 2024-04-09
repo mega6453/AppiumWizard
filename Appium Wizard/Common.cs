@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -607,20 +608,43 @@ namespace Appium_Wizard
 
         public static Dictionary<string, string> GetLatestReleaseInfo()
         {
-            var options = new RestClientOptions("https://api.github.com")
-            {
-                MaxTimeout = -1,
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);
-            RestResponse response = client.Execute(request);
             Dictionary<string, string> responseDictionary = new Dictionary<string, string>();
-            var responseObject = JObject.Parse(response.Content);
-            foreach (var property in responseObject.Properties())
+            try
             {
-                responseDictionary.Add(property.Name, property.Value.ToString());
+                var options = new RestClientOptions("https://api.github.com")
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);
+                RestResponse response = client.Execute(request);
+                var responseObject = JObject.Parse(response.Content);
+                foreach (var property in responseObject.Properties())
+                {
+                    responseDictionary.Add(property.Name, property.Value.ToString());
+                }
+                return responseDictionary;
             }
-            return responseDictionary;
+            catch (Exception)
+            {
+                return responseDictionary;
+            }
+        }
+
+        public static bool isInternetAvailable()
+        {
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    var reply = ping.Send("www.google.com");
+                    return reply.Status == IPStatus.Success;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

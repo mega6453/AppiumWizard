@@ -49,7 +49,6 @@ namespace Appium_Wizard
             DeleteDevice = new Button();
             richTextBox1 = new RichTextBox();
             checkBox1 = new CheckBox();
-            label1 = new Label();
             MoreButton = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -92,6 +91,8 @@ namespace Appium_Wizard
             refreshStatusToolStripMenuItem = new ToolStripMenuItem();
             takeScreenshotToolStripMenuItem = new ToolStripMenuItem();
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
+            label1 = new Label();
+            tableLayoutPanel1 = new TableLayoutPanel();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -109,7 +110,7 @@ namespace Appium_Wizard
             // Open
             // 
             Open.Enabled = false;
-            Open.Location = new Point(339, 70);
+            Open.Location = new Point(339, 73);
             Open.Name = "Open";
             Open.Size = new Size(127, 34);
             Open.TabIndex = 0;
@@ -122,7 +123,7 @@ namespace Appium_Wizard
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
-            listView1.Location = new Point(30, 122);
+            listView1.Location = new Point(30, 125);
             listView1.Name = "listView1";
             listView1.Size = new Size(583, 181);
             listView1.TabIndex = 2;
@@ -200,7 +201,7 @@ namespace Appium_Wizard
             // 
             // AddDevice
             // 
-            AddDevice.Location = new Point(30, 70);
+            AddDevice.Location = new Point(30, 73);
             AddDevice.Name = "AddDevice";
             AddDevice.Size = new Size(112, 34);
             AddDevice.TabIndex = 4;
@@ -211,7 +212,7 @@ namespace Appium_Wizard
             // DeleteDevice
             // 
             DeleteDevice.Enabled = false;
-            DeleteDevice.Location = new Point(173, 70);
+            DeleteDevice.Location = new Point(173, 73);
             DeleteDevice.Name = "DeleteDevice";
             DeleteDevice.Size = new Size(135, 34);
             DeleteDevice.TabIndex = 5;
@@ -234,7 +235,7 @@ namespace Appium_Wizard
             checkBox1.AutoSize = true;
             checkBox1.Checked = true;
             checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(1270, 42);
+            checkBox1.Location = new Point(1270, 75);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(125, 29);
             checkBox1.TabIndex = 7;
@@ -242,21 +243,10 @@ namespace Appium_Wizard
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += AutoScrollCheckbox_CheckedChanged;
             // 
-            // label1
-            // 
-            label1.Anchor = AnchorStyles.Top;
-            label1.AutoSize = true;
-            label1.ForeColor = Color.Tomato;
-            label1.Location = new Point(994, 43);
-            label1.Name = "label1";
-            label1.Size = new Size(173, 25);
-            label1.TabIndex = 8;
-            label1.Text = "Appium Server Logs";
-            // 
             // MoreButton
             // 
             MoreButton.Enabled = false;
-            MoreButton.Location = new Point(501, 70);
+            MoreButton.Location = new Point(501, 73);
             MoreButton.Name = "MoreButton";
             MoreButton.Size = new Size(112, 34);
             MoreButton.TabIndex = 9;
@@ -416,7 +406,7 @@ namespace Appium_Wizard
             tabControl1.Controls.Add(tabPage3);
             tabControl1.Controls.Add(tabPage4);
             tabControl1.Controls.Add(tabPage5);
-            tabControl1.Location = new Point(640, 70);
+            tabControl1.Location = new Point(640, 73);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(755, 493);
@@ -542,7 +532,7 @@ namespace Appium_Wizard
             // 
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
-            panel1.Location = new Point(30, 366);
+            panel1.Location = new Point(30, 369);
             panel1.Name = "panel1";
             panel1.Size = new Size(583, 150);
             panel1.TabIndex = 13;
@@ -618,18 +608,41 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(33, 35);
+            label1.Name = "label1";
+            label1.Size = new Size(0, 25);
+            label1.TabIndex = 15;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.BackColor = Color.Beige;
+            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 97.26736F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2.732644F));
+            tableLayoutPanel1.Location = new Point(33, 37);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Size = new Size(1354, 38);
+            tableLayoutPanel1.TabIndex = 16;
+            tableLayoutPanel1.Visible = false;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1407, 631);
+            Controls.Add(tableLayoutPanel1);
+            Controls.Add(checkBox1);
+            Controls.Add(label1);
             Controls.Add(panel1);
             Controls.Add(tabControl1);
             Controls.Add(menuStrip1);
             Controls.Add(MoreButton);
-            Controls.Add(label1);
-            Controls.Add(checkBox1);
             Controls.Add(DeleteDevice);
             Controls.Add(AddDevice);
             Controls.Add(listView1);
@@ -676,7 +689,6 @@ namespace Appium_Wizard
         private ColumnHeader columnHeader5;
         private RichTextBox richTextBox1;
         private CheckBox checkBox1;
-        private Label label1;
         private Button MoreButton;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
@@ -722,5 +734,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem reportAnIssueToolStripMenuItem;
         private ToolStripMenuItem startADiscussionToolStripMenuItem;
         private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+        private Label label1;
+        private TableLayoutPanel tableLayoutPanel1;
     }
 }

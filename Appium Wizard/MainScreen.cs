@@ -3,16 +3,21 @@ using RestSharp;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Windows.Forms;
 using File = System.IO.File;
 
 namespace Appium_Wizard
 {
     public partial class MainScreen : Form
     {
-        string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, Width, Height;
+        string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection;
         public static List<int> runningProcessesPortNumbers = new List<int>();
+        private int labelStartPosition; bool isUpdateAvailable;
+        string latestVersion;
+        Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public MainScreen()
         {
             InitializeComponent();
@@ -21,9 +26,50 @@ namespace Appium_Wizard
             this.Text = "Appium Wizard " + VersionInfo.VersionNumber;
             USBWatcher usb = new USBWatcher(listView1);
             usb.Start();
+            labelStartPosition = this.Width - label1.Width;
+            if (Common.isInternetAvailable())
+            {
+                releaseInfo = Common.GetLatestReleaseInfo();
+            }
         }
         private void onFormLoad(object sender, EventArgs e)
         {
+            try
+            {
+                if (releaseInfo.ContainsKey("tag_name"))
+                {
+                    latestVersion = releaseInfo["tag_name"];
+                    Version thisAppVersion = new Version(VersionInfo.VersionNumber);
+                    Version latestVersionObj = new Version(latestVersion.Substring(1));
+                    isUpdateAvailable = latestVersionObj > thisAppVersion;
+                    if (isUpdateAvailable)
+                    {
+                        tableLayoutPanel1.Visible = true;
+                        label1.Text = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
+                        label1.AutoSize = true;
+                        label1.Anchor = AnchorStyles.None;
+                        Button closeButton = new Button();
+                        closeButton.Text = "X";
+                        closeButton.AutoSize = true;
+                        closeButton.FlatStyle = FlatStyle.Flat;
+                        closeButton.FlatAppearance.BorderSize = 0;
+                        tableLayoutPanel1.Width = this.Width - 50;
+                        tableLayoutPanel1.Controls.Add(label1, 0, 0);
+                        tableLayoutPanel1.Controls.Add(closeButton, 1, 0);
+
+                        closeButton.Click += (sender, e) =>
+                        {
+                            Controls.Remove(tableLayoutPanel1);
+                        };
+
+                        Controls.Add(tableLayoutPanel1);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                GoogleAnalytics.SendExceptionEvent("Check_Software_update_On_Load", ex.Message);
+            }
             var screenSize = Screen.PrimaryScreen.WorkingArea.Size;
             var expectedSize = new Size(screenSize.Width * 66 / 100, screenSize.Height * 88 / 100);
             tabControl1.Size = expectedSize;
@@ -530,8 +576,8 @@ namespace Appium_Wizard
                                 udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
                                 OSType = "Android";
                                 Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
-                                Width = deviceInfo["Width"];
-                                Height = deviceInfo["Height"];
+                                screenWidth = deviceInfo["Width"];
+                                screenHeight = deviceInfo["Height"];
                                 string Brand = string.Empty;
                                 if (!deviceInfo.ContainsKey("ro.product.product.brand"))
                                 {
@@ -548,8 +594,8 @@ namespace Appium_Wizard
                                 string[] UniqueDeviceID = { "Udid", udid.Replace("\n", "") };
                                 BrandPlusModel = BrandPlusModel.Substring(0, 1).ToUpper() + BrandPlusModel.Substring(1);
                                 string[] DeviceModel = { "Model", BrandPlusModel };
-                                string[] ScreenWidth = { "Width", Width };
-                                string[] ScreenHeight = { "Height", Height };
+                                string[] ScreenWidth = { "Width", screenWidth };
+                                string[] ScreenHeight = { "Height", screenHeight };
                                 string[] Connection = { "Connection Type", "USB" };
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
@@ -1220,54 +1266,61 @@ namespace Appium_Wizard
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click");
-            try
+            if (Common.isInternetAvailable())
             {
-                var releaseInfo = Common.GetLatestReleaseInfo();
-                string tagName = releaseInfo["tag_name"];
-                string releaseNotes = releaseInfo["body"].Trim();
-                Version thisAppVersion = new Version(VersionInfo.VersionNumber);
-                Version latestVersionObj = new Version(tagName.Substring(1));
-
-                bool isLatestRelease = latestVersionObj > thisAppVersion;
-
-                if (isLatestRelease)
+                try
                 {
-                    var result = MessageBox.Show("Appium Wizard New version " + tagName + " is available.\n\nRelease Notes: "+releaseNotes+" \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result == DialogResult.Yes)
+                    var releaseInfo = Common.GetLatestReleaseInfo();
+                    string tagName = releaseInfo["tag_name"];
+                    string releaseNotes = releaseInfo["body"].Trim();
+                    Version thisAppVersion = new Version(VersionInfo.VersionNumber);
+                    Version latestVersionObj = new Version(tagName.Substring(1));
+
+                    bool isUpdateAvailable = latestVersionObj > thisAppVersion;
+
+                    if (isUpdateAvailable)
                     {
-                        try
+                        var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes: " + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (result == DialogResult.Yes)
                         {
-                            ProcessStartInfo psInfo = new ProcessStartInfo
+                            try
                             {
-                                FileName = "https://github.com/mega6453/AppiumWizard/releases/latest",
-                                UseShellExecute = true
-                            };
-                            Process.Start(psInfo);
-                            GoogleAnalytics.SendEvent("DownloadUpdate_Yes");
+                                ProcessStartInfo psInfo = new ProcessStartInfo
+                                {
+                                    FileName = "https://github.com/mega6453/AppiumWizard/releases/latest",
+                                    UseShellExecute = true
+                                };
+                                Process.Start(psInfo);
+                                GoogleAnalytics.SendEvent("DownloadUpdate_Yes");
+                            }
+                            catch (Exception exception)
+                            {
+                                GoogleAnalytics.SendExceptionEvent("DownloadUpdate_Yes", exception.Message);
+                            }
                         }
-                        catch (Exception exception)
+                        else
                         {
-                            GoogleAnalytics.SendExceptionEvent("DownloadUpdate_Yes", exception.Message);
+                            GoogleAnalytics.SendEvent("DownloadUpdate_No");
                         }
                     }
                     else
                     {
-                        GoogleAnalytics.SendEvent("DownloadUpdate_No");
+                        MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                }
-                else
-                {
-                    MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
 
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unhandled Exception", "Check for Updates...");
+                    GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Unhandled Exception", "Check for Updates...");
-                GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
+                MessageBox.Show("Internet connection not available. Please connect to internet and try again.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click", "No_Internet");
             }
         }
-
 
     }
 }

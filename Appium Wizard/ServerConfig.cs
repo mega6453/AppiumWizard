@@ -9,6 +9,10 @@ namespace Appium_Wizard
         {
             InitializeComponent();
             serverSetup = new AppiumServerSetup();
+        }
+
+        private void ServerConfig_Load(object sender, EventArgs e)
+        {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...");
@@ -102,7 +106,6 @@ namespace Appium_Wizard
             });
         }
 
-
         private void StartServer(TextBox portTextbox, Label statusLabel, int serverNumber)
         {
             int portNumber = int.Parse(portTextbox.Text);
@@ -124,11 +127,11 @@ namespace Appium_Wizard
                 int screenport = Common.GetFreePort();
                 serverSetup.StartAppiumServer(portNumber, wdaLocalPort, serverNumber, screenport);
                 int count = 1;
-                while (!serverSetup.serverStarted)
+                while (!ExecutionStatus.serverStarted)
                 {
-                    if (!string.IsNullOrEmpty(serverSetup.statusText))
+                    if (!string.IsNullOrEmpty(ExecutionStatus.statusText))
                     {
-                        if (serverSetup.statusText.Equals("address already in use"))
+                        if (ExecutionStatus.statusText.Equals("address already in use"))
                         {
                             statusLabel.Text = "Not Running";
                             MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -144,7 +147,7 @@ namespace Appium_Wizard
                     Thread.Sleep(3000);
                     count++;
                 }
-                if (serverSetup.serverStarted)
+                if (ExecutionStatus.serverStarted)
                 {
                     statusLabel.Text = "Running";
                     Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);

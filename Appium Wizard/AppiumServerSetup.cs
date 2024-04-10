@@ -8,10 +8,8 @@ using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
 {
-    internal class AppiumServerSetup
+    public class AppiumServerSetup
     {
-        public bool serverStarted = false;
-        public string statusText = "";
         public static string deviceList = "", deviceInfo = "", tempFolder = "", logFilePath = "";
         public static Dictionary<int, Tuple<Process, string>> listOfProcess = new Dictionary<int, Tuple<Process, string>>();
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
@@ -102,9 +100,10 @@ namespace Appium_Wizard
                         streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                     }
                 }
+                ExecutionStatus.UpdateStatus(e.Data);
                 if (ScreenControl.screenControl != null)
                 {
-                    ExecutionStatus.UpdateStatus(e.Data);
+                    ExecutionStatus.UpdateScreenControl(ScreenControl.screenControl, e.Data);
                 }                
             }
         }

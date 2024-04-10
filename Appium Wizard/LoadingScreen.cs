@@ -2,6 +2,7 @@
 using System;
 using System.Net;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Windows.Forms;
 
 namespace Appium_Wizard
@@ -137,19 +138,19 @@ namespace Appium_Wizard
                 DialogResult result = DialogResult.None;
                 if (Common.IsNodeInstalled())
                 {
-                    while (!serverSetup.serverStarted)
+                    while (!ExecutionStatus.serverStarted)
                     {
-                        if (!string.IsNullOrEmpty(serverSetup.statusText))
+                        if (!string.IsNullOrEmpty(ExecutionStatus.statusText))
                         {
                             // UpdateStepLabel(AppiumServerSetup.statusText);
-                            if (serverSetup.statusText.Contains("address already in use"))
+                            if (ExecutionStatus.statusText.Contains("address already in use"))
                             {
                                 result = MessageBox.Show("Port " + appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(appiumPort).Item2 + ".Please try to configure in different port here, File-> Server config.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             }
                         }
                     }
-                    if (serverSetup.serverStarted)
+                    if (ExecutionStatus.serverStarted)
                     {
                         statusLabel.Text = "Running";
                     }

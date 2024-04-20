@@ -90,9 +90,9 @@
             label3.ForeColor = Color.Red;
             label3.Location = new Point(12, 309);
             label3.Name = "label3";
-            label3.Size = new Size(552, 25);
+            label3.Size = new Size(599, 25);
             label3.TabIndex = 6;
-            label3.Text = "Note : Device connected over Wi-Fi will be slower comparing to USB.";
+            label3.Text = "Note : Device connected over Wi-Fi may be slower when compared to USB.";
             // 
             // AndroidWireless
             // 

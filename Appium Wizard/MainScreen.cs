@@ -18,6 +18,9 @@ namespace Appium_Wizard
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
+        public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
+
+
         public MainScreen()
         {
             InitializeComponent();
@@ -311,6 +314,10 @@ namespace Appium_Wizard
             {
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
                 listView1.Items.Add(new ListViewItem(item1));
+                if (!DeviceInfo.ContainsKey(udid))
+                {
+                    DeviceInfo.Add(udid, Tuple.Create(DeviceName, OS));
+                }
             }
             GoogleAnalytics.SendEvent("Device_Added_To_List");
         }
@@ -351,6 +358,10 @@ namespace Appium_Wizard
                         }
                         string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"] };
                         listView1.Items.Add(new ListViewItem(item1));
+                        if (!DeviceInfo.ContainsKey(device["UDID"]))
+                        {
+                            DeviceInfo.Add(device["UDID"], Tuple.Create(device["Name"], device["OS"]));
+                        }
                     }
                 }
             }
@@ -496,7 +507,14 @@ namespace Appium_Wizard
                                 Dictionary<string, object> deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
                                 if (deviceInfo.Count > 0)
                                 {
-                                    Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
+                                    try
+                                    {
+                                        Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
+                                    }
+                                    catch (Exception)
+                                    {
+                                        Model = deviceInfo["ProductType"]?.ToString() ?? "";
+                                    }
                                     DeviceName = deviceInfo["DeviceName"]?.ToString() ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";

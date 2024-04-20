@@ -1,19 +1,26 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {
     public class AppiumServerSetup
     {
+        public string statusText = "";
+        public bool serverStarted = false;
         public static string deviceList = "", deviceInfo = "", tempFolder = "", logFilePath = "";
         public static Dictionary<int, Tuple<Process, string>> listOfProcess = new Dictionary<int, Tuple<Process, string>>();
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
+        public static bool UpdateStatusInScreenFlag = false;
         public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
@@ -35,7 +42,8 @@ namespace Appium_Wizard
                     //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info:info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
 
 
                     //working
@@ -87,24 +95,174 @@ namespace Appium_Wizard
             }
         }
 
+        string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
+        int proxyPort = 0;
+        Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
+                string data = Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", "");
                 using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 using (var streamWriter = new StreamWriter(fileStream))
                 {
-                    streamWriter.WriteLine(Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", ""));
-                    if (e.Data.Contains("No plugins have been installed."))
+                    streamWriter.WriteLine(data);
+                    if (data.Contains("No plugins have been installed."))
                     {
                         streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                     }
                 }
-                ExecutionStatus.UpdateStatus(e.Data);
-                if (ScreenControl.screenControl != null)
+                if (data.Contains("Appium REST http interface listener started"))
                 {
-                    ExecutionStatus.UpdateScreenControl(ScreenControl.screenControl, e.Data);
-                }                
+                    statusText = "Appium Server Started";
+                    serverStarted = true;
+                }
+                else if (data.Contains("address already in use"))
+                {
+                    statusText = "address already in use";
+                    serverStarted = false;
+                }
+                ExecutionStatus.UpdateStatus(data);
+
+                if (data.Contains("Using device:"))
+                {
+                    string input = data;
+                    int startIndex = input.IndexOf(":") + 2;
+                    deviceUDID = input.Substring(startIndex);
+                    string name = MainScreen.DeviceInfo[deviceUDID].Item1;
+                    string text = "Set Device " + name;
+                    UpdateScreenControl(deviceUDID, text);
+                }
+                else if (data.Contains("Successfully requested the connection for"))
+                {
+                    int colonIndex = data.IndexOf(':');
+                    if (colonIndex != -1)
+                    {
+                        deviceUDID = data.Substring(data.LastIndexOf(' ', colonIndex) + 1, colonIndex - data.LastIndexOf(' ', colonIndex) - 1);
+                        iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                        string name = MainScreen.DeviceInfo[deviceUDID].Item1;
+                        string text = "Set Device " + name;
+                        UpdateScreenControl(deviceUDID, text);
+                    }
+                }
+                if (data.Contains("appium:webDriverAgentUrl"))
+                {
+                    string pattern1 = @"'appium:webDriverAgentUrl': 'http://localhost:(\d+)'";
+                    Regex regex1 = new Regex(pattern1);
+                    Match match2 = regex1.Match(data);
+                    if (match2.Success)
+                    {
+                        proxyPort = int.Parse(match2.Groups[1].Value);
+                    }
+                }
+                if (data.Contains("added to master session list"))
+                {
+                    string pattern = @"session (\w+-\w+-\w+-\w+-\w+)";
+                    Regex regex = new Regex(pattern);
+                    Match match1 = regex.Match(data);
+
+                    if (match1.Success)
+                    {
+                        string sessionId = match1.Groups[1].Value;
+                        sessionIdUDID.Add(sessionId, deviceUDID);
+                        string name = MainScreen.DeviceInfo[deviceUDID].Item1;
+                        string text = "Session Created for " + name;
+                        UpdateScreenControl(deviceUDID, text);
+                    }
+                }
+                //if (data.Contains("Replacing sessionId"))
+                //{
+                //    string pattern = @"sessionId\s+([A-Z0-9-]+).*?with\s+(.*?)$";
+                //    Regex regex = new Regex(pattern);
+                //    Match match = regex.Match(data);
+                //    if (match.Success)
+                //    {
+                //        string originalSessionId = match.Groups[1].Value;
+                //        string replacedSessionId = match.Groups[2].Value;
+                //        if (sessionIdUDID.ContainsKey(originalSessionId))
+                //        {
+                //            string value = sessionIdUDID[originalSessionId];
+                //            sessionIdUDID.Remove(originalSessionId);
+                //            sessionIdUDID.Add(replacedSessionId, value);
+                //        }
+                //    }
+                //}
+                if (data.Contains("DELETE /session/"))
+                {
+                    string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
+                    Regex regex = new Regex(pattern);
+                    Match match = regex.Match(data);
+                    if (match.Success)
+                    {
+                        string udid = "";
+                        string sessionId = match.Groups[1].Value;
+                        if (sessionIdUDID.ContainsKey(sessionId))
+                        {
+                            udid = sessionIdUDID[sessionId];
+                            string name = MainScreen.DeviceInfo[udid].Item1;
+                            string text = "Session Deleted for " + name;
+                            UpdateScreenControl(udid, text);
+                            if (MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
+                            {
+                                try
+                                {
+                                    int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
+                                    int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
+                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
+                                    AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                        }
+                    }
+
+                }
+                string sessionIdPattern = @"/session/([^/]+)";
+                if (data.Contains("POST /session/") && data.Contains("/element"))
+                {
+                    Match match = Regex.Match(data, sessionIdPattern);
+                    if (match.Success)
+                    {
+                        currentSessionId = match.Groups[1].Value;
+                    }
+                    if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
+                    {
+                        currentUDID = sessionIdUDID[currentSessionId];
+                    }
+                }
+                if (data.Contains("POST /session/") && (data.Contains("/element 200") | data.Contains("/elements 200") | data.Contains("/click 200") | data.Contains("/value 200")))
+                {
+                    Match match = Regex.Match(data, sessionIdPattern);
+                    if (match.Success)
+                    {
+                        currentSessionId = match.Groups[1].Value;
+                    }
+                    if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
+                    {
+                        currentUDID = sessionIdUDID[currentSessionId];
+                    }
+                    UpdateScreenControl(currentUDID, "");
+                }
+               
+                if (UpdateStatusInScreenFlag)
+                {
+                    if (ScreenControl.udidScreenControl.ContainsKey(currentUDID))
+                    {
+                        ExecutionStatus.UpdateScreenControl(ScreenControl.udidScreenControl[currentUDID], data);
+                    }
+                }
+
+            }
+        }
+
+        private void UpdateScreenControl(string udid, string text)
+        {
+            if (UpdateStatusInScreenFlag && ScreenControl.udidScreenControl.ContainsKey(udid))
+            {
+                var control = ScreenControl.udidScreenControl[udid];
+                control.UpdateStatusLabel(control, text);
             }
         }
 

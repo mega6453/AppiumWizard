@@ -582,8 +582,13 @@ namespace Appium_Wizard
 
         public string GetDeviceModel(string input)
         {
-            var url = "https://gist.githubusercontent.com/adamawolf/3048717/raw/1ee7e1a93dff9416f6ff34dd36b0ffbad9b956e9/Apple_mobile_device_types.txt";
-            var AppleDeviceTypesRawData = new WebClient().DownloadString(url);
+            var filePath = FilesPath.AppleDeviceTypesFilePath;
+            var AppleDeviceTypesRawData = File.ReadAllText(filePath);
+            if (!AppleDeviceTypesRawData.Contains(input))
+            {
+                var url = "https://gist.githubusercontent.com/adamawolf/3048717/raw/1ee7e1a93dff9416f6ff34dd36b0ffbad9b956e9/Apple_mobile_device_types.txt";
+                AppleDeviceTypesRawData = new WebClient().DownloadString(url);
+            }
             Dictionary<string, string> AppleDeviceTypes = new Dictionary<string, string>();
             string model;
             StringReader reader = new StringReader(AppleDeviceTypesRawData);
@@ -599,7 +604,6 @@ namespace Appium_Wizard
                     continue;
                 }
             };
-
             return AppleDeviceTypes[input].Trim();
         }
 
@@ -706,7 +710,10 @@ namespace Appium_Wizard
                 iOSAsyncProcess.StartInfo.Arguments = "forward --udid=" + udid + " " + localPort + " " + iOSPort + "";
                 iOSAsyncProcess.Start();
                 var processId = iOSAsyncProcess.Id;
-                PortProcessId.Add(localPort, processId);
+                if (!PortProcessId.ContainsKey(localPort))
+                {
+                    PortProcessId.Add(localPort, processId);
+                }
                 MainScreen.runningProcessesPortNumbers.Add(localPort);
             }
             catch (Exception ex)
@@ -719,8 +726,9 @@ namespace Appium_Wizard
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = iProxyFilePath,
-                Arguments = localPort + " " + iOSPort + " " + udid,
+                FileName = iProxyFilePath,                
+                Arguments = localPort + ":" + iOSPort + " -u " + udid,
+                //Arguments = localPort + " " + iOSPort + " " + udid,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true
@@ -731,7 +739,56 @@ namespace Appium_Wizard
             };
             iProxyProcess.Start();
             var processId = iProxyProcess.Id;
-            PortProcessId.Add(localPort, processId);
+            if (!PortProcessId.ContainsKey(localPort))
+            {
+                PortProcessId.Add(localPort, processId);
+            }           
+            MainScreen.runningProcessesPortNumbers.Add(localPort);
+        }
+
+        public void StartiProxyServer(string udid, int localPort1, int iOSPort1, int localPort2, int iOSPort2)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = iProxyFilePath,
+                Arguments = localPort1+":"+iOSPort1+" "+localPort2+":"+iOSPort2+" -u "+udid,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
+            };
+            Process iProxyProcess = new Process
+            {
+                StartInfo = startInfo
+            };
+            iProxyProcess.Start();
+            var processId = iProxyProcess.Id;
+            if (!PortProcessId.ContainsKey(localPort1))
+            {
+                PortProcessId.Add(localPort1, processId);
+            }
+            MainScreen.runningProcessesPortNumbers.Add(localPort1);
+        }
+
+        public void StartiProxyServer(int localPort, int iOSPort)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = iProxyFilePath,
+                Arguments = localPort + " " + iOSPort,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
+            };
+            Process iProxyProcess = new Process
+            {
+                StartInfo = startInfo
+            };
+            iProxyProcess.Start();
+            var processId = iProxyProcess.Id;
+            if (!PortProcessId.ContainsKey(localPort))
+            {
+                PortProcessId.Add(localPort, processId);
+            }
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
@@ -823,6 +880,7 @@ namespace Appium_Wizard
                         while (sessionId.Equals("nosession") && count <= 6 && count > 0)
                         {
                             sessionId = iOSAPIMethods.CreateWDASession(port);
+                            Thread.Sleep(5000);
                             if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
                             {
                                 int seconds = 5 * count;

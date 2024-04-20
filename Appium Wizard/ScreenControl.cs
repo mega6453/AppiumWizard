@@ -18,7 +18,7 @@ namespace Appium_Wizard
         public string IPAddress = "127.0.0.1";
         string deviceName, udid, OSType, OSVersion;
         int screenPort, proxyPort;
-        public static ScreenControl? screenControl;
+        public static Dictionary<string,ScreenControl> udidScreenControl = new Dictionary<string,ScreenControl>();
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
@@ -65,34 +65,75 @@ namespace Appium_Wizard
                         {
                             if (tempSessionId != sessionId)
                             {
-                                ScreenWebView.EnsureCoreWebView2Async();
-                                ScreenWebView.Reload();
-                                tempSessionId = sessionId;
+                                try
+                                {
+                                    ScreenWebView.EnsureCoreWebView2Async();
+                                    ScreenWebView.Reload();
+                                    tempSessionId = sessionId;
+                                }
+                                catch (Exception)
+                                {
+                                }
                             }
                         }));
                     }
                     Thread.Sleep(1000);
                 }
             });
-            screenControl = this;
+            //screenControl = this;
+            udidScreenControl.Add(udid, this);
         }
 
-        public void UpdateStatusLabel(string actualText)
+        public void UpdateStatusLabel(ScreenControl screenControl,string actualText)
         {
-            string truncatedText = string.Empty;
+            //string truncatedText = string.Empty;
+            //if (screenControl.InvokeRequired)
+            //{
+            //    if (actualText.Length > 55)
+            //    {
+            //        truncatedText = actualText.Substring(0, 55) + "...";
+            //        screenControl.BeginInvoke((Action)(() => UpdateStatusLabel(screenControl, truncatedText)));
+            //        screenControl.statusLabel.ToolTipText = actualText;
+            //    }
+            //    else
+            //    {
+            //        screenControl.BeginInvoke((Action)(() => UpdateStatusLabel(screenControl, actualText)));
+            //        screenControl.statusLabel.ToolTipText = actualText;
+            //    }
+            //}
+            //else
+            //{
+            //    if (actualText.Length > 55)
+            //    {
+            //        truncatedText = actualText.Substring(0, 55) + "...";
+            //        screenControl.statusLabel.Text = truncatedText;
+            //    }
+            //    else
+            //    {
+            //        screenControl.statusLabel.Text = actualText;
+            //    }
+            //    screenControl.statusLabel.ToolTipText = actualText;
+            //    screenControl.toolStrip2.Refresh();
+            //}
             try
             {
-                if (actualText.Length > 55)
+                BeginInvoke(new Action(() =>
                 {
-                    truncatedText = actualText.Substring(0, 55) + "...";
-                    statusLabel.Text = truncatedText;
-                }
-                else
-                {
-                    statusLabel.Text = actualText;
-                }
-                statusLabel.ToolTipText = actualText;
-                toolStrip2.Refresh();
+                    string truncatedText = string.Empty;
+                    if (actualText.Length > 45)
+                    {
+                        truncatedText = actualText.Substring(0, 45) + "...";
+                        screenControl.statusLabel.Text = truncatedText;
+                    }
+                    else
+                    {
+                        screenControl.statusLabel.Text = actualText;
+                    }
+                    screenControl.statusLabel.ToolTipText = actualText;
+                    screenControl.toolStrip2.Refresh();
+
+                }));
+
             }
             catch (Exception)
             {
@@ -122,12 +163,23 @@ namespace Appium_Wizard
             //{
             //    ScreenWebView = webview2[udid];
             //}
+           
             ScreenWebView = webview2[udid];
-            //if (Controls.Contains(ScreenWebView))
-            //{
-            //    Controls.Remove(ScreenWebView);
-            //    Controls.Add(ScreenWebView);
-            //}
+            if (Controls.Contains(ScreenWebView))
+            {
+                Controls.Remove(ScreenWebView);
+                ScreenWebView = new WebView2();
+                //Controls.Add(ScreenWebView);
+                InitializeWebView();
+                if (!webview2.ContainsKey(udid))
+                {
+                    webview2.Add(udid, ScreenWebView);
+                }
+                else
+                {
+                    webview2[udid] = ScreenWebView;
+                }
+            }
             string imageUrl = "http://" + IPAddress + ":" + screenPort;
             int imageWidth = width;
             int imageHeight = height;
@@ -159,6 +211,9 @@ namespace Appium_Wizard
             await ScreenWebView.EnsureCoreWebView2Async();
             try
             {
+                //string tempFilePath = Path.GetTempFileName() + ".html";
+                //File.WriteAllText(tempFilePath, htmlContent);
+                //ScreenWebView.CoreWebView2.Navigate(tempFilePath);
                 ScreenWebView.NavigateToString(htmlContent);
             }
             catch (Exception)
@@ -471,6 +526,7 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
+            udidScreenControl.Remove(udid);
             webview2.Remove(udid);
             //Hide();
             //try

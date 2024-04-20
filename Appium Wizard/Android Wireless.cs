@@ -13,7 +13,8 @@ namespace Appium_Wizard
             IPAddressTextBox.TextChanged += TextBox_TextChanged;
             PortTextBox.TextChanged += TextBox_TextChanged;
             networkPortion = Common.GetOnlyNetworkPortion();
-            IPAddressTextBox.Text = networkPortion;
+            IPAddressTextBox.Text = networkPortion + ".";
+            IPAddressTextBox.Select(IPAddressTextBox.Text.Length, 0);
         }
 
         private void TextBox_TextChanged(object sender, EventArgs e)

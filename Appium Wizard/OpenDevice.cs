@@ -73,6 +73,12 @@
 
         private Task ExecuteiOSBackgroundMethod()
         {
+            var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+            if (!deviceList.Contains(udid))
+            {
+                MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return Task.Delay(100);
+            }
             try
             {
                 bool wdaCheck = iOSMethods.GetInstance().iSWDAInstalled(udid);

@@ -1,5 +1,7 @@
-﻿using System.Management;
+﻿using OpenQA.Selenium.Appium;
+using System.Management;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {
@@ -92,7 +94,8 @@ namespace Appium_Wizard
                                         }
                                         count++;
                                     }
-                                    ScreenControl.screenControl.LoadScreen(udid, screenPort);
+                                    var control = ScreenControl.udidScreenControl[udid];
+                                    control.LoadScreen(udid,screenPort);
                                 }
                                 else
                                 {
@@ -147,24 +150,15 @@ namespace Appium_Wizard
                                     //    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                                     //}  
                                     //---------------------------------------
+                                    AndroidMethods.GetInstance().StopUIAutomator(udid);
+                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                                     int proxyPort = Common.GetFreePort();
                                     int screenPort = Common.GetFreePort();
                                     AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                                     AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                                     Thread.Sleep(5000);
-                                    //bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                    //int count = 0;
-                                    //while (!isLoaded && count == 5)
-                                    //{
-                                    //    isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                    //    if (!isLoaded)
-                                    //    {
-                                    //        Thread.Sleep(2000);
-                                    //    }
-                                    //    count++;
-                                    //}
-                                    ScreenControl.screenControl.LoadScreen(udid, screenPort);
+                                    var control = ScreenControl.udidScreenControl[udid];
+                                    control.LoadScreen(udid, screenPort);
                                 }
                             }
                             GoogleAnalytics.SendEvent("UsbDeviceConnected", OSVersion);
@@ -250,7 +244,8 @@ namespace Appium_Wizard
                             }
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {
-                                ScreenControl.screenControl.LoadDeviceDisconnected(udid);
+                                var control = ScreenControl.udidScreenControl[udid];
+                                control.LoadDeviceDisconnected(udid);
                             }
                             GoogleAnalytics.SendEvent("UsbDeviceDisconnected", OSVersion);
                         }

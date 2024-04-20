@@ -127,11 +127,11 @@ namespace Appium_Wizard
                 int screenport = Common.GetFreePort();
                 serverSetup.StartAppiumServer(portNumber, wdaLocalPort, serverNumber, screenport);
                 int count = 1;
-                while (!ExecutionStatus.serverStarted)
+                while (!serverSetup.serverStarted)
                 {
-                    if (!string.IsNullOrEmpty(ExecutionStatus.statusText))
+                    if (!string.IsNullOrEmpty(serverSetup.statusText))
                     {
-                        if (ExecutionStatus.statusText.Equals("address already in use"))
+                        if (serverSetup.statusText.Equals("address already in use"))
                         {
                             statusLabel.Text = "Not Running";
                             MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -146,8 +146,14 @@ namespace Appium_Wizard
                     }
                     Thread.Sleep(3000);
                     count++;
+                    if (count == 10)
+                    {
+                        MessageBox.Show("Timed out after 30 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        GoogleAnalytics.SendEvent("StartServer_30Sec_Timedout");
+                        break;
+                    }
                 }
-                if (ExecutionStatus.serverStarted)
+                if (serverSetup.serverStarted)
                 {
                     statusLabel.Text = "Running";
                     Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);

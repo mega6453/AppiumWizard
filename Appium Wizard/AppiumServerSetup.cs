@@ -20,7 +20,7 @@ namespace Appium_Wizard
         public static Dictionary<int, Tuple<Process, string>> listOfProcess = new Dictionary<int, Tuple<Process, string>>();
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
-        public static bool UpdateStatusInScreenFlag = false;
+        public static bool UpdateStatusInScreenFlag = true;
         public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
             string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
@@ -234,15 +234,6 @@ namespace Appium_Wizard
                 }
                 if (data.Contains("POST /session/") && (data.Contains("/element 200") | data.Contains("/elements 200") | data.Contains("/click 200") | data.Contains("/value 200")))
                 {
-                    Match match = Regex.Match(data, sessionIdPattern);
-                    if (match.Success)
-                    {
-                        currentSessionId = match.Groups[1].Value;
-                    }
-                    if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
-                    {
-                        currentUDID = sessionIdUDID[currentSessionId];
-                    }
                     UpdateScreenControl(currentUDID, "");
                 }
                

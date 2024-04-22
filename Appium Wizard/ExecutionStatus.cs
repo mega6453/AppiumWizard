@@ -129,7 +129,7 @@ namespace Appium_Wizard
                     {
                     }
                 }
-                else if (data.Contains("POST /session/") && data.Contains("/click"))
+                else if (data.Contains("POST /session/") && data.Contains("/click") && !data.Contains("/click 200"))
                 {
                     statusText = "Click " + element;
                     screenControl.UpdateStatusLabel(screenControl, statusText);

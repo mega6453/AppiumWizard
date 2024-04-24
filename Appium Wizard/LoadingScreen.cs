@@ -15,19 +15,6 @@ namespace Appium_Wizard
         public int appiumPort = 4723;
         public LoadingScreen()
         {
-            string clientId = Database.QueryDataFromGUIDTable();
-            if (clientId.Equals("Empty"))
-            {
-                Guid guid = Guid.NewGuid();
-                GoogleAnalytics.clientId = guid.ToString();
-                Database.UpdateDataIntoGUIDTable(guid.ToString());
-                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
-            }
-            else
-            {
-                GoogleAnalytics.clientId = clientId;
-                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
-            }
             InitializeComponent();
             try
             {
@@ -54,6 +41,19 @@ namespace Appium_Wizard
         }
         private void LoadingScreen_Load(object sender, EventArgs e)
         {
+            string clientId = Database.QueryDataFromGUIDTable();
+            if (clientId.Equals("Empty"))
+            {
+                Guid guid = Guid.NewGuid();
+                GoogleAnalytics.clientId = guid.ToString();
+                Database.UpdateDataIntoGUIDTable(guid.ToString());
+                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
+            }
+            else
+            {
+                GoogleAnalytics.clientId = clientId;
+                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
+            }
             StartBackgroundTasks();
         }
 

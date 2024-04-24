@@ -515,7 +515,7 @@ namespace Appium_Wizard
                                     {
                                         Model = deviceInfo["ProductType"]?.ToString() ?? "";
                                     }
-                                    DeviceName = deviceInfo["DeviceName"]?.ToString() ?? "";
+                                    DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™","'") ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
                                     OSType = "iOS";

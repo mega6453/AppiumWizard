@@ -1,6 +1,6 @@
                ---------------------------------PLEASE READ CAREFULLY---------------------------------
 
-Please note that this setup will install Latest Node.js, Appium Server and the necessary drivers for Appium to work properly. 
+Please note that this setup will install Node.js, Appium Server and the necessary drivers for Appium to work properly. 
 
 It is important to maintain proper internet connection throughout the installation process. 
 

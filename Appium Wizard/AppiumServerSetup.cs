@@ -23,7 +23,6 @@ namespace Appium_Wizard
         public static bool UpdateStatusInScreenFlag = true;
         public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
         {
-            string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
@@ -38,7 +37,7 @@ namespace Appium_Wizard
                     //FileName = AppiumServerFilePath,
                     //Arguments = @"--allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",
                     FileName = "cmd.exe",
-                    WorkingDirectory = appiumInstallationPath,
+                    WorkingDirectory = FilesPath.serverInstalledPath,
                     //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",

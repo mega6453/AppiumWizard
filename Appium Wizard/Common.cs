@@ -15,6 +15,8 @@ namespace Appium_Wizard
     public class Common
     {
         private static string executablesFolderPath = FilesPath.executablesFolderPath;
+        private static string serverFolderPath = FilesPath.serverInstalledPath;
+        private static string nodeFilePath = FilesPath.nodeZipPath;
         public static void TerminateProcess(string command)
         {
             try
@@ -59,7 +61,6 @@ namespace Appium_Wizard
         {
             Environment.SetEnvironmentVariable("ANDROID_HOME", executablesFolderPath, EnvironmentVariableTarget.User);
         }
-
 
         public static int GetFreePort()
         {
@@ -258,21 +259,12 @@ namespace Appium_Wizard
 
         public static bool IsNodeInstalled()
         {
-            try
+            string nodePath = Path.Combine(serverFolderPath, "node.exe");
+            if (File.Exists(nodePath))
             {
-                string pathVariable = Environment.GetEnvironmentVariable("PATH");
-                string[] paths = pathVariable.Split(';');
-                foreach (string path in paths)
-                {
-                    string nodePath = System.IO.Path.Combine(path, "node.exe");
-                    if (System.IO.File.Exists(nodePath))
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return true;
             }
-            catch (Exception)
+            else
             {
                 return false;
             }
@@ -282,12 +274,10 @@ namespace Appium_Wizard
         {
             try
             {
-                string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
-
                 Process process = new Process();
                 process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.WorkingDirectory = appiumInstallationPath;
-                process.StartInfo.Arguments = "/c appium --version";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C appium --version";
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.UseShellExecute = false;
@@ -316,8 +306,12 @@ namespace Appium_Wizard
         public static void InstallAppiumGlobally()
         {
             Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            process.StartInfo.Arguments = "/c npm i --location=global appium";
+            process.StartInfo.FileName = "cmd.exe";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            pathVariable += ";" + serverFolderPath;
+            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+            process.StartInfo.Arguments = "/C npm i -g appium";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -327,12 +321,13 @@ namespace Appium_Wizard
 
         public static void InstallXCUITestDriver()
         {
-            string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
-
             Process process = new Process();
             process.StartInfo.FileName = "cmd";
-            process.StartInfo.WorkingDirectory = appiumInstallationPath;
-            process.StartInfo.Arguments = "/c appium driver install xcuitest";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            pathVariable += ";" + serverFolderPath;
+            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+            process.StartInfo.Arguments = "/C appium driver install xcuitest";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -343,12 +338,13 @@ namespace Appium_Wizard
 
         public static void InstallUIAutomatorDriver()
         {
-            string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
-
             Process process = new Process();
             process.StartInfo.FileName = "cmd";
-            process.StartInfo.WorkingDirectory = appiumInstallationPath;
-            process.StartInfo.Arguments = "/c appium driver install uiautomator2";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            pathVariable += ";" + serverFolderPath;
+            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+            process.StartInfo.Arguments = "/C appium driver install uiautomator2";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -361,12 +357,10 @@ namespace Appium_Wizard
         {
             try
             {
-                string appiumInstallationPath = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\npm";
-
                 Process process = new Process();
                 process.StartInfo.FileName = "cmd";
-                process.StartInfo.WorkingDirectory = appiumInstallationPath;
-                process.StartInfo.Arguments = "/c appium driver list";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C appium driver list";
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.UseShellExecute = false;
@@ -411,19 +405,15 @@ namespace Appium_Wizard
 
         public static void InstallNodeJs()
         {
-            try
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = "cmd";
-                process.StartInfo.Arguments = "/c winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements";
-                process.Start();
-                process.WaitForExit();
-            }
-            catch (Exception ex)
-            {
-                // Handle any exceptions that occurred while executing the command
-                Console.WriteLine("An error occurred: " + ex.Message);
-            }
+            Process process = new Process();
+            process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
+            process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\"";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
         }
 
         public static string WSLHelp()

@@ -2,9 +2,7 @@
 
 Please note that this setup will install Latest Node.js, Appium Server and the necessary drivers for Appium to work properly. 
 
-During the installation process, you may be prompted for permission to install the required components. Please make sure to grant the necessary permissions to proceed with the installation.
-
-Additionally, it is important to maintain an internet connection throughout the installation process. 
+It is important to maintain proper internet connection throughout the installation process. 
 
 If you encounter any issues during the installation or have any questions, please create an issue/discussion topic in github(https://github.com/mega6453/AppiumWizard).
 

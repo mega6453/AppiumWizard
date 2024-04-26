@@ -67,19 +67,19 @@ namespace Appium_Wizard
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
             {
-                firstTimeRunLabel.Text = "First time run verifies the installation, It may take sometime, Please wait...";
+                firstTimeRunLabel.Text = "First time run verifies the installation, This may take sometime, Please wait...";
                 firstTimeRunLabel.Refresh();
                 bool isNodeInstalled = Common.IsNodeInstalled();
                 if (!isNodeInstalled)
                 {
-                    UpdateStepLabel("Installing NodeJS, Please provide required permission when system prompts...");
+                    UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
                     Common.InstallNodeJs();
                     GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "NodeJS not installed");
                 }
                 bool iSAppiumInstalled = Common.IsAppiumInstalled();
                 if (!iSAppiumInstalled)
                 {
-                    UpdateStepLabel("Installing Appium Server, Please wait...");
+                    UpdateStepLabel("Installing Appium Server, This may take sometime, Please wait...");
                     Common.InstallAppiumGlobally();
                     GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "Appium not installed");
                 }
@@ -88,13 +88,13 @@ namespace Appium_Wizard
                 bool IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
                 if (!IsXCUITestDriverInstalled)
                 {
-                    UpdateStepLabel("Installing XCUITest driver, Please wait...");
+                    UpdateStepLabel("Installing XCUITest driver, This may take sometime, Please wait...");
                     Common.InstallXCUITestDriver();
                     GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "XCUITest not installed");
                 }
                 if (!IsUIAutomatorDriverInstalled)
                 {
-                    UpdateStepLabel("Installing UIAutomator2 driver, Please wait...");
+                    UpdateStepLabel("Installing UIAutomator2 driver, This may take sometime, Please wait...");
                     Common.InstallUIAutomatorDriver();
                     GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "UIAutomator2 not installed");
                 }

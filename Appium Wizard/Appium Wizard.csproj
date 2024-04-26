@@ -52,14 +52,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ExcludeInInstaller\Installer Script.iss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ExcludeInInstaller\License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExcludeInInstaller\Information.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="ExcludeInInstaller\Installer Script.iss">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Docs\Appium Wizard Troubleshooting Guide.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -137,6 +137,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\iOS\zsign.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Server\Backup\7za.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Server\Backup\node.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

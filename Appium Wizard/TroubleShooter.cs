@@ -107,6 +107,7 @@ namespace Appium_Wizard
             Common.InstallXCUITestDriver();
             commonProgress.Close();
             FindIssues();
+            MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
@@ -118,6 +119,7 @@ namespace Appium_Wizard
             Common.InstallUIAutomatorDriver();
             commonProgress.Close();
             FindIssues();
+            MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server",MessageBoxButtons.OK,MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 

@@ -109,6 +109,11 @@ work under this License, and how to view a copy of this License.  If
 the interface presents a list of user commands or options, such as a
 menu, a prominent item in the list meets this criterion.
 
+    0.1 This software is licensed under the GNU General Public License version 3.0 (GPL-3.0) 
+with the additional restriction that it can only be used and modified for non-commercial purposes.
+You may not create a paid app or commercialize this code without obtaining a separate license or 
+permission from the copyright holder.
+
   1. Source Code.
 
   The "source code" for a work means the preferred form of the work

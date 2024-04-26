@@ -8,7 +8,7 @@ Appium Wizard is a Windows software designed to streamline mobile automation usi
 
 ## Downloading and Installing
 * Appium Wizard executable is added in a zip file because some browser thinks that this exe is a suspicious file. So, after downloading, extract the exe file and Run it.
-* When you run the exe file, you will see "Microsoft Defender SmartScreen prevented an unrecognized app from starting. Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on More Info -> Run Anyway to start the installation.      
+* When you run the exe file, you will see "**Microsoft Defender SmartScreen prevented an unrecognized app from starting.** Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on **More Info -> Run Anyway to start the installation.**      
 
 ## During Installation
 * Appium Wizard will Install Appium Server, iOS and Android drivers over the internet using npm. So, Please make sure you have proper internet connection during installation.

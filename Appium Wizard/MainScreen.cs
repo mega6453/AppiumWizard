@@ -1070,6 +1070,7 @@ namespace Appium_Wizard
                         AndroidMethods.GetInstance().RebootDevice(selectedUDID);
                         GoogleAnalytics.SendExceptionEvent("Reboot_Android");
                     }
+                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName+".", "Reboot Device",MessageBoxButtons.OK,MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -1205,16 +1206,29 @@ namespace Appium_Wizard
             {
                 if (saveFileDialog.FileName != "")
                 {
+                    CommonProgress commonProgress = new CommonProgress();                   
+                    commonProgress.UpdateStepLabel("Take Screenshot","Please wait while taking screenshot of "+selectedDeviceName+"..."); 
+                    commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
-                    if (selectedDeviceConnection.Equals("Wi-Fi"))
+                    try
                     {
-                        AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
+                        if (selectedDeviceConnection.Equals("Wi-Fi"))
+                        {
+                            AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
+                        }
+                        else
+                        {
+                            AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                        }
+                        commonProgress.Close();
                     }
-                    else
+                    catch (Exception)
                     {
-                        AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                        commonProgress.Close();
+                        MessageBox.Show("Failed to Take Screenshot","Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
+                    commonProgress.Close();
                     GoogleAnalytics.SendEvent("Android_TakeScreenshot");
                 }
             }
@@ -1222,9 +1236,21 @@ namespace Appium_Wizard
             {
                 if (saveFileDialog.FileName != "")
                 {
+                    CommonProgress commonProgress = new CommonProgress();
+                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
+                    commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
-                    iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                    try
+                    {
+                        iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                        commonProgress.Close();
+                    }
+                    catch (Exception)
+                    {
+                        commonProgress.Close();
+                        MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     GoogleAnalytics.SendEvent("iOS_TakeScreenshot");
                 }
             }

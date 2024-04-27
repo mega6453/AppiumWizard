@@ -8,17 +8,14 @@ Appium Wizard is a Windows software designed to streamline mobile automation usi
 
 ## Downloading and Installing
 * Appium Wizard executable is added in a zip file because some browser thinks that this exe is a suspicious file. So, after downloading, extract the exe file and Run it.
-* When you run the exe file, you will see "Microsoft Defender SmartScreen prevented an unrecognized app from starting. Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on More Info -> Run Anyway to start the installation.      
+* When you run the exe file, you will see "**Microsoft Defender SmartScreen prevented an unrecognized app from starting.** Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on **More Info -> Run Anyway to start the installation.**      
 
 ## During Installation
-Please provide necessary permission when system prompts. Because,
-1. If NodeJS not installed in your system, Appium Wizard will download and install it.
-2. If Appium Sever not installed, Appium Wizard will Install it.
-3. Appium Wizard will Install iOS and Android drivers.
+* Appium Wizard will Install Appium Server, iOS and Android drivers over the internet using npm. So, Please make sure you have proper internet connection during installation.
   
   ####  During first launch
   First launch will verify the installation of the software components(i.e.Appium Server and drivers).  If any of the component installation is not proper, then Appium Wizard will try 
-to install it during the first time launch which may take sometime to complete it.
+to install it during the first time launch which may take sometime to complete it. Again here, Please make sure you have proper internet connection during installation.
 
 ## How to Use
 1. Install Appium Wizard and Launch it.<br>
@@ -44,13 +41,15 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * iOS Automation Execution
 * iOS Screen Reflection and Screen Control
 * iOS Profile management
-* IPA Installation
+* IPA Signer
 * Android Automation Execution
 * Android Screen Reflection and Screen Control
-* APK Installation
 * Server Management
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)
+* Mangage Apps - Install / Launch / Kill / Uninstall
+* Take Device Screenshot
+* Reboot Device
 * etc.
 
 ## Features/Improvements in Queue

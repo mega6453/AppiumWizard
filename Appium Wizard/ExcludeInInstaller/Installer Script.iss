@@ -44,6 +44,9 @@ Source: "..\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recurs
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\*"
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon

@@ -41,6 +41,16 @@ namespace Appium_Wizard
         }
         private void LoadingScreen_Load(object sender, EventArgs e)
         {
+            StartBackgroundTasks();
+        }
+
+        private void StartBackgroundTasks()
+        {
+            var startTime = DateTime.Now;
+            Show();
+            Common.SetAndroidHomeEnvironmentVariable();
+            productVersion.Text = "Version " + VersionInfo.VersionNumber;
+            productVersion.Refresh();
             string clientId = Database.QueryDataFromGUIDTable();
             if (clientId.Equals("Empty"))
             {
@@ -54,16 +64,6 @@ namespace Appium_Wizard
                 GoogleAnalytics.clientId = clientId;
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
             }
-            StartBackgroundTasks();
-        }
-
-        private void StartBackgroundTasks()
-        {
-            var startTime = DateTime.Now;
-            Show();
-            Common.SetAndroidHomeEnvironmentVariable();
-            productVersion.Text = "Version " + VersionInfo.VersionNumber;
-            productVersion.Refresh();
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
             {

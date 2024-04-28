@@ -46,7 +46,7 @@ jobs:
         Solution_Name: Appium Wizard
 
     - name: Build the solution
-      run: dotnet $env:Solution_Name /p:Configuration=$env:Configuration /p:SelfContained=true /p:PublishSingleFile=true /p:ReadyToRun=true /p:IncludeNativeLibrariesForSelfExtract=true
+      run: dotnet publish -r win-x64 $env:Solution_Name /p:Configuration=$env:Configuration /p:SelfContained=true /p:PublishSingleFile=true /p:ReadyToRun=true /p:IncludeNativeLibrariesForSelfExtract=true
       env:
         Configuration: ${{ matrix.configuration }}
 

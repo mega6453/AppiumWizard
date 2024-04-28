@@ -54,7 +54,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Server Management
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)
-* Mangage Apps - Install / Launch / Kill / Uninstall
+* Manage Apps - Install / Launch / Kill / Uninstall
 * Take Device Screenshot
 * Reboot Device
 * etc.

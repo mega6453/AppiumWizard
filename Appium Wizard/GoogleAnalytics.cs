@@ -20,9 +20,11 @@ namespace Appium_Wizard
             {
                 Task.Run(() =>
                 {
+
+                    MessageBox.Show("Inside0 Client id : " + clientId + "\napi : " + APISecret + "\nmeas id : " + MeasurementID);
                     if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
                     {
-                        MessageBox.Show("Inside1 Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
+                        MessageBox.Show("Inside1 Client id : " + clientId + "\napi : " + APISecret + "\nmeas id : " + MeasurementID);
                         var client = new HttpClient();
                         var request = new HttpRequestMessage(HttpMethod.Post, "https://www.google-analytics.com/mp/collect?api_secret=" + APISecret + "&measurement_id=" + MeasurementID);
                         StringContent? content = null;

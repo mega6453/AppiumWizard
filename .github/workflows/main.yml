@@ -37,8 +37,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+    # - name: Setup MSBuild.exe
+    #   uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Restore the application
       run: dotnet restore $env:Solution_Name
@@ -51,8 +51,14 @@ jobs:
     #     Configuration: ${{ matrix.configuration }}
     
     - name: Build and publish app
-      run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true    
+      run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeAllContentForSelfExtract=true /p:ReadyToRun=true /p:IncludeNativeLibrariesForSelfExtract=true  
 
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish"
+        
     - name: Install Chocolatey
       run: |
         Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -66,11 +72,11 @@ jobs:
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"
       env:
-        SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/win-x64/ExcludeInInstaller/Installer Script.iss"  
+        SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/ExcludeInInstaller/Installer Script.iss"  
 
     - name: Zip the EXE file
       run: |
-        $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/output/AppiumWizard.exe"
+        $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.exe"
         $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
         Compress-Archive -Path $exePath -DestinationPath $zipPath
 
@@ -91,7 +97,7 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
-        files: "Appium Wizard/bin/Release/net6.0-windows/win-x64/output/AppiumWizard.zip"
+        files: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.zip"
         tag_name: v${{ steps.get_version.outputs.version }}
         release_name: Release ${{ steps.get_version.outputs.version }}
         body: |

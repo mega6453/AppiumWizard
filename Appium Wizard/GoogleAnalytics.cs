@@ -26,6 +26,7 @@ namespace Appium_Wizard
                     content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{{\"engagement_time_msec\":{userCount},\"Info\":\"{info}\"}}}}]}}", null, "application/json");
                     request.Content = content;
                     client.Send(request);
+                    MessageBox.Show("Client id : " +clientId+ "api : " + APISecret+ "meas id : " + MeasurementID);
                 }
             });
         }
@@ -57,6 +58,7 @@ namespace Appium_Wizard
                     content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{paramsJson}}}]}}", null, "application/json");
                     request.Content = content;
                     client.Send(request);
+                    MessageBox.Show("Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
                 }
             });
 

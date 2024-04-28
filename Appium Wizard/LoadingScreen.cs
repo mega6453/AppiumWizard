@@ -58,11 +58,13 @@ namespace Appium_Wizard
                 GoogleAnalytics.clientId = guid.ToString();
                 Database.UpdateDataIntoGUIDTable(guid.ToString());
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
+                MessageBox.Show("first launch: "+guid);
             }
             else
             {
                 GoogleAnalytics.clientId = clientId;
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
+                MessageBox.Show("not first launch: " + clientId);
             }
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)

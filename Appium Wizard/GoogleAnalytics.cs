@@ -15,20 +15,31 @@ namespace Appium_Wizard
 
         public static void SendEvent(object eventName, string info = "", bool addUserCount = false)
         {
-            Task.Run(() =>
+            MessageBox.Show("Outside, Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
+            try
             {
-                if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
+                Task.Run(() =>
                 {
-                    var client = new HttpClient();
-                    var request = new HttpRequestMessage(HttpMethod.Post, "https://www.google-analytics.com/mp/collect?api_secret=" + APISecret + "&measurement_id=" + MeasurementID);
-                    StringContent? content = null;
-                    int userCount = addUserCount ? 1 : 0;
-                    content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{{\"engagement_time_msec\":{userCount},\"Info\":\"{info}\"}}}}]}}", null, "application/json");
-                    request.Content = content;
-                    client.Send(request);
-                    MessageBox.Show("Client id : " +clientId+ "api : " + APISecret+ "meas id : " + MeasurementID);
-                }
-            });
+                    if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
+                    {
+                        MessageBox.Show("Inside1 Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
+                        var client = new HttpClient();
+                        var request = new HttpRequestMessage(HttpMethod.Post, "https://www.google-analytics.com/mp/collect?api_secret=" + APISecret + "&measurement_id=" + MeasurementID);
+                        StringContent? content = null;
+                        int userCount = addUserCount ? 1 : 0;
+                        content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{{\"engagement_time_msec\":{userCount},\"Info\":\"{info}\"}}}}]}}", null, "application/json");
+                        request.Content = content;
+                        client.Send(request);
+                        MessageBox.Show("Inside2 Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
+                    }
+                });
+
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show("Exception: " + e);
+            }
         }
 
 

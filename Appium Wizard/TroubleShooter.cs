@@ -81,7 +81,7 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install NodeJS", "Installing NodeJS, Please provide required permission when system prompts...");
+            commonProgress.UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
             Common.InstallNodeJs();
             commonProgress.Close();
             FindIssues();
@@ -92,7 +92,7 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install Appium", "Installing Appium Server, Please wait...");
+            commonProgress.UpdateStepLabel("Install Appium", "Installing Appium Server, This may take sometime, Please wait...");
             Common.InstallAppiumGlobally();
             commonProgress.Close();
             FindIssues();
@@ -103,7 +103,7 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install XCUITest", "Installing XCUITest(iOS) driver, Please wait...");
+            commonProgress.UpdateStepLabel("Install XCUITest", "Installing XCUITest(iOS) driver, This may take sometime, Please wait...");
             Common.InstallXCUITestDriver();
             commonProgress.Close();
             FindIssues();
@@ -115,7 +115,7 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install UIAutomator2", "Installing UIAutomator2(android) driver, Please wait...");
+            commonProgress.UpdateStepLabel("Install UIAutomator2", "Installing UIAutomator2(android) driver, This may take sometime, Please wait...");
             Common.InstallUIAutomatorDriver();
             commonProgress.Close();
             FindIssues();

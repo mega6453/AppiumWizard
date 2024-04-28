@@ -310,8 +310,8 @@ namespace Appium_Wizard
             string pathVariable = Environment.GetEnvironmentVariable("PATH");
             pathVariable += ";" + serverFolderPath;
             process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-
-            process.StartInfo.Arguments = "/C npm i -g appium";
+            process.StartInfo.WorkingDirectory = serverFolderPath;
+            process.StartInfo.Arguments = $"/C npm i -g appium";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;

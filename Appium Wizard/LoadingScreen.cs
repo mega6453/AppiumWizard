@@ -38,6 +38,19 @@ namespace Appium_Wizard
             catch (Exception)
             {
             }
+            string clientId = Database.QueryDataFromGUIDTable();
+            if (clientId.Equals("Empty"))
+            {
+                Guid guid = Guid.NewGuid();
+                GoogleAnalytics.clientId = guid.ToString();
+                Database.UpdateDataIntoGUIDTable(guid.ToString());
+                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
+            }
+            else
+            {
+                GoogleAnalytics.clientId = clientId;
+                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
+            }
         }
         private void LoadingScreen_Load(object sender, EventArgs e)
         {
@@ -51,21 +64,6 @@ namespace Appium_Wizard
             Common.SetAndroidHomeEnvironmentVariable();
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
-            string clientId = Database.QueryDataFromGUIDTable();
-            if (clientId.Equals("Empty"))
-            {
-                Guid guid = Guid.NewGuid();
-                GoogleAnalytics.clientId = guid.ToString();
-                Database.UpdateDataIntoGUIDTable(guid.ToString());
-                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
-                MessageBox.Show("first launch: "+guid);
-            }
-            else
-            {
-                GoogleAnalytics.clientId = clientId;
-                GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
-                MessageBox.Show("not first launch: " + clientId);
-            }
             bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
             {

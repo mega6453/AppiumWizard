@@ -15,16 +15,12 @@ namespace Appium_Wizard
 
         public static void SendEvent(object eventName, string info = "", bool addUserCount = false)
         {
-            MessageBox.Show("Outside, Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
             try
             {
                 Task.Run(() =>
                 {
-
-                    MessageBox.Show("Inside0 Client id : " + clientId + "\napi : " + APISecret + "\nmeas id : " + MeasurementID);
-                    if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
+                    if (!APISecret.Contains("ANALYTICSAPISECRET"))
                     {
-                        MessageBox.Show("Inside1 Client id : " + clientId + "\napi : " + APISecret + "\nmeas id : " + MeasurementID);
                         var client = new HttpClient();
                         var request = new HttpRequestMessage(HttpMethod.Post, "https://www.google-analytics.com/mp/collect?api_secret=" + APISecret + "&measurement_id=" + MeasurementID);
                         StringContent? content = null;
@@ -32,15 +28,11 @@ namespace Appium_Wizard
                         content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{{\"engagement_time_msec\":{userCount},\"Info\":\"{info}\"}}}}]}}", null, "application/json");
                         request.Content = content;
                         client.Send(request);
-                        MessageBox.Show("Inside2 Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
                     }
                 });
-
             }
             catch (Exception e)
             {
-
-                MessageBox.Show("Exception: " + e);
             }
         }
 
@@ -49,7 +41,7 @@ namespace Appium_Wizard
         {
             Task.Run(() =>
             {
-                if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
+                if (!APISecret.Contains("ANALYTICSAPISECRET"))
                 {
                     var client = new HttpClient();
                     var request = new HttpRequestMessage(HttpMethod.Post, "https://www.google-analytics.com/mp/collect?api_secret=" + APISecret + "&measurement_id=" + MeasurementID);
@@ -71,7 +63,6 @@ namespace Appium_Wizard
                     content = new StringContent($"{{\"client_id\":\"{clientId}\",\"non_personalized_ads\":true,\"events\":[{{\"name\":\"{eventName}\",\"params\":{paramsJson}}}]}}", null, "application/json");
                     request.Content = content;
                     client.Send(request);
-                    MessageBox.Show("Client id : " + clientId + "api : " + APISecret + "meas id : " + MeasurementID);
                 }
             });
 
@@ -80,7 +71,7 @@ namespace Appium_Wizard
 
         public static void SendExceptionEvent(object eventName, string message="", bool addUserCount = false)
         {
-            if (!APISecret.Equals("{GOOGLEANALYTICSAPISECRET}"))
+            if (!APISecret.Contains("ANALYTICSAPISECRET"))
             {
                 Task.Run(async () =>
                 {

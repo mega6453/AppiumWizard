@@ -1,3 +1,4 @@
+[![.NET Core Desktop](https://github.com/mega6453/AppiumWizard/actions/workflows/main.yml/badge.svg)](https://github.com/mega6453/AppiumWizard/actions/workflows/main.yml)
 <p align="center">
   <img src="logo.jpg" alt="Appium Wizard Logo">
 </p>

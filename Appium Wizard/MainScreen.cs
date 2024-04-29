@@ -15,6 +15,7 @@ namespace Appium_Wizard
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection;
         public static List<int> runningProcessesPortNumbers = new List<int>();
+        public static List<int> runningProcesses = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
@@ -661,6 +662,10 @@ namespace Appium_Wizard
                 foreach (var item in runningProcessesPortNumbers)
                 {
                     Common.KillProcessByPortNumber(item);
+                }
+                foreach (var item in runningProcesses)
+                {
+                    Common.KillProcessById(item);
                 }
             }
             catch (Exception)

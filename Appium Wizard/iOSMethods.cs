@@ -857,6 +857,8 @@ namespace Appium_Wizard
 
             // Start the process
             process.Start();
+            var processId = process.Id;
+            MainScreen.runningProcesses.Add(processId);
             Thread.Sleep(2000);
             // Begin asynchronous reading of the output/error streams
             process.BeginErrorReadLine();

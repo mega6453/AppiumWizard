@@ -7,6 +7,12 @@
 
 Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool helps testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows.
 
+
+
+https://github.com/mega6453/AppiumWizard/assets/50325649/1fb5333e-4be0-46c5-b2b6-35f36695f800
+
+
+
 ## Downloading and Installing
 * Appium Wizard executable is added in a zip file because some browser thinks that this exe is a suspicious file. So, after downloading, extract the exe file and Run it.
 * When you run the exe file, you will see "**Microsoft Defender SmartScreen prevented an unrecognized app from starting.** Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on **More Info -> Run Anyway to start the installation.**      
@@ -48,7 +54,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Server Management
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)
-* Mangage Apps - Install / Launch / Kill / Uninstall
+* Manage Apps - Install / Launch / Kill / Uninstall
 * Take Device Screenshot
 * Reboot Device
 * etc.

@@ -151,11 +151,6 @@ namespace Appium_Wizard
                             }
                         }
                     }
-                    if (serverSetup.serverStarted)
-                    {
-                        statusLabel.Text = "Running";
-                    }
-
                 }
             });
             return Task.Delay(500);

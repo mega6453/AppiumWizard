@@ -868,7 +868,7 @@ namespace Appium_Wizard
             // Clean up resources
             //process.Close();
             bool isPasscodeRequired = false;
-            int count = 6;
+            int count = 1;
             string sessionId = string.Empty;
             while (!process.HasExited)
             {
@@ -877,18 +877,18 @@ namespace Appium_Wizard
                     if (runwdaError.Contains("Process started successfully"))
                     {
                         sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                        while (sessionId.Equals("nosession") && count <= 6 && count > 0)
+                        while (sessionId.Equals("nosession") && count <= 6)
                         {
                             sessionId = iOSAPIMethods.CreateWDASession(port);
                             Thread.Sleep(5000);
+                            sessionId = iOSAPIMethods.CreateWDASession(port);
                             if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
                             {
-                                int seconds = 5 * count;
-                                commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Will timeout in " + seconds.ToString() + " seconds.");
+                                commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry "+count+"/6.");
                                 isPasscodeRequired = true;
                                 Thread.Sleep(5000);
                             }
-                            count--;
+                            count++;
                         }
                         //if (runwdaError.Contains("Timed out while enabling automation mode"))
                         //{

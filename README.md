@@ -14,6 +14,7 @@ https://github.com/mega6453/AppiumWizard/assets/50325649/1fb5333e-4be0-46c5-b2b6
 
 
 ## Downloading and Installing
+* Download the Appium Wizard zip file from here --> https://github.com/mega6453/AppiumWizard/releases/latest
 * Appium Wizard executable is added in a zip file because some browser thinks that this exe is a suspicious file. So, after downloading, extract the exe file and Run it.
 * When you run the exe file, you will see "**Microsoft Defender SmartScreen prevented an unrecognized app from starting.** Running this app might put your PC at risk." error. This error is because, this software is not signed with a certificate which involves cost in buying the certificate. Click on **More Info -> Run Anyway to start the installation.**      
 

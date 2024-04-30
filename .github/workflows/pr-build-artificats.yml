@@ -1,0 +1,38 @@
+name: PR build artificats
+
+on:
+  workflow_dispatch:  
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release]
+    runs-on: windows-latest
+    env:
+      Solution_Name: Appium Wizard
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore the application
+      run: dotnet restore $env:Solution_Name
+      env:
+        Solution_Name: Appium Wizard
+
+    - name: Build the solution
+      run: dotnet build $env:Solution_Name --configuration ${{ matrix.configuration }}
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: "Appium Wizard/bin/${{ matrix.configuration }}/net6.0-windows/win-x64"

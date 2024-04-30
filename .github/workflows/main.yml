@@ -1,13 +1,13 @@
 name: .NET Core Desktop
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    types:
-      - closed
-    branches:
-      - master
+  # push:
+  #   branches: [ "master" ]
+  # pull_request:
+  #   types:
+  #     - closed
+  #   branches:
+  #     - master
   workflow_dispatch:
 
 jobs:

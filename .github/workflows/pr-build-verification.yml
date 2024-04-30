@@ -1,4 +1,4 @@
-name: .NET Core Desktop
+name: PR build Verification
 
 on:
   pull_request:
@@ -32,9 +32,3 @@ jobs:
 
     - name: Build the solution
       run: dotnet build $env:Solution_Name --configuration ${{ matrix.configuration }}
-
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: app
-        path: "Appium Wizard/bin/${{ matrix.configuration }}/net6.0-windows/win-x64"

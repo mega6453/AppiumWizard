@@ -1,4 +1,4 @@
-name: PR build artificats
+name: PR build Artificats
 
 on:
   workflow_dispatch:  

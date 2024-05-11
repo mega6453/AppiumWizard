@@ -1,19 +1,18 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
 {
-    public static class ExecutionStatus
+    public class ExecutionStatus
     {
-        //public static bool serverStarted = false;
-        //public static string statusText = "";
         static Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
         public static List<string> listOfSessionIDs = new List<string>();
         static string tempsessionId = string.Empty;
         static string deviceId = string.Empty;
         static string element = string.Empty;
-        public static void UpdateStatus(string data)
+        public void UpdateStatus(string data)
         {
             string statusText;
             if (data.Contains("Appium REST http interface listener started"))
@@ -49,8 +48,9 @@ namespace Appium_Wizard
             }
            
         }
-
-        public static void UpdateScreenControl(ScreenControl screenControl, string data)
+        string sessionId = string.Empty; static string url = "";
+        int x, y, width, height;
+        public void UpdateScreenControl(ScreenControl screenControl, string data, int screenDensity=0)
         {
             string statusText;
             if (screenControl != null)
@@ -109,11 +109,22 @@ namespace Appium_Wizard
                 //    {
                 //    }
                 //}
-
+                if (data.Contains("POST /session/") && data.Contains("/element"))
+                {
+                    int startIndex = data.IndexOf("/session/") + "/session/".Length;
+                    int endIndex = data.IndexOf("/", startIndex);
+                    sessionId = data.Substring(startIndex, endIndex - startIndex);
+                }
 
                 if (data.Contains("[POST /element]") | data.Contains("[POST /elements]") | data.Contains("{\"using\":"))
-                    //if (data.Contains("{\"using\":"))
-                {                   
+                {
+                    string pattern = @"(?<=\[POST\s)(http:\/\/[^\/]+\/session\/[^\/]+\/element)";
+                    Regex regex = new Regex(pattern);
+                    Match match = regex.Match(data);
+                    if (match.Success)
+                    {
+                        url = match.Value;
+                    }
                     string json = GetOnlyJson(data);
                     try
                     {
@@ -129,13 +140,15 @@ namespace Appium_Wizard
                     {
                     }
                 }
-                else if (data.Contains("POST /session/") && data.Contains("/click") && !data.Contains("/click 200"))
+                else if ((data.Contains("[POST /session/") | data.Contains("[POST /element/")) && data.Contains("/click]"))
                 {
                     statusText = "Click " + element;
                     screenControl.UpdateStatusLabel(screenControl, statusText);
+                    x = x + (width/2);
+                    y = y + (height/2);
+                    screenControl.DrawDot(screenControl, x, y);
                 }
                 else if (data.Contains("{\"text\":") | (data.Contains("POST /session/") && data.Contains("/value")))
-                //else if (data.Contains("{\"text\":"))
                 {
                     string text;
                     string json = GetOnlyJson(data);
@@ -157,7 +170,37 @@ namespace Appium_Wizard
                 {
                     try
                     {
-                        screenControl.UpdateStatusLabel(screenControl, "");
+                        if (data.Contains("value") && data.Contains("ELEMENT") && data.Contains("sessionId"))
+                        {
+                            string json = GetOnlyJson(data);
+                            JObject jsonObject = JObject.Parse(json);
+                            string elementId = jsonObject["value"]["ELEMENT"].ToString();
+                            sessionId = jsonObject["sessionId"].ToString();
+                            var result = AppiumServerSetup.ElementInfo(url, elementId);
+                            if (result != null)
+                            {
+                                if (screenDensity !=0)
+                                {
+                                    x = (int)(result["x"] / (screenDensity / 160f));
+                                    y = (int)(result["y"] / (screenDensity / 160f));
+                                    width = (int)(result["width"] / (screenDensity / 160f));
+                                    height = (int)(result["height"] / (screenDensity / 160f));
+                                }
+                                else
+                                {
+                                    x = result["x"];
+                                    y = result["y"];
+                                    width = result["width"];
+                                    height = result["height"];
+                                }                             
+                                screenControl.DrawRectangle(screenControl, x, y, width, height);
+                            }
+                            screenControl.UpdateStatusLabel(screenControl, "");
+                        }
+                        else
+                        {
+                            screenControl.UpdateStatusLabel(screenControl, "");
+                        }
                     }
                     catch (Exception)
                     {

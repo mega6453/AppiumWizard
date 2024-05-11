@@ -55,6 +55,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Server Management
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)
+* Highlight element accessed by Appium in Screen Reflection during execution
 * Manage Apps - Install / Launch / Kill / Uninstall
 * Take Device Screenshot
 * Reboot Device
@@ -65,7 +66,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Update Appium Server and drivers from Appium Wizard
 * Status bar for Element interaction (WaitForElement, Swipe, etc.)
 * Handle resources on Application exit
-* Highlight element accessed by Appium in Screen Reflection
 * Unlock Mobile using Screen Control
 * Performance and Reliability Improvements
 * Error handling

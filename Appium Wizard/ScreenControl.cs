@@ -1,9 +1,7 @@
-﻿using Microsoft.Web.WebView2.WinForms;
-using System;
-using System.Data.Entity.Infrastructure;
+﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Reflection;
-using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
 {
@@ -18,11 +16,15 @@ namespace Appium_Wizard
         public string IPAddress = "127.0.0.1";
         string deviceName, udid, OSType, OSVersion;
         int screenPort, proxyPort;
-        public static Dictionary<string,ScreenControl> udidScreenControl = new Dictionary<string,ScreenControl>();
+        public static Dictionary<string, ScreenControl> udidScreenControl = new Dictionary<string, ScreenControl>();
         Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
-        public ScreenControl(string os,string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
+        string canvasFunction = string.Empty;
+        string canvasFunctionID = string.Empty;
+        string color = ColorTranslator.ToHtml(Color.Red);
+        int lineWidth = 2;
+        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
             this.OSVersion = Version;
@@ -80,41 +82,11 @@ namespace Appium_Wizard
                     Thread.Sleep(1000);
                 }
             });
-            //screenControl = this;
             udidScreenControl.Add(udid, this);
         }
 
-        public void UpdateStatusLabel(ScreenControl screenControl,string actualText)
+        public void UpdateStatusLabel(ScreenControl screenControl, string actualText)
         {
-            //string truncatedText = string.Empty;
-            //if (screenControl.InvokeRequired)
-            //{
-            //    if (actualText.Length > 55)
-            //    {
-            //        truncatedText = actualText.Substring(0, 55) + "...";
-            //        screenControl.BeginInvoke((Action)(() => UpdateStatusLabel(screenControl, truncatedText)));
-            //        screenControl.statusLabel.ToolTipText = actualText;
-            //    }
-            //    else
-            //    {
-            //        screenControl.BeginInvoke((Action)(() => UpdateStatusLabel(screenControl, actualText)));
-            //        screenControl.statusLabel.ToolTipText = actualText;
-            //    }
-            //}
-            //else
-            //{
-            //    if (actualText.Length > 55)
-            //    {
-            //        truncatedText = actualText.Substring(0, 55) + "...";
-            //        screenControl.statusLabel.Text = truncatedText;
-            //    }
-            //    else
-            //    {
-            //        screenControl.statusLabel.Text = actualText;
-            //    }
-            //    screenControl.statusLabel.ToolTipText = actualText;
-            //    screenControl.toolStrip2.Refresh();
-            //}
             try
             {
                 BeginInvoke(new Action(() =>
@@ -163,7 +135,7 @@ namespace Appium_Wizard
             //{
             //    ScreenWebView = webview2[udid];
             //}
-           
+
             ScreenWebView = webview2[udid];
             if (Controls.Contains(ScreenWebView))
             {
@@ -211,9 +183,6 @@ namespace Appium_Wizard
             await ScreenWebView.EnsureCoreWebView2Async();
             try
             {
-                //string tempFilePath = Path.GetTempFileName() + ".html";
-                //File.WriteAllText(tempFilePath, htmlContent);
-                //ScreenWebView.CoreWebView2.Navigate(tempFilePath);
                 ScreenWebView.NavigateToString(htmlContent);
             }
             catch (Exception)
@@ -271,12 +240,25 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void InitializeWebView()
+        private async void InitializeWebView()
         {
             SetWebViewSize(width, height);
+            canvasFunction = JavaScripts.DrawRectangleOnCanvas();
+            var env = await CoreWebView2Environment.CreateAsync(null, null, null);
+            ScreenWebView.CoreWebView2InitializationCompleted += InitializationCompleted;
+            await ScreenWebView.EnsureCoreWebView2Async(env);
             Controls.Add(ScreenWebView);
-        }
 
+
+        }
+        private async void InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+            if (e.IsSuccess)
+            {
+                var canvasFunctionID = await
+                    ScreenWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(canvasFunction);
+            }
+        }
         private void SetWebViewSize(int width, int height)
         {
             ScreenWebView.Width = width;
@@ -353,7 +335,6 @@ namespace Appium_Wizard
         public void SendKeys(object sender, KeyPressEventArgs e)
         {
             string text = e.KeyChar.ToString();
-            //UpdateStatusLabel(text);
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.SendText(URL, sessionId, text);
@@ -447,12 +428,12 @@ namespace Appium_Wizard
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.GoToHome(URL);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"iOS");
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
             }
             else
             {
                 AndroidMethods.GetInstance().GoToHome(udid);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"Android");
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
             }
         }
         private void BackButton_Click(object sender, EventArgs e)
@@ -485,7 +466,7 @@ namespace Appium_Wizard
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"iOS");
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
             }
             else
             {
@@ -501,7 +482,7 @@ namespace Appium_Wizard
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,"Android");
+                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
             }
         }
 
@@ -520,7 +501,7 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 Console.WriteLine("Exception" + exception);
-                GoogleAnalytics.SendExceptionEvent(MethodBase.GetCurrentMethod().Name,exception.Message);
+                GoogleAnalytics.SendExceptionEvent(MethodBase.GetCurrentMethod().Name, exception.Message);
             }
         }
 
@@ -648,7 +629,38 @@ namespace Appium_Wizard
         private void ScreenControl_Shown(object sender, EventArgs e)
         {
             string OS = OSType + " " + OSVersion;
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name,OS);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, OS);
+        }
+
+        public void DrawRectangle(ScreenControl screenControl,int x, int y, int width, int height)
+        {
+            try
+            {
+                BeginInvoke(new Action(() =>
+                {
+                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawRectangle({x}, {y}, {width}, {height}, {lineWidth}, '{color}', true)");
+                    //screenControl.ScreenWebView.ExecuteScriptAsync("drawRectangle(0, 0, 0, 0, 0, '', true)");
+                }));
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public void DrawDot(ScreenControl screenControl, int x, int y)
+        {
+            try
+            {
+                BeginInvoke(new Action(() =>
+                {
+                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot({x}, {y}, 5, 'red', true)");                    
+                    //screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot(0, 0, 0, '',true)");
+
+                }));
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 }

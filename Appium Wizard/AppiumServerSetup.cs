@@ -1,14 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {
@@ -41,8 +37,8 @@ namespace Appium_Wizard
                     //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
 
 
                     //working
@@ -95,8 +91,9 @@ namespace Appium_Wizard
         }
 
         string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
-        int proxyPort = 0;
+        int proxyPort = 0; int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
+        ExecutionStatus executionStatus = new ExecutionStatus();
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -121,127 +118,137 @@ namespace Appium_Wizard
                     statusText = "address already in use";
                     serverStarted = false;
                 }
-                ExecutionStatus.UpdateStatus(data);
 
-                if (data.Contains("Using device:"))
+                try
                 {
-                    string input = data;
-                    int startIndex = input.IndexOf(":") + 2;
-                    deviceUDID = input.Substring(startIndex);
-                    string name = MainScreen.DeviceInfo[deviceUDID].Item1;
-                    string text = "Set Device " + name;
-                    UpdateScreenControl(deviceUDID, text);
-                }
-                else if (data.Contains("Successfully requested the connection for"))
-                {
-                    int colonIndex = data.IndexOf(':');
-                    if (colonIndex != -1)
+                    executionStatus.UpdateStatus(data);
+
+                    if (data.Contains("Using device:"))
                     {
-                        deviceUDID = data.Substring(data.LastIndexOf(' ', colonIndex) + 1, colonIndex - data.LastIndexOf(' ', colonIndex) - 1);
-                        iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                        string input = data;
+                        int startIndex = input.IndexOf(":") + 2;
+                        deviceUDID = input.Substring(startIndex);
                         string name = MainScreen.DeviceInfo[deviceUDID].Item1;
                         string text = "Set Device " + name;
                         UpdateScreenControl(deviceUDID, text);
+                        screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(deviceUDID);
                     }
-                }
-                if (data.Contains("appium:webDriverAgentUrl"))
-                {
-                    string pattern1 = @"'appium:webDriverAgentUrl': 'http://localhost:(\d+)'";
-                    Regex regex1 = new Regex(pattern1);
-                    Match match2 = regex1.Match(data);
-                    if (match2.Success)
+                    else if (data.Contains("Successfully requested the connection for"))
                     {
-                        proxyPort = int.Parse(match2.Groups[1].Value);
-                    }
-                }
-                if (data.Contains("added to master session list"))
-                {
-                    string pattern = @"session (\w+-\w+-\w+-\w+-\w+)";
-                    Regex regex = new Regex(pattern);
-                    Match match1 = regex.Match(data);
-
-                    if (match1.Success)
-                    {
-                        string sessionId = match1.Groups[1].Value;
-                        sessionIdUDID.Add(sessionId, deviceUDID);
-                        string name = MainScreen.DeviceInfo[deviceUDID].Item1;
-                        string text = "Session Created for " + name;
-                        UpdateScreenControl(deviceUDID, text);
-                    }
-                }
-                //if (data.Contains("Replacing sessionId"))
-                //{
-                //    string pattern = @"sessionId\s+([A-Z0-9-]+).*?with\s+(.*?)$";
-                //    Regex regex = new Regex(pattern);
-                //    Match match = regex.Match(data);
-                //    if (match.Success)
-                //    {
-                //        string originalSessionId = match.Groups[1].Value;
-                //        string replacedSessionId = match.Groups[2].Value;
-                //        if (sessionIdUDID.ContainsKey(originalSessionId))
-                //        {
-                //            string value = sessionIdUDID[originalSessionId];
-                //            sessionIdUDID.Remove(originalSessionId);
-                //            sessionIdUDID.Add(replacedSessionId, value);
-                //        }
-                //    }
-                //}
-                if (data.Contains("DELETE /session/"))
-                {
-                    string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
-                    Regex regex = new Regex(pattern);
-                    Match match = regex.Match(data);
-                    if (match.Success)
-                    {
-                        string udid = "";
-                        string sessionId = match.Groups[1].Value;
-                        if (sessionIdUDID.ContainsKey(sessionId))
+                        int colonIndex = data.IndexOf(':');
+                        if (colonIndex != -1)
                         {
-                            udid = sessionIdUDID[sessionId];
-                            string name = MainScreen.DeviceInfo[udid].Item1;
-                            string text = "Session Deleted for " + name;
-                            UpdateScreenControl(udid, text);
-                            if (MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
+                            deviceUDID = data.Substring(data.LastIndexOf(' ', colonIndex) + 1, colonIndex - data.LastIndexOf(' ', colonIndex) - 1);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                            string name = MainScreen.DeviceInfo[deviceUDID].Item1;
+                            string text = "Set Device " + name;
+                            UpdateScreenControl(deviceUDID, text);
+                        }
+                    }
+                    if (data.Contains("appium:webDriverAgentUrl"))
+                    {
+                        string pattern1 = @"'appium:webDriverAgentUrl': 'http://localhost:(\d+)'";
+                        Regex regex1 = new Regex(pattern1);
+                        Match match2 = regex1.Match(data);
+                        if (match2.Success)
+                        {
+                            proxyPort = int.Parse(match2.Groups[1].Value);
+                        }
+                    }
+                    if (data.Contains("added to master session list"))
+                    {
+                        string pattern = @"session (\w+-\w+-\w+-\w+-\w+)";
+                        Regex regex = new Regex(pattern);
+                        Match match1 = regex.Match(data);
+
+                        if (match1.Success)
+                        {
+                            string sessionId = match1.Groups[1].Value;
+                            sessionIdUDID.Add(sessionId, deviceUDID);
+                            string name = MainScreen.DeviceInfo[deviceUDID].Item1;
+                            string text = "Session Created for " + name;
+                            UpdateScreenControl(deviceUDID, text);
+                        }
+                    }
+                    //if (data.Contains("Replacing sessionId"))
+                    //{
+                    //    string pattern = @"sessionId\s+([A-Z0-9-]+).*?with\s+(.*?)$";
+                    //    Regex regex = new Regex(pattern);
+                    //    Match match = regex.Match(data);
+                    //    if (match.Success)
+                    //    {
+                    //        string originalSessionId = match.Groups[1].Value;
+                    //        string replacedSessionId = match.Groups[2].Value;
+                    //        if (sessionIdUDID.ContainsKey(originalSessionId))
+                    //        {
+                    //            string value = sessionIdUDID[originalSessionId];
+                    //            sessionIdUDID.Remove(originalSessionId);
+                    //            sessionIdUDID.Add(replacedSessionId, value);
+                    //        }
+                    //    }
+                    //}
+                    if (data.Contains("DELETE /session/"))
+                    {
+                        string pattern = @"/session/(\w+-\w+-\w+-\w+-\w+)";
+                        Regex regex = new Regex(pattern);
+                        Match match = regex.Match(data);
+                        if (match.Success)
+                        {
+                            string udid = "";
+                            string sessionId = match.Groups[1].Value;
+                            if (sessionIdUDID.ContainsKey(sessionId))
                             {
-                                try
+                                udid = sessionIdUDID[sessionId];
+                                string name = MainScreen.DeviceInfo[udid].Item1;
+                                string text = "Session Deleted for " + name;
+                                UpdateScreenControl(udid, text);
+                                if (MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
                                 {
-                                    int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
-                                    int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
-                                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                                    AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
-                                }
-                                catch (Exception)
-                                {
+                                    try
+                                    {
+                                        int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
+                                        int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
+                                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
+                                        AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
                                 }
                             }
+                        }
+
+                    }
+                    string sessionIdPattern = @"/session/([^/]+)";
+                    if (data.Contains("POST /session/") && data.Contains("/element"))
+                    {
+                        Match match = Regex.Match(data, sessionIdPattern);
+                        if (match.Success)
+                        {
+                            currentSessionId = match.Groups[1].Value;
+                        }
+                        if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
+                        {
+                            currentUDID = sessionIdUDID[currentSessionId];
+                        }
+                    }
+                    if (data.Contains("POST /session/") && (data.Contains("/element 200") | data.Contains("/elements 200") | data.Contains("/click 200") | data.Contains("/value 200")))
+                    {
+                        UpdateScreenControl(currentUDID, "");
+                    }
+
+                    if (UpdateStatusInScreenFlag)
+                    {
+                        if (ScreenControl.udidScreenControl.ContainsKey(currentUDID))
+                        {
+                           executionStatus.UpdateScreenControl(ScreenControl.udidScreenControl[currentUDID], data,screenDensity);
                         }
                     }
 
                 }
-                string sessionIdPattern = @"/session/([^/]+)";
-                if (data.Contains("POST /session/") && data.Contains("/element"))
+                catch (Exception)
                 {
-                    Match match = Regex.Match(data, sessionIdPattern);
-                    if (match.Success)
-                    {
-                        currentSessionId = match.Groups[1].Value;
-                    }
-                    if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
-                    {
-                        currentUDID = sessionIdUDID[currentSessionId];
-                    }
-                }
-                if (data.Contains("POST /session/") && (data.Contains("/element 200") | data.Contains("/elements 200") | data.Contains("/click 200") | data.Contains("/value 200")))
-                {
-                    UpdateScreenControl(currentUDID, "");
-                }
-               
-                if (UpdateStatusInScreenFlag)
-                {
-                    if (ScreenControl.udidScreenControl.ContainsKey(currentUDID))
-                    {
-                        ExecutionStatus.UpdateScreenControl(ScreenControl.udidScreenControl[currentUDID], data);
-                    }
+
                 }
 
             }
@@ -462,6 +469,40 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return "error";
+            }
+        }
+
+        public static Dictionary<string,int> ElementInfo(string url, string elementId)
+        {
+            try
+            {
+                var options = new RestClientOptions(url)
+                {
+                    MaxTimeout = 3000,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest(elementId + "/rect", Method.Get);
+                request.AddHeader("Content-Type", "application/json");
+                RestResponse response = client.Execute(request);
+                var jsonObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                int x = jsonObject.value.x;
+                int y = jsonObject.value.y;
+                int width = jsonObject.value.width;
+                int height = jsonObject.value.height;
+
+                Dictionary<string, int> rectangleDict = new Dictionary<string, int>
+                    {
+                        { "x", x },
+                        { "y", y },
+                        { "width", width },
+                        { "height", height }
+                    };
+
+                return rectangleDict;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

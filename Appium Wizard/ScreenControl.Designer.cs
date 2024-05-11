@@ -57,7 +57,7 @@
             ScreenWebView.Dock = DockStyle.Fill;
             ScreenWebView.Location = new Point(0, 0);
             ScreenWebView.Name = "ScreenWebView";
-            ScreenWebView.Size = new Size(371, 572);
+            ScreenWebView.Size = new Size(380, 595);
             ScreenWebView.TabIndex = 0;
             ScreenWebView.ZoomFactor = 1D;
             ScreenWebView.KeyPress += SendKeys;
@@ -71,10 +71,10 @@
             toolStrip1.ImageScalingSize = new Size(24, 24);
             toolStrip1.Items.AddRange(new ToolStripItem[] { buttonAlwaysOnTop, toolStripSeparator4, toolStripSeparator3, ObjectSpy, toolStripSeparator2, toolStripSeparator1, toolStripButton1, BackButton, controlCenter, toolStripDropDownButton1 });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            toolStrip1.Location = new Point(0, 572);
+            toolStrip1.Location = new Point(0, 595);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.RenderMode = ToolStripRenderMode.System;
-            toolStrip1.Size = new Size(371, 33);
+            toolStrip1.Size = new Size(380, 33);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -180,10 +180,10 @@
             toolStrip2.GripStyle = ToolStripGripStyle.Hidden;
             toolStrip2.ImageScalingSize = new Size(24, 24);
             toolStrip2.Items.AddRange(new ToolStripItem[] { statusLabel });
-            toolStrip2.Location = new Point(0, 547);
+            toolStrip2.Location = new Point(0, 570);
             toolStrip2.Name = "toolStrip2";
             toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(371, 25);
+            toolStrip2.Size = new Size(380, 25);
             toolStrip2.TabIndex = 2;
             toolStrip2.TabStop = true;
             toolStrip2.Text = "toolStrip2";
@@ -202,7 +202,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(371, 605);
+            ClientSize = new Size(380, 628);
             Controls.Add(toolStrip2);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);

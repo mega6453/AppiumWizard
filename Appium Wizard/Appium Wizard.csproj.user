@@ -49,6 +49,9 @@
     <Compile Update="TroubleShooter.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Updater.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

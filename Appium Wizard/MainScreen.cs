@@ -516,7 +516,7 @@ namespace Appium_Wizard
                                     {
                                         Model = deviceInfo["ProductType"]?.ToString() ?? "";
                                     }
-                                    DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™","'") ?? "";
+                                    DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™", "'") ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
                                     OSType = "iOS";
@@ -1075,7 +1075,7 @@ namespace Appium_Wizard
                         AndroidMethods.GetInstance().RebootDevice(selectedUDID);
                         GoogleAnalytics.SendExceptionEvent("Reboot_Android");
                     }
-                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName+".", "Reboot Device",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName + ".", "Reboot Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -1211,8 +1211,8 @@ namespace Appium_Wizard
             {
                 if (saveFileDialog.FileName != "")
                 {
-                    CommonProgress commonProgress = new CommonProgress();                   
-                    commonProgress.UpdateStepLabel("Take Screenshot","Please wait while taking screenshot of "+selectedDeviceName+"..."); 
+                    CommonProgress commonProgress = new CommonProgress();
+                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
@@ -1231,7 +1231,7 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                         commonProgress.Close();
-                        MessageBox.Show("Failed to Take Screenshot","Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     commonProgress.Close();
                     GoogleAnalytics.SendEvent("Android_TakeScreenshot");

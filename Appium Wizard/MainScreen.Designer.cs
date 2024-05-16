@@ -93,6 +93,7 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
+            updaterToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -268,7 +269,7 @@ namespace Appium_Wizard
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(77, 29);
             fileToolStripMenuItem.Text = "Server";
@@ -277,7 +278,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(233, 34);
+            serverSetupToolStripMenuItem.Size = new Size(270, 34);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -285,7 +286,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(270, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -630,6 +631,12 @@ namespace Appium_Wizard
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
             // 
+            // updaterToolStripMenuItem
+            // 
+            updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
+            updaterToolStripMenuItem.Size = new Size(270, 34);
+            updaterToolStripMenuItem.Text = "Updater";
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -736,5 +743,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
+        private ToolStripMenuItem updaterToolStripMenuItem;
     }
 }

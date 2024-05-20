@@ -213,7 +213,7 @@ namespace Appium_Wizard
 
         public string GetAppActivity(string udid, string packageName)
         {
-            return ExecuteCommand("-s " + udid + " shell \"cmd package resolve-activity --brief "+packageName+" | tail -n 1\"").Replace("\r","").Replace("\n","");
+            return ExecuteCommand("-s " + udid + " shell \"cmd package resolve-activity --brief " + packageName + " | tail -n 1\"").Replace("\r", "").Replace("\n", "");
         }
 
         public void LaunchApp(string udid, string packageName, string activityName)
@@ -268,10 +268,84 @@ namespace Appium_Wizard
         {
             ExecuteCommand("-s " + udid + " tcpip 5555");
         }
+        public void ConnectToAndroidWirelessly(string connectAddress)
+        {
+            ExecuteCommand(" connect " + connectAddress);
+        }
 
         public void ConnectToAndroidWirelessly(string udid, string IPAddress, string Port)
         {
             ExecuteCommand("-s " + udid + " connect " + IPAddress + ":" + Port);
+        }
+
+        public Dictionary<string, Tuple<string, string>> FindPairingReadyDevicesOverWiFi()
+        {
+            string output = ExecuteCommand("mdns services");
+            Dictionary<string, Tuple<string, string>> keyValuePairs = new Dictionary<string, Tuple<string, string>>();
+            string pattern = @"(\S+)\s+(_adb-tls-connect|_adb-tls-pairing)\._tcp\.\s+(\d+\.\d+\.\d+\.\d+):(\d+)";
+            MatchCollection matches = Regex.Matches(output, pattern);
+
+            foreach (Match match in matches)
+            {
+                string deviceName = match.Groups[1].Value;
+                string[] parts = deviceName.Split('-');
+                if (parts.Length >= 3)
+                {
+                    deviceName = parts[1];
+                }
+                string service = match.Groups[2].Value;
+                string ipAddress = match.Groups[3].Value;
+                string portNumber = match.Groups[4].Value;
+                string address = ipAddress+":" + portNumber;
+                if (service.Contains("pairing"))
+                {
+                    if (keyValuePairs.ContainsKey(deviceName))
+                    {
+                        var tuple = keyValuePairs[deviceName];
+                        keyValuePairs[deviceName] = Tuple.Create(address, tuple.Item2);
+                    }
+                    else
+                    {
+                        keyValuePairs.Add(deviceName, Tuple.Create(address, ""));
+                    }
+                }
+                else
+                {
+                    if (keyValuePairs.ContainsKey(deviceName))
+                    {
+                        var tuple = keyValuePairs[deviceName];
+                        keyValuePairs[deviceName] = Tuple.Create(tuple.Item1, address);
+                    }
+                    else
+                    {
+                        keyValuePairs.Add(deviceName, Tuple.Create("", address));
+                    }
+                }
+            }
+            return keyValuePairs;
+        }
+
+        public List<string> FindConnectReadyDevicesOverWiFi()
+        {
+            List<string> address = new List<string>();
+            string output = ExecuteCommand("mdns services");
+            string pattern = @"_adb-tls-connect._tcp\.\s+(\d+\.\d+\.\d+\.\d+):(\d+)";
+
+            MatchCollection matches = Regex.Matches(output, pattern);
+
+            foreach (Match match in matches)
+            {
+                string ipAddress = match.Groups[1].Value;
+                string portNumber = match.Groups[2].Value;
+                string result = ipAddress + ":" + portNumber;
+                address.Add(result);
+            }
+            return address;
+        }
+
+        public string PairAndroidWirelessly(string address, string PairingCode)
+        {
+            return ExecuteCommand(" pair " + address + " " + PairingCode);
         }
 
         public void ConnectToAndroidWirelessly(string IPAddress, string Port)
@@ -364,7 +438,7 @@ namespace Appium_Wizard
             {
                 ProcessStartInfo processStartInfo = new ProcessStartInfo();
                 processStartInfo.FileName = "cmd.exe";
-                processStartInfo.Arguments = "/C adb.exe "+arguments;
+                processStartInfo.Arguments = "/C adb.exe " + arguments;
                 processStartInfo.RedirectStandardOutput = true;
                 processStartInfo.WorkingDirectory = FilesPath.executablesFolderPath;
                 processStartInfo.RedirectStandardError = true;

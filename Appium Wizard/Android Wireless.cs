@@ -1,41 +1,105 @@
-﻿using System.Diagnostics;
-
-namespace Appium_Wizard
+﻿namespace Appium_Wizard
 {
     public partial class AndroidWireless : Form
     {
         MainScreen mainScreen;
-        string networkPortion = string.Empty;
+        string selectedDevice = string.Empty;
+        string selectedAddress = string.Empty;
+        ListViewItem selectedItem;
+        Dictionary<string, Tuple<string, string>> listOfDevices = new Dictionary<string, Tuple<string, string>>();
         public AndroidWireless(MainScreen mainScreen)
         {
             this.mainScreen = mainScreen;
             InitializeComponent();
-            IPAddressTextBox.TextChanged += TextBox_TextChanged;
-            PortTextBox.TextChanged += TextBox_TextChanged;
-            networkPortion = Common.GetOnlyNetworkPortion();
-            IPAddressTextBox.Text = networkPortion + ".";
-            IPAddressTextBox.Select(IPAddressTextBox.Text.Length, 0);
+        }
+        int retryCount = 0;
+        private void FindDeviceButton_Click(object sender, EventArgs e)
+        {
+            FindDevices();
         }
 
-        private void TextBox_TextChanged(object sender, EventArgs e)
+        private void FindDevices()
         {
-            if (!string.IsNullOrWhiteSpace(IPAddressTextBox.Text) && !string.IsNullOrWhiteSpace(PortTextBox.Text))
+            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for Android devices over Wi-Fi...");
+            deviceLookUp.Show();
+            listOfDevices.Clear();
+            listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+            while (listOfDevices.Count == 0 && retryCount <= 5)
             {
-                FindDeviceButton.Enabled = true;
+                listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+                Thread.Sleep(1000);
+                retryCount++;
+            }
+            listView1.Items.Clear();
+            foreach (var pair in listOfDevices)
+            {
+                string deviceName = pair.Key;
+                string pairingAddress = pair.Value.Item1;
+                string connectAddress = pair.Value.Item2;
+                if (!string.IsNullOrEmpty(pairingAddress))
+                {
+                    ListViewItem item = new ListViewItem(deviceName);
+                    item.SubItems.Add(pairingAddress);
+                    listView1.Items.Add(item);
+                }
+                else if (!string.IsNullOrEmpty(connectAddress))
+                {
+                    ListViewItem item = new ListViewItem(deviceName);
+                    item.SubItems.Add(connectAddress);
+                    listView1.Items.Add(item);
+                }
+            }
+            deviceLookUp.Close();
+        }
+
+        private void PairButton_Click(object sender, EventArgs e)
+        {
+            string pairingAddress = listOfDevices[selectedDevice].Item1;
+            string connectAddress = listOfDevices[selectedDevice].Item2;
+            if (string.IsNullOrEmpty(connectAddress))
+            {
+                listOfDevices.Clear();
+                listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+                connectAddress = listOfDevices[selectedDevice].Item2;
+            }
+            if (string.IsNullOrEmpty(pairingAddress) & !string.IsNullOrEmpty(connectAddress))
+            {
+                DeviceLookUp deviceLookUp = new DeviceLookUp("Connecting to Android device over Wi-Fi...");
+                deviceLookUp.Show();
+                GetDeviceInformation(deviceLookUp, this, connectAddress);
+            }
+            if (!string.IsNullOrEmpty(pairingAddress) & !string.IsNullOrEmpty(connectAddress))
+            {
+                PairingCodePrompt pairingCodePrompt = new PairingCodePrompt(this, mainScreen, selectedDevice, selectedAddress, connectAddress);
+                pairingCodePrompt.ShowDialog();
+            }
+        }
+
+        public void RemoveFromList()
+        {
+            listView1.Items.Remove(selectedItem);
+            listView1.Refresh();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                selectedItem = listView1.SelectedItems[0];
+                selectedDevice = selectedItem.SubItems[0].Text;
+                selectedAddress = selectedItem.SubItems[1].Text;
+                PairButton.Enabled = true;
             }
             else
             {
-                FindDeviceButton.Enabled = false;
+                PairButton.Enabled = false;
             }
         }
 
-        private void FindDeviceButton_Click(object sender, EventArgs e)
+        public void GetDeviceInformation(DeviceLookUp deviceLookUp, AndroidWireless androidWireless, string connectIPAddress)
         {
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for Android device over Wi-Fi...");
-            deviceLookUp.Show();
-            AndroidMethods.GetInstance().ConnectToAndroidWirelessly(IPAddressTextBox.Text, PortTextBox.Text);
-            string address = IPAddressTextBox.Text + ":" + PortTextBox.Text;
-            Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(address);
+            AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPAddress);
+            Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
             DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
             if (deviceInfo.ContainsKey("ro.serialno"))
             {
@@ -70,7 +134,7 @@ namespace Appium_Wizard
                         string[] ScreenWidth = { "Width", Width };
                         string[] ScreenHeight = { "Height", Height };
                         string[] Connection = { "Connection Type", "Wi-Fi" };
-                        string[] IPAddress = { "IP Address", address };
+                        string[] IPAddress = { "IP Address", connectIPAddress };
                         deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                         deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
                         deviceInformation.infoListView.Items.Add(new ListViewItem(os));
@@ -81,17 +145,24 @@ namespace Appium_Wizard
                         deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
                         deviceInformation.infoListView.Items.Add(new ListViewItem(IPAddress));
                         deviceLookUp.Hide();
-                        Hide();
                         deviceInformation.ShowDialog();
                         GoogleAnalytics.SendEvent("DeviceInformation_Android_Wireless");
                         deviceLookUp.Close();
-                        Close();
+                        if (MainScreen.isDeviceAlreadyAdded(udid))
+                        {
+                            RemoveFromList();
+                            MessageBox.Show(DeviceName.Replace("\n", "") + " added over Wi-Fi.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            FindDevices();
+                        }
                     }
                 }
                 else
                 {
                     deviceLookUp.Close();
-                    MessageBox.Show(DeviceName.Replace("\n", "") + " already added to the list.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(DeviceName.Replace("\n", "") + " already exist in the Devices list.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             else

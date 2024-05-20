@@ -37,6 +37,9 @@
     <Compile Update="MainScreen.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="PairingCodePrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="ScreenControl.cs">
       <SubType>Form</SubType>
     </Compile>

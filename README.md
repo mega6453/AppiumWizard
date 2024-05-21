@@ -52,6 +52,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * IPA Signer
 * Android Automation Execution
 * Android Screen Reflection and Screen Control
+* Use Android 11+ device over Wi-Fi
 * Server Management
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)

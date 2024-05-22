@@ -12,7 +12,7 @@
             this.mainScreen = mainScreen;
             InitializeComponent();
         }
-        int retryCount = 0;
+       
         private void FindDeviceButton_Click(object sender, EventArgs e)
         {
             FindDevices();
@@ -20,6 +20,7 @@
 
         private void FindDevices()
         {
+            int retryCount = 0;
             DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for Android devices over Wi-Fi...");
             deviceLookUp.Show();
             listOfDevices.Clear();

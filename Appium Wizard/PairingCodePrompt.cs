@@ -70,7 +70,7 @@
             else
             {
                 deviceLookUp.Close();
-                MessageBox.Show("Unable to Pair the device. Please try again by restarting device Wi-Fi or rebooting device.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Unable to Pair the device. Please try the following steps:\n1.Restart Wireless debugging\n2.Restart Mobile Wi-Fi\n3.Restart device", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

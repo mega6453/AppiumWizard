@@ -268,9 +268,9 @@ namespace Appium_Wizard
         {
             ExecuteCommand("-s " + udid + " tcpip 5555");
         }
-        public void ConnectToAndroidWirelessly(string connectAddress)
+        public string ConnectToAndroidWirelessly(string connectAddress)
         {
-            ExecuteCommand(" connect " + connectAddress);
+            return ExecuteCommand(" connect " + connectAddress);
         }
 
         public void ConnectToAndroidWirelessly(string udid, string IPAddress, string Port)

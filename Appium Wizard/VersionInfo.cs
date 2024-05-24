@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "1.1.0";
-        public const string ReleaseNotes = "Highlight element based on find element";
+        public const string VersionNumber = "1.2.0";
+        public const string ReleaseNotes = "Fixed Issue - Android Wireless not finding the device";
     }
 }

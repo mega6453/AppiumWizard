@@ -99,77 +99,85 @@
 
         public void GetDeviceInformation(DeviceLookUp deviceLookUp, AndroidWireless androidWireless, string connectIPAddress)
         {
-            AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPAddress);
-            Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
-            DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
-            if (deviceInfo.ContainsKey("ro.serialno"))
+            var output = AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPAddress);
+            if (output.Contains("failed to connect"))
             {
-                string udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
-                string DeviceName = deviceInfo["deviceName"]?.ToString() ?? "";
-                if (!MainScreen.isDeviceAlreadyAdded(udid))
+                deviceLookUp.Close();
+                MessageBox.Show("1.In the phone, Go to Developer options > Wireless debugging > Pair device with pairing code.\n2.Here, Click Find Devices again> Select the pairing IP > Pair.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
+                DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
+                if (deviceInfo.ContainsKey("ro.serialno"))
                 {
-                    if (deviceInfo.Count > 0)
+                    string udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
+                    string DeviceName = deviceInfo["deviceName"]?.ToString() ?? "";
+                    if (!MainScreen.isDeviceAlreadyAdded(udid))
                     {
-                        //DeviceName = deviceInfo["ro.product.model"]?.ToString() ?? "";
-                        string OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
-                        string OSType = "Android";
-                        string Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
-                        string Width = deviceInfo["Width"];
-                        string Height = deviceInfo["Height"];
-                        string Brand = string.Empty;
-                        if (!deviceInfo.ContainsKey("ro.product.product.brand"))
+                        if (deviceInfo.Count > 0)
                         {
-                            Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                            //DeviceName = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                            string OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
+                            string OSType = "Android";
+                            string Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                            string Width = deviceInfo["Width"];
+                            string Height = deviceInfo["Height"];
+                            string Brand = string.Empty;
+                            if (!deviceInfo.ContainsKey("ro.product.product.brand"))
+                            {
+                                Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                            }
+                            else
+                            {
+                                Brand = deviceInfo["ro.product.vendor.brand"]?.ToString() ?? "";
+                            }
+                            string BrandPlusModel = Brand.Replace("\n", "") + " " + Model.Replace("\n", "");
+                            string[] name = { "Name", DeviceName.Replace("\n", "") };
+                            string[] os = { "OS", OSType.Replace("\n", "") };
+                            string[] version = { "Version", OSVersion.Replace("\n", "") };
+                            string[] UniqueDeviceID = { "Udid", udid.Replace("\n", "") };
+                            BrandPlusModel = BrandPlusModel.Substring(0, 1).ToUpper() + BrandPlusModel.Substring(1);
+                            string[] DeviceModel = { "Model", BrandPlusModel };
+                            string[] ScreenWidth = { "Width", Width };
+                            string[] ScreenHeight = { "Height", Height };
+                            string[] Connection = { "Connection Type", "Wi-Fi" };
+                            string[] IPAddress = { "IP Address", connectIPAddress };
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(name));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(os));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(version));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(UniqueDeviceID));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenWidth));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
+                            deviceInformation.infoListView.Items.Add(new ListViewItem(IPAddress));
+                            deviceLookUp.Hide();
+                            deviceInformation.ShowDialog();
+                            GoogleAnalytics.SendEvent("DeviceInformation_Android_Wireless");
+                            deviceLookUp.Close();
+                            if (MainScreen.isDeviceAlreadyAdded(udid))
+                            {
+                                RemoveFromList();
+                                MessageBox.Show(DeviceName.Replace("\n", "") + " added over Wi-Fi.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            else
+                            {
+                                FindDevices();
+                            }
                         }
-                        else
-                        {
-                            Brand = deviceInfo["ro.product.vendor.brand"]?.ToString() ?? "";
-                        }
-                        string BrandPlusModel = Brand.Replace("\n", "") + " " + Model.Replace("\n", "");
-                        string[] name = { "Name", DeviceName.Replace("\n", "") };
-                        string[] os = { "OS", OSType.Replace("\n", "") };
-                        string[] version = { "Version", OSVersion.Replace("\n", "") };
-                        string[] UniqueDeviceID = { "Udid", udid.Replace("\n", "") };
-                        BrandPlusModel = BrandPlusModel.Substring(0, 1).ToUpper() + BrandPlusModel.Substring(1);
-                        string[] DeviceModel = { "Model", BrandPlusModel };
-                        string[] ScreenWidth = { "Width", Width };
-                        string[] ScreenHeight = { "Height", Height };
-                        string[] Connection = { "Connection Type", "Wi-Fi" };
-                        string[] IPAddress = { "IP Address", connectIPAddress };
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(name));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(os));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(version));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(UniqueDeviceID));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenWidth));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
-                        deviceInformation.infoListView.Items.Add(new ListViewItem(IPAddress));
-                        deviceLookUp.Hide();
-                        deviceInformation.ShowDialog();
-                        GoogleAnalytics.SendEvent("DeviceInformation_Android_Wireless");
+                    }
+                    else
+                    {
                         deviceLookUp.Close();
-                        if (MainScreen.isDeviceAlreadyAdded(udid))
-                        {
-                            RemoveFromList();
-                            MessageBox.Show(DeviceName.Replace("\n", "") + " added over Wi-Fi.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            FindDevices();
-                        }
+                        MessageBox.Show(DeviceName.Replace("\n", "") + " already exist in the Devices list.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
                 {
                     deviceLookUp.Close();
-                    MessageBox.Show(DeviceName.Replace("\n", "") + " already exist in the Devices list.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No Android Device available.\nPlease check if the device is on the same network as this PC.\nGo to Developer options > Wireless debugging > Pair device with pairing code > Find Devices again.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-            }
-            else
-            {
-                deviceLookUp.Close();
-                MessageBox.Show("No Android Device available. Please check if the device is on the same network as this PC.\nMake sure Wireless debugging option enabled in your phone's Developer options.\nMake sure you've entered valid IP Address and Port number.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

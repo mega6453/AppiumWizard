@@ -185,6 +185,7 @@
             Controls.Add(CancelButton);
             Controls.Add(profilesListComboBox);
             Controls.Add(selectProfileLabel);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;

@@ -1,10 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Net;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
+﻿using System.Reflection;
 
 namespace Appium_Wizard
 {

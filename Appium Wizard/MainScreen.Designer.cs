@@ -54,6 +54,7 @@ namespace Appium_Wizard
             fileToolStripMenuItem = new ToolStripMenuItem();
             serverSetupToolStripMenuItem = new ToolStripMenuItem();
             fixInstallationToolStripMenuItem = new ToolStripMenuItem();
+            updaterToolStripMenuItem = new ToolStripMenuItem();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
@@ -268,7 +269,7 @@ namespace Appium_Wizard
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(77, 29);
             fileToolStripMenuItem.Text = "Server";
@@ -277,7 +278,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(233, 34);
+            serverSetupToolStripMenuItem.Size = new Size(270, 34);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -285,9 +286,17 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(270, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
+            // 
+            // updaterToolStripMenuItem
+            // 
+            updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
+            updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
+            updaterToolStripMenuItem.Size = new Size(270, 34);
+            updaterToolStripMenuItem.Text = "Updater";
+            updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem
             // 
@@ -736,5 +745,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
+        private ToolStripMenuItem updaterToolStripMenuItem;
     }
 }

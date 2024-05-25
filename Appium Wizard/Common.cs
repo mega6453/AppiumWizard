@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {
@@ -335,6 +336,22 @@ namespace Appium_Wizard
             process.WaitForExit();
         }
 
+        public static void UpdateXCUITestDriver()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "cmd";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            pathVariable += ";" + serverFolderPath;
+            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+            process.StartInfo.Arguments = "/C appium driver update xcuitest";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            process.WaitForExit();
+        }
+
 
         public static void InstallUIAutomatorDriver()
         {
@@ -345,6 +362,22 @@ namespace Appium_Wizard
             process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
 
             process.StartInfo.Arguments = "/C appium driver install uiautomator2";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            process.WaitForExit();
+        }
+
+        public static void UpdateUIAutomatorDriver()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "cmd";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            pathVariable += ";" + serverFolderPath;
+            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+            process.StartInfo.Arguments = "/C appium driver update uiautomator2";
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -383,6 +416,117 @@ namespace Appium_Wizard
             }
         }
 
+        public static Dictionary<string,string> InstalledDriverVersion()
+        {
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();    
+            var output = AppiumInstalledDriverList();
+            string pattern = @"- (\w+)@(\d+(\.\d+){0,2})";
+            Regex regex = new Regex(pattern);
+            MatchCollection matches = regex.Matches(output);
+            foreach (Match match in matches)
+            {
+                string driverName = match.Groups[1].Value;
+                string version = match.Groups[2].Value;
+                keyValuePairs.Add(driverName,version);
+            }
+            return keyValuePairs;
+        }
+
+        public static string InstalledAppiumServerVersion()
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C appium --version";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return output + error;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        public static string AavailableAppiumVersion()
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C npm show appium version";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return output + error;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        public static string AavailableXCUITestVersion()
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C npm show appium-xcuitest-driver version";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return output + error;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        public static string AavailableUIAutomatorVersion()
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C npm show appium-uiautomator2-driver version";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return output + error;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
 
         const int SM_REBOOTREQUIRED = 0x42;
         [DllImport("user32.dll", SetLastError = true)]

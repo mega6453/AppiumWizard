@@ -50,6 +50,7 @@
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(527, 128);
             Controls.Add(label1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;

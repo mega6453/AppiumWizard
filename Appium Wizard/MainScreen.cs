@@ -82,6 +82,7 @@ namespace Appium_Wizard
             richTextBox3.Size = expectedSize;
             richTextBox4.Size = expectedSize;
             richTextBox5.Size = expectedSize;
+            GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
         DateTime lastWriteTime1 = new DateTime();
@@ -516,7 +517,7 @@ namespace Appium_Wizard
                                     {
                                         Model = deviceInfo["ProductType"]?.ToString() ?? "";
                                     }
-                                    DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™","'") ?? "";
+                                    DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™", "'") ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
                                     OSType = "iOS";
@@ -1075,7 +1076,7 @@ namespace Appium_Wizard
                         AndroidMethods.GetInstance().RebootDevice(selectedUDID);
                         GoogleAnalytics.SendExceptionEvent("Reboot_Android");
                     }
-                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName+".", "Reboot Device",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName + ".", "Reboot Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -1211,8 +1212,8 @@ namespace Appium_Wizard
             {
                 if (saveFileDialog.FileName != "")
                 {
-                    CommonProgress commonProgress = new CommonProgress();                   
-                    commonProgress.UpdateStepLabel("Take Screenshot","Please wait while taking screenshot of "+selectedDeviceName+"..."); 
+                    CommonProgress commonProgress = new CommonProgress();
+                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
@@ -1231,7 +1232,7 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                         commonProgress.Close();
-                        MessageBox.Show("Failed to Take Screenshot","Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     commonProgress.Close();
                     GoogleAnalytics.SendEvent("Android_TakeScreenshot");
@@ -1314,6 +1315,9 @@ namespace Appium_Wizard
 
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Check for Appium Wizard updates", "Please wait while checking for updates...");
             GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click");
             if (Common.isInternetAvailable())
             {
@@ -1329,6 +1333,7 @@ namespace Appium_Wizard
 
                     if (isUpdateAvailable)
                     {
+                        commonProgress.Close();
                         var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes: " + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (result == DialogResult.Yes)
                         {
@@ -1354,22 +1359,31 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        commonProgress.Close();
                         MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                 }
                 catch (Exception ex)
                 {
+                    commonProgress.Close();
                     MessageBox.Show("Unhandled Exception", "Check for Updates...");
                     GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
                 }
             }
             else
             {
+                commonProgress.Close();
                 MessageBox.Show("Internet connection not available. Please connect to internet and try again.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click", "No_Internet");
             }
+            commonProgress.Close();
         }
 
+        private void updaterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Updater updater = new Updater();
+            updater.ShowDialog();
+        }
     }
 }

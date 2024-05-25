@@ -632,7 +632,7 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, OS);
         }
 
-        public void DrawRectangle(ScreenControl screenControl,int x, int y, int width, int height)
+        public void DrawRectangle(ScreenControl screenControl, int x, int y, int width, int height)
         {
             try
             {
@@ -653,7 +653,7 @@ namespace Appium_Wizard
             {
                 BeginInvoke(new Action(() =>
                 {
-                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot({x}, {y}, 5, 'red', true)");                    
+                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot({x}, {y}, 5, 'red', true)");
                     //screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot(0, 0, 0, '',true)");
 
                 }));

@@ -63,7 +63,7 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
-            // InstallApp
+            // InstalliOSApp
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -72,11 +72,12 @@
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             HelpButton = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "InstallApp";
+            Name = "InstalliOSApp";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Install iOS App";

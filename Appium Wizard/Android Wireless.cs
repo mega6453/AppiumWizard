@@ -12,7 +12,7 @@
             this.mainScreen = mainScreen;
             InitializeComponent();
         }
-       
+
         private void FindDeviceButton_Click(object sender, EventArgs e)
         {
             FindDevices();
@@ -74,6 +74,7 @@
                 PairingCodePrompt pairingCodePrompt = new PairingCodePrompt(this, mainScreen, selectedDevice, selectedAddress, connectAddress);
                 pairingCodePrompt.ShowDialog();
             }
+            GoogleAnalytics.SendEvent("PairButton_Click");
         }
 
         public void RemoveFromList()
@@ -179,6 +180,11 @@
                     MessageBox.Show("No Android Device available.\nPlease check if the device is on the same network as this PC.\nGo to Developer options > Wireless debugging > Pair device with pairing code > Find Devices again.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        private void AndroidWireless_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent("AndroidWireless_Shown");
         }
     }
 }

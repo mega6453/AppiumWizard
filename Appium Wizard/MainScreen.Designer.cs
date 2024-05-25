@@ -54,6 +54,7 @@ namespace Appium_Wizard
             fileToolStripMenuItem = new ToolStripMenuItem();
             serverSetupToolStripMenuItem = new ToolStripMenuItem();
             fixInstallationToolStripMenuItem = new ToolStripMenuItem();
+            updaterToolStripMenuItem = new ToolStripMenuItem();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
@@ -93,7 +94,6 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
-            updaterToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -289,6 +289,14 @@ namespace Appium_Wizard
             fixInstallationToolStripMenuItem.Size = new Size(270, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
+            // 
+            // updaterToolStripMenuItem
+            // 
+            updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
+            updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
+            updaterToolStripMenuItem.Size = new Size(270, 34);
+            updaterToolStripMenuItem.Text = "Updater";
+            updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem
             // 
@@ -630,12 +638,6 @@ namespace Appium_Wizard
             tableLayoutPanel1.Size = new Size(1354, 38);
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
-            // 
-            // updaterToolStripMenuItem
-            // 
-            updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(270, 34);
-            updaterToolStripMenuItem.Text = "Updater";
             // 
             // MainScreen
             // 

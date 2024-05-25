@@ -12,14 +12,111 @@ namespace Appium_Wizard
 {
     public partial class Updater : Form
     {
+        Dictionary<string, string> driverVersion = new Dictionary<string, string>();
         public Updater()
         {
             InitializeComponent();
         }
 
-        private void label6_Click(object sender, EventArgs e)
+        private void Updater_Load(object sender, EventArgs e)
         {
+            GetVersionInformation();
+        }
 
+        private void GetVersionInformation()
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed server version information. This may take sometime...");
+            driverVersion = Common.InstalledDriverVersion();
+            appiumCurrentVersionLabel.Text = Common.InstalledAppiumServerVersion(); ;
+            XCUITestCurrentVersionLabel.Text = driverVersion["xcuitest"];
+            UIAutomatorCurrentVersionLabel.Text = driverVersion["uiautomator2"];
+            commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while checking for server updates. This may take sometime...");
+            AppiumAvailableVersionLabel.Text = Common.AavailableAppiumVersion();
+            XCUITestAvailableVersionLabel.Text = Common.AavailableXCUITestVersion();
+            UIAutomatorAvailableVersionLabel.Text = Common.AavailableUIAutomatorVersion();
+
+            Version currentVersionAppium = new Version(appiumCurrentVersionLabel.Text);
+            Version latestVersionAppium = new Version(AppiumAvailableVersionLabel.Text);
+
+            bool isUpdateAvailableAppium = latestVersionAppium > currentVersionAppium;
+            if (isUpdateAvailableAppium)
+            {
+                AppiumButton.Enabled = true;
+            }
+            else
+            {
+                AppiumButton.Enabled = false;
+            }
+
+            //XCUITest
+            Version currentVersionXCUITest = new Version(XCUITestCurrentVersionLabel.Text);
+            Version latestVersionXCUITest = new Version(XCUITestAvailableVersionLabel.Text);
+
+            bool isUpdateAvailableXCUITest = latestVersionXCUITest > currentVersionXCUITest;
+            if (isUpdateAvailableXCUITest)
+            {
+                XCUITestButton.Enabled = true;
+            }
+            else
+            {
+                XCUITestButton.Enabled = false;
+            }
+
+            //UIAutomator2
+            Version currentVersionUI = new Version(UIAutomatorCurrentVersionLabel.Text);
+            Version latestVersionUI = new Version(UIAutomatorAvailableVersionLabel.Text);
+
+            bool isUpdateAvailableUI = latestVersionUI > currentVersionUI;
+            if (isUpdateAvailableUI)
+            {
+                UIAutomatorButton.Enabled = true;
+            }
+            else
+            {
+                UIAutomatorButton.Enabled = false;
+            }
+            commonProgress.Close();
+
+        }
+
+        private void AppiumButton_Click(object sender, EventArgs e)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Update Appium Server", "Please wait while updating appium server version to " + AppiumAvailableVersionLabel.Text);
+            Common.InstallAppiumGlobally();
+            commonProgress.Close();
+            GetVersionInformation();
+            GoogleAnalytics.SendEvent("Update_Appium");
+        }
+
+        private void UIAutomatorButton_Click(object sender, EventArgs e)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Update UIAutomator driver", "Please wait while updating UIAutomator driver version to " + UIAutomatorAvailableVersionLabel.Text);
+            Common.UpdateUIAutomatorDriver();
+            commonProgress.Close();
+            GetVersionInformation();
+            GoogleAnalytics.SendEvent("Update_UIAutomator");
+        }
+
+        private void XCUITestButton_Click(object sender, EventArgs e)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Update XCUITest driver", "Please wait while updating XCUITest driver version to " + XCUITestAvailableVersionLabel.Text);
+            Common.UpdateXCUITestDriver();
+            commonProgress.Close();
+            GetVersionInformation();
+            GoogleAnalytics.SendEvent("Update_XCUITest");
+        }
+
+        private void Updater_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent("Updater_Shown");
         }
     }
 }

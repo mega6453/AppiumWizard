@@ -206,6 +206,7 @@
             Controls.Add(toolStrip2);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "ScreenControl";

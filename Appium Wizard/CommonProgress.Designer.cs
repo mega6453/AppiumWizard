@@ -50,6 +50,7 @@
             ClientSize = new Size(728, 176);
             ControlBox = false;
             Controls.Add(commonProgressLabel);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;

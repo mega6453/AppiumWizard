@@ -44,7 +44,7 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 if (UDIDTextbox.Text == "")
                 {
-                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : "+ IPAFilePathTextBox.Name +"\nProfile : " + profilesListComboBox.SelectedItem);
+                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem);
                 }
                 else
                 {

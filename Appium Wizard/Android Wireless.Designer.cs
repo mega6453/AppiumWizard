@@ -125,6 +125,7 @@
             Controls.Add(FindDeviceButton);
             Controls.Add(label2);
             Controls.Add(label1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
@@ -132,6 +133,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Android Wireless";
+            Shown += AndroidWireless_Shown;
             ResumeLayout(false);
             PerformLayout();
         }

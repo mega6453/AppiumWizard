@@ -46,6 +46,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Features Available
 
 * Upto 5 Parallel Appium servers
+* Update Appium Server and drivers from Appium Wizard
 * iOS Automation Execution
 * iOS Screen Reflection and Screen Control
 * iOS Profile management
@@ -64,7 +65,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window
-* Update Appium Server and drivers from Appium Wizard
 * Status bar for Element interaction (WaitForElement, Swipe, etc.)
 * Handle resources on Application exit
 * Unlock Mobile using Screen Control

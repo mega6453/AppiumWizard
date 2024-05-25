@@ -46,7 +46,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Features Available
 
 * Upto 5 Parallel Appium servers
-* Update Appium Server and drivers from Appium Wizard
+* Update Appium Server and drivers
 * iOS Automation Execution
 * iOS Screen Reflection and Screen Control
 * iOS Profile management

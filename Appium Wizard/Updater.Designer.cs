@@ -274,6 +274,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Server Updater";
+            FormClosed += Updater_FormClosed;
             Load += Updater_Load;
             Shown += Updater_Shown;
             tableLayoutPanel1.ResumeLayout(false);

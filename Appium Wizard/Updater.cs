@@ -13,6 +13,7 @@ namespace Appium_Wizard
     public partial class Updater : Form
     {
         Dictionary<string, string> driverVersion = new Dictionary<string, string>();
+        bool isUpdated = false;
         public Updater()
         {
             InitializeComponent();
@@ -90,6 +91,7 @@ namespace Appium_Wizard
             commonProgress.Close();
             GetVersionInformation();
             GoogleAnalytics.SendEvent("Update_Appium");
+            isUpdated = true;
         }
 
         private void UIAutomatorButton_Click(object sender, EventArgs e)
@@ -101,6 +103,7 @@ namespace Appium_Wizard
             commonProgress.Close();
             GetVersionInformation();
             GoogleAnalytics.SendEvent("Update_UIAutomator");
+            isUpdated = true;
         }
 
         private void XCUITestButton_Click(object sender, EventArgs e)
@@ -112,11 +115,20 @@ namespace Appium_Wizard
             commonProgress.Close();
             GetVersionInformation();
             GoogleAnalytics.SendEvent("Update_XCUITest");
+            isUpdated = true;
         }
 
         private void Updater_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("Updater_Shown");
+        }
+
+        private void Updater_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (isUpdated)
+            {
+                MessageBox.Show("Please restart the Appium Server to use the updated version. Go to Server > Config > Stop > Start.","Server Updater",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+            }
         }
     }
 }

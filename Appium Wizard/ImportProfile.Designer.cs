@@ -149,6 +149,7 @@
             Controls.Add(label2);
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            HelpButton = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
@@ -156,6 +157,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Import iOS Profile";
+            HelpButtonClicked += ImportProfile_HelpButtonClicked;
             Shown += ImportProfile_Shown;
             ResumeLayout(false);
             PerformLayout();

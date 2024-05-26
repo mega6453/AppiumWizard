@@ -292,5 +292,11 @@ namespace Appium_Wizard
         {
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
+
+        private void ImportProfile_HelpButtonClicked(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageBox.Show("For iOS automation, you need to add valid profiles here. Please contact your iOS developer to get the profiles for your device UDID.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
     }
 }

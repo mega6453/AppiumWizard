@@ -49,7 +49,7 @@
             // pictureBox1
             // 
             pictureBox1.Image = Properties.Resources.appium_wizard_small;
-            pictureBox1.Location = new Point(25, 12);
+            pictureBox1.Location = new Point(82, 12);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(462, 139);
             pictureBox1.TabIndex = 1;

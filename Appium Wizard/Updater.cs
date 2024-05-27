@@ -127,7 +127,7 @@ namespace Appium_Wizard
         {
             if (isUpdated)
             {
-                MessageBox.Show("Please restart the Appium Server to use the updated version. Go to Server > Config > Stop > Start.","Server Updater",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Please restart the Appium Server to use the updated version. Go to Server > Config > Stop > Start.", "Server Updater", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

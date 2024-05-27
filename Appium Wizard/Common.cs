@@ -780,5 +780,11 @@ namespace Appium_Wizard
                 return false;
             }
         }
+
+        public static bool isValidIPAddress(string ipAddressString)
+        {
+            bool isValidIpAddress = Regex.IsMatch(ipAddressString, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$") && IPAddress.TryParse(ipAddressString, out IPAddress ipAddress);
+            return isValidIpAddress;
+        }
     }
 }

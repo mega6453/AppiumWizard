@@ -51,6 +51,15 @@
                 }
             }
             deviceLookUp.Close();
+            if (listOfDevices.Count == 0)
+            {
+                var result = MessageBox.Show("No device found. Do you want to try adding the device manually?", "Add Android Device Over Wi-Fi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (result == DialogResult.Yes)
+                {
+                    AndroidWirelessManual androidWirelessManual = new AndroidWirelessManual(this);
+                    androidWirelessManual.ShowDialog();
+                }
+            }
         }
 
         private void PairButton_Click(object sender, EventArgs e)
@@ -185,6 +194,12 @@
         private void AndroidWireless_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("AndroidWireless_Shown");
+        }
+
+        private void ManualButton_Click(object sender, EventArgs e)
+        {
+            AndroidWirelessManual androidWirelessManual = new AndroidWirelessManual(this);
+            androidWirelessManual.ShowDialog();
         }
     }
 }

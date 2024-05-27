@@ -37,6 +37,7 @@
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             PairButton = new Button();
+            ManualButton = new Button();
             SuspendLayout();
             // 
             // label1
@@ -52,19 +53,19 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 69);
+            label2.Location = new Point(12, 60);
             label2.Name = "label2";
             label2.Size = new Size(659, 75);
             label2.TabIndex = 1;
-            label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging > Pair device with pairing code.\r\n3. Click on Find Devices.";
+            label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging > Pair device with pairing code.\r\n3. Click any one of the below options.";
             // 
             // FindDeviceButton
             // 
-            FindDeviceButton.Location = new Point(273, 158);
+            FindDeviceButton.Location = new Point(160, 159);
             FindDeviceButton.Name = "FindDeviceButton";
-            FindDeviceButton.Size = new Size(132, 34);
+            FindDeviceButton.Size = new Size(169, 34);
             FindDeviceButton.TabIndex = 4;
-            FindDeviceButton.Text = "Find Devices";
+            FindDeviceButton.Text = "Find automatically";
             FindDeviceButton.UseVisualStyleBackColor = true;
             FindDeviceButton.Click += FindDeviceButton_Click;
             // 
@@ -113,12 +114,23 @@
             PairButton.UseVisualStyleBackColor = true;
             PairButton.Click += PairButton_Click;
             // 
+            // ManualButton
+            // 
+            ManualButton.Location = new Point(351, 159);
+            ManualButton.Name = "ManualButton";
+            ManualButton.Size = new Size(146, 34);
+            ManualButton.TabIndex = 9;
+            ManualButton.Text = "Pair Manually";
+            ManualButton.UseVisualStyleBackColor = true;
+            ManualButton.Click += ManualButton_Click;
+            // 
             // AndroidWireless
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(690, 458);
+            Controls.Add(ManualButton);
             Controls.Add(PairButton);
             Controls.Add(listView1);
             Controls.Add(label3);
@@ -148,5 +160,6 @@
         private Button PairButton;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
+        private Button ManualButton;
     }
 }

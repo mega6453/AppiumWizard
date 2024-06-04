@@ -1181,13 +1181,17 @@ namespace Appium_Wizard
             }
         }
 
-        int processId = 0; bool isProcessRunning = false;
         public void CreateTunnel()
         {
-            isProcessRunning = Common.isProcessIdExist(processId);
+            bool isProcessRunning = false;
+            int processId = Database.QueryDataFromTunnelTable();
+            if (processId != 0)
+            {
+                isProcessRunning = Common.isProcessIdExist(processId);
+            }            
             if (processId == 0 | !isProcessRunning)
             {
-                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo grant permission to create the tunnel in the next windows prompt.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo grant permission to create the tunnel in the next windows prompt which will allow to run iOS 17+ automation.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
                     try
@@ -1200,7 +1204,7 @@ namespace Appium_Wizard
                         pyAsyncProcess.StartInfo.Verb = "runas";
                         pyAsyncProcess.Start();
                         processId = pyAsyncProcess.Id;
-
+                        Database.UpdateDataIntoTunnelTable(processId);
                         //if (!PortProcessId.ContainsKey(localPort))
                         //{
                         //    PortProcessId.Add(localPort, processId);

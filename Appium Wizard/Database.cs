@@ -265,5 +265,41 @@ namespace Appium_Wizard
             }
         }
 
+        public static void UpdateDataIntoTunnelTable(int processId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE Tunnel SET processId = @processId";
+                    command.Parameters.AddWithValue("@processId", processId);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+        public static int QueryDataFromTunnelTable()
+        {
+            int count = 0;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Tunnel", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            count = reader.GetInt32(0);
+                        }
+                    }
+                }
+                connection.Close();
+                return count;
+            }
+        }
     }
 }

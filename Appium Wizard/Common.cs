@@ -786,5 +786,36 @@ namespace Appium_Wizard
             bool isValidIpAddress = Regex.IsMatch(ipAddressString, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$") && IPAddress.TryParse(ipAddressString, out IPAddress ipAddress);
             return isValidIpAddress;
         }
+
+        public static bool isProcessIdExist(int processId)
+        {
+            Process[] processes = Process.GetProcesses();
+            bool isRunning = false;
+
+            foreach (Process process in processes)
+            {
+                if (process.Id == processId)
+                {
+                    isRunning = true;
+                    break;
+                }
+            }
+            if (isRunning)
+            {
+                Process process = Process.GetProcessById(processId);
+                if (process.ProcessName.Equals("cmd", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

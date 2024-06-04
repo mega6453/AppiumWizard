@@ -236,6 +236,21 @@ namespace Appium_Wizard
                 Open.Enabled = true;
                 MoreButton.Enabled = true;
                 DeleteDevice.Enabled = true;
+                if (selectedOS.Equals("iOS"))
+                {
+                    Version deviceVersion = new Version(selectedDeviceVersion);
+                    Version version17Plus = new Version("17.0.0");
+                    if (deviceVersion >= version17Plus) // >=17
+                    {
+                        iOSMethods.isGo = false;
+                        iOSAsyncMethods.isGo = false;
+                    }
+                    else // <17
+                    {
+                        iOSMethods.isGo = true;
+                        iOSAsyncMethods.isGo = true;
+                    }
+                }
                 if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi") && selectedDeviceStatus.Equals("Online"))
                 {
                     label2.MaximumSize = new Size(panel1.Width, 0);
@@ -521,7 +536,19 @@ namespace Appium_Wizard
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
                                     OSType = "iOS";
-                                    string connectedVia = iOSMethods.iOSConnectedVia((bool)deviceInfo["HostAttached"]);
+                                    string connectedVia = string.Empty;
+                                    if (deviceInfo.ContainsKey("HostAttached"))
+                                    {
+                                        connectedVia = iOSMethods.iOSConnectedVia((bool)deviceInfo["HostAttached"]);
+                                    }
+                                    else if (deviceInfo.ContainsKey("ConnectionType"))
+                                    {
+                                        connectedVia = deviceInfo["ConnectionType"]?.ToString() ?? "";
+                                    }
+                                    else
+                                    {
+                                        connectedVia = "";
+                                    }
                                     string[] name = { "Name", DeviceName };
                                     string[] version = { "OS", OSType };
                                     string[] os = { "Version", OSVersion };
@@ -737,6 +764,7 @@ namespace Appium_Wizard
             }
             if (iOSAsyncMethods.installationProgress.Contains("installation successful") | iOSAsyncMethods.installationProgress == "100")
             {
+                commonProgress.Close();
                 if (isPListRead)
                 {
                     DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
@@ -769,6 +797,7 @@ namespace Appium_Wizard
             }
             else
             {
+                commonProgress.Close();
                 if (iOSAsyncMethods.installationProgress.Contains("MismatchedApplicationIdentifierEntitlement"))
                 {
                     MessageBox.Show("Uninstall the existing " + appName + " app and Try again...", "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -871,7 +900,7 @@ namespace Appium_Wizard
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo
                 {
-                    FileName = "https://appium.github.io/appium-xcuitest-driver",
+                    FileName = "https://appium.github.io/appium-xcuitest-driver/latest/reference/scripts/",
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);

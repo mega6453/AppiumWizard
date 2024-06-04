@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Remote;
 using RestSharp;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,34 +25,72 @@ namespace Appium_Wizard
         public string statusText = "";
         public static string deviceList = "";
         public string deviceInfo = "";
-
-
-        public List<string> GetListOfDevicesUDID()
+        public enum iOSExecutable { go, py }
+        public static bool isGo;
+        public List<string> GetListOfDevicesUDID(iOSExecutable executable = iOSExecutable.go)
         {
             List<string> list = new List<string>();
-            string deviceListString = ExecuteCommand("list");
-            if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+            if (executable == iOSExecutable.go)
             {
-                list.Add("ITunes not installed");
+                string deviceListString = ExecuteCommand("list");
+                if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+                {
+                    list.Add("ITunes not installed");
+                }
+                else
+                {
+                    JObject json = JObject.Parse(deviceListString);
+                    JArray deviceList = (JArray)json["deviceList"];
+                    foreach (JToken device in deviceList)
+                    {
+                        string udid = device.ToString();
+                        list.Add(udid);
+                    }
+                }
+                return list;
             }
             else
             {
-                JObject json = JObject.Parse(deviceListString);
-                JArray deviceList = (JArray)json["deviceList"];
-                foreach (JToken device in deviceList)
+                string deviceListString = ExecuteCommandPy("pymobiledevice3 usbmux list");
+                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
+                foreach (dynamic device in devices)
                 {
-                    string udid = device.ToString();
-                    list.Add(udid);
+                    list.Add(device.UniqueDeviceID.ToString());
                 }
+                return list;
             }
-            return list;
         }
 
-        public Dictionary<string, object> GetDeviceInformation(string udid = "firstDevice")
+        public Dictionary<string, object> GetDeviceInformation(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            string output = ExecuteCommand("info", udid);
-            Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
-            return result;
+            if (executable == iOSExecutable.go)
+            {
+                string output = ExecuteCommand("info", udid);
+                Dictionary<string, object> deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
+                return deviceValues;
+            }
+            else
+            {
+                string output = ExecuteCommandPy("pymobiledevice3 usbmux list");
+                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
+
+                Dictionary<string, object> deviceValues = new Dictionary<string, object>();
+                foreach (dynamic device in devices)
+                {
+                    string uniqueDeviceID = device.UniqueDeviceID.ToString();
+                    if (uniqueDeviceID == udid)
+                    {
+                        foreach (var property in device)
+                        {
+                            string key = property.Name.ToString();
+                            string value = property.Value;
+                            deviceValues[key] = value;
+                        }
+                        break;
+                    }
+                }
+                return deviceValues;
+            }
         }
 
         public static string iOSConnectedVia(bool HostAttached)
@@ -64,23 +105,37 @@ namespace Appium_Wizard
             }
         }
 
-        public List<string> GetListOfInstalledApps(string udid)
+        public List<string> GetListOfInstalledApps(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            var output = ExecuteCommand("apps --list", udid);
             List<string> packageList = new List<string>();
-
-            string pattern = @"(\w+(\.\w+)*)\s";
-            MatchCollection matches = Regex.Matches(output, pattern);
-
-            foreach (Match match in matches)
+            if (executable == iOSExecutable.go)
             {
-                bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
-                if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                var output = ExecuteCommand("apps --list", udid);
+                string pattern = @"(\w+(\.\w+)*)\s";
+                MatchCollection matches = Regex.Matches(output, pattern);
+
+                foreach (Match match in matches)
                 {
-                    packageList.Add(match.Groups[1].Value);
+                    bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
+                    if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                    {
+                        packageList.Add(match.Groups[1].Value);
+                    }
                 }
+                return packageList;
             }
-            return packageList;
+            else
+            {
+                var output = ExecuteCommandPy("pymobiledevice3 apps list -t User", udid);
+                JObject data = JObject.Parse(output);
+                var keys = data.Properties().Select(p => p.Name);
+
+                foreach (var key in keys)
+                {
+                    packageList.Add(key);
+                }
+                return packageList;
+            }
         }
 
         public bool iSWDAInstalled(string udid)
@@ -95,25 +150,53 @@ namespace Appium_Wizard
             return isProtected;
         }
 
-        public bool isDeveloperModeDisabled(string udid)
+        public bool isDeveloperModeDisabled(string udid, iOSExecutable executable = iOSExecutable.py)
         {
-            bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
-            return isDevModeDisabled;
+            if (executable.Equals(iOSExecutable.go))
+            {
+                bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
+                return isDevModeDisabled;
+            }
+            else
+            {
+                return ExecuteCommandPy("pymobiledevice3 amfi developer-mode-status", udid).Contains("true");
+            }
         }
 
-        public void RebootDevice(string udid)
+        public void RebootDevice(string udid, iOSExecutable executable = iOSExecutable.py)
         {
-            ExecuteCommand("reboot", udid);
+            if (executable.Equals(iOSExecutable.go))
+            {
+                ExecuteCommand("reboot", udid);
+            }
+            else
+            {
+                ExecuteCommandPy("pymobiledevice3 diagnostics restart", udid);
+            }
         }
 
-        public void UninstallApp(string udid, string bundleId)
+        public void UninstallApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.go)
         {
-            ExecuteCommand("uninstall " + bundleId, udid);
+            if (executable.Equals(iOSExecutable.go))
+            {
+                ExecuteCommand("uninstall " + bundleId, udid);
+            }
+            else
+            {
+                ExecuteCommandPy("pymobiledevice3 developer core-device uninstall " + bundleId, udid);
+            }
         }
 
-        public void TakeScreenshot(string udid, string path)
+        public void TakeScreenshot(string udid, string path, iOSExecutable executable = iOSExecutable.go)
         {
-            ExecuteCommand("screenshot  --output=" + path, udid);
+            if (isGo)
+            {
+                ExecuteCommand("screenshot --output=" + path, udid);
+            }
+            else
+            {
+                ExecuteCommandPy("pymobiledevice3 developer dvt screenshot " + path, udid);
+            }
         }
 
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
@@ -311,7 +394,7 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath,IPAFilePath,signedIPAFilePath);
+                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath);
             }
             else
             {
@@ -382,7 +465,7 @@ namespace Appium_Wizard
             }
             else if (stackTrace == "Archive OK")
             {
-                return outputPath;               
+                return outputPath;
             }
             else
             {
@@ -437,10 +520,18 @@ namespace Appium_Wizard
         }
 
 
-        public void RunWebDriverAgentQuick(string udid)
+        public string RunWebDriverAgentQuick(string udid, iOSExecutable executable = iOSExecutable.py)
         {
-            iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
-            iOSProcess.Start();
+            if (isGo)
+            {
+                iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                iOSProcess.Start();
+                return "";
+            }
+            else
+            {
+                return ExecuteCommandPy("pymobiledevice3 developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid);
+            }
         }
 
         public string IsWDARunning(int port)
@@ -483,10 +574,17 @@ namespace Appium_Wizard
             }
         }
 
-        public bool IsWDARunningInAppsList(string udid)
+        public bool IsWDARunningInAppsList(string udid, iOSExecutable executable = iOSExecutable.py)
         {
-            bool isRunning = false;
-            string output = ExecuteCommand("ps --apps", udid, false);
+            bool isRunning = false; string output = "";
+            if (executable.Equals(iOSExecutable.go))
+            {
+                output = ExecuteCommand("ps --apps", udid, false);
+            }
+            else
+            {
+                output = ExecuteCommandPy("pymobiledevice3 developer core-device list-processes");
+            }
             if (output.Contains("WebDriverAgentRunner-Runner"))
             {
                 isRunning = true;
@@ -494,9 +592,16 @@ namespace Appium_Wizard
             return isRunning;
         }
 
-        public string MountImage(string udid)
+        public string MountImage(string udid, iOSExecutable executable = iOSExecutable.py)
         {
-            return ExecuteCommand("image auto", udid);
+            if (isGo)
+            {
+                return ExecuteCommand("image auto", udid);
+            }
+            else
+            {
+                return ExecuteCommandPy("pymobiledevice3 mounter auto-mount", udid);
+            }
         }
 
         public Dictionary<string, string> GetIPAInformation(string ipaFilePath)
@@ -536,13 +641,27 @@ namespace Appium_Wizard
             }
         }
 
-        public string LaunchApp(string udid, string bundleId)
+        public string LaunchApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.py)
         {
-            return ExecuteCommand("launch " + bundleId, udid);
+            if (isGo)
+            {
+                return ExecuteCommand("launch " + bundleId, udid);
+            }
+            else
+            {
+                return ExecuteCommandPy("pymobiledevice3 developer dvt launch " + bundleId, udid);
+            }
         }
-        public string KillApp(string udid, string bundleId)
+        public string KillApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.py)
         {
-            return ExecuteCommand("kill " + bundleId, udid);
+            if (isGo)
+            {
+                return ExecuteCommand("kill " + bundleId, udid);
+            }
+            else
+            {
+                return ExecuteCommandPy("pymobiledevice3 developer dvt pkill --bundle " + bundleId, udid);
+            }
         }
 
         public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true)
@@ -578,6 +697,31 @@ namespace Appium_Wizard
                 Console.WriteLine("An error occurred while executing argument " + arguments + ": " + ex.Message);
                 return "Exception";
             }
+        }
+
+        public string ExecuteCommandPy(string command, string udid = "")
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "cmd.exe";
+            if (udid == "")
+            {
+                process.StartInfo.Arguments = "/C " + command;
+            }
+            else
+            {
+                process.StartInfo.Arguments = "/C " + command + " --udid " + udid;
+            }
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            string error = process.StandardError.ReadToEnd();
+            string output = process.StandardOutput.ReadToEnd();
+            string result = output + error;
+            process.WaitForExit();
+            result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+            return result;
         }
 
         public string GetDeviceModel(string input)
@@ -654,8 +798,11 @@ namespace Appium_Wizard
         private static iOSAsyncMethods? instance;
         private static readonly object lockObject = new object();
         private Process iOSAsyncProcess;
+        private Process pyAsyncProcess;
         private StringBuilder outputBuffer;
         public static Dictionary<int, int>? PortProcessId;
+        public enum iOSExecutable { go, py }
+        public static bool isGo;
         public iOSAsyncMethods()
         {
             InitializeProcess();
@@ -703,22 +850,48 @@ namespace Appium_Wizard
             };
         }
 
-        public void StartiOSProxyServer(string udid, int localPort, int iOSPort)
+        public void StartiOSProxyServer(string udid, int localPort, int iOSPort, iOSExecutable executable = iOSExecutable.py)
         {
-            try
+            if (executable.Equals(iOSExecutable.go))
             {
-                iOSAsyncProcess.StartInfo.Arguments = "forward --udid=" + udid + " " + localPort + " " + iOSPort + "";
-                iOSAsyncProcess.Start();
-                var processId = iOSAsyncProcess.Id;
-                if (!PortProcessId.ContainsKey(localPort))
+                try
                 {
-                    PortProcessId.Add(localPort, processId);
+                    iOSAsyncProcess.StartInfo.Arguments = "forward --udid=" + udid + " " + localPort + " " + iOSPort + "";
+                    iOSAsyncProcess.Start();
+                    var processId = iOSAsyncProcess.Id;
+                    if (!PortProcessId.ContainsKey(localPort))
+                    {
+                        PortProcessId.Add(localPort, processId);
+                    }
+                    MainScreen.runningProcessesPortNumbers.Add(localPort);
                 }
-                MainScreen.runningProcessesPortNumbers.Add(localPort);
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                try
+                {
+                    pyAsyncProcess = new Process();
+                    pyAsyncProcess.StartInfo.FileName = "cmd.exe";
+                    pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 usbmux forward " + udid + " " + localPort + " " + iOSPort + "";
+                    pyAsyncProcess.StartInfo.RedirectStandardError = true;
+                    pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
+                    pyAsyncProcess.StartInfo.UseShellExecute = false;
+                    pyAsyncProcess.StartInfo.CreateNoWindow = true;
+                    pyAsyncProcess.Start();
+                    var processId = pyAsyncProcess.Id;
+                    if (!PortProcessId.ContainsKey(localPort))
+                    {
+                        PortProcessId.Add(localPort, processId);
+                    }
+                    MainScreen.runningProcessesPortNumbers.Add(localPort);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -726,7 +899,7 @@ namespace Appium_Wizard
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = iProxyFilePath,                
+                FileName = iProxyFilePath,
                 Arguments = localPort + ":" + iOSPort + " -u " + udid,
                 //Arguments = localPort + " " + iOSPort + " " + udid,
                 UseShellExecute = false,
@@ -742,7 +915,7 @@ namespace Appium_Wizard
             if (!PortProcessId.ContainsKey(localPort))
             {
                 PortProcessId.Add(localPort, processId);
-            }           
+            }
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
@@ -751,7 +924,7 @@ namespace Appium_Wizard
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = iProxyFilePath,
-                Arguments = localPort1+":"+iOSPort1+" "+localPort2+":"+iOSPort2+" -u "+udid,
+                Arguments = localPort1 + ":" + iOSPort1 + " " + localPort2 + ":" + iOSPort2 + " -u " + udid,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true
@@ -792,21 +965,45 @@ namespace Appium_Wizard
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
-        public void InstallApp(string udid, string path)
+        public void InstallApp(string udid, string path, iOSExecutable executable = iOSExecutable.go)
         {
-            try
+            if (executable == iOSExecutable.go)
             {
-                iOSAsyncProcess.StartInfo.Arguments = $"install --path=\"{path}\"";
-                iOSAsyncProcess.OutputDataReceived += InstallOutput;
-                iOSAsyncProcess.ErrorDataReceived += InstallOutput;
-                iOSAsyncProcess.Start();
-                iOSAsyncProcess.BeginErrorReadLine();
-                iOSAsyncProcess.BeginOutputReadLine();
-                iOSAsyncProcess.WaitForExit();
+                try
+                {
+                    iOSAsyncProcess.StartInfo.Arguments = $"install --path=\"{path}\" --udid=" + udid;
+                    iOSAsyncProcess.OutputDataReceived += InstallOutput;
+                    iOSAsyncProcess.ErrorDataReceived += InstallOutput;
+                    iOSAsyncProcess.Start();
+                    iOSAsyncProcess.BeginErrorReadLine();
+                    iOSAsyncProcess.BeginOutputReadLine();
+                    iOSAsyncProcess.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                try
+                {
+                    pyAsyncProcess = new Process();
+                    pyAsyncProcess.StartInfo.FileName = "cmd.exe";
+                    pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 apps install \"{path}\" --udid " + udid;
+                    pyAsyncProcess.OutputDataReceived += InstallOutputPy;
+                    pyAsyncProcess.ErrorDataReceived += InstallOutputPy;
+                    pyAsyncProcess.StartInfo.RedirectStandardError = true;
+                    pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
+                    pyAsyncProcess.StartInfo.UseShellExecute = false;
+                    pyAsyncProcess.StartInfo.CreateNoWindow = true;
+                    pyAsyncProcess.Start();
+                    pyAsyncProcess.BeginErrorReadLine();
+                    pyAsyncProcess.BeginOutputReadLine();
+                    pyAsyncProcess.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                }
             }
         }
 
@@ -833,105 +1030,137 @@ namespace Appium_Wizard
                 iOSAsyncProcess.CancelErrorRead();
                 iOSAsyncProcess.CancelOutputRead();
             }
+        }
 
+        private void InstallOutputPy(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                if (e.Data.Contains("Complete"))
+                {
+                    string pattern = @"\b(\d+)%";
+                    Regex regex = new Regex(pattern);
+                    Match match = regex.Match(e.Data);
+                    if (match.Success)
+                    {
+                        installationProgress = match.Groups[1].Value;
+                    }
+                }
+                else if (e.Data.Contains("error"))
+                {
+                    installationProgress = e.Data;
+                }
+            }
+            else
+            {
+                pyAsyncProcess.CancelErrorRead();
+                pyAsyncProcess.CancelOutputRead();
+            }
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
+        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port, iOSExecutable executable = iOSExecutable.go)
         {
-            // Create a new process
-            Process process = new Process();
-
-            // Configure the process
-            process.StartInfo.FileName = iOSServerFilePath;
-            process.StartInfo.Arguments = "runwda";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.EnableRaisingEvents = true;
-
-            // Register event handlers for error and output data received
-            process.ErrorDataReceived += Process_ErrorDataReceived;
-            process.OutputDataReceived += Process_OutputDataReceived;
-
-            // Start the process
-            process.Start();
-            var processId = process.Id;
-            MainScreen.runningProcesses.Add(processId);
-            Thread.Sleep(2000);
-            // Begin asynchronous reading of the output/error streams
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-
-            // Wait for the process to exit
-            //process.WaitForExit();
-
-            // Clean up resources
-            //process.Close();
-            bool isPasscodeRequired = false;
-            int count = 1;
-            string sessionId = string.Empty;
-            while (!process.HasExited)
+            if (isGo)
             {
-                if (!string.IsNullOrEmpty(runwdaError))
-                {
-                    if (runwdaError.Contains("Process started successfully"))
-                    {
-                        sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                        while (sessionId.Equals("nosession") && count <= 6)
-                        {
-                            sessionId = iOSAPIMethods.CreateWDASession(port);
-                            Thread.Sleep(5000);
-                            sessionId = iOSAPIMethods.CreateWDASession(port);
-                            if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
-                            {
-                                commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry "+count+"/6.");
-                                isPasscodeRequired = true;
-                                Thread.Sleep(5000);
-                            }
-                            count++;
-                        }
-                        //if (runwdaError.Contains("Timed out while enabling automation mode"))
-                        //{
-                        //    return "Timed out";
-                        //}
-                        if (sessionId.Equals("nosession") & isPasscodeRequired)
-                        {
-                            process.Close();
-                            return "nosession passcode required";
-                        }
-                        else
-                        {
-                            process.Close();
-                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                            return sessionId;
-                        }
-                        //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'InvalidService'"))
-                        //{
-                        //    return "Enable Developer Mode";
-                        //}
-                        //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-                        //{
-                        //    return "Password Protected";
-                        //}
+                // Create a new process
+                Process process = new Process();
 
+                // Configure the process
+                process.StartInfo.FileName = iOSServerFilePath;
+                process.StartInfo.Arguments = "runwda";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.EnableRaisingEvents = true;
+
+                // Register event handlers for error and output data received
+                process.ErrorDataReceived += Process_ErrorDataReceived;
+                process.OutputDataReceived += Process_OutputDataReceived;
+
+                // Start the process
+                process.Start();
+                var processId = process.Id;
+                MainScreen.runningProcesses.Add(processId);
+                Thread.Sleep(2000);
+                // Begin asynchronous reading of the output/error streams
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+
+                // Wait for the process to exit
+                //process.WaitForExit();
+
+                // Clean up resources
+                //process.Close();
+                bool isPasscodeRequired = false;
+                int count = 1;
+                string sessionId = string.Empty;
+                while (!process.HasExited)
+                {
+                    if (!string.IsNullOrEmpty(runwdaError))
+                    {
+                        if (runwdaError.Contains("Process started successfully"))
+                        {
+                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                            while (sessionId.Equals("nosession") && count <= 6)
+                            {
+                                sessionId = iOSAPIMethods.CreateWDASession(port);
+                                Thread.Sleep(5000);
+                                sessionId = iOSAPIMethods.CreateWDASession(port);
+                                if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
+                                {
+                                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                    isPasscodeRequired = true;
+                                    Thread.Sleep(5000);
+                                }
+                                count++;
+                            }
+                            //if (runwdaError.Contains("Timed out while enabling automation mode"))
+                            //{
+                            //    return "Timed out";
+                            //}
+                            if (sessionId.Equals("nosession") & isPasscodeRequired)
+                            {
+                                process.Close();
+                                return "nosession passcode required";
+                            }
+                            else
+                            {
+                                process.Close();
+                                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                                return sessionId;
+                            }
+                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'InvalidService'"))
+                            //{
+                            //    return "Enable Developer Mode";
+                            //}
+                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+                            //{
+                            //    return "Password Protected";
+                            //}
+
+                        }
                     }
                 }
+                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+                {
+                    return "Enable Developer Mode";
+                }
+                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+                {
+                    return "Password Protected";
+                }
+                if (runwdaError.Contains("Timed out while enabling automation mode"))
+                {
+                    return "Timed out";
+                }
+                return "unhandled";
             }
-            if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+            else
             {
-                return "Enable Developer Mode";
+                return iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
             }
-            if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-            {
-                return "Password Protected";
-            }
-            if (runwdaError.Contains("Timed out while enabling automation mode"))
-            {
-                return "Timed out";
-            }
-            return "unhandled";
         }
         public void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -949,6 +1178,40 @@ namespace Appium_Wizard
             {
                 Console.WriteLine("Output: " + e.Data);
                 runwdaOutput += e.Data;
+            }
+        }
+
+        int processId = 0; bool isProcessRunning = false;
+        public void CreateTunnel()
+        {
+            isProcessRunning = Common.isProcessIdExist(processId);
+            if (processId == 0 | !isProcessRunning)
+            {
+                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo grant permission to create the tunnel in the next windows prompt.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.OK)
+                {
+                    try
+                    {
+                        pyAsyncProcess = new Process();
+                        pyAsyncProcess.StartInfo.FileName = "cmd.exe";
+                        pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
+                        pyAsyncProcess.StartInfo.UseShellExecute = true;
+                        pyAsyncProcess.StartInfo.CreateNoWindow = false;
+                        pyAsyncProcess.StartInfo.Verb = "runas";
+                        pyAsyncProcess.Start();
+                        processId = pyAsyncProcess.Id;
+
+                        //if (!PortProcessId.ContainsKey(localPort))
+                        //{
+                        //    PortProcessId.Add(localPort, processId);
+                        //}
+                        //MainScreen.runningProcessesPortNumbers.Add(localPort);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                }
             }
         }
     }

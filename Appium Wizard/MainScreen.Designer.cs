@@ -278,7 +278,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(270, 34);
+            serverSetupToolStripMenuItem.Size = new Size(233, 34);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -286,7 +286,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(270, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -294,7 +294,7 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(270, 34);
+            updaterToolStripMenuItem.Size = new Size(233, 34);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 

@@ -1189,7 +1189,7 @@ namespace Appium_Wizard
             {
                 isProcessRunning = Common.isProcessIdExist(processId);
             }            
-            if (processId == 0 | !isProcessRunning)
+            if (!isProcessRunning)
             {
                 var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel in the next windows prompt which will allow to run iOS 17+ automation OR Click cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)

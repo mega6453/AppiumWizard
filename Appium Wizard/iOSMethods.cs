@@ -1211,10 +1211,12 @@ namespace Appium_Wizard
                         tunnelProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
                         tunnelProcess.StartInfo.UseShellExecute = true;
                         tunnelProcess.StartInfo.CreateNoWindow = true;
+                        tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
                         processId = tunnelProcess.Id;
-                        Database.UpdateDataIntoTunnelTable(processId);                        
+                        int pyProcessId = Common.GetChildProcessId(processId, "pymobiledevice3.exe");
+                        Database.UpdateDataIntoTunnelTable(pyProcessId);                        
                         //if (!PortProcessId.ContainsKey(localPort))
                         //{
                         //    PortProcessId.Add(localPort, processId);
@@ -1228,9 +1230,9 @@ namespace Appium_Wizard
                 }
                 else
                 {
+                    clickedOK = false;
                     try
                     {
-                        clickedOK = false;
                         ProcessStartInfo psInfo = new ProcessStartInfo
                         {
                             FileName = "https://developer.apple.com/forums/thread/730947?answerId=756665022#756665022",

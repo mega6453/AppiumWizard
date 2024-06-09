@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
+using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -803,7 +804,7 @@ namespace Appium_Wizard
             if (isRunning)
             {
                 Process process = Process.GetProcessById(processId);
-                if (process.ProcessName.Equals("cmd", StringComparison.OrdinalIgnoreCase))
+                if (process.ProcessName.Equals("pymobiledevice3", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -816,6 +817,21 @@ namespace Appium_Wizard
             {
                 return false;
             }
+        }
+
+        public static int GetChildProcessId(int parentId, string processName)
+        {
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_Process WHERE ParentProcessID={parentId}"))
+            {
+                foreach (ManagementObject process in searcher.Get())
+                {
+                    if (process["Name"].ToString().ToLower() == processName.ToLower())
+                    {
+                        return Convert.ToInt32(process["ProcessId"]);
+                    }
+                }
+            }
+            return -1; // Not found
         }
     }
 }

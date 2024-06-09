@@ -701,27 +701,35 @@ namespace Appium_Wizard
 
         public string ExecuteCommandPy(string command, string udid = "")
         {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            if (udid == "")
+            bool isClickedOK = iOSAsyncMethods.GetInstance().CreateTunnel();
+            if (isClickedOK)
             {
-                process.StartInfo.Arguments = "/C " + command;
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                if (udid == "")
+                {
+                    process.StartInfo.Arguments = "/C " + command;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C " + command + " --udid " + udid;
+                }
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string error = process.StandardError.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
+                string result = output + error;
+                process.WaitForExit();
+                result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+                return result;
             }
             else
             {
-                process.StartInfo.Arguments = "/C " + command + " --udid " + udid;
+                return "tunnel not created";
             }
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            string error = process.StandardError.ReadToEnd();
-            string output = process.StandardOutput.ReadToEnd();
-            string result = output + error;
-            process.WaitForExit();
-            result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
-            return result;
         }
 
         public string GetDeviceModel(string input)
@@ -1181,8 +1189,9 @@ namespace Appium_Wizard
             }
         }
 
-        public void CreateTunnel()
+        public bool CreateTunnel()
         {
+            bool clickedOK = false;
             bool isProcessRunning = false;
             int processId = Database.QueryDataFromTunnelTable();
             if (processId != 0)
@@ -1191,20 +1200,21 @@ namespace Appium_Wizard
             }            
             if (!isProcessRunning)
             {
-                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel in the next windows prompt which will allow to run iOS 17+ automation OR Click cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
+                    clickedOK = true;
                     try
                     {
                         Process tunnelProcess = new Process();
                         tunnelProcess.StartInfo.FileName = "cmd.exe";
                         tunnelProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
                         tunnelProcess.StartInfo.UseShellExecute = true;
-                        tunnelProcess.StartInfo.CreateNoWindow = false;
+                        tunnelProcess.StartInfo.CreateNoWindow = true;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
                         processId = tunnelProcess.Id;
-                        Database.UpdateDataIntoTunnelTable(processId);
+                        Database.UpdateDataIntoTunnelTable(processId);                        
                         //if (!PortProcessId.ContainsKey(localPort))
                         //{
                         //    PortProcessId.Add(localPort, processId);
@@ -1220,6 +1230,7 @@ namespace Appium_Wizard
                 {
                     try
                     {
+                        clickedOK = false;
                         ProcessStartInfo psInfo = new ProcessStartInfo
                         {
                             FileName = "https://developer.apple.com/forums/thread/730947?answerId=756665022#756665022",
@@ -1234,6 +1245,11 @@ namespace Appium_Wizard
                     }
                 }
             }
+            else
+            {
+                clickedOK = true;
+            }
+            return clickedOK;
         }
     }
 

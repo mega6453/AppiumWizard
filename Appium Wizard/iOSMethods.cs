@@ -150,9 +150,9 @@ namespace Appium_Wizard
             return isProtected;
         }
 
-        public bool isDeveloperModeDisabled(string udid, iOSExecutable executable = iOSExecutable.py)
+        public bool isDeveloperModeDisabled(string udid)
         {
-            if (executable.Equals(iOSExecutable.go))
+            if (isGo)
             {
                 bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
                 return isDevModeDisabled;
@@ -163,7 +163,7 @@ namespace Appium_Wizard
             }
         }
 
-        public void RebootDevice(string udid, iOSExecutable executable = iOSExecutable.py)
+        public void RebootDevice(string udid, iOSExecutable executable = iOSExecutable.go)
         {
             if (executable.Equals(iOSExecutable.go))
             {
@@ -187,7 +187,7 @@ namespace Appium_Wizard
             }
         }
 
-        public void TakeScreenshot(string udid, string path, iOSExecutable executable = iOSExecutable.go)
+        public void TakeScreenshot(string udid, string path)
         {
             if (isGo)
             {
@@ -520,7 +520,7 @@ namespace Appium_Wizard
         }
 
 
-        public string RunWebDriverAgentQuick(string udid, iOSExecutable executable = iOSExecutable.py)
+        public string RunWebDriverAgentQuick(string udid)
         {
             if (isGo)
             {
@@ -574,10 +574,10 @@ namespace Appium_Wizard
             }
         }
 
-        public bool IsWDARunningInAppsList(string udid, iOSExecutable executable = iOSExecutable.py)
+        public bool IsWDARunningInAppsList(string udid)
         {
             bool isRunning = false; string output = "";
-            if (executable.Equals(iOSExecutable.go))
+            if (isGo)
             {
                 output = ExecuteCommand("ps --apps", udid, false);
             }
@@ -592,7 +592,7 @@ namespace Appium_Wizard
             return isRunning;
         }
 
-        public string MountImage(string udid, iOSExecutable executable = iOSExecutable.py)
+        public string MountImage(string udid)
         {
             if (isGo)
             {
@@ -641,7 +641,7 @@ namespace Appium_Wizard
             }
         }
 
-        public string LaunchApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.py)
+        public string LaunchApp(string udid, string bundleId)
         {
             if (isGo)
             {
@@ -652,7 +652,7 @@ namespace Appium_Wizard
                 return ExecuteCommandPy("pymobiledevice3 developer dvt launch " + bundleId, udid);
             }
         }
-        public string KillApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.py)
+        public string KillApp(string udid, string bundleId)
         {
             if (isGo)
             {
@@ -850,9 +850,9 @@ namespace Appium_Wizard
             };
         }
 
-        public void StartiOSProxyServer(string udid, int localPort, int iOSPort, iOSExecutable executable = iOSExecutable.py)
+        public void StartiOSProxyServer(string udid, int localPort, int iOSPort)
         {
-            if (executable.Equals(iOSExecutable.go))
+            if (isGo)
             {
                 try
                 {
@@ -1059,7 +1059,7 @@ namespace Appium_Wizard
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port, iOSExecutable executable = iOSExecutable.go)
+        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             if (isGo)
             {
@@ -1191,19 +1191,19 @@ namespace Appium_Wizard
             }            
             if (processId == 0 | !isProcessRunning)
             {
-                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo grant permission to create the tunnel in the next windows prompt which will allow to run iOS 17+ automation.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel in the next windows prompt which will allow to run iOS 17+ automation OR Click cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
                     try
                     {
-                        pyAsyncProcess = new Process();
-                        pyAsyncProcess.StartInfo.FileName = "cmd.exe";
-                        pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
-                        pyAsyncProcess.StartInfo.UseShellExecute = true;
-                        pyAsyncProcess.StartInfo.CreateNoWindow = false;
-                        pyAsyncProcess.StartInfo.Verb = "runas";
-                        pyAsyncProcess.Start();
-                        processId = pyAsyncProcess.Id;
+                        Process tunnelProcess = new Process();
+                        tunnelProcess.StartInfo.FileName = "cmd.exe";
+                        tunnelProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
+                        tunnelProcess.StartInfo.UseShellExecute = true;
+                        tunnelProcess.StartInfo.CreateNoWindow = false;
+                        tunnelProcess.StartInfo.Verb = "runas";
+                        tunnelProcess.Start();
+                        processId = tunnelProcess.Id;
                         Database.UpdateDataIntoTunnelTable(processId);
                         //if (!PortProcessId.ContainsKey(localPort))
                         //{
@@ -1214,6 +1214,23 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                         MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        ProcessStartInfo psInfo = new ProcessStartInfo
+                        {
+                            FileName = "https://developer.apple.com/forums/thread/730947?answerId=756665022#756665022",
+                            UseShellExecute = true
+                        };
+                        Process.Start(psInfo);
+                        GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
+                    }
+                    catch (Exception exception)
+                    {
+                        GoogleAnalytics.SendExceptionEvent("iOS17_Admin_Cancel", exception.Message);
                     }
                 }
             }

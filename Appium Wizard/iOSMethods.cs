@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -51,7 +52,7 @@ namespace Appium_Wizard
             }
             else
             {
-                string deviceListString = ExecuteCommandPy("pymobiledevice3 usbmux list");
+                string deviceListString = ExecuteCommandPy("usbmux list");
                 List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
                 foreach (dynamic device in devices)
                 {
@@ -71,7 +72,7 @@ namespace Appium_Wizard
             }
             else
             {
-                string output = ExecuteCommandPy("pymobiledevice3 usbmux list");
+                string output = ExecuteCommandPy("usbmux list");
                 List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
 
                 Dictionary<string, object> deviceValues = new Dictionary<string, object>();
@@ -126,7 +127,7 @@ namespace Appium_Wizard
             }
             else
             {
-                var output = ExecuteCommandPy("pymobiledevice3 apps list -t User", udid);
+                var output = ExecuteCommandPy("apps list -t User", udid);
                 JObject data = JObject.Parse(output);
                 var keys = data.Properties().Select(p => p.Name);
 
@@ -159,7 +160,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("pymobiledevice3 amfi developer-mode-status", udid).Contains("true");
+                return ExecuteCommandPy("amfi developer-mode-status", udid).Contains("true");
             }
         }
 
@@ -171,7 +172,7 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("pymobiledevice3 diagnostics restart", udid);
+                ExecuteCommandPy("diagnostics restart", udid);
             }
         }
 
@@ -183,7 +184,7 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("pymobiledevice3 developer core-device uninstall " + bundleId, udid);
+                ExecuteCommandPy("developer core-device uninstall " + bundleId, udid);
             }
         }
 
@@ -195,7 +196,7 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("pymobiledevice3 developer dvt screenshot " + path, udid);
+                ExecuteCommandPy("developer dvt screenshot " + path, udid);
             }
         }
 
@@ -530,7 +531,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("pymobiledevice3 developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid);
+                return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid);
             }
         }
 
@@ -583,7 +584,7 @@ namespace Appium_Wizard
             }
             else
             {
-                output = ExecuteCommandPy("pymobiledevice3 developer core-device list-processes");
+                output = ExecuteCommandPy("developer core-device list-processes");
             }
             if (output.Contains("WebDriverAgentRunner-Runner"))
             {
@@ -600,7 +601,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("pymobiledevice3 mounter auto-mount", udid);
+                return ExecuteCommandPy("mounter auto-mount", udid);
             }
         }
 
@@ -649,7 +650,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("pymobiledevice3 developer dvt launch " + bundleId, udid);
+                return ExecuteCommandPy("developer dvt launch " + bundleId, udid);
             }
         }
         public string KillApp(string udid, string bundleId)
@@ -660,7 +661,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("pymobiledevice3 developer dvt pkill --bundle " + bundleId, udid);
+                return ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
             }
         }
 
@@ -705,14 +706,14 @@ namespace Appium_Wizard
             if (isClickedOK)
             {
                 Process process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.FileName = FilesPath.pymd3FilePath;
                 if (udid == "")
                 {
-                    process.StartInfo.Arguments = "/C " + command;
+                    process.StartInfo.Arguments = command;
                 }
                 else
                 {
-                    process.StartInfo.Arguments = "/C " + command + " --udid " + udid;
+                    process.StartInfo.Arguments = command + " --udid " + udid;
                 }
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardOutput = true;
@@ -883,8 +884,8 @@ namespace Appium_Wizard
                 try
                 {
                     pyAsyncProcess = new Process();
-                    pyAsyncProcess.StartInfo.FileName = "cmd.exe";
-                    pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 usbmux forward " + udid + " " + localPort + " " + iOSPort + "";
+                    pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward " + udid + " " + localPort + " " + iOSPort + "";
                     pyAsyncProcess.StartInfo.RedirectStandardError = true;
                     pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
                     pyAsyncProcess.StartInfo.UseShellExecute = false;
@@ -996,8 +997,8 @@ namespace Appium_Wizard
                 try
                 {
                     pyAsyncProcess = new Process();
-                    pyAsyncProcess.StartInfo.FileName = "cmd.exe";
-                    pyAsyncProcess.StartInfo.Arguments = $"/C pymobiledevice3 apps install \"{path}\" --udid " + udid;
+                    pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                    pyAsyncProcess.StartInfo.Arguments = $"apps install \"{path}\" --udid " + udid;
                     pyAsyncProcess.OutputDataReceived += InstallOutputPy;
                     pyAsyncProcess.ErrorDataReceived += InstallOutputPy;
                     pyAsyncProcess.StartInfo.RedirectStandardError = true;
@@ -1191,13 +1192,8 @@ namespace Appium_Wizard
 
         public bool CreateTunnel()
         {
-            bool clickedOK = false;
-            bool isProcessRunning = false;
-            int processId = Database.QueryDataFromTunnelTable();
-            if (processId != 0)
-            {
-                isProcessRunning = Common.isProcessIdExist(processId);
-            }            
+            bool clickedOK = false; int counter = 1;
+            bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
             if (!isProcessRunning)
             {
                 var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
@@ -1207,16 +1203,20 @@ namespace Appium_Wizard
                     try
                     {
                         Process tunnelProcess = new Process();
-                        tunnelProcess.StartInfo.FileName = "cmd.exe";
-                        tunnelProcess.StartInfo.Arguments = $"/C pymobiledevice3 remote tunneld";
+                        tunnelProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                        tunnelProcess.StartInfo.Arguments = "remote tunneld";
                         tunnelProcess.StartInfo.UseShellExecute = true;
                         tunnelProcess.StartInfo.CreateNoWindow = true;
                         tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
-                        processId = tunnelProcess.Id;
-                        int pyProcessId = Common.GetChildProcessId(processId, "pymobiledevice3.exe");
-                        Database.UpdateDataIntoTunnelTable(pyProcessId);                        
+                        Thread.Sleep(10000);
+                        while (!iOSAPIMethods.isTunnelRunning() && counter <= 10) 
+                        {
+                            Thread.Sleep(5000);
+                            counter++;
+                        }
+                        //processId = tunnelProcess.Id;
                         //if (!PortProcessId.ContainsKey(localPort))
                         //{
                         //    PortProcessId.Add(localPort, processId);
@@ -1445,6 +1445,21 @@ namespace Appium_Wizard
             }
         }
 
-
+        public static bool isTunnelRunning()
+        {
+            var options = new RestClientOptions("http://127.0.0.1:49151")
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/hello", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            if (response.Content != null)
+            {
+                return response.Content.Contains("Hello, I'm alive");
+            }
+            else { return false; }  
+        }
     }
 }

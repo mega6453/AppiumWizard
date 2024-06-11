@@ -78,8 +78,8 @@ namespace Appium_Wizard
         private void LaunchButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
-            commonProgress.UpdateStepLabel("Launch App", "Please wait while launching app : " + selectedPackageName);
             commonProgress.Show();
+            commonProgress.UpdateStepLabel("Launch App", "Please wait while launching app : " + selectedPackageName);
             if (os.Equals("Android"))
             {
                 string activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
@@ -102,8 +102,8 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("Are you sure you want to uninstall " + selectedPackageName + " from " + deviceName + "?", "Uninstall App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
                     AndroidMethods.GetInstance().UnInstallApp(udid, selectedPackageName);
                     GoogleAnalytics.SendEvent("Android_App_Uninstalled");
                 }
@@ -113,8 +113,8 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("Are you sure you want to uninstall " + selectedPackageName + " from " + deviceName + "?", "Uninstall App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
                     iOSMethods.GetInstance().UninstallApp(udid, selectedPackageName);
                     GoogleAnalytics.SendEvent("iOS_App_Uninstalled");
                 }
@@ -135,8 +135,8 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("Are you sure you want to kill " + selectedPackageName + " in " + deviceName + "?", "Kill App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
                     AndroidMethods.GetInstance().KillApp(udid, selectedPackageName);
                     GoogleAnalytics.SendEvent("Android_App_Killed");
                 }
@@ -146,8 +146,8 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("Are you sure you want to kill " + selectedPackageName + " in " + deviceName + "?", "Kill App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
                     iOSMethods.GetInstance().KillApp(udid, selectedPackageName);
                     GoogleAnalytics.SendEvent("iOS_App_Killed");
                 }

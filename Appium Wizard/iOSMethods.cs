@@ -1192,6 +1192,7 @@ namespace Appium_Wizard
 
         public bool CreateTunnel()
         {
+            CommonProgress commonProgress = new CommonProgress();
             bool clickedOK = false; int counter = 1;
             bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
             if (!isProcessRunning)
@@ -1199,6 +1200,8 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
+                    commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\n\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
                     clickedOK = true;
                     try
                     {
@@ -1216,12 +1219,8 @@ namespace Appium_Wizard
                             Thread.Sleep(5000);
                             counter++;
                         }
-                        //processId = tunnelProcess.Id;
-                        //if (!PortProcessId.ContainsKey(localPort))
-                        //{
-                        //    PortProcessId.Add(localPort, processId);
-                        //}
-                        //MainScreen.runningProcessesPortNumbers.Add(localPort);
+                        var processId = tunnelProcess.Id;
+                        MainScreen.runningProcesses.Add(processId);
                     }
                     catch (Exception)
                     {
@@ -1251,6 +1250,7 @@ namespace Appium_Wizard
             {
                 clickedOK = true;
             }
+            commonProgress.Close();
             return clickedOK;
         }
     }

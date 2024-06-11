@@ -700,25 +700,22 @@ namespace Appium_Wizard
         {
             try
             {
-                string hostname = Dns.GetHostName();
-                IPHostEntry host = Dns.GetHostEntry(hostname);
-                IPAddress ipAddress = null;
-                foreach (IPAddress ip in host.AddressList)
+                foreach (NetworkInterface netInterface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+                        netInterface.OperationalStatus == OperationalStatus.Up)
                     {
-                        ipAddress = ip;
-                        break;
+                        IPInterfaceProperties ipProps = netInterface.GetIPProperties();
+                        foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+                        {
+                            if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                return addr.Address.ToString();
+                            }
+                        }
                     }
                 }
-                if (ipAddress != null)
-                {
-                    return ipAddress.ToString();
-                }
-                else
-                {
-                    return "NoValidAddress";
-                }
+                return "NoValidAddress";
             }
             catch (Exception)
             {

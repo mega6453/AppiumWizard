@@ -4,10 +4,12 @@ using OpenQA.Selenium.Remote;
 using RestSharp;
 using System;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -1469,6 +1471,56 @@ namespace Appium_Wizard
                 return response.Content.Contains("Hello, I'm alive");
             }
             else { return false; }  
+        }
+
+        public static void LaunchApp(string URL, string sessionId, string bundleId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
+            var body = $@"{{""bundleId"": ""{bundleId}""}}";
+            request.AddParameter("text/plain", body, ParameterType.RequestBody);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
+
+        public static void KillApp(string URL, string sessionId, string bundleId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
+            var body = $@"{{""bundleId"": ""{bundleId}""}}";
+            request.AddParameter("text/plain", body, ParameterType.RequestBody);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
+
+        public static void TakeScreenshot(string URL, string filePath)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/screenshot", Method.Get);
+            RestResponse response = client.Execute(request);
+            string jsonString = response.Content;
+
+            JsonDocument doc = JsonDocument.Parse(jsonString);
+            string base64String = doc.RootElement.GetProperty("value").GetString();
+
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+            using (MemoryStream ms = new MemoryStream(imageBytes))
+            {
+                Image image = Image.FromStream(ms);
+                image.Save(filePath, ImageFormat.Png);
+            }
         }
     }
 }

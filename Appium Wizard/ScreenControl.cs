@@ -320,7 +320,7 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
+                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY,waitDuration);
                             GoogleAnalytics.SendEvent("Press_Hold_Screen", "iOS");
                         }
                     }

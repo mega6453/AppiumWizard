@@ -88,12 +88,18 @@
                     keyValuePairs = new Dictionary<object, object>();
                     if (!deviceDetails.ContainsKey(udid))
                     {
-                        commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...");
-                        var output = iOSMethods.GetInstance().MountImage(udid);
-                        if (output.Contains("tunnel not created"))
+                        Version deviceVersion = new Version(OSVersion);
+                        Version version17Plus = new Version("17.0.0");
+                        if (deviceVersion < version17Plus)
                         {
-                            commonProgress.Close();
-                            return Task.Delay(100);
+                            commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...");
+                            iOSMethods.GetInstance().MountImage(udid);
+                            //var output = iOSMethods.GetInstance().MountImage(udid);
+                            //if (output.Contains("tunnel not created"))
+                            //{
+                            //    commonProgress.Close();
+                            //    return Task.Delay(100);
+                            //}
                         }
                         commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...");
                         proxyPort = LoadingScreen.WDAproxyPort;

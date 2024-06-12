@@ -885,7 +885,7 @@ namespace Appium_Wizard
                 {
                     pyAsyncProcess = new Process();
                     pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
-                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward " + udid + " " + localPort + " " + iOSPort + "";
+                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward "+ localPort + " " + iOSPort + " --serial " +udid;
                     pyAsyncProcess.StartInfo.RedirectStandardError = true;
                     pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
                     pyAsyncProcess.StartInfo.UseShellExecute = false;
@@ -1197,7 +1197,7 @@ namespace Appium_Wizard
             bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
             if (!isProcessRunning)
             {
-                var result = MessageBox.Show("Starting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
                     commonProgress.Show();
@@ -1295,7 +1295,7 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/window/size", Method.Get);
+            var request = new RestRequest("/window/size", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
             if (response.StatusCode == HttpStatusCode.OK)
@@ -1315,9 +1315,11 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL);
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/wda/tap", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {pressX}, ""y"": {pressY} }} }},{{ ""action"": ""release"" }}]}}";
+            //var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {pressX}, ""y"": {pressY} }} }},{{ ""action"": ""release"" }}]}}";
+            var body = $@"{{ ""x"": {pressX}, ""y"": {pressY} }}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1330,9 +1332,11 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/wda/keys", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            //var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            var body = $@"{{""value"":[""{text}""]}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1345,9 +1349,12 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{pressX},""y"":{pressY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{moveToX},""y"":{moveToY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
+            //var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{pressX},""y"":{pressY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{moveToX},""y"":{moveToY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
+            //var body = $@"{{""actions"":[{{""type"":""pointer"",""id"":""finger1"",""parameters"":{{""pointerType"":""touch""}},""actions"":[{{""type"":""pointerMove"",""duration"":0,""x"":{pressX},""y"":{pressY}}},{{""type"":""pointerMove"",""duration"":{waitDuration},""origin"":""viewport"",""x"":{moveToX},""y"":{moveToY}}}]]}}";
+            var body = $@"{{""actions"":[{{""type"":""pointer"",""id"":""finger1"",""parameters"":{{""pointerType"":""touch""}},""actions"":[{{""type"":""pointerMove"",""duration"":0,""x"":{pressX},""y"":{pressY}}},{{""type"":""pointerMove"",""duration"":{waitDuration},""origin"":""viewport"",""x"":{moveToX},""y"":{moveToY}}}]}}]}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1369,36 +1376,38 @@ namespace Appium_Wizard
 
         public static void OpenControlCenter(string URL, string sessionId, int screenWidth, int screenHeight)
         {
-            var options = new RestClientOptions(URL)
-            {
-                MaxTimeout = -1,
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
+            //var options = new RestClientOptions(URL)
+            //{
+            //    MaxTimeout = -1,
+            //};
+            //var client = new RestClient(options);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //request.AddHeader("Content-Type", "application/json");
             int waitDuration = 500;
             int fromX = screenWidth - 50;
             int fromY = 50;
             int endX = fromX;
             int endY = screenHeight;
-            var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{fromX},""y"":{fromY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{endX},""y"":{endY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
-            request.AddStringBody(body, DataFormat.Json);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            Swipe(URL,sessionId,fromX,fromY,endX,endY,waitDuration);
+            //var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{fromX},""y"":{fromY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{endX},""y"":{endY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
+            //request.AddStringBody(body, DataFormat.Json);
+            //RestResponse response = client.Execute(request);
+            //Console.WriteLine(response.Content);
         }
 
         public static void CloseControlCenter(string URL, string sessionId, int screenWidth)
         {
-            var options = new RestClientOptions(URL);
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
+            //var options = new RestClientOptions(URL);
+            //var client = new RestClient(options);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //request.AddHeader("Content-Type", "application/json");
             int x = screenWidth / 2;
             int y = 50;
-            var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {x}, ""y"": {y} }} }},{{ ""action"": ""release"" }}]}}";
-            request.AddStringBody(body, DataFormat.Json);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            //var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {x}, ""y"": {y} }} }},{{ ""action"": ""release"" }}]}}";
+            //request.AddStringBody(body, DataFormat.Json);
+            //RestResponse response = client.Execute(request);
+            //Console.WriteLine(response.Content);
+            Tap(URL, sessionId, x, y);
         }
 
         public static string GetWDASessionID(string URL)

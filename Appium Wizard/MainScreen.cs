@@ -1470,8 +1470,23 @@ namespace Appium_Wizard
 
         private void capabilityCopyButton_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(selectedDeviceCapability);
-            GoogleAnalytics.SendEvent("Copy_Capability");
+            if (selectedDeviceCapability.Contains("\"appium:webDriverAgentUrl\": \"\""))
+            {
+                MessageBox.Show("\"appium:webDriverAgentUrl\" capability is empty. Please open the device to get the updated capability and then copy again.", "Capability Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                Clipboard.SetText(selectedDeviceCapability);
+                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;                
+                timer1.Start();
+                GoogleAnalytics.SendEvent("Copy_Capability");
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            capabilityCopyButton.BackgroundImage = Properties.Resources.files; // Replace with your image resource
+            timer1.Stop();
         }
     }
 }

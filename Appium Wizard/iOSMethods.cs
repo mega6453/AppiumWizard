@@ -1313,7 +1313,7 @@ namespace Appium_Wizard
             bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
             if (!isProcessRunning)
             {
-                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nClick cancel to read the official apple comment about the change.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
                     commonProgress.Show();

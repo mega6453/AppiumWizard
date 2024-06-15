@@ -97,6 +97,7 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             label4 = new Label();
             CapabilityNoteLabel = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -680,6 +681,11 @@ namespace Appium_Wizard
             CapabilityNoteLabel.Text = "Warning : Open Device -> Select Device again -> Copy.";
             CapabilityNoteLabel.Visible = false;
             // 
+            // timer1
+            // 
+            timer1.Interval = 2000;
+            timer1.Tick += timer1_Tick;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -794,5 +800,6 @@ namespace Appium_Wizard
         private Label label4;
         private Label label5;
         private Label CapabilityNoteLabel;
+        private System.Windows.Forms.Timer timer1;
     }
 }

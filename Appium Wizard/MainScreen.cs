@@ -267,11 +267,22 @@ namespace Appium_Wizard
                     if (selectedOS.Equals("Android"))
                     {
                         automationName = "UiAutomator2";
-                        jsonString = $@"{{
+                        if (string.IsNullOrEmpty(selectedDeviceIP))
+                        {
+                            jsonString = $@"{{
                                                 ""platformName"": ""{selectedOS}"",
                                                 ""appium:automationName"": ""{automationName}"",
                                                 ""appium:udid"": ""{selectedUDID}""
                                             }}";
+                        }
+                        else
+                        {
+                            jsonString = $@"{{
+                                                ""platformName"": ""{selectedOS}"",
+                                                ""appium:automationName"": ""{automationName}"",
+                                                ""appium:udid"": ""{selectedDeviceIP}""
+                                            }}";
+                        }
                     }
                     else
                     {
@@ -296,9 +307,7 @@ namespace Appium_Wizard
                     selectedDeviceCapability = FormatJsonString(jsonString);
                     label2.MaximumSize = new Size(panel1.Width, 0);
                     label2.Visible = true;
-                    label3.Visible = true;
                     label2.Text = selectedDeviceCapability;
-                    label3.Text = selectedDeviceIP;
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
@@ -333,7 +342,6 @@ namespace Appium_Wizard
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
                 label2.Visible = false;
-                label3.Visible = false;
             }
         }
         private string FormatJsonString(string jsonString)
@@ -1130,12 +1138,6 @@ namespace Appium_Wizard
             {
                 contextMenuStrip3.Show(Cursor.Position);
             }
-        }
-
-        private void copyIPAddressToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Clipboard.SetText(label3.Text);
-            GoogleAnalytics.SendEvent("Copy_IPAddress");
         }
 
         private void rebootDeviceToolStripMenuItem_Click(object sender, EventArgs e)

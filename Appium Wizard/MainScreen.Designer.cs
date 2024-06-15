@@ -84,7 +84,6 @@ namespace Appium_Wizard
             label2 = new Label();
             panel1 = new Panel();
             capabilityCopyButton = new Button();
-            label3 = new Label();
             contextMenuStrip3 = new ContextMenuStrip(components);
             copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip4 = new ContextMenuStrip(components);
@@ -545,7 +544,6 @@ namespace Appium_Wizard
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(capabilityCopyButton);
-            panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
             panel1.Location = new Point(30, 403);
             panel1.Name = "panel1";
@@ -565,15 +563,6 @@ namespace Appium_Wizard
             capabilityCopyButton.UseVisualStyleBackColor = false;
             capabilityCopyButton.Click += capabilityCopyButton_Click;
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(3, 102);
-            label3.Name = "label3";
-            label3.Size = new Size(0, 25);
-            label3.TabIndex = 14;
-            label3.MouseUp += label3_MouseUp;
-            // 
             // contextMenuStrip3
             // 
             contextMenuStrip3.ImageScalingSize = new Size(24, 24);
@@ -587,7 +576,6 @@ namespace Appium_Wizard
             copyIPAddressToolStripMenuItem.Name = "copyIPAddressToolStripMenuItem";
             copyIPAddressToolStripMenuItem.Size = new Size(224, 32);
             copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
-            copyIPAddressToolStripMenuItem.Click += copyIPAddressToolStripMenuItem_Click;
             // 
             // contextMenuStrip4
             // 
@@ -786,7 +774,6 @@ namespace Appium_Wizard
         private ColumnHeader columnHeader7;
         private Label label2;
         private Panel panel1;
-        private Label label3;
         private ContextMenuStrip contextMenuStrip3;
         private ToolStripMenuItem copyIPAddressToolStripMenuItem;
         private ContextMenuStrip contextMenuStrip4;

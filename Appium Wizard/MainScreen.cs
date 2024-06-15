@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Appium.Enums;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
@@ -13,14 +15,14 @@ namespace Appium_Wizard
     {
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection;
+        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
         public static List<int> runningProcessesPortNumbers = new List<int>();
         public static List<int> runningProcesses = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
-
+        public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
 
         public MainScreen()
         {
@@ -251,16 +253,58 @@ namespace Appium_Wizard
                         iOSAsyncMethods.isGo = true;
                     }
                 }
-                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi") && selectedDeviceStatus.Equals("Online"))
+                if (selectedDeviceStatus.Equals("Online"))
                 {
+                    panel1.Visible = true;
+                    capabilityLabel.Visible = true;
+                    string automationName = string.Empty;
+                    string jsonString = string.Empty;
+                    string webDriverAgentUrl = string.Empty;
+                    if (udidProxyPort.ContainsKey(selectedUDID))
+                    {
+                        webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
+                    }
+                    if (selectedOS.Equals("Android"))
+                    {
+                        automationName = "UiAutomator2";
+                        jsonString = $@"{{
+                                                ""platformName"": ""{selectedOS}"",
+                                                ""appium:automationName"": ""{automationName}"",
+                                                ""appium:udid"": ""{selectedUDID}""
+                                            }}";
+                    }
+                    else
+                    {
+                        automationName = "XCUITest";
+                        jsonString = $@"{{
+                                                ""platformName"": ""{selectedOS}"",
+                                                ""appium:automationName"": ""{automationName}"",
+                                                ""appium:udid"": ""{selectedUDID}"",
+                                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
+                                            }}";
+
+                        if (string.IsNullOrEmpty(webDriverAgentUrl))
+                        {
+                            CapabilityNoteLabel.Visible = true;
+                        }
+                        else
+                        {
+                            CapabilityNoteLabel.Visible = false;
+                        }
+                    }
+
+                    selectedDeviceCapability = FormatJsonString(jsonString);
                     label2.MaximumSize = new Size(panel1.Width, 0);
                     label2.Visible = true;
                     label3.Visible = true;
-                    label2.Text = "To establish an Appium session for the device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
+                    label2.Text = selectedDeviceCapability;
                     label3.Text = selectedDeviceIP;
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
+                    panel1.Visible = false;
+                    capabilityLabel.Visible = false;
+                    CapabilityNoteLabel.Visible = false;
                     Open.Enabled = false;
                     contextMenuStrip4.Items[0].Enabled = false;
                     contextMenuStrip4.Items[1].Enabled = false;
@@ -282,6 +326,9 @@ namespace Appium_Wizard
             }
             else
             {
+                panel1.Visible = false;
+                capabilityLabel.Visible = false;
+                CapabilityNoteLabel.Visible = false;
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
@@ -289,7 +336,11 @@ namespace Appium_Wizard
                 label3.Visible = false;
             }
         }
-
+        private string FormatJsonString(string jsonString)
+        {
+            dynamic parsedJson = JsonConvert.DeserializeObject(jsonString);
+            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+        }
         private void Open_Click(object sender, EventArgs e)
         {
             if (selectedDeviceStatus.Equals("Online"))
@@ -1413,6 +1464,12 @@ namespace Appium_Wizard
         {
             Updater updater = new Updater();
             updater.ShowDialog();
+        }
+
+        private void capabilityCopyButton_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(selectedDeviceCapability);
+            GoogleAnalytics.SendEvent("Copy_Capability");
         }
     }
 }

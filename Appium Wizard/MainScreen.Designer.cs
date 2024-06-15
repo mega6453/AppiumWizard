@@ -83,6 +83,7 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
             label2 = new Label();
             panel1 = new Panel();
+            capabilityCopyButton = new Button();
             label3 = new Label();
             contextMenuStrip3 = new ContextMenuStrip(components);
             copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
@@ -94,6 +95,9 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
+            capabilityLabel = new Label();
+            label4 = new Label();
+            CapabilityNoteLabel = new Label();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -225,7 +229,7 @@ namespace Appium_Wizard
             // 
             richTextBox1.Location = new Point(0, 0);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(747, 455);
+            richTextBox1.Size = new Size(747, 497);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = "";
             richTextBox1.TextChanged += richTextBox1_TextChanged;
@@ -539,12 +543,27 @@ namespace Appium_Wizard
             // 
             // panel1
             // 
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(capabilityCopyButton);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
-            panel1.Location = new Point(30, 369);
+            panel1.Location = new Point(30, 403);
             panel1.Name = "panel1";
-            panel1.Size = new Size(583, 150);
+            panel1.Size = new Size(583, 235);
             panel1.TabIndex = 13;
+            panel1.Visible = false;
+            // 
+            // capabilityCopyButton
+            // 
+            capabilityCopyButton.BackColor = SystemColors.ControlLightLight;
+            capabilityCopyButton.BackgroundImage = Properties.Resources.files;
+            capabilityCopyButton.BackgroundImageLayout = ImageLayout.Stretch;
+            capabilityCopyButton.Location = new Point(525, -1);
+            capabilityCopyButton.Name = "capabilityCopyButton";
+            capabilityCopyButton.Size = new Size(57, 51);
+            capabilityCopyButton.TabIndex = 18;
+            capabilityCopyButton.UseVisualStyleBackColor = false;
+            capabilityCopyButton.Click += capabilityCopyButton_Click;
             // 
             // label3
             // 
@@ -639,12 +658,49 @@ namespace Appium_Wizard
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
             // 
+            // capabilityLabel
+            // 
+            capabilityLabel.AutoSize = true;
+            capabilityLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            capabilityLabel.Location = new Point(30, 375);
+            capabilityLabel.Name = "capabilityLabel";
+            capabilityLabel.Size = new Size(97, 25);
+            capabilityLabel.TabIndex = 17;
+            capabilityLabel.Text = "Capability";
+            capabilityLabel.Visible = false;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.BackColor = SystemColors.ControlLightLight;
+            label4.ForeColor = Color.IndianRed;
+            label4.Location = new Point(30, 309);
+            label4.Name = "label4";
+            label4.Size = new Size(556, 25);
+            label4.TabIndex = 18;
+            label4.Text = "Note : It's mandatory to open the device before starting automation.";
+            // 
+            // CapabilityNoteLabel
+            // 
+            CapabilityNoteLabel.AutoSize = true;
+            CapabilityNoteLabel.BackColor = SystemColors.ControlLightLight;
+            CapabilityNoteLabel.ForeColor = Color.Red;
+            CapabilityNoteLabel.Location = new Point(30, 644);
+            CapabilityNoteLabel.Name = "CapabilityNoteLabel";
+            CapabilityNoteLabel.Size = new Size(448, 25);
+            CapabilityNoteLabel.TabIndex = 19;
+            CapabilityNoteLabel.Text = "Warning : Open Device -> Select Device again -> Copy.";
+            CapabilityNoteLabel.Visible = false;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1407, 631);
+            ClientSize = new Size(1407, 678);
+            Controls.Add(CapabilityNoteLabel);
+            Controls.Add(label4);
+            Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(checkBox1);
             Controls.Add(label1);
@@ -746,5 +802,10 @@ namespace Appium_Wizard
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
         private ToolStripMenuItem updaterToolStripMenuItem;
+        private Label capabilityLabel;
+        private Button capabilityCopyButton;
+        private Label label4;
+        private Label label5;
+        private Label CapabilityNoteLabel;
     }
 }

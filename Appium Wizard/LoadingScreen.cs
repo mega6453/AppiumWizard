@@ -5,7 +5,7 @@ namespace Appium_Wizard
     public partial class LoadingScreen : Form
     {
         AppiumServerSetup serverSetup = new AppiumServerSetup();
-        public static int WDAproxyPort, UiAutomatorPort;
+        public static int UiAutomatorPort;
         public int appiumPort = 4723;
         public LoadingScreen()
         {
@@ -121,15 +121,13 @@ namespace Appium_Wizard
 
         private Task ExecuteBackgroundMethod()
         {
-            WDAproxyPort = Common.GetFreePort();
             UiAutomatorPort = Common.GetFreePort(8200, 8220);
             //AndroidMethods.GetInstance().StartAndroidProxyServer(UiAutomatorPort, 6790);
             int screenport = Common.GetFreePort();
             Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, WDAproxyPort, 1, screenport);
+                serverSetup.StartAppiumServer(appiumPort, 1);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
-                MainScreen.runningProcessesPortNumbers.Add(WDAproxyPort);
                 DialogResult result = DialogResult.None;
                 if (Common.IsNodeInstalled())
                 {

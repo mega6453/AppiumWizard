@@ -17,7 +17,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public void StartAppiumServer(int appiumPort, int webDriverAgentProxyPort, int serverNumber, int screenport)
+        public void StartAppiumServer(int appiumPort, int serverNumber)
         {
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
@@ -38,8 +38,8 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors",
 
                     //working
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",
@@ -139,7 +139,10 @@ namespace Appium_Wizard
                         if (colonIndex != -1)
                         {
                             deviceUDID = data.Substring(data.LastIndexOf(' ', colonIndex) + 1, colonIndex - data.LastIndexOf(' ', colonIndex) - 1);
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                            if (!MainScreen.udidProxyPort.ContainsKey(deviceUDID))
+                            {
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                            }
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
                             string text = "Set Device " + name;
                             UpdateScreenControl(deviceUDID, text);
@@ -167,6 +170,7 @@ namespace Appium_Wizard
                             sessionIdUDID.Add(sessionId, deviceUDID);
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
                             string text = "Session Created for " + name;
+                            MainScreen.udidProxyPort.Add(deviceUDID, proxyPort);
                             UpdateScreenControl(deviceUDID, text);
                         }
                     }

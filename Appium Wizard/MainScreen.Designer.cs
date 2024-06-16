@@ -47,7 +47,6 @@ namespace Appium_Wizard
             androidWiFiToolStripMenuItem = new ToolStripMenuItem();
             AddDevice = new Button();
             DeleteDevice = new Button();
-            richTextBox1 = new RichTextBox();
             checkBox1 = new CheckBox();
             MoreButton = new Button();
             menuStrip1 = new MenuStrip();
@@ -71,14 +70,7 @@ namespace Appium_Wizard
             aboutToolStripMenuItem = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
-            tabPage2 = new TabPage();
-            richTextBox2 = new RichTextBox();
-            tabPage3 = new TabPage();
-            richTextBox3 = new RichTextBox();
-            tabPage4 = new TabPage();
-            richTextBox4 = new RichTextBox();
-            tabPage5 = new TabPage();
-            richTextBox5 = new RichTextBox();
+            richTextBox1 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
             label2 = new Label();
@@ -102,10 +94,6 @@ namespace Appium_Wizard
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
-            tabPage2.SuspendLayout();
-            tabPage3.SuspendLayout();
-            tabPage4.SuspendLayout();
-            tabPage5.SuspendLayout();
             contextMenuStrip2.SuspendLayout();
             panel1.SuspendLayout();
             contextMenuStrip3.SuspendLayout();
@@ -225,22 +213,13 @@ namespace Appium_Wizard
             DeleteDevice.UseVisualStyleBackColor = true;
             DeleteDevice.Click += DeleteDevice_Click;
             // 
-            // richTextBox1
-            // 
-            richTextBox1.Location = new Point(0, 0);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(747, 497);
-            richTextBox1.TabIndex = 6;
-            richTextBox1.Text = "";
-            richTextBox1.TextChanged += richTextBox1_TextChanged;
-            // 
             // checkBox1
             // 
             checkBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox1.AutoSize = true;
             checkBox1.Checked = true;
             checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(1270, 75);
+            checkBox1.Location = new Point(1271, 75);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(125, 29);
             checkBox1.TabIndex = 7;
@@ -267,7 +246,7 @@ namespace Appium_Wizard
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1407, 33);
+            menuStrip1.Size = new Size(1408, 33);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -415,10 +394,6 @@ namespace Appium_Wizard
             // tabControl1
             // 
             tabControl1.Controls.Add(tabPage1);
-            tabControl1.Controls.Add(tabPage2);
-            tabControl1.Controls.Add(tabPage3);
-            tabControl1.Controls.Add(tabPage4);
-            tabControl1.Controls.Add(tabPage5);
             tabControl1.Location = new Point(640, 73);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -436,85 +411,14 @@ namespace Appium_Wizard
             tabPage1.Text = "#1";
             tabPage1.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // richTextBox1
             // 
-            tabPage2.Controls.Add(richTextBox2);
-            tabPage2.Location = new Point(4, 34);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(747, 455);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "#2";
-            tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox2
-            // 
-            richTextBox2.Location = new Point(0, 0);
-            richTextBox2.Name = "richTextBox2";
-            richTextBox2.Size = new Size(747, 459);
-            richTextBox2.TabIndex = 0;
-            richTextBox2.Text = "";
-            richTextBox2.TextChanged += richTextBox2_TextChanged;
-            // 
-            // tabPage3
-            // 
-            tabPage3.Controls.Add(richTextBox3);
-            tabPage3.Location = new Point(4, 34);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(747, 455);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "#3";
-            tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox3
-            // 
-            richTextBox3.Location = new Point(0, 0);
-            richTextBox3.Name = "richTextBox3";
-            richTextBox3.Size = new Size(747, 455);
-            richTextBox3.TabIndex = 0;
-            richTextBox3.Text = "";
-            richTextBox3.TextChanged += richTextBox3_TextChanged;
-            // 
-            // tabPage4
-            // 
-            tabPage4.Controls.Add(richTextBox4);
-            tabPage4.Location = new Point(4, 34);
-            tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(3);
-            tabPage4.Size = new Size(747, 455);
-            tabPage4.TabIndex = 3;
-            tabPage4.Text = "#4";
-            tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox4
-            // 
-            richTextBox4.Location = new Point(0, 0);
-            richTextBox4.Name = "richTextBox4";
-            richTextBox4.Size = new Size(747, 455);
-            richTextBox4.TabIndex = 0;
-            richTextBox4.Text = "";
-            richTextBox4.TextChanged += richTextBox4_TextChanged;
-            // 
-            // tabPage5
-            // 
-            tabPage5.Controls.Add(richTextBox5);
-            tabPage5.Location = new Point(4, 34);
-            tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(3);
-            tabPage5.Size = new Size(747, 455);
-            tabPage5.TabIndex = 4;
-            tabPage5.Text = "#5";
-            tabPage5.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox5
-            // 
-            richTextBox5.Location = new Point(0, 0);
-            richTextBox5.Name = "richTextBox5";
-            richTextBox5.Size = new Size(747, 459);
-            richTextBox5.TabIndex = 0;
-            richTextBox5.Text = "";
-            richTextBox5.TextChanged += richTextBox5_TextChanged;
+            richTextBox1.Location = new Point(0, 0);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(747, 497);
+            richTextBox1.TabIndex = 6;
+            richTextBox1.Text = "\t\t\t\t------------------------------Starting Appium Server------------------------------";
+            richTextBox1.TextChanged += RichTextBox_TextChanged;
             // 
             // contextMenuStrip2
             // 
@@ -676,9 +580,9 @@ namespace Appium_Wizard
             CapabilityNoteLabel.ForeColor = Color.Red;
             CapabilityNoteLabel.Location = new Point(30, 644);
             CapabilityNoteLabel.Name = "CapabilityNoteLabel";
-            CapabilityNoteLabel.Size = new Size(448, 25);
+            CapabilityNoteLabel.Size = new Size(571, 25);
             CapabilityNoteLabel.TabIndex = 19;
-            CapabilityNoteLabel.Text = "Warning : Open Device -> Select Device again -> Copy.";
+            CapabilityNoteLabel.Text = "Warning : Capability missing. Open the device to update the capability.";
             CapabilityNoteLabel.Visible = false;
             // 
             // timer1
@@ -691,7 +595,7 @@ namespace Appium_Wizard
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1407, 678);
+            ClientSize = new Size(1408, 678);
             Controls.Add(CapabilityNoteLabel);
             Controls.Add(label4);
             Controls.Add(capabilityLabel);
@@ -719,10 +623,6 @@ namespace Appium_Wizard
             menuStrip1.PerformLayout();
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
-            tabPage2.ResumeLayout(false);
-            tabPage3.ResumeLayout(false);
-            tabPage4.ResumeLayout(false);
-            tabPage5.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
@@ -746,7 +646,6 @@ namespace Appium_Wizard
         private Button DeleteDevice;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader5;
-        private RichTextBox richTextBox1;
         private CheckBox checkBox1;
         private Button MoreButton;
         private MenuStrip menuStrip1;
@@ -755,15 +654,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private TabControl tabControl1;
-        private TabPage tabPage1;
-        private TabPage tabPage2;
-        private TabPage tabPage3;
-        private TabPage tabPage4;
-        private TabPage tabPage5;
-        private RichTextBox richTextBox2;
-        private RichTextBox richTextBox3;
-        private RichTextBox richTextBox4;
-        private RichTextBox richTextBox5;
         private ToolStripMenuItem appiumDocsToolStripMenuItem;
         private ToolStripMenuItem capabilitiesToolStripMenuItem;
         private ToolStripMenuItem xCUITestToolStripMenuItem;
@@ -801,5 +691,7 @@ namespace Appium_Wizard
         private Label label5;
         private Label CapabilityNoteLabel;
         private System.Windows.Forms.Timer timer1;
+        private TabPage tabPage1;
+        private RichTextBox richTextBox1;
     }
 }

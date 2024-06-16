@@ -210,7 +210,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "ScreenControl";
-            StartPosition = FormStartPosition.WindowsDefaultBounds;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "ScreenControl";
             FormClosing += ScreenControl_FormClosing;
             FormClosed += ScreenControl_FormClosed;

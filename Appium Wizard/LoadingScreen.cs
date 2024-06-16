@@ -126,7 +126,7 @@ namespace Appium_Wizard
             int screenport = Common.GetFreePort();
             Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, 1);
+                serverSetup.StartAppiumServer(appiumPort);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 DialogResult result = DialogResult.None;
                 if (Common.IsNodeInstalled())

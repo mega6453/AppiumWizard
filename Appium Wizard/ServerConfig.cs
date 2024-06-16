@@ -5,8 +5,10 @@ namespace Appium_Wizard
     public partial class ServerConfig : Form
     {
         AppiumServerSetup serverSetup;
-        public ServerConfig()
+        MainScreen mainScreen;
+        public ServerConfig(MainScreen mainScreen)
         {
+            this.mainScreen = mainScreen;
             InitializeComponent();
             serverSetup = new AppiumServerSetup();
         }
@@ -97,9 +99,15 @@ namespace Appium_Wizard
                     bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox1.Text));
                     if (isRunning)
                     {
-                        Invoke(new Action(() => StatusLabel1.Text = "Running"));
-                        GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
-                        break;
+                        try
+                        {
+                            Invoke(new Action(() => StatusLabel1.Text = "Running"));
+                            GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                     Thread.Sleep(2000);
                 }
@@ -125,7 +133,7 @@ namespace Appium_Wizard
             {
                 int wdaLocalPort = Common.GetFreePort();
                 int screenport = Common.GetFreePort();
-                serverSetup.StartAppiumServer(portNumber, serverNumber);
+                serverSetup.StartAppiumServer(portNumber);
                 int count = 1;
                 while (!serverSetup.serverStarted)
                 {
@@ -158,7 +166,8 @@ namespace Appium_Wizard
                     statusLabel.Text = "Running";
                     Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
                     MainScreen.runningProcessesPortNumbers.Add(portNumber);
-                    GoogleAnalytics.SendEvent("ServerStarted");
+                    mainScreen.AddTab(portNumber.ToString());
+                    GoogleAnalytics.SendEvent("ServerStarted");                    
                 }
             }
             commonProgress.Close();
@@ -333,6 +342,7 @@ namespace Appium_Wizard
             else
             {
                 statusLabel.Text = "Not Running";
+                mainScreen.RemoveTab(port.ToString());
             }
         }
 

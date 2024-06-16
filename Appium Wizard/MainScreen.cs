@@ -1,13 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Appium.Enums;
-using RestSharp;
-using System.Diagnostics;
-using System.Net;
+﻿using System.Diagnostics;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Windows.Forms;
-using File = System.IO.File;
+using Newtonsoft.Json;
 
 namespace Appium_Wizard
 {
@@ -80,18 +73,14 @@ namespace Appium_Wizard
             var expectedSize = new Size(screenSize.Width * 66 / 100, screenSize.Height * 88 / 100);
             tabControl1.Size = expectedSize;
             richTextBox1.Size = expectedSize;
-            richTextBox2.Size = expectedSize;
-            richTextBox3.Size = expectedSize;
-            richTextBox4.Size = expectedSize;
-            richTextBox5.Size = expectedSize;
+            var portTable = Database.QueryDataFromPortNumberTable();
+            tabRichTextBoxes.Add(int.Parse(portTable["PortNumber1"]), richTextBox1);
+            tabControl1.TabPages[0].Text = portTable["PortNumber1"];
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
-        DateTime lastWriteTime1 = new DateTime();
-        DateTime lastWriteTime2 = new DateTime();
-        DateTime lastWriteTime3 = new DateTime();
-        DateTime lastWriteTime4 = new DateTime();
-        DateTime lastWriteTime5 = new DateTime();
+        private static readonly object _lock = new object();
+        private static Dictionary<int, DateTime> lastWriteTimes = new Dictionary<int, DateTime>();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
             Task.Run(() =>
@@ -100,49 +89,31 @@ namespace Appium_Wizard
                 {
                     try
                     {
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
+                        lock (_lock)
                         {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[1].Item2);
-                            if (currentWriteTime != lastWriteTime1)
+                            foreach (var kvp in AppiumServerSetup.portServerNumberAndFilePath)
                             {
-                                lastWriteTime1 = currentWriteTime;
-                                UpdateRichTextbox(1);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[2].Item2);
-                            if (currentWriteTime != lastWriteTime2)
-                            {
-                                lastWriteTime2 = currentWriteTime;
-                                UpdateRichTextbox(2);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[3].Item2);
-                            if (currentWriteTime != lastWriteTime3)
-                            {
-                                lastWriteTime3 = currentWriteTime;
-                                UpdateRichTextbox(3);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[4].Item2);
-                            if (currentWriteTime != lastWriteTime4)
-                            {
-                                lastWriteTime4 = currentWriteTime;
-                                UpdateRichTextbox(4);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[5].Item2);
-                            if (currentWriteTime != lastWriteTime5)
-                            {
-                                lastWriteTime5 = currentWriteTime;
-                                UpdateRichTextbox(5);
+                                int portNumber = kvp.Key;
+                                string filePath = kvp.Value.Item2;
+                                string directory = Path.GetDirectoryName(filePath);
+                                string filename = Path.GetFileName(filePath);
+                                FileSystemWatcher watcher = new FileSystemWatcher(directory, filename);
+                                watcher.NotifyFilter = NotifyFilters.LastWrite;
+                                watcher.Changed += (sender, e) =>
+                                {
+                                    try
+                                    {
+                                        lock (_lock)
+                                        {
+                                            UpdateRichTextboxSafe(portNumber);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex);
+                                    }
+                                };
+                                watcher.EnableRaisingEvents = true;
                             }
                         }
                     }
@@ -156,34 +127,102 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void UpdateRichTextbox(int tabNumber)
+        public static Dictionary<int, RichTextBox> tabRichTextBoxes = new Dictionary<int, RichTextBox>();
+        private void UpdateRichTextbox(int appiumPort)
         {
-            using (var fileStream = new FileStream(AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var streamReader = new StreamReader(fileStream))
+            if (tabRichTextBoxes.TryGetValue(appiumPort, out RichTextBox richTextBox))
             {
-                var fileContent = streamReader.ReadToEnd();
-                if (tabNumber == 1)
+                string filePath = AppiumServerSetup.portServerNumberAndFilePath[appiumPort].Item2;
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var streamReader = new StreamReader(fileStream))
                 {
-                    Invoke(new Action(() => richTextBox1.Text = fileContent));
-                }
-                else if (tabNumber == 2)
-                {
-                    Invoke(new Action(() => richTextBox2.Text = fileContent));
-                }
-                else if (tabNumber == 3)
-                {
-                    Invoke(new Action(() => richTextBox3.Text = fileContent));
-                }
-                else if (tabNumber == 4)
-                {
-                    Invoke(new Action(() => richTextBox4.Text = fileContent));
-                }
-                else if (tabNumber == 5)
-                {
-                    Invoke(new Action(() => richTextBox5.Text = fileContent));
+                    string fileContent = streamReader.ReadToEnd();
+                    Invoke(new Action(() => richTextBox.Text = fileContent));
                 }
             }
         }
+
+        private void UpdateRichTextboxSafe(int key)
+        {
+            lock (_lock)
+            {
+                var richTextBox = tabRichTextBoxes[key];
+                main.UpdateRichTextbox(key);
+            }
+        }
+
+        public void AddTab(string tabTitle)
+        {
+            if (GetTabIndexByTitle(tabTitle) == 0)
+            {
+                if (!tabRichTextBoxes.ContainsKey(int.Parse(tabTitle)))
+                {
+                    tabRichTextBoxes.Add(int.Parse(tabTitle), richTextBox1);
+                }
+                UpdateRichTextbox(int.Parse(tabTitle));
+            }
+            else
+            {
+                TabPage newTab = new TabPage(tabTitle);
+                RichTextBox richTextBox = new RichTextBox();
+                richTextBox.Dock = DockStyle.Fill;
+                newTab.Controls.Add(richTextBox);
+                richTextBox.TextChanged += RichTextBox_TextChanged;
+                tabControl1.TabPages.Add(newTab);
+                tabControl1.SelectedTab = newTab;
+                if (!tabRichTextBoxes.ContainsKey(int.Parse(tabTitle)))
+                {
+                    tabRichTextBoxes.Add(int.Parse(tabTitle), richTextBox);
+                }
+                UpdateRichTextbox(int.Parse(tabTitle));
+            }
+        }
+
+        public void RemoveTab(string tabTitle)
+        {
+            if (tabControl1.TabPages.Count > 1)
+            {
+                foreach (TabPage tabPage in tabControl1.TabPages)
+                {
+                    if (tabPage.Text == tabTitle)
+                    {
+                        tabControl1.TabPages.Remove(tabPage);
+                        tabRichTextBoxes.Remove(int.Parse(tabTitle));
+                        break;
+                    }
+                }
+            }
+        }
+        private int GetTabIndexByTitle(string title)
+        {
+            for (int i = 0; i < tabControl1.TabPages.Count; i++)
+            {
+                if (tabControl1.TabPages[i].Text == title)
+                {
+                    return i;
+                }
+            }
+            return -1; // Return -1 if the title is not found
+        }
+
+        private async void RichTextBox_TextChanged(object sender, EventArgs e)
+        {
+            RichTextBox richTextBox = sender as RichTextBox;
+            if (richTextBox != null)
+            {
+                if (checkBox1.Checked)
+                {
+                    richTextBox.SelectionStart = richTextBox.Text.Length;
+                    richTextBox.ScrollToCaret();
+                }
+                else
+                {
+                    richTextBox.ScrollBars = RichTextBoxScrollBars.Both;
+                    richTextBox.SelectionStart = richTextBox.Text.Length;
+                }
+            }
+        }
+
 
 
         public void UpdateDeviceStatus()
@@ -222,12 +261,12 @@ namespace Appium_Wizard
             });
         }
 
-
+        ListViewItem selectedItem;
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                ListViewItem selectedItem = listView1.SelectedItems[0];
+                selectedItem = listView1.SelectedItems[0];
                 selectedDeviceName = selectedItem.SubItems[0].Text;
                 selectedDeviceVersion = selectedItem.SubItems[1].Text;
                 selectedOS = selectedItem.SubItems[2].Text;
@@ -255,59 +294,15 @@ namespace Appium_Wizard
                 }
                 if (selectedDeviceStatus.Equals("Online"))
                 {
-                    panel1.Visible = true;
-                    capabilityLabel.Visible = true;
-                    string automationName = string.Empty;
-                    string jsonString = string.Empty;
-                    string webDriverAgentUrl = string.Empty;
-                    if (udidProxyPort.ContainsKey(selectedUDID))
-                    {
-                        webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
-                    }
-                    if (selectedOS.Equals("Android"))
-                    {
-                        automationName = "UiAutomator2";
-                        if (string.IsNullOrEmpty(selectedDeviceIP))
-                        {
-                            jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedUDID}""
-                                            }}";
-                        }
-                        else
-                        {
-                            jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedDeviceIP}""
-                                            }}";
-                        }
-                    }
-                    else
-                    {
-                        automationName = "XCUITest";
-                        jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedUDID}"",
-                                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
-                                            }}";
-
-                        if (string.IsNullOrEmpty(webDriverAgentUrl))
-                        {
-                            CapabilityNoteLabel.Visible = true;
-                        }
-                        else
-                        {
-                            CapabilityNoteLabel.Visible = false;
-                        }
-                    }
-
-                    selectedDeviceCapability = FormatJsonString(jsonString);
-                    label2.MaximumSize = new Size(panel1.Width, 0);
-                    label2.Visible = true;
-                    label2.Text = selectedDeviceCapability;
+                    ShowCapability();
+                }
+                if (selectedDeviceConnection.Equals("Wi-Fi"))
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
+                }
+                else
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.";
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
@@ -344,6 +339,65 @@ namespace Appium_Wizard
                 label2.Visible = false;
             }
         }
+
+        private void ShowCapability()
+        {
+            panel1.Visible = true;
+            capabilityLabel.Visible = true;
+            string automationName = string.Empty;
+            string jsonString = string.Empty;
+            string webDriverAgentUrl = string.Empty;
+            if (udidProxyPort.ContainsKey(selectedUDID))
+            {
+                webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
+            }
+            if (selectedOS.Equals("Android"))
+            {
+                automationName = "UiAutomator2";
+                if (string.IsNullOrEmpty(selectedDeviceIP))
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedUDID}""
+                                }}";
+                }
+                else
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedDeviceIP}""
+                                }}";
+                }
+            }
+            else
+            {
+                automationName = "XCUITest";
+                jsonString = $@"{{
+                                ""platformName"": ""{selectedOS}"",
+                                ""appium:automationName"": ""{automationName}"",
+                                ""appium:udid"": ""{selectedUDID}"",
+                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
+                              }}";
+
+                if (string.IsNullOrEmpty(webDriverAgentUrl))
+                {
+                    CapabilityNoteLabel.Visible = true;
+                }
+                else
+                {
+                    CapabilityNoteLabel.Visible = false;
+                }
+            }
+
+            selectedDeviceCapability = FormatJsonString(jsonString);
+            label2.MaximumSize = new Size(panel1.Width, 0);
+            label2.Visible = true;
+            label2.Text = selectedDeviceCapability;
+
+        }
+
         private string FormatJsonString(string jsonString)
         {
             dynamic parsedJson = JsonConvert.DeserializeObject(jsonString);
@@ -362,7 +416,11 @@ namespace Appium_Wizard
                     }
                 }
                 OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                openDevice.StartBackgroundTasks();
+                var isStarted = openDevice.StartBackgroundTasks();
+                if (isStarted)
+                {
+                    ShowCapability();
+                }
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
@@ -877,7 +935,7 @@ namespace Appium_Wizard
         {
             if (Common.IsNodeInstalled())
             {
-                ServerConfig serverSetup = new ServerConfig();
+                ServerConfig serverSetup = new ServerConfig(main);
                 serverSetup.ShowDialog();
             }
             else
@@ -1014,78 +1072,77 @@ namespace Appium_Wizard
             iOSProfileManagement.ShowDialog();
         }
 
+        //private void richTextBox1_TextChanged(object sender, EventArgs e)
+        //{
+        //    if (checkBox1.Checked)
+        //    {
+        //        richTextBox1.SelectionStart = richTextBox1.Text.Length;
+        //        richTextBox1.ScrollToCaret();
+        //    }
+        //    else
+        //    {
+        //        richTextBox1.ScrollBars = RichTextBoxScrollBars.Both;
+        //        richTextBox1.SelectionStart = richTextBox1.Text.Length;
+        //    }
+        //}
 
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                richTextBox1.SelectionStart = richTextBox1.Text.Length;
-                richTextBox1.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox1.ScrollBars = RichTextBoxScrollBars.Both;
-                richTextBox1.SelectionStart = richTextBox1.Text.Length;
-            }
-        }
+        //private void richTextBox2_TextChanged(object sender, EventArgs e)
+        //{
+        //    if (checkBox1.Checked)
+        //    {
+        //        richTextBox2.SelectionStart = richTextBox2.Text.Length;
+        //        richTextBox2.ScrollToCaret();
+        //    }
+        //    else
+        //    {
+        //        richTextBox2.ScrollBars = RichTextBoxScrollBars.Both;
+        //        richTextBox2.SelectionStart = richTextBox2.Text.Length;
+        //    }
+        //}
 
-        private void richTextBox2_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                richTextBox2.SelectionStart = richTextBox2.Text.Length;
-                richTextBox2.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox2.ScrollBars = RichTextBoxScrollBars.Both;
-                richTextBox2.SelectionStart = richTextBox2.Text.Length;
-            }
-        }
-
-        private void richTextBox3_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                richTextBox3.SelectionStart = richTextBox3.Text.Length;
-                richTextBox3.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox3.ScrollBars = RichTextBoxScrollBars.Both;
-                richTextBox3.SelectionStart = richTextBox3.Text.Length;
-            }
-        }
-
-
-        private void richTextBox4_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                richTextBox4.SelectionStart = richTextBox4.Text.Length;
-                richTextBox4.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox4.ScrollBars = RichTextBoxScrollBars.Both;
-                richTextBox4.SelectionStart = richTextBox4.Text.Length;
-            }
-        }
+        //private void richTextBox3_TextChanged(object sender, EventArgs e)
+        //{
+        //    if (checkBox1.Checked)
+        //    {
+        //        richTextBox3.SelectionStart = richTextBox3.Text.Length;
+        //        richTextBox3.ScrollToCaret();
+        //    }
+        //    else
+        //    {
+        //        richTextBox3.ScrollBars = RichTextBoxScrollBars.Both;
+        //        richTextBox3.SelectionStart = richTextBox3.Text.Length;
+        //    }
+        //}
 
 
-        private void richTextBox5_TextChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-            {
-                richTextBox5.SelectionStart = richTextBox5.Text.Length;
-                richTextBox5.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox5.ScrollBars = RichTextBoxScrollBars.Both;
-                richTextBox5.SelectionStart = richTextBox5.Text.Length;
-            }
-        }
+        //private void richTextBox4_TextChanged(object sender, EventArgs e)
+        //{
+        //    if (checkBox1.Checked)
+        //    {
+        //        richTextBox4.SelectionStart = richTextBox4.Text.Length;
+        //        richTextBox4.ScrollToCaret();
+        //    }
+        //    else
+        //    {
+        //        richTextBox4.ScrollBars = RichTextBoxScrollBars.Both;
+        //        richTextBox4.SelectionStart = richTextBox4.Text.Length;
+        //    }
+        //}
+
+
+        //private void richTextBox5_TextChanged(object sender, EventArgs e)
+        //{
+        //    if (checkBox1.Checked)
+        //    {
+        //        richTextBox5.SelectionStart = richTextBox5.Text.Length;
+        //        richTextBox5.ScrollToCaret();
+        //    }
+        //    else
+        //    {
+        //        richTextBox5.ScrollBars = RichTextBoxScrollBars.Both;
+        //        richTextBox5.SelectionStart = richTextBox5.Text.Length;
+        //    }
+        //}
 
         private void listView1_MouseUp(object sender, MouseEventArgs e)
         {
@@ -1477,7 +1534,7 @@ namespace Appium_Wizard
             else
             {
                 Clipboard.SetText(selectedDeviceCapability);
-                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;                
+                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
                 timer1.Start();
                 GoogleAnalytics.SendEvent("Copy_Capability");
             }

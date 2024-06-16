@@ -17,7 +17,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public void StartAppiumServer(int appiumPort, int serverNumber)
+        public void StartAppiumServer(int appiumPort)
         {
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
@@ -56,8 +56,8 @@ namespace Appium_Wizard
                 appiumServerProcess.StartInfo = startInfo;
                 //appiumServerProcess.OutputDataReceived += AppiumServer_OutputDataReceived;
                 //appiumServerProcess.ErrorDataReceived += AppiumServer_OutputDataReceived;
-                appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
-                appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
+                appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, appiumPort);
+                appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, appiumPort);
 
                 appiumServerProcess.EnableRaisingEvents = true;
 
@@ -73,13 +73,13 @@ namespace Appium_Wizard
                     listOfProcess.Add(appiumPort, Tuple.Create(appiumServerProcess, logFilePath));
                 }
 
-                if (portServerNumberAndFilePath.ContainsKey(serverNumber))
+                if (portServerNumberAndFilePath.ContainsKey(appiumPort))
                 {
-                    portServerNumberAndFilePath[serverNumber] = Tuple.Create(appiumPort, logFilePath);
+                    portServerNumberAndFilePath[appiumPort] = Tuple.Create(appiumPort, logFilePath);
                 }
                 else
                 {
-                    portServerNumberAndFilePath.Add(serverNumber, Tuple.Create(appiumPort, logFilePath));
+                    portServerNumberAndFilePath.Add(appiumPort, Tuple.Create(appiumPort, logFilePath));
                 }
             }
             catch (Exception ex)
@@ -94,12 +94,12 @@ namespace Appium_Wizard
         int proxyPort = 0; int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
-        private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
+        private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int appiumPort)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 string data = Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", "");
-                using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                using (var fileStream = new FileStream(portServerNumberAndFilePath[appiumPort].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 using (var streamWriter = new StreamWriter(fileStream))
                 {
                     streamWriter.WriteLine(data);

@@ -41,36 +41,35 @@
             return (0, 0);
         }
 
-        public async void StartBackgroundTasks()
+        public bool StartBackgroundTasks()
         {
-            await Task.Delay(100);
             commonProgress.Show();
             commonProgress.UpdateStepLabel(title, "Initializing...");
             if (OSType.Equals("Android"))
             {
-                await ExecuteAndroid();
+                ExecuteAndroid();
             }
             else
             {
-                await ExecuteiOSBackgroundMethod();
+                ExecuteiOSBackgroundMethod();
             }
             if (isScreenServerStarted)
             {
                 commonProgress.UpdateStepLabel(title, "Screen server started...");
                 commonProgress.Close();
-                await ExecuteBackgroundMethod2();
+                ExecuteBackgroundMethod2();
             }
             else
             {
                 commonProgress.Close();
                 // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            return isScreenServerStarted;
         }
+
 
         public static Dictionary<string, Dictionary<object, object>> deviceDetails = new Dictionary<string, Dictionary<object, object>>();
         Dictionary<object, object> keyValuePairs;
-
-
         private Task ExecuteiOSBackgroundMethod()
         {
             var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();

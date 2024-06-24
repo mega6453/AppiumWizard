@@ -81,9 +81,9 @@ namespace Appium_Wizard
             richTextBox5 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
-            label2 = new Label();
             panel1 = new Panel();
             capabilityCopyButton = new Button();
+            richTextBox6 = new RichTextBox();
             contextMenuStrip3 = new ContextMenuStrip(components);
             copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip4 = new ContextMenuStrip(components);
@@ -531,21 +531,11 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
-            // label2
-            // 
-            label2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label2.AutoSize = true;
-            label2.ForeColor = Color.IndianRed;
-            label2.Location = new Point(3, 12);
-            label2.Name = "label2";
-            label2.Size = new Size(0, 25);
-            label2.TabIndex = 12;
-            // 
             // panel1
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(capabilityCopyButton);
-            panel1.Controls.Add(label2);
+            panel1.Controls.Add(richTextBox6);
             panel1.Location = new Point(30, 403);
             panel1.Name = "panel1";
             panel1.Size = new Size(583, 235);
@@ -563,6 +553,15 @@ namespace Appium_Wizard
             capabilityCopyButton.TabIndex = 18;
             capabilityCopyButton.UseVisualStyleBackColor = false;
             capabilityCopyButton.Click += capabilityCopyButton_Click;
+            // 
+            // richTextBox6
+            // 
+            richTextBox6.Location = new Point(-1, -1);
+            richTextBox6.Name = "richTextBox6";
+            richTextBox6.ReadOnly = true;
+            richTextBox6.Size = new Size(583, 235);
+            richTextBox6.TabIndex = 20;
+            richTextBox6.Text = "";
             // 
             // contextMenuStrip3
             // 
@@ -725,7 +724,6 @@ namespace Appium_Wizard
             tabPage5.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             contextMenuStrip3.ResumeLayout(false);
             contextMenuStrip4.ResumeLayout(false);
             ResumeLayout(false);
@@ -778,7 +776,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem androidWiFiToolStripMenuItem;
         private ColumnHeader columnHeader6;
         private ColumnHeader columnHeader7;
-        private Label label2;
         private Panel panel1;
         private ContextMenuStrip contextMenuStrip3;
         private ToolStripMenuItem copyIPAddressToolStripMenuItem;
@@ -801,5 +798,6 @@ namespace Appium_Wizard
         private Label label5;
         private Label CapabilityNoteLabel;
         private System.Windows.Forms.Timer timer1;
+        private RichTextBox richTextBox6;
     }
 }

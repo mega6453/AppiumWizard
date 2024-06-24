@@ -297,7 +297,6 @@ namespace Appium_Wizard
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
-                label2.Visible = false;
             }
         }
 
@@ -353,9 +352,7 @@ namespace Appium_Wizard
             }
 
             selectedDeviceCapability = FormatJsonString(jsonString);
-            label2.MaximumSize = new Size(panel1.Width, 0);
-            label2.Visible = true;
-            label2.Text = selectedDeviceCapability;
+            richTextBox6.Text = selectedDeviceCapability;
         }
 
         private string FormatJsonString(string jsonString)

@@ -676,9 +676,9 @@ namespace Appium_Wizard
             CapabilityNoteLabel.ForeColor = Color.Red;
             CapabilityNoteLabel.Location = new Point(30, 644);
             CapabilityNoteLabel.Name = "CapabilityNoteLabel";
-            CapabilityNoteLabel.Size = new Size(448, 25);
+            CapabilityNoteLabel.Size = new Size(571, 25);
             CapabilityNoteLabel.TabIndex = 19;
-            CapabilityNoteLabel.Text = "Warning : Open Device -> Select Device again -> Copy.";
+            CapabilityNoteLabel.Text = "Warning : Capability missing. Open the device to update the capability.";
             CapabilityNoteLabel.Visible = false;
             // 
             // timer1

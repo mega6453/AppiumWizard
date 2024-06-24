@@ -255,59 +255,15 @@ namespace Appium_Wizard
                 }
                 if (selectedDeviceStatus.Equals("Online"))
                 {
-                    panel1.Visible = true;
-                    capabilityLabel.Visible = true;
-                    string automationName = string.Empty;
-                    string jsonString = string.Empty;
-                    string webDriverAgentUrl = string.Empty;
-                    if (udidProxyPort.ContainsKey(selectedUDID))
-                    {
-                        webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
-                    }
-                    if (selectedOS.Equals("Android"))
-                    {
-                        automationName = "UiAutomator2";
-                        if (string.IsNullOrEmpty(selectedDeviceIP))
-                        {
-                            jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedUDID}""
-                                            }}";
-                        }
-                        else
-                        {
-                            jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedDeviceIP}""
-                                            }}";
-                        }
-                    }
-                    else
-                    {
-                        automationName = "XCUITest";
-                        jsonString = $@"{{
-                                                ""platformName"": ""{selectedOS}"",
-                                                ""appium:automationName"": ""{automationName}"",
-                                                ""appium:udid"": ""{selectedUDID}"",
-                                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
-                                            }}";
-
-                        if (string.IsNullOrEmpty(webDriverAgentUrl))
-                        {
-                            CapabilityNoteLabel.Visible = true;
-                        }
-                        else
-                        {
-                            CapabilityNoteLabel.Visible = false;
-                        }
-                    }
-
-                    selectedDeviceCapability = FormatJsonString(jsonString);
-                    label2.MaximumSize = new Size(panel1.Width, 0);
-                    label2.Visible = true;
-                    label2.Text = selectedDeviceCapability;
+                    ShowCapability();
+                }
+                if (selectedDeviceConnection.Equals("Wi-Fi"))
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
+                }
+                else
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.";
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
@@ -344,6 +300,64 @@ namespace Appium_Wizard
                 label2.Visible = false;
             }
         }
+
+        private void ShowCapability()
+        {
+            panel1.Visible = true;
+            capabilityLabel.Visible = true;
+            string automationName = string.Empty;
+            string jsonString = string.Empty;
+            string webDriverAgentUrl = string.Empty;
+            if (udidProxyPort.ContainsKey(selectedUDID))
+            {
+                webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
+            }
+            if (selectedOS.Equals("Android"))
+            {
+                automationName = "UiAutomator2";
+                if (string.IsNullOrEmpty(selectedDeviceIP))
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedUDID}""
+                                }}";
+                }
+                else
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedDeviceIP}""
+                                }}";
+                }
+            }
+            else
+            {
+                automationName = "XCUITest";
+                jsonString = $@"{{
+                                ""platformName"": ""{selectedOS}"",
+                                ""appium:automationName"": ""{automationName}"",
+                                ""appium:udid"": ""{selectedUDID}"",
+                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
+                              }}";
+
+                if (string.IsNullOrEmpty(webDriverAgentUrl))
+                {
+                    CapabilityNoteLabel.Visible = true;
+                }
+                else
+                {
+                    CapabilityNoteLabel.Visible = false;
+                }
+            }
+
+            selectedDeviceCapability = FormatJsonString(jsonString);
+            label2.MaximumSize = new Size(panel1.Width, 0);
+            label2.Visible = true;
+            label2.Text = selectedDeviceCapability;
+        }
+
         private string FormatJsonString(string jsonString)
         {
             dynamic parsedJson = JsonConvert.DeserializeObject(jsonString);
@@ -362,7 +376,11 @@ namespace Appium_Wizard
                     }
                 }
                 OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                openDevice.StartBackgroundTasks();
+                var isStarted = openDevice.StartBackgroundTasks();
+                if (isStarted)
+                {
+                    ShowCapability();
+                }
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
@@ -1477,7 +1495,7 @@ namespace Appium_Wizard
             else
             {
                 Clipboard.SetText(selectedDeviceCapability);
-                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;                
+                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
                 timer1.Start();
                 GoogleAnalytics.SendEvent("Copy_Capability");
             }

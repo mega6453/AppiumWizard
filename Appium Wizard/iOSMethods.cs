@@ -1332,19 +1332,29 @@ namespace Appium_Wizard
                         Thread.Sleep(10000);
                         while (!iOSAPIMethods.isTunnelRunning() && counter <= 10) 
                         {
+                            if (tunnelProcess.HasExited)
+                            {
+                                commonProgress.Close();
+                                MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                return false;
+                            }
                             Thread.Sleep(5000);
                             counter++;
                         }
                         var processId = tunnelProcess.Id;
                         MainScreen.runningProcesses.Add(processId);
+                        commonProgress.Close();
                     }
                     catch (Exception)
                     {
+                        commonProgress.Close();
                         MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return false;
                     }
                 }
                 else
                 {
+                    commonProgress.Close();
                     clickedOK = false;
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try

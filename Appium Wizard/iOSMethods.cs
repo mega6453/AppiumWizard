@@ -162,12 +162,27 @@ namespace Appium_Wizard
 
         public bool isLatestVersionWDAInstalled(string udid)
         {
-            string installedWDAVersion = GetInstalledWDAVersion(udid);
-            string ipaWDAVersion = GetWDAIPAVersion();
+            try
+            {
+                string installedWDAVersion = GetInstalledWDAVersion(udid);
+                if (installedWDAVersion.Equals("failedToGetVersion"))
+                {
+                    return false;
+                }
+                else
+                {
+                    string ipaWDAVersion = GetWDAIPAVersion();
 
-            Version installed = new Version(installedWDAVersion);
-            Version ipa = new Version(ipaWDAVersion);
-            return installed.Equals(ipa);
+                    Version installed = new Version(installedWDAVersion);
+                    Version ipa = new Version(ipaWDAVersion);
+                    return installed.Equals(ipa);
+                }
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool iSWDAInstalled(string udid)

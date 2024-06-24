@@ -694,22 +694,47 @@ namespace Appium_Wizard
                             Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
                             if (deviceInfo.Count > 0)
                             {
-                                DeviceName = deviceInfo["deviceName"]?.ToString() ?? "";
-                                //DeviceName = deviceInfo["ro.product.model"]?.ToString() ?? "";
-                                OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
                                 udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
                                 OSType = "Android";
-                                Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
                                 screenWidth = deviceInfo["Width"];
                                 screenHeight = deviceInfo["Height"];
                                 string Brand = string.Empty;
-                                if (!deviceInfo.ContainsKey("ro.product.product.brand"))
+                                if (deviceInfo.ContainsKey("deviceName"))
                                 {
-                                    Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                                    DeviceName = deviceInfo["deviceName"]?.ToString() ?? "";
                                 }
                                 else
                                 {
+                                    //DeviceName = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                                    DeviceName = "No information";
+                                }
+                                if (deviceInfo.ContainsKey("ro.build.version.release"))
+                                {
+                                    OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
+                                }
+                                else
+                                {
+                                    OSVersion = "No information";
+                                }
+                                if (deviceInfo.ContainsKey("ro.product.model"))
+                                {
+                                    Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                                }
+                                else
+                                {
+                                    Model = "No information";
+                                }
+                                if (deviceInfo.ContainsKey("ro.product.product.brand"))
+                                {
+                                    Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                                }
+                                else if (deviceInfo.ContainsKey("ro.product.vendor.brand"))
+                                {
                                     Brand = deviceInfo["ro.product.vendor.brand"]?.ToString() ?? "";
+                                }
+                                else
+                                {
+                                    Brand = "No information";
                                 }
                                 string BrandPlusModel = Brand.Replace("\n", "") + " " + Model.Replace("\n", "");
                                 string[] name = { "Name", DeviceName.Replace("\n", "") };

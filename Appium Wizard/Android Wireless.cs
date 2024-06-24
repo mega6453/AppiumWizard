@@ -128,19 +128,47 @@
                         if (deviceInfo.Count > 0)
                         {
                             //DeviceName = deviceInfo["ro.product.model"]?.ToString() ?? "";
-                            string OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
+                            string OSVersion = "";
                             string OSType = "Android";
-                            string Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                            string Model = "";
                             string Width = deviceInfo["Width"];
                             string Height = deviceInfo["Height"];
                             string Brand = string.Empty;
-                            if (!deviceInfo.ContainsKey("ro.product.product.brand"))
+                            if (deviceInfo.ContainsKey("deviceName"))
                             {
-                                Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                                DeviceName = deviceInfo["deviceName"]?.ToString() ?? "";
                             }
                             else
                             {
+                                DeviceName = "No information";
+                            }
+                            if (deviceInfo.ContainsKey("ro.build.version.release"))
+                            {
+                                OSVersion = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
+                            }
+                            else
+                            {
+                                OSVersion = "No information";
+                            }
+                            if (deviceInfo.ContainsKey("ro.product.model"))
+                            {
+                                Model = deviceInfo["ro.product.model"]?.ToString() ?? "";
+                            }
+                            else
+                            {
+                                Model = "No information";
+                            }
+                            if (deviceInfo.ContainsKey("ro.product.product.brand"))
+                            {
+                                Brand = deviceInfo["ro.product.product.brand"]?.ToString() ?? "";
+                            }
+                            else if (deviceInfo.ContainsKey("ro.product.vendor.brand"))
+                            {
                                 Brand = deviceInfo["ro.product.vendor.brand"]?.ToString() ?? "";
+                            }
+                            else
+                            {
+                                Brand = "No information";
                             }
                             string BrandPlusModel = Brand.Replace("\n", "") + " " + Model.Replace("\n", "");
                             string[] name = { "Name", DeviceName.Replace("\n", "") };

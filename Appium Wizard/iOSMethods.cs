@@ -1329,6 +1329,16 @@ namespace Appium_Wizard
                         tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
+                        try
+                        {
+                            var id = tunnelProcess.Id; // just to check if there's exception.
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            commonProgress.Close();
+                            MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            return false;
+                        }
                         Thread.Sleep(10000);
                         while (!iOSAPIMethods.isTunnelRunning() && counter <= 10) 
                         {

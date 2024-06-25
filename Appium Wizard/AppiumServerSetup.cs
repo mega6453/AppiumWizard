@@ -19,6 +19,7 @@ namespace Appium_Wizard
         public static bool UpdateStatusInScreenFlag = true;
         public void StartAppiumServer(int appiumPort, int serverNumber)
         {
+            int webDriverAgentProxyPort = Common.GetFreePort();
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
@@ -38,8 +39,8 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
 
                     //working
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",
@@ -56,8 +57,8 @@ namespace Appium_Wizard
                 appiumServerProcess.StartInfo = startInfo;
                 //appiumServerProcess.OutputDataReceived += AppiumServer_OutputDataReceived;
                 //appiumServerProcess.ErrorDataReceived += AppiumServer_OutputDataReceived;
-                appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
-                appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber);
+                appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
+                appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
 
                 appiumServerProcess.EnableRaisingEvents = true;
 
@@ -91,10 +92,11 @@ namespace Appium_Wizard
         }
 
         string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
-        int proxyPort = 0; int screenDensity = 0;
+        //int proxyPort = 0;
+        int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
-        private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber)
+        private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
@@ -112,6 +114,7 @@ namespace Appium_Wizard
                 {
                     statusText = "Appium Server Started";
                     serverStarted = true;
+                    iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
                 }
                 else if (data.Contains("address already in use"))
                 {
@@ -141,23 +144,23 @@ namespace Appium_Wizard
                             deviceUDID = data.Substring(data.LastIndexOf(' ', colonIndex) + 1, colonIndex - data.LastIndexOf(' ', colonIndex) - 1);
                             if (!MainScreen.udidProxyPort.ContainsKey(deviceUDID))
                             {
-                                iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, proxyPort, 8100);
+                                //iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
                             }
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
                             string text = "Set Device " + name;
                             UpdateScreenControl(deviceUDID, text);
                         }
                     }
-                    if (data.Contains("appium:webDriverAgentUrl"))
-                    {
-                        string pattern1 = @"'appium:webDriverAgentUrl': 'http://localhost:(\d+)'";
-                        Regex regex1 = new Regex(pattern1);
-                        Match match2 = regex1.Match(data);
-                        if (match2.Success)
-                        {
-                            proxyPort = int.Parse(match2.Groups[1].Value);
-                        }
-                    }
+                    //if (data.Contains("appium:webDriverAgentUrl"))
+                    //{
+                    //    string pattern1 = @"'appium:webDriverAgentUrl': 'http://localhost:(\d+)'";
+                    //    Regex regex1 = new Regex(pattern1);
+                    //    Match match2 = regex1.Match(data);
+                    //    if (match2.Success)
+                    //    {
+                    //        proxyPort = int.Parse(match2.Groups[1].Value);
+                    //    }
+                    //}
                     if (data.Contains("added to master session list"))
                     {
                         string pattern = @"session (\w+-\w+-\w+-\w+-\w+)";
@@ -170,10 +173,14 @@ namespace Appium_Wizard
                             sessionIdUDID.Add(sessionId, deviceUDID);
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
                             string text = "Session Created for " + name;
-                            MainScreen.udidProxyPort.Add(deviceUDID, proxyPort);
+                            MainScreen.udidProxyPort.Add(deviceUDID, webDriverAgentProxyPort);
                             UpdateScreenControl(deviceUDID, text);
                         }
                     }
+                    //if (data.Contains("Session created with session id"))
+                    //{
+                    //    iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
+                    //}
                     //if (data.Contains("Replacing sessionId"))
                     //{
                     //    string pattern = @"sessionId\s+([A-Z0-9-]+).*?with\s+(.*?)$";
@@ -210,10 +217,10 @@ namespace Appium_Wizard
                                 {
                                     try
                                     {
-                                        int proxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
+                                        int androidProxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
                                         int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
                                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                                        AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                                        AndroidAPIMethods.CreateSession(androidProxyPort, screenServerPort);
                                     }
                                     catch (Exception)
                                     {

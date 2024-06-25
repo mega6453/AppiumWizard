@@ -58,7 +58,7 @@ namespace Appium_Wizard
             Common.SetAndroidHomeEnvironmentVariable();
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
-            bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
+            bool isFirstTimeRun = false;// Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
             {
                 firstTimeRunLabel.Text = "First time run verifies the installation, This may take sometime, Please wait...";
@@ -114,8 +114,8 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                Close();
                 GoogleAnalytics.SendEvent("App_Crashed",ex.Message);
+                Close();
             }
         }
 

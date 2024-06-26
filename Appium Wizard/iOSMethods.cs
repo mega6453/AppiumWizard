@@ -1005,9 +1005,9 @@ namespace Appium_Wizard
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = iProxyFilePath,
-                //Arguments = localPort + ":" + iOSPort + " -u " + udid,
+                Arguments = localPort + ":" + iOSPort + " -u " + udid,
                 //Arguments = localPort + " " + iOSPort + " " + udid,
-                Arguments = localPort + " " + iOSPort,
+                //Arguments = localPort + " " + iOSPort,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true

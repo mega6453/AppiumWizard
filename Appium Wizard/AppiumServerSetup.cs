@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {
@@ -96,6 +97,7 @@ namespace Appium_Wizard
         int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
+        string proxiedUDID = "";
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -114,7 +116,6 @@ namespace Appium_Wizard
                 {
                     statusText = "Appium Server Started";
                     serverStarted = true;
-                    iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
                 }
                 else if (data.Contains("address already in use"))
                 {
@@ -126,6 +127,16 @@ namespace Appium_Wizard
                 {
                     executionStatus.UpdateStatus(data);
 
+                    if (data.Contains("Calling AppiumDriver.createSession()"))
+                    {
+                        string pattern = "\"appium:udid\":\"([^\"]+)\"";
+                        Match match = Regex.Match(data, pattern);
+
+                        if (match.Success)
+                        {
+                            deviceUDID = match.Groups[1].Value;
+                        }
+                    }
                     if (data.Contains("Using device:"))
                     {
                         string input = data;
@@ -177,10 +188,70 @@ namespace Appium_Wizard
                             UpdateScreenControl(deviceUDID, text);
                         }
                     }
-                    //if (data.Contains("Session created with session id"))
-                    //{
-                    //    iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
-                    //}
+                    if (data.Contains("Session created with session id"))
+                    {
+                        //string pattern = @"session id: ([a-f0-9\-]+)";
+                        //Match match = Regex.Match(data, pattern);
+                        //if (match.Success)
+                        //{
+                        //    string sessionId = match.Groups[1].Value;
+                        //}
+                        Common.KillProcessByPortNumber(webDriverAgentProxyPort);
+                        //iOSAsyncMethods.GetInstance().StartiProxyServer(deviceUDID, webDriverAgentProxyPort, 8100);
+                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(deviceUDID, webDriverAgentProxyPort,8100);
+                        Thread.Sleep(3000);
+                        proxiedUDID = deviceUDID;
+
+                    }
+                    string sessionIdPattern = @"/session/([^/]+)";
+                    if (data.Contains("Proxying"))
+                    {
+                        
+                        //Match match = Regex.Match(data, sessionIdPattern);
+                        //if (match.Success)
+                        //{
+                        //    currentSessionId = match.Groups[1].Value;
+                        //}
+                        //if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
+                        //{
+                        //    currentUDID = sessionIdUDID[currentSessionId];
+                        //}
+                        if (!proxiedUDID.Equals(currentUDID) && !currentUDID.Equals("none"))
+                        {
+                            UpdateScreenControl(currentUDID, "Switch Device "+currentUDID);
+                            Common.KillProcessByPortNumber(webDriverAgentProxyPort);
+                            //iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            Thread.Sleep(3000);
+                            proxiedUDID = currentUDID;
+                        }
+                    }
+
+                    if (data.Contains("Calling AppiumDriver") & !data.Contains("Calling AppiumDriver.getTimeouts()"))
+                    {
+                        string pattern = @"args: \[\""(?<sessionId>[a-f0-9\-]+)\""\]";
+
+                        Match match = Regex.Match(data, pattern);
+                        if (match.Success)
+                        {
+                            currentSessionId = match.Groups[1].Value.Trim('"');
+                        }
+                        if (currentSessionId != "none" && sessionIdUDID.ContainsKey(currentSessionId))
+                        {
+                            currentUDID = sessionIdUDID[currentSessionId];
+                        }
+                    }
+                    if (data.Contains("Calling AppiumDriver.createSession()"))
+                    {
+                        string pattern = @"\""appium:udid\"":\""(.*?)\""";
+
+                        Match match = Regex.Match(data, pattern);
+                        if (match.Success)
+                        {
+                            currentUDID = match.Groups[1].Value;
+                        }
+                    }
+
                     //if (data.Contains("Replacing sessionId"))
                     //{
                     //    string pattern = @"sessionId\s+([A-Z0-9-]+).*?with\s+(.*?)$";
@@ -230,7 +301,7 @@ namespace Appium_Wizard
                         }
 
                     }
-                    string sessionIdPattern = @"/session/([^/]+)";
+                    //string sessionIdPattern = @"/session/([^/]+)";
                     if (data.Contains("POST /session/") && data.Contains("/element"))
                     {
                         Match match = Regex.Match(data, sessionIdPattern);

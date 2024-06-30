@@ -1183,7 +1183,7 @@ namespace Appium_Wizard
 
                 // Configure the process
                 process.StartInfo.FileName = iOSServerFilePath;
-                process.StartInfo.Arguments = "runwda";
+                process.StartInfo.Arguments = "runwda --udid=" + udid;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.RedirectStandardError = true;
@@ -1662,6 +1662,40 @@ namespace Appium_Wizard
             {
                 Image image = Image.FromStream(ms);
                 image.Save(filePath, ImageFormat.Png);
+            }
+        }
+
+        public static bool IsWDARunning(int port)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/status", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                if (response.Content != null)
+                {
+                    if (response.Content.Contains("WebDriverAgent is ready to accept commands"))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

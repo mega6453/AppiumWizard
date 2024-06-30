@@ -96,7 +96,6 @@ namespace Appium_Wizard
             tableLayoutPanel1 = new TableLayoutPanel();
             capabilityLabel = new Label();
             label4 = new Label();
-            CapabilityNoteLabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -668,18 +667,6 @@ namespace Appium_Wizard
             label4.TabIndex = 18;
             label4.Text = "Note : It's mandatory to open the device before starting automation.";
             // 
-            // CapabilityNoteLabel
-            // 
-            CapabilityNoteLabel.AutoSize = true;
-            CapabilityNoteLabel.BackColor = SystemColors.ControlLightLight;
-            CapabilityNoteLabel.ForeColor = Color.Red;
-            CapabilityNoteLabel.Location = new Point(30, 644);
-            CapabilityNoteLabel.Name = "CapabilityNoteLabel";
-            CapabilityNoteLabel.Size = new Size(571, 25);
-            CapabilityNoteLabel.TabIndex = 19;
-            CapabilityNoteLabel.Text = "Warning : Capability missing. Open the device to update the capability.";
-            CapabilityNoteLabel.Visible = false;
-            // 
             // timer1
             // 
             timer1.Interval = 2000;
@@ -691,7 +678,6 @@ namespace Appium_Wizard
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1407, 678);
-            Controls.Add(CapabilityNoteLabel);
             Controls.Add(label4);
             Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
@@ -796,7 +782,6 @@ namespace Appium_Wizard
         private Button capabilityCopyButton;
         private Label label4;
         private Label label5;
-        private Label CapabilityNoteLabel;
         private System.Windows.Forms.Timer timer1;
         private RichTextBox richTextBox6;
     }

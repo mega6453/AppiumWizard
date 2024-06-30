@@ -269,7 +269,6 @@ namespace Appium_Wizard
                 {
                     panel1.Visible = false;
                     capabilityLabel.Visible = false;
-                    CapabilityNoteLabel.Visible = false;
                     Open.Enabled = false;
                     contextMenuStrip4.Items[0].Enabled = false;
                     contextMenuStrip4.Items[1].Enabled = false;
@@ -293,7 +292,6 @@ namespace Appium_Wizard
             {
                 panel1.Visible = false;
                 capabilityLabel.Visible = false;
-                CapabilityNoteLabel.Visible = false;
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
@@ -306,11 +304,6 @@ namespace Appium_Wizard
             capabilityLabel.Visible = true;
             string automationName = string.Empty;
             string jsonString = string.Empty;
-            string webDriverAgentUrl = string.Empty;
-            if (udidProxyPort.ContainsKey(selectedUDID))
-            {
-                webDriverAgentUrl = "http://localhost:" + udidProxyPort[selectedUDID];
-            }
             if (selectedOS.Equals("Android"))
             {
                 automationName = "UiAutomator2";
@@ -319,7 +312,8 @@ namespace Appium_Wizard
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedUDID}""
+                                    ""appium:udid"": ""{selectedUDID}"",
+                                    ""appium:newCommandTimeout"": 0
                                 }}";
                 }
                 else
@@ -327,7 +321,8 @@ namespace Appium_Wizard
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedDeviceIP}""
+                                    ""appium:udid"": ""{selectedDeviceIP}"",
+                                    ""appium:newCommandTimeout"": 0
                                 }}";
                 }
             }
@@ -338,17 +333,8 @@ namespace Appium_Wizard
                                 ""platformName"": ""{selectedOS}"",
                                 ""appium:automationName"": ""{automationName}"",
                                 ""appium:udid"": ""{selectedUDID}"",
-                                ""appium:webDriverAgentUrl"":  ""{webDriverAgentUrl}""
+                                    ""appium:newCommandTimeout"": 0
                               }}";
-
-                if (string.IsNullOrEmpty(webDriverAgentUrl))
-                {
-                    CapabilityNoteLabel.Visible = true;
-                }
-                else
-                {
-                    CapabilityNoteLabel.Visible = false;
-                }
             }
 
             selectedDeviceCapability = FormatJsonString(jsonString);
@@ -405,10 +391,21 @@ namespace Appium_Wizard
             {
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
                 listView1.Items.Add(new ListViewItem(item1));
-                if (!DeviceInfo.ContainsKey(udid))
+                if (string.IsNullOrEmpty(IPAddress))
                 {
-                    DeviceInfo.Add(udid, Tuple.Create(DeviceName, OS));
+                    if (!DeviceInfo.ContainsKey(udid))
+                    {
+                        DeviceInfo.Add(udid, Tuple.Create(DeviceName, OS));
+                    }
                 }
+                else
+                {
+                    if (!DeviceInfo.ContainsKey(IPAddress))
+                    {
+                        DeviceInfo.Add(IPAddress, Tuple.Create(DeviceName, OS));
+                    }
+                }
+                
             }
             GoogleAnalytics.SendEvent("Device_Added_To_List");
         }
@@ -520,6 +517,8 @@ namespace Appium_Wizard
                     {
                         ListViewItem selectedItem = listView1.SelectedItems[0];
                         listView1.Items.Remove(selectedItem);
+                        DeviceInfo.Remove(selectedUDID);
+                        OpenDevice.deviceDetails.Remove(selectedUDID);
                     }
                     if (selectedOS.Equals("Android"))
                     {
@@ -527,13 +526,6 @@ namespace Appium_Wizard
                     }
                     DeleteDevice.Enabled = false;
                     Open.Enabled = false;
-                    try
-                    {
-                        //OpenDevice.deviceDetails.Remove(selectedUDID);
-                    }
-                    catch (Exception)
-                    {
-                    }
                     MessageBox.Show(selectedDeviceName + " removed successfully.", "Delete Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     GoogleAnalytics.SendEvent("Device_Deleted");
                 }

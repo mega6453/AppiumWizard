@@ -63,21 +63,27 @@ namespace Appium_Wizard
                     sessionId = GetSessionID();
                     if (OSType.Equals("Android"))
                     {
-                        BeginInvoke(new Action(() =>
+                        try
                         {
-                            if (tempSessionId != sessionId)
+                            BeginInvoke(new Action(() =>
                             {
-                                try
+                                if (tempSessionId != sessionId)
                                 {
-                                    ScreenWebView.EnsureCoreWebView2Async();
-                                    ScreenWebView.Reload();
-                                    tempSessionId = sessionId;
+                                    try
+                                    {
+                                        ScreenWebView.EnsureCoreWebView2Async();
+                                        ScreenWebView.Reload();
+                                        tempSessionId = sessionId;
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
                                 }
-                                catch (Exception)
-                                {
-                                }
-                            }
-                        }));
+                            }));
+                        }
+                        catch (Exception)
+                        {
+                        }                       
                     }
                     Thread.Sleep(1000);
                 }

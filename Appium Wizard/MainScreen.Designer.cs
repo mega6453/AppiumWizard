@@ -81,9 +81,9 @@ namespace Appium_Wizard
             richTextBox5 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
-            label2 = new Label();
             panel1 = new Panel();
-            label3 = new Label();
+            capabilityCopyButton = new Button();
+            richTextBox6 = new RichTextBox();
             contextMenuStrip3 = new ContextMenuStrip(components);
             copyIPAddressToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip4 = new ContextMenuStrip(components);
@@ -94,6 +94,9 @@ namespace Appium_Wizard
             rebootDeviceToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
+            capabilityLabel = new Label();
+            label4 = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -225,7 +228,7 @@ namespace Appium_Wizard
             // 
             richTextBox1.Location = new Point(0, 0);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(747, 455);
+            richTextBox1.Size = new Size(747, 497);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = "";
             richTextBox1.TextChanged += richTextBox1_TextChanged;
@@ -278,7 +281,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(270, 34);
+            serverSetupToolStripMenuItem.Size = new Size(233, 34);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -286,7 +289,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(270, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -294,7 +297,7 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(270, 34);
+            updaterToolStripMenuItem.Size = new Size(233, 34);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
@@ -527,33 +530,37 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
-            // label2
-            // 
-            label2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label2.AutoSize = true;
-            label2.ForeColor = Color.IndianRed;
-            label2.Location = new Point(3, 12);
-            label2.Name = "label2";
-            label2.Size = new Size(0, 25);
-            label2.TabIndex = 12;
-            // 
             // panel1
             // 
-            panel1.Controls.Add(label3);
-            panel1.Controls.Add(label2);
-            panel1.Location = new Point(30, 369);
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(capabilityCopyButton);
+            panel1.Controls.Add(richTextBox6);
+            panel1.Location = new Point(30, 403);
             panel1.Name = "panel1";
-            panel1.Size = new Size(583, 150);
+            panel1.Size = new Size(583, 235);
             panel1.TabIndex = 13;
+            panel1.Visible = false;
             // 
-            // label3
+            // capabilityCopyButton
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(3, 102);
-            label3.Name = "label3";
-            label3.Size = new Size(0, 25);
-            label3.TabIndex = 14;
-            label3.MouseUp += label3_MouseUp;
+            capabilityCopyButton.BackColor = SystemColors.ControlLightLight;
+            capabilityCopyButton.BackgroundImage = Properties.Resources.files;
+            capabilityCopyButton.BackgroundImageLayout = ImageLayout.Stretch;
+            capabilityCopyButton.Location = new Point(525, -1);
+            capabilityCopyButton.Name = "capabilityCopyButton";
+            capabilityCopyButton.Size = new Size(57, 51);
+            capabilityCopyButton.TabIndex = 18;
+            capabilityCopyButton.UseVisualStyleBackColor = false;
+            capabilityCopyButton.Click += capabilityCopyButton_Click;
+            // 
+            // richTextBox6
+            // 
+            richTextBox6.Location = new Point(-1, -1);
+            richTextBox6.Name = "richTextBox6";
+            richTextBox6.ReadOnly = true;
+            richTextBox6.Size = new Size(583, 235);
+            richTextBox6.TabIndex = 20;
+            richTextBox6.Text = "";
             // 
             // contextMenuStrip3
             // 
@@ -568,7 +575,6 @@ namespace Appium_Wizard
             copyIPAddressToolStripMenuItem.Name = "copyIPAddressToolStripMenuItem";
             copyIPAddressToolStripMenuItem.Size = new Size(224, 32);
             copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
-            copyIPAddressToolStripMenuItem.Click += copyIPAddressToolStripMenuItem_Click;
             // 
             // contextMenuStrip4
             // 
@@ -639,12 +645,41 @@ namespace Appium_Wizard
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
             // 
+            // capabilityLabel
+            // 
+            capabilityLabel.AutoSize = true;
+            capabilityLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            capabilityLabel.Location = new Point(30, 375);
+            capabilityLabel.Name = "capabilityLabel";
+            capabilityLabel.Size = new Size(97, 25);
+            capabilityLabel.TabIndex = 17;
+            capabilityLabel.Text = "Capability";
+            capabilityLabel.Visible = false;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.BackColor = SystemColors.ControlLightLight;
+            label4.ForeColor = Color.IndianRed;
+            label4.Location = new Point(30, 309);
+            label4.Name = "label4";
+            label4.Size = new Size(556, 25);
+            label4.TabIndex = 18;
+            label4.Text = "Note : It's mandatory to open the device before starting automation.";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 2000;
+            timer1.Tick += timer1_Tick;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1407, 631);
+            ClientSize = new Size(1407, 678);
+            Controls.Add(label4);
+            Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(checkBox1);
             Controls.Add(label1);
@@ -675,7 +710,6 @@ namespace Appium_Wizard
             tabPage5.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             contextMenuStrip3.ResumeLayout(false);
             contextMenuStrip4.ResumeLayout(false);
             ResumeLayout(false);
@@ -728,9 +762,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem androidWiFiToolStripMenuItem;
         private ColumnHeader columnHeader6;
         private ColumnHeader columnHeader7;
-        private Label label2;
         private Panel panel1;
-        private Label label3;
         private ContextMenuStrip contextMenuStrip3;
         private ToolStripMenuItem copyIPAddressToolStripMenuItem;
         private ContextMenuStrip contextMenuStrip4;
@@ -746,5 +778,11 @@ namespace Appium_Wizard
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
         private ToolStripMenuItem updaterToolStripMenuItem;
+        private Label capabilityLabel;
+        private Button capabilityCopyButton;
+        private Label label4;
+        private Label label5;
+        private System.Windows.Forms.Timer timer1;
+        private RichTextBox richTextBox6;
     }
 }

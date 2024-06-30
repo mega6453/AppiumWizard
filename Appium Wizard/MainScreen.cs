@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Appium.Enums;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
@@ -13,14 +15,14 @@ namespace Appium_Wizard
     {
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection;
+        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
         public static List<int> runningProcessesPortNumbers = new List<int>();
         public static List<int> runningProcesses = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
-
+        public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
 
         public MainScreen()
         {
@@ -236,16 +238,37 @@ namespace Appium_Wizard
                 Open.Enabled = true;
                 MoreButton.Enabled = true;
                 DeleteDevice.Enabled = true;
-                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi") && selectedDeviceStatus.Equals("Online"))
+                if (selectedOS.Equals("iOS"))
                 {
-                    label2.MaximumSize = new Size(panel1.Width, 0);
-                    label2.Visible = true;
-                    label3.Visible = true;
-                    label2.Text = "To establish an Appium session for the device(" + selectedDeviceName + ") connected over Wi-Fi, use the following IP Address in \"appium:udid\" capability.";
-                    label3.Text = selectedDeviceIP;
+                    Version deviceVersion = new Version(selectedDeviceVersion);
+                    Version version17Plus = new Version("17.0.0");
+                    if (deviceVersion >= version17Plus) // >=17
+                    {
+                        iOSMethods.isGo = false;
+                        iOSAsyncMethods.isGo = false;
+                    }
+                    else // <17
+                    {
+                        iOSMethods.isGo = true;
+                        iOSAsyncMethods.isGo = true;
+                    }
+                }
+                if (selectedDeviceStatus.Equals("Online"))
+                {
+                    ShowCapability();
+                }
+                if (selectedDeviceConnection.Equals("Wi-Fi"))
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
+                }
+                else
+                {
+                    label4.Text = "Note : It's mandatory to open the device before starting automation.";
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
+                    panel1.Visible = false;
+                    capabilityLabel.Visible = false;
                     Open.Enabled = false;
                     contextMenuStrip4.Items[0].Enabled = false;
                     contextMenuStrip4.Items[1].Enabled = false;
@@ -267,14 +290,62 @@ namespace Appium_Wizard
             }
             else
             {
+                panel1.Visible = false;
+                capabilityLabel.Visible = false;
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
-                label2.Visible = false;
-                label3.Visible = false;
             }
         }
 
+        private void ShowCapability()
+        {
+            panel1.Visible = true;
+            capabilityLabel.Visible = true;
+            string automationName = string.Empty;
+            string jsonString = string.Empty;
+            if (selectedOS.Equals("Android"))
+            {
+                automationName = "UiAutomator2";
+                if (string.IsNullOrEmpty(selectedDeviceIP))
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedUDID}"",
+                                    ""appium:newCommandTimeout"": 0
+                                }}";
+                }
+                else
+                {
+                    jsonString = $@"{{
+                                    ""platformName"": ""{selectedOS}"",
+                                    ""appium:automationName"": ""{automationName}"",
+                                    ""appium:udid"": ""{selectedDeviceIP}"",
+                                    ""appium:newCommandTimeout"": 0
+                                }}";
+                }
+            }
+            else
+            {
+                automationName = "XCUITest";
+                jsonString = $@"{{
+                                ""platformName"": ""{selectedOS}"",
+                                ""appium:automationName"": ""{automationName}"",
+                                ""appium:udid"": ""{selectedUDID}"",
+                                    ""appium:newCommandTimeout"": 0
+                              }}";
+            }
+
+            selectedDeviceCapability = FormatJsonString(jsonString);
+            richTextBox6.Text = selectedDeviceCapability;
+        }
+
+        private string FormatJsonString(string jsonString)
+        {
+            dynamic parsedJson = JsonConvert.DeserializeObject(jsonString);
+            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+        }
         private void Open_Click(object sender, EventArgs e)
         {
             if (selectedDeviceStatus.Equals("Online"))
@@ -288,7 +359,11 @@ namespace Appium_Wizard
                     }
                 }
                 OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                openDevice.StartBackgroundTasks();
+                var isStarted = openDevice.StartBackgroundTasks();
+                if (isStarted)
+                {
+                    ShowCapability();
+                }
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
                 {                                           //Open screen in progress class and brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
@@ -316,10 +391,21 @@ namespace Appium_Wizard
             {
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
                 listView1.Items.Add(new ListViewItem(item1));
-                if (!DeviceInfo.ContainsKey(udid))
+                if (string.IsNullOrEmpty(IPAddress))
                 {
-                    DeviceInfo.Add(udid, Tuple.Create(DeviceName, OS));
+                    if (!DeviceInfo.ContainsKey(udid))
+                    {
+                        DeviceInfo.Add(udid, Tuple.Create(DeviceName, OS));
+                    }
                 }
+                else
+                {
+                    if (!DeviceInfo.ContainsKey(IPAddress))
+                    {
+                        DeviceInfo.Add(IPAddress, Tuple.Create(DeviceName, OS));
+                    }
+                }
+                
             }
             GoogleAnalytics.SendEvent("Device_Added_To_List");
         }
@@ -431,6 +517,8 @@ namespace Appium_Wizard
                     {
                         ListViewItem selectedItem = listView1.SelectedItems[0];
                         listView1.Items.Remove(selectedItem);
+                        DeviceInfo.Remove(selectedUDID);
+                        OpenDevice.deviceDetails.Remove(selectedUDID);
                     }
                     if (selectedOS.Equals("Android"))
                     {
@@ -438,13 +526,6 @@ namespace Appium_Wizard
                     }
                     DeleteDevice.Enabled = false;
                     Open.Enabled = false;
-                    try
-                    {
-                        //OpenDevice.deviceDetails.Remove(selectedUDID);
-                    }
-                    catch (Exception)
-                    {
-                    }
                     MessageBox.Show(selectedDeviceName + " removed successfully.", "Delete Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     GoogleAnalytics.SendEvent("Device_Deleted");
                 }
@@ -521,7 +602,19 @@ namespace Appium_Wizard
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
                                     OSType = "iOS";
-                                    string connectedVia = iOSMethods.iOSConnectedVia((bool)deviceInfo["HostAttached"]);
+                                    string connectedVia = string.Empty;
+                                    if (deviceInfo.ContainsKey("HostAttached"))
+                                    {
+                                        connectedVia = iOSMethods.iOSConnectedVia((bool)deviceInfo["HostAttached"]);
+                                    }
+                                    else if (deviceInfo.ContainsKey("ConnectionType"))
+                                    {
+                                        connectedVia = deviceInfo["ConnectionType"]?.ToString() ?? "";
+                                    }
+                                    else
+                                    {
+                                        connectedVia = "";
+                                    }
                                     string[] name = { "Name", DeviceName };
                                     string[] version = { "OS", OSType };
                                     string[] os = { "Version", OSVersion };
@@ -762,6 +855,7 @@ namespace Appium_Wizard
             }
             if (iOSAsyncMethods.installationProgress.Contains("installation successful") | iOSAsyncMethods.installationProgress == "100")
             {
+                commonProgress.Close();
                 if (isPListRead)
                 {
                     DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
@@ -794,6 +888,7 @@ namespace Appium_Wizard
             }
             else
             {
+                commonProgress.Close();
                 if (iOSAsyncMethods.installationProgress.Contains("MismatchedApplicationIdentifierEntitlement"))
                 {
                     MessageBox.Show("Uninstall the existing " + appName + " app and Try again...", "Intallation Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -896,7 +991,7 @@ namespace Appium_Wizard
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo
                 {
-                    FileName = "https://appium.github.io/appium-xcuitest-driver",
+                    FileName = "https://appium.github.io/appium-xcuitest-driver/latest/reference/scripts/",
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
@@ -1075,12 +1170,6 @@ namespace Appium_Wizard
             {
                 contextMenuStrip3.Show(Cursor.Position);
             }
-        }
-
-        private void copyIPAddressToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Clipboard.SetText(label3.Text);
-            GoogleAnalytics.SendEvent("Copy_IPAddress");
         }
 
         private void rebootDeviceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1409,6 +1498,27 @@ namespace Appium_Wizard
         {
             Updater updater = new Updater();
             updater.ShowDialog();
+        }
+
+        private void capabilityCopyButton_Click(object sender, EventArgs e)
+        {
+            if (selectedDeviceCapability.Contains("\"appium:webDriverAgentUrl\": \"\""))
+            {
+                MessageBox.Show("\"appium:webDriverAgentUrl\" capability is empty. Please open the device to get the updated capability and then copy again.", "Capability Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                Clipboard.SetText(selectedDeviceCapability);
+                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
+                timer1.Start();
+                GoogleAnalytics.SendEvent("Copy_Capability");
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            capabilityCopyButton.BackgroundImage = Properties.Resources.files; // Replace with your image resource
+            timer1.Stop();
         }
     }
 }

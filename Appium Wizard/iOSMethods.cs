@@ -1,9 +1,16 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Remote;
 using RestSharp;
+using System;
+using System.Data.Common;
 using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -22,34 +29,72 @@ namespace Appium_Wizard
         public string statusText = "";
         public static string deviceList = "";
         public string deviceInfo = "";
-
-
-        public List<string> GetListOfDevicesUDID()
+        public enum iOSExecutable { go, py }
+        public static bool isGo;
+        public List<string> GetListOfDevicesUDID(iOSExecutable executable = iOSExecutable.go)
         {
             List<string> list = new List<string>();
-            string deviceListString = ExecuteCommand("list");
-            if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+            if (executable == iOSExecutable.go)
             {
-                list.Add("ITunes not installed");
+                string deviceListString = ExecuteCommand("list");
+                if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+                {
+                    list.Add("ITunes not installed");
+                }
+                else
+                {
+                    JObject json = JObject.Parse(deviceListString);
+                    JArray deviceList = (JArray)json["deviceList"];
+                    foreach (JToken device in deviceList)
+                    {
+                        string udid = device.ToString();
+                        list.Add(udid);
+                    }
+                }
+                return list;
             }
             else
             {
-                JObject json = JObject.Parse(deviceListString);
-                JArray deviceList = (JArray)json["deviceList"];
-                foreach (JToken device in deviceList)
+                string deviceListString = ExecuteCommandPy("usbmux list");
+                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
+                foreach (dynamic device in devices)
                 {
-                    string udid = device.ToString();
-                    list.Add(udid);
+                    list.Add(device.UniqueDeviceID.ToString());
                 }
+                return list;
             }
-            return list;
         }
 
-        public Dictionary<string, object> GetDeviceInformation(string udid = "firstDevice")
+        public Dictionary<string, object> GetDeviceInformation(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            string output = ExecuteCommand("info", udid);
-            Dictionary<string, object> result = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
-            return result;
+            if (executable == iOSExecutable.go)
+            {
+                string output = ExecuteCommand("info", udid);
+                Dictionary<string, object> deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
+                return deviceValues;
+            }
+            else
+            {
+                string output = ExecuteCommandPy("usbmux list");
+                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
+
+                Dictionary<string, object> deviceValues = new Dictionary<string, object>();
+                foreach (dynamic device in devices)
+                {
+                    string uniqueDeviceID = device.UniqueDeviceID.ToString();
+                    if (uniqueDeviceID == udid)
+                    {
+                        foreach (var property in device)
+                        {
+                            string key = property.Name.ToString();
+                            string value = property.Value;
+                            deviceValues[key] = value;
+                        }
+                        break;
+                    }
+                }
+                return deviceValues;
+            }
         }
 
         public static string iOSConnectedVia(bool HostAttached)
@@ -64,23 +109,80 @@ namespace Appium_Wizard
             }
         }
 
-        public List<string> GetListOfInstalledApps(string udid)
+        public List<string> GetListOfInstalledApps(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            var output = ExecuteCommand("apps --list", udid);
             List<string> packageList = new List<string>();
-
-            string pattern = @"(\w+(\.\w+)*)\s";
-            MatchCollection matches = Regex.Matches(output, pattern);
-
-            foreach (Match match in matches)
+            if (executable == iOSExecutable.go)
             {
-                bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
-                if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                var output = ExecuteCommand("apps --list", udid);
+                string pattern = @"(\w+(\.\w+)*)\s";
+                MatchCollection matches = Regex.Matches(output, pattern);
+
+                foreach (Match match in matches)
                 {
-                    packageList.Add(match.Groups[1].Value);
+                    bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
+                    if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                    {
+                        packageList.Add(match.Groups[1].Value);
+                    }
                 }
+                return packageList;
             }
-            return packageList;
+            else
+            {
+                var output = ExecuteCommandPy("apps list -t User", udid);
+                JObject data = JObject.Parse(output);
+                var keys = data.Properties().Select(p => p.Name);
+
+                foreach (var key in keys)
+                {
+                    packageList.Add(key);
+                }
+                return packageList;
+            }
+        }
+
+        public string GetInstalledAppVersion(string udid, string bundleId)
+        {
+            string output = ExecuteCommand("apps --list", udid);
+            string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
+            var match = Regex.Match(output, pattern);
+
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            return "failedToGetVersion";
+        }
+
+        public string GetInstalledWDAVersion(string udid)
+        {
+            return GetInstalledAppVersion(udid, "com.facebook.WebDriverAgentRunner.xctrunner");
+        }
+
+        public bool isLatestVersionWDAInstalled(string udid)
+        {
+            try
+            {
+                string installedWDAVersion = GetInstalledWDAVersion(udid);
+                if (installedWDAVersion.Equals("failedToGetVersion"))
+                {
+                    return false;
+                }
+                else
+                {
+                    string ipaWDAVersion = GetWDAIPAVersion();
+
+                    Version installed = new Version(installedWDAVersion);
+                    Version ipa = new Version(ipaWDAVersion);
+                    return installed.Equals(ipa);
+                }
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool iSWDAInstalled(string udid)
@@ -97,23 +199,62 @@ namespace Appium_Wizard
 
         public bool isDeveloperModeDisabled(string udid)
         {
-            bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
-            return isDevModeDisabled;
+            if (isGo)
+            {
+                bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
+                return isDevModeDisabled;
+            }
+            else
+            {
+                return ExecuteCommandPy("amfi developer-mode-status", udid).Contains("true");
+            }
         }
 
-        public void RebootDevice(string udid)
+        public void RebootDevice(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            ExecuteCommand("reboot", udid);
+            if (executable.Equals(iOSExecutable.go))
+            {
+                ExecuteCommand("reboot", udid);
+            }
+            else
+            {
+                ExecuteCommandPy("diagnostics restart", udid);
+            }
         }
 
-        public void UninstallApp(string udid, string bundleId)
+        public void UninstallApp(string udid, string bundleId, iOSExecutable executable = iOSExecutable.go)
         {
-            ExecuteCommand("uninstall " + bundleId, udid);
+            if (executable.Equals(iOSExecutable.go))
+            {
+                ExecuteCommand("uninstall " + bundleId, udid);
+            }
+            else
+            {
+                ExecuteCommandPy("developer core-device uninstall " + bundleId, udid);
+            }
         }
 
         public void TakeScreenshot(string udid, string path)
         {
-            ExecuteCommand("screenshot  --output=" + path, udid);
+            if (isGo)
+            {
+                ExecuteCommand("screenshot --output=" + path, udid);
+            }
+            else
+            {
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    int port = MainScreen.udidProxyPort[udid];
+                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        string url = "http://localhost:" + port;
+                        iOSAPIMethods.TakeScreenshot(url, path.Replace("\"",""));
+                        return;
+                    }
+                }
+                ExecuteCommandPy("developer dvt screenshot " + path, udid);
+            }
         }
 
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
@@ -311,7 +452,7 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath,IPAFilePath,signedIPAFilePath);
+                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath);
             }
             else
             {
@@ -382,7 +523,7 @@ namespace Appium_Wizard
             }
             else if (stackTrace == "Archive OK")
             {
-                return outputPath;               
+                return outputPath;
             }
             else
             {
@@ -437,10 +578,18 @@ namespace Appium_Wizard
         }
 
 
-        public void RunWebDriverAgentQuick(string udid)
+        public string RunWebDriverAgentQuick(string udid)
         {
-            iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
-            iOSProcess.Start();
+            if (isGo)
+            {
+                iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                iOSProcess.Start();
+                return "";
+            }
+            else
+            {
+                return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+            }
         }
 
         public string IsWDARunning(int port)
@@ -485,8 +634,15 @@ namespace Appium_Wizard
 
         public bool IsWDARunningInAppsList(string udid)
         {
-            bool isRunning = false;
-            string output = ExecuteCommand("ps --apps", udid, false);
+            bool isRunning = false; string output = "";
+            if (isGo)
+            {
+                output = ExecuteCommand("ps --apps", udid, false);
+            }
+            else
+            {
+                output = ExecuteCommandPy("developer core-device list-processes");
+            }
             if (output.Contains("WebDriverAgentRunner-Runner"))
             {
                 isRunning = true;
@@ -496,7 +652,14 @@ namespace Appium_Wizard
 
         public string MountImage(string udid)
         {
-            return ExecuteCommand("image auto", udid);
+            if (isGo)
+            {
+                return ExecuteCommand("image auto", udid);
+            }
+            else
+            {
+                return ExecuteCommandPy("mounter auto-mount", udid, false);
+            }
         }
 
         public Dictionary<string, string> GetIPAInformation(string ipaFilePath)
@@ -512,6 +675,14 @@ namespace Appium_Wizard
             return output;
         }
 
+        public string GetWDAIPAVersion()
+        {
+            //string WDAPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\wda.ipa";
+            //var output = GetIPAInformation(WDAPath);
+            //return output["CFBundleShortVersionString"];
+            return "8.7.3";
+        }
+        
         public string ExecutePlistUtil(string plistFilePath)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
@@ -538,11 +709,45 @@ namespace Appium_Wizard
 
         public string LaunchApp(string udid, string bundleId)
         {
-            return ExecuteCommand("launch " + bundleId, udid);
+            if (isGo)
+            {
+                return ExecuteCommand("launch " + bundleId, udid);
+            }
+            else
+            {
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    int port = MainScreen.udidProxyPort[udid];
+                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        string url = "http://localhost:" + port;
+                        return iOSAPIMethods.LaunchApp(url,sessionId,bundleId);
+                    }
+                }
+                return ExecuteCommandPy("developer dvt launch " + bundleId, udid);
+            }
         }
         public string KillApp(string udid, string bundleId)
         {
-            return ExecuteCommand("kill " + bundleId, udid);
+            if (isGo)
+            {
+                return ExecuteCommand("kill " + bundleId, udid);
+            }
+            else
+            {
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    int port = MainScreen.udidProxyPort[udid];
+                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        string url = "http://localhost:" + port;
+                        return iOSAPIMethods.KillApp(url, sessionId, bundleId);
+                    }
+                }
+                return ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
+            }
         }
 
         public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true)
@@ -577,6 +782,50 @@ namespace Appium_Wizard
             {
                 Console.WriteLine("An error occurred while executing argument " + arguments + ": " + ex.Message);
                 return "Exception";
+            }
+        }
+
+        public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false)
+        {
+            bool isClickedOK = iOSAsyncMethods.GetInstance().CreateTunnel();
+            if (isClickedOK)
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.pymd3FilePath;
+                if (udid == "")
+                {
+                    process.StartInfo.Arguments = command;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = command + " --udid " + udid;
+                }
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string error = process.StandardError.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
+                string result = output + error;
+                process.WaitForExit();
+                result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+                process.Close();
+                if (closeTunnel)
+                {
+                    try
+                    {
+                        iOSAsyncMethods.GetInstance().CloseTunnel();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                return result;
+            }
+            else
+            {
+                return "tunnel not created";
             }
         }
 
@@ -654,8 +903,11 @@ namespace Appium_Wizard
         private static iOSAsyncMethods? instance;
         private static readonly object lockObject = new object();
         private Process iOSAsyncProcess;
+        private Process pyAsyncProcess;
         private StringBuilder outputBuffer;
         public static Dictionary<int, int>? PortProcessId;
+        public enum iOSExecutable { go, py }
+        public static bool isGo;
         public iOSAsyncMethods()
         {
             InitializeProcess();
@@ -703,22 +955,48 @@ namespace Appium_Wizard
             };
         }
 
-        public void StartiOSProxyServer(string udid, int localPort, int iOSPort)
+        public void StartiOSProxyServer(string udid, int localPort, int iOSPort, iOSExecutable executable = iOSExecutable.go)
         {
-            try
+            if (executable.Equals(iOSExecutable.go))
             {
-                iOSAsyncProcess.StartInfo.Arguments = "forward --udid=" + udid + " " + localPort + " " + iOSPort + "";
-                iOSAsyncProcess.Start();
-                var processId = iOSAsyncProcess.Id;
-                if (!PortProcessId.ContainsKey(localPort))
+                try
                 {
-                    PortProcessId.Add(localPort, processId);
+                    iOSAsyncProcess.StartInfo.Arguments = "forward --udid=" + udid + " " + localPort + " " + iOSPort + "";
+                    iOSAsyncProcess.Start();
+                    var processId = iOSAsyncProcess.Id;
+                    if (!PortProcessId.ContainsKey(localPort))
+                    {
+                        PortProcessId.Add(localPort, processId);
+                    }
+                    MainScreen.runningProcessesPortNumbers.Add(localPort);
                 }
-                MainScreen.runningProcessesPortNumbers.Add(localPort);
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                try
+                {
+                    pyAsyncProcess = new Process();
+                    pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward "+ localPort + " " + iOSPort + " --serial " +udid;
+                    pyAsyncProcess.StartInfo.RedirectStandardError = true;
+                    pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
+                    pyAsyncProcess.StartInfo.UseShellExecute = false;
+                    pyAsyncProcess.StartInfo.CreateNoWindow = true;
+                    pyAsyncProcess.Start();
+                    var processId = pyAsyncProcess.Id;
+                    if (!PortProcessId.ContainsKey(localPort))
+                    {
+                        PortProcessId.Add(localPort, processId);
+                    }
+                    MainScreen.runningProcessesPortNumbers.Add(localPort);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -726,9 +1004,10 @@ namespace Appium_Wizard
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = iProxyFilePath,                
+                FileName = iProxyFilePath,
                 Arguments = localPort + ":" + iOSPort + " -u " + udid,
                 //Arguments = localPort + " " + iOSPort + " " + udid,
+                //Arguments = localPort + " " + iOSPort,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true
@@ -742,7 +1021,7 @@ namespace Appium_Wizard
             if (!PortProcessId.ContainsKey(localPort))
             {
                 PortProcessId.Add(localPort, processId);
-            }           
+            }
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
@@ -751,7 +1030,7 @@ namespace Appium_Wizard
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = iProxyFilePath,
-                Arguments = localPort1+":"+iOSPort1+" "+localPort2+":"+iOSPort2+" -u "+udid,
+                Arguments = localPort1 + ":" + iOSPort1 + " " + localPort2 + ":" + iOSPort2 + " -u " + udid,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true
@@ -792,21 +1071,45 @@ namespace Appium_Wizard
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
-        public void InstallApp(string udid, string path)
+        public void InstallApp(string udid, string path, iOSExecutable executable = iOSExecutable.go)
         {
-            try
+            if (executable == iOSExecutable.go)
             {
-                iOSAsyncProcess.StartInfo.Arguments = $"install --path=\"{path}\"";
-                iOSAsyncProcess.OutputDataReceived += InstallOutput;
-                iOSAsyncProcess.ErrorDataReceived += InstallOutput;
-                iOSAsyncProcess.Start();
-                iOSAsyncProcess.BeginErrorReadLine();
-                iOSAsyncProcess.BeginOutputReadLine();
-                iOSAsyncProcess.WaitForExit();
+                try
+                {
+                    iOSAsyncProcess.StartInfo.Arguments = $"install --path=\"{path}\" --udid=" + udid;
+                    iOSAsyncProcess.OutputDataReceived += InstallOutput;
+                    iOSAsyncProcess.ErrorDataReceived += InstallOutput;
+                    iOSAsyncProcess.Start();
+                    iOSAsyncProcess.BeginErrorReadLine();
+                    iOSAsyncProcess.BeginOutputReadLine();
+                    iOSAsyncProcess.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("An error occurred while forwarding port: " + ex.Message);
+                try
+                {
+                    pyAsyncProcess = new Process();
+                    pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                    pyAsyncProcess.StartInfo.Arguments = $"apps install \"{path}\" --udid " + udid;
+                    pyAsyncProcess.OutputDataReceived += InstallOutputPy;
+                    pyAsyncProcess.ErrorDataReceived += InstallOutputPy;
+                    pyAsyncProcess.StartInfo.RedirectStandardError = true;
+                    pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
+                    pyAsyncProcess.StartInfo.UseShellExecute = false;
+                    pyAsyncProcess.StartInfo.CreateNoWindow = true;
+                    pyAsyncProcess.Start();
+                    pyAsyncProcess.BeginErrorReadLine();
+                    pyAsyncProcess.BeginOutputReadLine();
+                    pyAsyncProcess.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                }
             }
         }
 
@@ -833,105 +1136,171 @@ namespace Appium_Wizard
                 iOSAsyncProcess.CancelErrorRead();
                 iOSAsyncProcess.CancelOutputRead();
             }
+        }
 
+        private void InstallOutputPy(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                if (e.Data.Contains("Complete"))
+                {
+                    string pattern = @"\b(\d+)%";
+                    Regex regex = new Regex(pattern);
+                    Match match = regex.Match(e.Data);
+                    if (match.Success)
+                    {
+                        installationProgress = match.Groups[1].Value;
+                    }
+                }
+                else if (e.Data.Contains("error"))
+                {
+                    installationProgress = e.Data;
+                }
+            }
+            else
+            {
+                pyAsyncProcess.CancelErrorRead();
+                pyAsyncProcess.CancelOutputRead();
+            }
         }
 
         string runwdaOutput = "", runwdaError = "";
         public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
-            // Create a new process
-            Process process = new Process();
-
-            // Configure the process
-            process.StartInfo.FileName = iOSServerFilePath;
-            process.StartInfo.Arguments = "runwda";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.EnableRaisingEvents = true;
-
-            // Register event handlers for error and output data received
-            process.ErrorDataReceived += Process_ErrorDataReceived;
-            process.OutputDataReceived += Process_OutputDataReceived;
-
-            // Start the process
-            process.Start();
-            var processId = process.Id;
-            MainScreen.runningProcesses.Add(processId);
-            Thread.Sleep(2000);
-            // Begin asynchronous reading of the output/error streams
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-
-            // Wait for the process to exit
-            //process.WaitForExit();
-
-            // Clean up resources
-            //process.Close();
-            bool isPasscodeRequired = false;
-            int count = 1;
-            string sessionId = string.Empty;
-            while (!process.HasExited)
+            if (MainScreen.udidProxyPort.ContainsKey(udid))
             {
-                if (!string.IsNullOrEmpty(runwdaError))
+                int port1 = MainScreen.udidProxyPort[udid];
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
                 {
-                    if (runwdaError.Contains("Process started successfully"))
-                    {
-                        sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                        while (sessionId.Equals("nosession") && count <= 6)
-                        {
-                            sessionId = iOSAPIMethods.CreateWDASession(port);
-                            Thread.Sleep(5000);
-                            sessionId = iOSAPIMethods.CreateWDASession(port);
-                            if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
-                            {
-                                commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry "+count+"/6.");
-                                isPasscodeRequired = true;
-                                Thread.Sleep(5000);
-                            }
-                            count++;
-                        }
-                        //if (runwdaError.Contains("Timed out while enabling automation mode"))
-                        //{
-                        //    return "Timed out";
-                        //}
-                        if (sessionId.Equals("nosession") & isPasscodeRequired)
-                        {
-                            process.Close();
-                            return "nosession passcode required";
-                        }
-                        else
-                        {
-                            process.Close();
-                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                            return sessionId;
-                        }
-                        //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'InvalidService'"))
-                        //{
-                        //    return "Enable Developer Mode";
-                        //}
-                        //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-                        //{
-                        //    return "Password Protected";
-                        //}
-
-                    }
+                    return sessionId;
                 }
             }
-            if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+            if (isGo)
             {
-                return "Enable Developer Mode";
+                // Create a new process
+                Process process = new Process();
+
+                // Configure the process
+                process.StartInfo.FileName = iOSServerFilePath;
+                process.StartInfo.Arguments = "runwda --udid=" + udid;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.EnableRaisingEvents = true;
+
+                // Register event handlers for error and output data received
+                process.ErrorDataReceived += Process_ErrorDataReceived;
+                process.OutputDataReceived += Process_OutputDataReceived;
+
+                // Start the process
+                process.Start();
+                var processId = process.Id;
+                MainScreen.runningProcesses.Add(processId);
+                Thread.Sleep(2000);
+                // Begin asynchronous reading of the output/error streams
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+
+                // Wait for the process to exit
+                //process.WaitForExit();
+
+                // Clean up resources
+                //process.Close();
+                bool isPasscodeRequired = false;
+                int count = 1;
+                string sessionId = string.Empty;
+                while (!process.HasExited)
+                {
+                    if (!string.IsNullOrEmpty(runwdaError))
+                    {
+                        if (runwdaError.Contains("Process started successfully"))
+                        {
+                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                            while (sessionId.Equals("nosession") && count <= 6)
+                            {
+                                Thread.Sleep(5000);
+                                sessionId = iOSAPIMethods.CreateWDASession(port);
+                                if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
+                                {
+                                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                    isPasscodeRequired = true;
+                                }
+                                count++;
+                            }
+                            //if (runwdaError.Contains("Timed out while enabling automation mode"))
+                            //{
+                            //    return "Timed out";
+                            //}
+                            if (sessionId.Equals("nosession") & isPasscodeRequired)
+                            {
+                                process.Close();
+                                return "nosession passcode required";
+                            }
+                            else
+                            {
+                                process.Close();
+                                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                                return sessionId;
+                            }
+                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'InvalidService'"))
+                            //{
+                            //    return "Enable Developer Mode";
+                            //}
+                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+                            //{
+                            //    return "Password Protected";
+                            //}
+
+                        }
+                    }
+                }
+                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+                {
+                    return "Enable Developer Mode";
+                }
+                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+                {
+                    return "Password Protected";
+                }
+                if (runwdaError.Contains("Timed out while enabling automation mode"))
+                {
+                    return "Timed out";
+                }
+                return "unhandled";
             }
-            if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+            else
             {
-                return "Password Protected";
+                int count = 1;
+                string sessionId = string.Empty;
+                string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                if (output.Contains("Process launched with pid"))
+                {
+                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    while (sessionId.Equals("nosession") && count <= 6)
+                    {
+                        Thread.Sleep(5000);
+                        sessionId = iOSAPIMethods.CreateWDASession(port);
+                        if (sessionId.Equals("nosession"))
+                        {
+                            commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nRetry " + count + "/6.");
+                            Thread.Sleep(5000);
+                            iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                        }
+                        count++;
+                    }
+                }
+                else if (output.Contains("'BSErrorCodeDescription': 'Locked'") | output.Contains("'PasswordProtected'"))
+                {
+                    return "Password Protected";
+                }
+                else if (!iOSMethods.GetInstance().isDeveloperModeDisabled(udid))
+                {
+                    return "Enable Developer Mode";
+                }
+                return sessionId;
             }
-            if (runwdaError.Contains("Timed out while enabling automation mode"))
-            {
-                return "Timed out";
-            }
-            return "unhandled";
         }
         public void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -949,6 +1318,101 @@ namespace Appium_Wizard
             {
                 Console.WriteLine("Output: " + e.Data);
                 runwdaOutput += e.Data;
+            }
+        }
+
+        Process tunnelProcess;
+        public bool CreateTunnel()
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            bool clickedOK = false; int counter = 1;
+            bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
+            if (!isProcessRunning)
+            {
+                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result == DialogResult.OK)
+                {
+                    commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\n\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
+                    clickedOK = true;
+                    try
+                    {
+                        tunnelProcess = new Process();
+                        tunnelProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
+                        tunnelProcess.StartInfo.Arguments = "remote tunneld";
+                        tunnelProcess.StartInfo.UseShellExecute = true;
+                        tunnelProcess.StartInfo.CreateNoWindow = true;
+                        tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        tunnelProcess.StartInfo.Verb = "runas";
+                        tunnelProcess.Start();
+                        try
+                        {
+                            var id = tunnelProcess.Id; // just to check if there's exception.
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            commonProgress.Close();
+                            MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            return false;
+                        }
+                        Thread.Sleep(10000);
+                        while (!iOSAPIMethods.isTunnelRunning() && counter <= 10) 
+                        {
+                            if (tunnelProcess.HasExited)
+                            {
+                                commonProgress.Close();
+                                MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                return false;
+                            }
+                            Thread.Sleep(5000);
+                            counter++;
+                        }
+                        var processId = tunnelProcess.Id;
+                        MainScreen.runningProcesses.Add(processId);
+                        commonProgress.Close();
+                    }
+                    catch (Exception)
+                    {
+                        commonProgress.Close();
+                        MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return false;
+                    }
+                }
+                else
+                {
+                    commonProgress.Close();
+                    clickedOK = false;
+                    GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
+                    //try
+                    //{
+                    //    ProcessStartInfo psInfo = new ProcessStartInfo
+                    //    {
+                    //        FileName = "https://developer.apple.com/forums/thread/730947?answerId=756665022#756665022",
+                    //        UseShellExecute = true
+                    //    };
+                    //    Process.Start(psInfo);
+                    //    GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
+                    //}
+                    //catch (Exception exception)
+                    //{
+                    //    GoogleAnalytics.SendExceptionEvent("iOS17_Admin_Cancel", exception.Message);
+                    //}
+                }
+            }
+            else
+            {
+                clickedOK = true;
+            }
+            commonProgress.Close();
+            return clickedOK;
+        }
+
+        public void CloseTunnel()
+        {
+            if (tunnelProcess != null)
+            {
+                tunnelProcess.Kill();
+                tunnelProcess.Close();
             }
         }
     }
@@ -985,7 +1449,7 @@ namespace Appium_Wizard
             return sessionId;
         }
 
-        public static (int, int) GetScreenSize(string sessionId, int proxyPort)
+        public static (int, int) GetScreenSize(int proxyPort)
         {
             int width, height;
             var options = new RestClientOptions("http://localhost:" + proxyPort)
@@ -993,7 +1457,7 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/window/size", Method.Get);
+            var request = new RestRequest("/window/size", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
             if (response.StatusCode == HttpStatusCode.OK)
@@ -1013,9 +1477,11 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL);
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/wda/tap", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {pressX}, ""y"": {pressY} }} }},{{ ""action"": ""release"" }}]}}";
+            //var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {pressX}, ""y"": {pressY} }} }},{{ ""action"": ""release"" }}]}}";
+            var body = $@"{{ ""x"": {pressX}, ""y"": {pressY} }}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1028,9 +1494,11 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/wda/keys", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            //var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            var body = $@"{{""value"":[""{text}""]}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1043,9 +1511,11 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
             request.AddHeader("Content-Type", "application/json");
-            var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{pressX},""y"":{pressY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{moveToX},""y"":{moveToY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
+            //var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{pressX},""y"":{pressY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{moveToX},""y"":{moveToY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
+            var body = $@"{{""actions"":[{{""type"":""pointer"",""id"":""finger1"",""parameters"":{{""pointerType"":""touch""}},""actions"":[{{""type"":""pointerMove"",""duration"":0,""x"":{pressX},""y"":{pressY}}},{{""type"":""pointerMove"",""duration"":{waitDuration},""origin"":""viewport"",""x"":{moveToX},""y"":{moveToY}}}]}}]}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
@@ -1067,36 +1537,19 @@ namespace Appium_Wizard
 
         public static void OpenControlCenter(string URL, string sessionId, int screenWidth, int screenHeight)
         {
-            var options = new RestClientOptions(URL)
-            {
-                MaxTimeout = -1,
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
             int waitDuration = 500;
             int fromX = screenWidth - 50;
             int fromY = 50;
             int endX = fromX;
             int endY = screenHeight;
-            var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{fromX},""y"":{fromY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{endX},""y"":{endY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
-            request.AddStringBody(body, DataFormat.Json);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            Swipe(URL,sessionId,fromX,fromY,endX,endY,waitDuration);
         }
 
         public static void CloseControlCenter(string URL, string sessionId, int screenWidth)
         {
-            var options = new RestClientOptions(URL);
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
             int x = screenWidth / 2;
             int y = 50;
-            var body = $@"{{""actions"": [{{ ""action"": ""press"", ""options"": {{ ""x"": {x}, ""y"": {y} }} }},{{ ""action"": ""release"" }}]}}";
-            request.AddStringBody(body, DataFormat.Json);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            Tap(URL, sessionId, x, y);
         }
 
         public static string GetWDASessionID(string URL)
@@ -1143,6 +1596,107 @@ namespace Appium_Wizard
             }
         }
 
+        public static bool isTunnelRunning()
+        {
+            var options = new RestClientOptions("http://127.0.0.1:49151")
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/hello", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            if (response.Content != null)
+            {
+                return response.Content.Contains("Hello, I'm alive");
+            }
+            else { return false; }  
+        }
 
+        public static string LaunchApp(string URL, string sessionId, string bundleId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
+            var body = $@"{{""bundleId"": ""{bundleId}""}}";
+            request.AddParameter("text/plain", body, ParameterType.RequestBody);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.Content;
+        }
+
+        public static string KillApp(string URL, string sessionId, string bundleId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
+            var body = $@"{{""bundleId"": ""{bundleId}""}}";
+            request.AddParameter("text/plain", body, ParameterType.RequestBody);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.Content;
+        }
+
+        public static void TakeScreenshot(string URL, string filePath)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/screenshot", Method.Get);
+            RestResponse response = client.Execute(request);
+            string jsonString = response.Content;
+
+            JsonDocument doc = JsonDocument.Parse(jsonString);
+            string base64String = doc.RootElement.GetProperty("value").GetString();
+
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+            using (MemoryStream ms = new MemoryStream(imageBytes))
+            {
+                Image image = Image.FromStream(ms);
+                image.Save(filePath, ImageFormat.Png);
+            }
+        }
+
+        public static bool IsWDARunning(int port)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/status", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                if (response.Content != null)
+                {
+                    if (response.Content.Contains("WebDriverAgent is ready to accept commands"))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

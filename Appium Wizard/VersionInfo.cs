@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "1.4.1";
-        public const string ReleaseNotes = "Bug fix - Unable to add device if brand model not avilable";
+        public const string VersionNumber = "2.0.0";
+        public const string ReleaseNotes = "iOS >=17.4 support";
     }
 }

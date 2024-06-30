@@ -125,7 +125,7 @@ namespace Appium_Wizard
             {
                 int wdaLocalPort = Common.GetFreePort();
                 int screenport = Common.GetFreePort();
-                serverSetup.StartAppiumServer(portNumber, wdaLocalPort, serverNumber, screenport);
+                serverSetup.StartAppiumServer(portNumber, serverNumber);
                 int count = 1;
                 while (!serverSetup.serverStarted)
                 {

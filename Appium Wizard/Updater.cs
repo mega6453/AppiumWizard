@@ -26,60 +26,66 @@ namespace Appium_Wizard
 
         private void GetVersionInformation()
         {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed server version information. This may take sometime...");
-            driverVersion = Common.InstalledDriverVersion();
-            appiumCurrentVersionLabel.Text = Common.InstalledAppiumServerVersion(); ;
-            XCUITestCurrentVersionLabel.Text = driverVersion["xcuitest"];
-            UIAutomatorCurrentVersionLabel.Text = driverVersion["uiautomator2"];
-            commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while checking for server updates. This may take sometime...");
-            AppiumAvailableVersionLabel.Text = Common.AavailableAppiumVersion();
-            XCUITestAvailableVersionLabel.Text = Common.AavailableXCUITestVersion();
-            UIAutomatorAvailableVersionLabel.Text = Common.AavailableUIAutomatorVersion();
-
-            Version currentVersionAppium = new Version(appiumCurrentVersionLabel.Text);
-            Version latestVersionAppium = new Version(AppiumAvailableVersionLabel.Text);
-
-            bool isUpdateAvailableAppium = latestVersionAppium > currentVersionAppium;
-            if (isUpdateAvailableAppium)
+            try
             {
-                AppiumButton.Enabled = true;
-            }
-            else
-            {
-                AppiumButton.Enabled = false;
-            }
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed server version information. This may take sometime...");
+                driverVersion = Common.InstalledDriverVersion();
+                appiumCurrentVersionLabel.Text = Common.InstalledAppiumServerVersion();
+                XCUITestCurrentVersionLabel.Text = driverVersion["xcuitest"];
+                UIAutomatorCurrentVersionLabel.Text = driverVersion["uiautomator2"];
+                commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while checking for server updates. This may take sometime...");
+                AppiumAvailableVersionLabel.Text = Common.AavailableAppiumVersion();
+                XCUITestAvailableVersionLabel.Text = Common.AavailableXCUITestVersion();
+                UIAutomatorAvailableVersionLabel.Text = Common.AavailableUIAutomatorVersion();
 
-            //XCUITest
-            Version currentVersionXCUITest = new Version(XCUITestCurrentVersionLabel.Text);
-            Version latestVersionXCUITest = new Version(XCUITestAvailableVersionLabel.Text);
+                Version currentVersionAppium = new Version(appiumCurrentVersionLabel.Text);
+                Version latestVersionAppium = new Version(AppiumAvailableVersionLabel.Text);
 
-            bool isUpdateAvailableXCUITest = latestVersionXCUITest > currentVersionXCUITest;
-            if (isUpdateAvailableXCUITest)
-            {
-                XCUITestButton.Enabled = true;
-            }
-            else
-            {
-                XCUITestButton.Enabled = false;
-            }
+                bool isUpdateAvailableAppium = latestVersionAppium > currentVersionAppium;
+                if (isUpdateAvailableAppium)
+                {
+                    AppiumButton.Enabled = true;
+                }
+                else
+                {
+                    AppiumButton.Enabled = false;
+                }
 
-            //UIAutomator2
-            Version currentVersionUI = new Version(UIAutomatorCurrentVersionLabel.Text);
-            Version latestVersionUI = new Version(UIAutomatorAvailableVersionLabel.Text);
+                //XCUITest
+                Version currentVersionXCUITest = new Version(XCUITestCurrentVersionLabel.Text);
+                Version latestVersionXCUITest = new Version(XCUITestAvailableVersionLabel.Text);
 
-            bool isUpdateAvailableUI = latestVersionUI > currentVersionUI;
-            if (isUpdateAvailableUI)
-            {
-                UIAutomatorButton.Enabled = true;
-            }
-            else
-            {
-                UIAutomatorButton.Enabled = false;
-            }
-            commonProgress.Close();
+                bool isUpdateAvailableXCUITest = latestVersionXCUITest > currentVersionXCUITest;
+                if (isUpdateAvailableXCUITest)
+                {
+                    XCUITestButton.Enabled = true;
+                }
+                else
+                {
+                    XCUITestButton.Enabled = false;
+                }
 
+                //UIAutomator2
+                Version currentVersionUI = new Version(UIAutomatorCurrentVersionLabel.Text);
+                Version latestVersionUI = new Version(UIAutomatorAvailableVersionLabel.Text);
+
+                bool isUpdateAvailableUI = latestVersionUI > currentVersionUI;
+                if (isUpdateAvailableUI)
+                {
+                    UIAutomatorButton.Enabled = true;
+                }
+                else
+                {
+                    UIAutomatorButton.Enabled = false;
+                }
+                commonProgress.Close();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message,"Unhandled Exception",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
         }
 
         private void AppiumButton_Click(object sender, EventArgs e)

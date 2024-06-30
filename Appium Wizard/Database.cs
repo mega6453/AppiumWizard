@@ -264,6 +264,5 @@ namespace Appium_Wizard
                 connection.Close();
             }
         }
-
     }
 }

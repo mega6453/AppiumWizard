@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
+using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -699,25 +700,22 @@ namespace Appium_Wizard
         {
             try
             {
-                string hostname = Dns.GetHostName();
-                IPHostEntry host = Dns.GetHostEntry(hostname);
-                IPAddress ipAddress = null;
-                foreach (IPAddress ip in host.AddressList)
+                foreach (NetworkInterface netInterface in NetworkInterface.GetAllNetworkInterfaces())
                 {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 &&
+                        netInterface.OperationalStatus == OperationalStatus.Up)
                     {
-                        ipAddress = ip;
-                        break;
+                        IPInterfaceProperties ipProps = netInterface.GetIPProperties();
+                        foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+                        {
+                            if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                return addr.Address.ToString();
+                            }
+                        }
                     }
                 }
-                if (ipAddress != null)
-                {
-                    return ipAddress.ToString();
-                }
-                else
-                {
-                    return "NoValidAddress";
-                }
+                return "NoValidAddress";
             }
             catch (Exception)
             {
@@ -785,6 +783,52 @@ namespace Appium_Wizard
         {
             bool isValidIpAddress = Regex.IsMatch(ipAddressString, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$") && IPAddress.TryParse(ipAddressString, out IPAddress ipAddress);
             return isValidIpAddress;
+        }
+
+        public static bool isProcessIdExist(int processId)
+        {
+            Process[] processes = Process.GetProcesses();
+            bool isRunning = false;
+
+            foreach (Process process in processes)
+            {
+                if (process.Id == processId)
+                {
+                    isRunning = true;
+                    break;
+                }
+            }
+            if (isRunning)
+            {
+                Process process = Process.GetProcessById(processId);
+                if (process.ProcessName.Equals("pymobiledevice3", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static int GetChildProcessId(int parentId, string processName)
+        {
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_Process WHERE ParentProcessID={parentId}"))
+            {
+                foreach (ManagementObject process in searcher.Get())
+                {
+                    if (process["Name"].ToString().ToLower() == processName.ToLower())
+                    {
+                        return Convert.ToInt32(process["ProcessId"]);
+                    }
+                }
+            }
+            return -1; // Not found
         }
     }
 }

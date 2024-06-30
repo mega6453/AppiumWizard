@@ -51,7 +51,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 
 * Upto 5 Parallel Appium servers
 * Update Appium Server and drivers
-* iOS Automation Execution
+* iOS Automation Execution **(including iOS version >=17.4)**
 * iOS Screen Reflection and Screen Control
 * iOS Profile management
 * IPA Signer
@@ -76,14 +76,14 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Error handling
 
 ## Known Issues (fix in progress)
-* iOS 17 not supported 
 * Performance issues
 
 ## Built With
 * .Net C# & Windows Forms 
 * NodeJS
 * Appium, XCUITest, UIAutomator2
-* go-ios 
+* go-ios
+* pymobiledevice3
 * imobiledevice-net
 * zsign
 * adb
@@ -93,6 +93,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 
 ## Thanks To
 * [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
+* [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS 17+ support.
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
 * [Dadoum](https://github.com/Dadoum/zsign-Windows) - For providing zsign windows executable.

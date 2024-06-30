@@ -145,6 +145,7 @@
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
                                     MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
                                 }
                             }
                             if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
@@ -152,6 +153,7 @@
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
                             if (isWDAInstalled)
@@ -170,30 +172,35 @@
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("Password Protected"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("WDA Not Installed"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("unhandled"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (!WDAsessionId.Equals("nosession"))
                             {
@@ -223,6 +230,7 @@
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                         }
                     }
@@ -262,24 +270,28 @@
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("Password Protected"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("WDA Not Installed"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (WDAsessionId.Equals("nosession passcode required"))
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
                                 MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             else if (!WDAsessionId.Equals("nosession"))
                             {
@@ -307,6 +319,7 @@
                 {
                     commonProgress.Close();
                     MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
             }
             catch (Exception e)
@@ -314,6 +327,7 @@
                 commonProgress.Hide();
                 MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 commonProgress.Close();
+                return;
             }
         }
 

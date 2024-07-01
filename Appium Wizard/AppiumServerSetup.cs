@@ -124,8 +124,6 @@ namespace Appium_Wizard
 
                 try
                 {
-                    executionStatus.UpdateStatus(data);
-
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
                     {
                         string platformName = "";

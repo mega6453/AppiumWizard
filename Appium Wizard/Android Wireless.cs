@@ -11,6 +11,10 @@
         {
             this.mainScreen = mainScreen;
             InitializeComponent();
+            int listViewWidth = listView1.Width;
+            int columnWidth = listViewWidth / 2;
+            listView1.Columns[0].Width = columnWidth;
+            listView1.Columns[1].Width = columnWidth;
         }
 
         private void FindDeviceButton_Click(object sender, EventArgs e)

@@ -37,17 +37,20 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(132, 44);
+            label1.Location = new Point(92, 26);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(306, 25);
+            label1.Size = new Size(200, 15);
             label1.TabIndex = 0;
             label1.Text = "How do you want to Install the app ?";
             // 
             // button1
             // 
-            button1.Location = new Point(104, 105);
+            button1.AutoSize = true;
+            button1.Location = new Point(73, 63);
+            button1.Margin = new Padding(2, 2, 2, 2);
             button1.Name = "button1";
-            button1.Size = new Size(130, 34);
+            button1.Size = new Size(91, 25);
             button1.TabIndex = 1;
             button1.Text = "Sign && Install";
             button1.UseVisualStyleBackColor = true;
@@ -55,9 +58,11 @@
             // 
             // button2
             // 
-            button2.Location = new Point(357, 105);
+            button2.AutoSize = true;
+            button2.Location = new Point(250, 63);
+            button2.Margin = new Padding(2, 2, 2, 2);
             button2.Name = "button2";
-            button2.Size = new Size(112, 34);
+            button2.Size = new Size(78, 25);
             button2.TabIndex = 2;
             button2.Text = "Just Install";
             button2.UseVisualStyleBackColor = true;
@@ -65,16 +70,17 @@
             // 
             // InstalliOSApp
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(588, 180);
+            ClientSize = new Size(412, 108);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             HelpButton = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2, 2, 2, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "InstalliOSApp";

@@ -44,26 +44,30 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 106);
+            label1.Location = new Point(8, 64);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(70, 25);
+            label1.Size = new Size(45, 15);
             label1.TabIndex = 0;
             label1.Text = "P12 file";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 196);
+            label2.Location = new Point(8, 118);
+            label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(169, 25);
+            label2.Size = new Size(112, 15);
             label2.TabIndex = 1;
             label2.Text = "Mobileprovision file";
             // 
             // button1
             // 
-            button1.Location = new Point(751, 101);
+            button1.AutoSize = true;
+            button1.Location = new Point(526, 59);
+            button1.Margin = new Padding(2);
             button1.Name = "button1";
-            button1.Size = new Size(37, 34);
+            button1.Size = new Size(26, 25);
             button1.TabIndex = 2;
             button1.Text = "...";
             button1.UseVisualStyleBackColor = true;
@@ -71,9 +75,11 @@
             // 
             // button2
             // 
-            button2.Location = new Point(751, 194);
+            button2.AutoSize = true;
+            button2.Location = new Point(526, 114);
+            button2.Margin = new Padding(2);
             button2.Name = "button2";
-            button2.Size = new Size(37, 34);
+            button2.Size = new Size(26, 25);
             button2.TabIndex = 3;
             button2.Text = "...";
             button2.UseVisualStyleBackColor = true;
@@ -82,41 +88,47 @@
             // textBox1
             // 
             textBox1.Enabled = false;
-            textBox1.Location = new Point(187, 101);
+            textBox1.Location = new Point(131, 61);
+            textBox1.Margin = new Padding(2);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(540, 31);
+            textBox1.Size = new Size(379, 23);
             textBox1.TabIndex = 4;
             // 
             // textBox2
             // 
             textBox2.Enabled = false;
-            textBox2.Location = new Point(187, 194);
+            textBox2.Location = new Point(131, 116);
+            textBox2.Margin = new Padding(2);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(540, 31);
+            textBox2.Size = new Size(379, 23);
             textBox2.TabIndex = 5;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(12, 279);
+            label3.Location = new Point(8, 170);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(170, 25);
+            label3.Size = new Size(114, 15);
             label3.TabIndex = 6;
             label3.Text = "Certificate Password";
             // 
             // maskedTextBox1
             // 
-            maskedTextBox1.Location = new Point(188, 278);
+            maskedTextBox1.Location = new Point(132, 167);
+            maskedTextBox1.Margin = new Padding(2);
             maskedTextBox1.Name = "maskedTextBox1";
-            maskedTextBox1.Size = new Size(539, 31);
+            maskedTextBox1.Size = new Size(378, 23);
             maskedTextBox1.TabIndex = 7;
             maskedTextBox1.UseSystemPasswordChar = true;
             // 
             // button3
             // 
-            button3.Location = new Point(512, 369);
+            button3.AutoSize = true;
+            button3.Location = new Point(298, 221);
+            button3.Margin = new Padding(2);
             button3.Name = "button3";
-            button3.Size = new Size(112, 34);
+            button3.Size = new Size(78, 25);
             button3.TabIndex = 8;
             button3.Text = "Import";
             button3.UseVisualStyleBackColor = true;
@@ -124,9 +136,11 @@
             // 
             // button4
             // 
-            button4.Location = new Point(275, 369);
+            button4.AutoSize = true;
+            button4.Location = new Point(192, 221);
+            button4.Margin = new Padding(2);
             button4.Name = "button4";
-            button4.Size = new Size(112, 34);
+            button4.Size = new Size(78, 25);
             button4.TabIndex = 9;
             button4.Text = "Cancel";
             button4.UseVisualStyleBackColor = true;
@@ -134,10 +148,10 @@
             // 
             // ImportProfile
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(560, 270);
             Controls.Add(button4);
             Controls.Add(button3);
             Controls.Add(maskedTextBox1);
@@ -151,6 +165,7 @@
             FormBorderStyle = FormBorderStyle.FixedSingle;
             HelpButton = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ImportProfile";

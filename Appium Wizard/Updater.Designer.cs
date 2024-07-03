@@ -75,14 +75,15 @@
             tableLayoutPanel1.Controls.Add(AppiumButton, 3, 1);
             tableLayoutPanel1.Controls.Add(XCUITestButton, 3, 2);
             tableLayoutPanel1.Controls.Add(UIAutomatorButton, 3, 3);
-            tableLayoutPanel1.Location = new Point(0, 5);
+            tableLayoutPanel1.Location = new Point(0, 3);
+            tableLayoutPanel1.Margin = new Padding(2, 2, 2, 2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 4;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            tableLayoutPanel1.Size = new Size(800, 335);
+            tableLayoutPanel1.Size = new Size(560, 201);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // label11
@@ -90,9 +91,10 @@
             label11.Anchor = AnchorStyles.None;
             label11.AutoSize = true;
             label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
-            label11.Location = new Point(33, 272);
+            label11.Location = new Point(25, 162);
+            label11.Margin = new Padding(2, 0, 2, 0);
             label11.Name = "label11";
-            label11.Size = new Size(133, 25);
+            label11.Size = new Size(89, 15);
             label11.TabIndex = 11;
             label11.Text = "UIAutomator2";
             // 
@@ -101,9 +103,10 @@
             label5.Anchor = AnchorStyles.None;
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
-            label5.Location = new Point(60, 72);
+            label5.Location = new Point(44, 42);
+            label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
-            label5.Size = new Size(80, 25);
+            label5.Size = new Size(51, 15);
             label5.TabIndex = 5;
             label5.Text = "Appium";
             // 
@@ -112,9 +115,10 @@
             label4.Anchor = AnchorStyles.None;
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.Location = new Point(658, 5);
+            label4.Location = new Point(462, 3);
+            label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
-            label4.Size = new Size(81, 25);
+            label4.Size = new Size(53, 15);
             label4.TabIndex = 4;
             label4.Text = "Updater";
             // 
@@ -123,9 +127,10 @@
             label3.Anchor = AnchorStyles.None;
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(418, 5);
+            label3.Location = new Point(297, 3);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(159, 25);
+            label3.Size = new Size(101, 15);
             label3.TabIndex = 3;
             label3.Text = "Available Version";
             // 
@@ -134,9 +139,10 @@
             label2.Anchor = AnchorStyles.None;
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(227, 5);
+            label2.Location = new Point(162, 3);
+            label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(144, 25);
+            label2.Size = new Size(94, 15);
             label2.TabIndex = 2;
             label2.Text = "Current Version";
             // 
@@ -145,9 +151,10 @@
             label1.Anchor = AnchorStyles.None;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(44, 5);
+            label1.Location = new Point(34, 3);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(111, 25);
+            label1.Size = new Size(72, 15);
             label1.TabIndex = 1;
             label1.Text = "Component";
             // 
@@ -155,18 +162,20 @@
             // 
             appiumCurrentVersionLabel.Anchor = AnchorStyles.None;
             appiumCurrentVersionLabel.AutoSize = true;
-            appiumCurrentVersionLabel.Location = new Point(299, 72);
+            appiumCurrentVersionLabel.Location = new Point(209, 42);
+            appiumCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             appiumCurrentVersionLabel.Name = "appiumCurrentVersionLabel";
-            appiumCurrentVersionLabel.Size = new Size(0, 25);
+            appiumCurrentVersionLabel.Size = new Size(0, 15);
             appiumCurrentVersionLabel.TabIndex = 6;
             // 
             // AppiumAvailableVersionLabel
             // 
             AppiumAvailableVersionLabel.Anchor = AnchorStyles.None;
             AppiumAvailableVersionLabel.AutoSize = true;
-            AppiumAvailableVersionLabel.Location = new Point(498, 72);
+            AppiumAvailableVersionLabel.Location = new Point(348, 42);
+            AppiumAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             AppiumAvailableVersionLabel.Name = "AppiumAvailableVersionLabel";
-            AppiumAvailableVersionLabel.Size = new Size(0, 25);
+            AppiumAvailableVersionLabel.Size = new Size(0, 15);
             AppiumAvailableVersionLabel.TabIndex = 7;
             // 
             // label8
@@ -174,9 +183,10 @@
             label8.Anchor = AnchorStyles.None;
             label8.AutoSize = true;
             label8.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
-            label8.Location = new Point(55, 172);
+            label8.Location = new Point(40, 101);
+            label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
-            label8.Size = new Size(89, 25);
+            label8.Size = new Size(59, 15);
             label8.TabIndex = 8;
             label8.Text = "XCUITest";
             // 
@@ -184,44 +194,50 @@
             // 
             XCUITestCurrentVersionLabel.Anchor = AnchorStyles.None;
             XCUITestCurrentVersionLabel.AutoSize = true;
-            XCUITestCurrentVersionLabel.Location = new Point(299, 172);
+            XCUITestCurrentVersionLabel.Location = new Point(209, 101);
+            XCUITestCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             XCUITestCurrentVersionLabel.Name = "XCUITestCurrentVersionLabel";
-            XCUITestCurrentVersionLabel.Size = new Size(0, 25);
+            XCUITestCurrentVersionLabel.Size = new Size(0, 15);
             XCUITestCurrentVersionLabel.TabIndex = 9;
             // 
             // XCUITestAvailableVersionLabel
             // 
             XCUITestAvailableVersionLabel.Anchor = AnchorStyles.None;
             XCUITestAvailableVersionLabel.AutoSize = true;
-            XCUITestAvailableVersionLabel.Location = new Point(498, 172);
+            XCUITestAvailableVersionLabel.Location = new Point(348, 101);
+            XCUITestAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             XCUITestAvailableVersionLabel.Name = "XCUITestAvailableVersionLabel";
-            XCUITestAvailableVersionLabel.Size = new Size(0, 25);
+            XCUITestAvailableVersionLabel.Size = new Size(0, 15);
             XCUITestAvailableVersionLabel.TabIndex = 10;
             // 
             // UIAutomatorCurrentVersionLabel
             // 
             UIAutomatorCurrentVersionLabel.Anchor = AnchorStyles.None;
             UIAutomatorCurrentVersionLabel.AutoSize = true;
-            UIAutomatorCurrentVersionLabel.Location = new Point(299, 272);
+            UIAutomatorCurrentVersionLabel.Location = new Point(209, 162);
+            UIAutomatorCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             UIAutomatorCurrentVersionLabel.Name = "UIAutomatorCurrentVersionLabel";
-            UIAutomatorCurrentVersionLabel.Size = new Size(0, 25);
+            UIAutomatorCurrentVersionLabel.Size = new Size(0, 15);
             UIAutomatorCurrentVersionLabel.TabIndex = 12;
             // 
             // UIAutomatorAvailableVersionLabel
             // 
             UIAutomatorAvailableVersionLabel.Anchor = AnchorStyles.None;
             UIAutomatorAvailableVersionLabel.AutoSize = true;
-            UIAutomatorAvailableVersionLabel.Location = new Point(498, 272);
+            UIAutomatorAvailableVersionLabel.Location = new Point(348, 162);
+            UIAutomatorAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             UIAutomatorAvailableVersionLabel.Name = "UIAutomatorAvailableVersionLabel";
-            UIAutomatorAvailableVersionLabel.Size = new Size(0, 25);
+            UIAutomatorAvailableVersionLabel.Size = new Size(0, 15);
             UIAutomatorAvailableVersionLabel.TabIndex = 13;
             // 
             // AppiumButton
             // 
             AppiumButton.Anchor = AnchorStyles.None;
-            AppiumButton.Location = new Point(642, 67);
+            AppiumButton.AutoSize = true;
+            AppiumButton.Location = new Point(449, 37);
+            AppiumButton.Margin = new Padding(2, 2, 2, 2);
             AppiumButton.Name = "AppiumButton";
-            AppiumButton.Size = new Size(112, 34);
+            AppiumButton.Size = new Size(78, 25);
             AppiumButton.TabIndex = 14;
             AppiumButton.Text = "Update";
             AppiumButton.UseVisualStyleBackColor = true;
@@ -230,9 +246,11 @@
             // XCUITestButton
             // 
             XCUITestButton.Anchor = AnchorStyles.None;
-            XCUITestButton.Location = new Point(642, 167);
+            XCUITestButton.AutoSize = true;
+            XCUITestButton.Location = new Point(449, 96);
+            XCUITestButton.Margin = new Padding(2, 2, 2, 2);
             XCUITestButton.Name = "XCUITestButton";
-            XCUITestButton.Size = new Size(112, 34);
+            XCUITestButton.Size = new Size(78, 25);
             XCUITestButton.TabIndex = 15;
             XCUITestButton.Text = "Update";
             XCUITestButton.UseVisualStyleBackColor = true;
@@ -241,9 +259,11 @@
             // UIAutomatorButton
             // 
             UIAutomatorButton.Anchor = AnchorStyles.None;
-            UIAutomatorButton.Location = new Point(642, 267);
+            UIAutomatorButton.AutoSize = true;
+            UIAutomatorButton.Location = new Point(449, 157);
+            UIAutomatorButton.Margin = new Padding(2, 2, 2, 2);
             UIAutomatorButton.Name = "UIAutomatorButton";
-            UIAutomatorButton.Size = new Size(112, 34);
+            UIAutomatorButton.Size = new Size(78, 25);
             UIAutomatorButton.TabIndex = 16;
             UIAutomatorButton.Text = "Update";
             UIAutomatorButton.UseVisualStyleBackColor = true;
@@ -253,22 +273,24 @@
             // 
             label6.AutoSize = true;
             label6.ForeColor = Color.Red;
-            label6.Location = new Point(0, 351);
+            label6.Location = new Point(0, 211);
+            label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
-            label6.Size = new Size(642, 25);
+            label6.Size = new Size(427, 15);
             label6.TabIndex = 1;
             label6.Text = "Note : Appium will update the drivers only if the available version is compatible.";
             // 
             // Updater
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(800, 383);
+            ClientSize = new Size(560, 230);
             Controls.Add(label6);
             Controls.Add(tableLayoutPanel1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2, 2, 2, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Updater";

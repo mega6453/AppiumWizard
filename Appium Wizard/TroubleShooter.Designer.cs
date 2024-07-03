@@ -173,39 +173,47 @@
             // 
             // NodeJSStatusLabel
             // 
+            NodeJSStatusLabel.Anchor = AnchorStyles.None;
             NodeJSStatusLabel.AutoSize = true;
-            NodeJSStatusLabel.Location = new Point(249, 43);
+            NodeJSStatusLabel.Location = new Point(270, 39);
             NodeJSStatusLabel.Margin = new Padding(2, 0, 2, 0);
             NodeJSStatusLabel.Name = "NodeJSStatusLabel";
             NodeJSStatusLabel.Size = new Size(0, 15);
             NodeJSStatusLabel.TabIndex = 13;
+            NodeJSStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // AppiumStatusLabel
             // 
+            AppiumStatusLabel.Anchor = AnchorStyles.None;
             AppiumStatusLabel.AutoSize = true;
-            AppiumStatusLabel.Location = new Point(251, 81);
+            AppiumStatusLabel.Location = new Point(270, 79);
             AppiumStatusLabel.Margin = new Padding(2, 0, 2, 0);
             AppiumStatusLabel.Name = "AppiumStatusLabel";
             AppiumStatusLabel.Size = new Size(0, 15);
             AppiumStatusLabel.TabIndex = 14;
+            AppiumStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // XCUITestStatusLabel
             // 
+            XCUITestStatusLabel.Anchor = AnchorStyles.None;
             XCUITestStatusLabel.AutoSize = true;
-            XCUITestStatusLabel.Location = new Point(252, 122);
+            XCUITestStatusLabel.Location = new Point(270, 120);
             XCUITestStatusLabel.Margin = new Padding(2, 0, 2, 0);
             XCUITestStatusLabel.Name = "XCUITestStatusLabel";
             XCUITestStatusLabel.Size = new Size(0, 15);
             XCUITestStatusLabel.TabIndex = 15;
+            XCUITestStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // UIAutomatorStatusLabel
             // 
+            UIAutomatorStatusLabel.Anchor = AnchorStyles.None;
             UIAutomatorStatusLabel.AutoSize = true;
-            UIAutomatorStatusLabel.Location = new Point(252, 161);
+            UIAutomatorStatusLabel.Location = new Point(270, 165);
             UIAutomatorStatusLabel.Margin = new Padding(2, 0, 2, 0);
             UIAutomatorStatusLabel.Name = "UIAutomatorStatusLabel";
             UIAutomatorStatusLabel.Size = new Size(0, 15);
             UIAutomatorStatusLabel.TabIndex = 16;
+            UIAutomatorStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // FixLabel
             // 
@@ -240,6 +248,10 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));
             tableLayoutPanel1.Controls.Add(FixNodeJSButton, 2, 1);
             tableLayoutPanel1.Controls.Add(FixAppiumButton, 2, 2);
+            tableLayoutPanel1.Controls.Add(NodeJSStatusLabel, 1, 1);
+            tableLayoutPanel1.Controls.Add(AppiumStatusLabel, 1, 2);
+            tableLayoutPanel1.Controls.Add(XCUITestStatusLabel, 1, 3);
+            tableLayoutPanel1.Controls.Add(UIAutomatorStatusLabel, 1, 4);
             tableLayoutPanel1.Controls.Add(FixXCUITestButton, 2, 3);
             tableLayoutPanel1.Controls.Add(FixUIAutomatorButton, 2, 4);
             tableLayoutPanel1.Location = new Point(0, 0);
@@ -261,10 +273,6 @@
             ClientSize = new Size(538, 229);
             Controls.Add(checkForIssues);
             Controls.Add(FixLabel);
-            Controls.Add(UIAutomatorStatusLabel);
-            Controls.Add(XCUITestStatusLabel);
-            Controls.Add(AppiumStatusLabel);
-            Controls.Add(NodeJSStatusLabel);
             Controls.Add(StatusLabel);
             Controls.Add(ComponentsLabel);
             Controls.Add(UIAutomatorLabel);

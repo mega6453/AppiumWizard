@@ -10,6 +10,7 @@ namespace Appium_Wizard
         public iOSProfileManagement()
         {
             InitializeComponent();
+            AdjustFormAndListViewSize();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -21,7 +22,6 @@ namespace Appium_Wizard
 
         private void iOSProfileManagement_Load(object sender, EventArgs e)
         {
-            //RefreshProfileListView();
             UpdateProfilesList(listView1);
         }
 
@@ -114,6 +114,40 @@ namespace Appium_Wizard
         private void iOSProfileManagement_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
+
+        private void AdjustFormAndListViewSize()
+        {
+            using (Graphics g = this.CreateGraphics())
+            {
+                // Get the current DPI scaling factor
+                float dpiX = g.DpiX / 96.0f;
+
+                // Calculate the new width based on the scaling factor
+                int baseListViewWidth = 815;
+                int newListViewWidth = (int)(baseListViewWidth * dpiX);
+
+                // Adjust column widths and calculate total column width
+                int totalColumnWidth = (int)((300 + 200 + 150 + 150) * dpiX);
+
+                // Ensure ListView width is enough to fit all columns without scroll bar
+                listView1.Width = Math.Max(newListViewWidth, totalColumnWidth);
+
+                // Adjust Form width accordingly
+                this.Width = listView1.Width + (this.Width - this.ClientSize.Width);
+
+                // Set column widths
+                listView1.Columns[0].Width = (int)(300 * dpiX);
+                listView1.Columns[1].Width = (int)(200 * dpiX);
+                listView1.Columns[2].Width = (int)(150 * dpiX);
+                listView1.Columns[3].Width = (int)(150 * dpiX);
+
+                // Hide the 5th column if it exists
+                if (listView1.Columns.Count > 4)
+                {
+                    listView1.Columns[4].Width = 0;
+                }
+            }
         }
     }
 }

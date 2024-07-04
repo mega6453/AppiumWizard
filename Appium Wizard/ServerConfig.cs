@@ -97,9 +97,15 @@ namespace Appium_Wizard
                     bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox1.Text));
                     if (isRunning)
                     {
-                        Invoke(new Action(() => StatusLabel1.Text = "Running"));
-                        GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
-                        break;
+                        try
+                        {
+                            Invoke(new Action(() => StatusLabel1.Text = "Running"));
+                            GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                     Thread.Sleep(2000);
                 }

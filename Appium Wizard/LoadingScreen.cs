@@ -6,7 +6,8 @@ namespace Appium_Wizard
     {
         AppiumServerSetup serverSetup = new AppiumServerSetup();
         public static int UiAutomatorPort;
-        public int appiumPort = 4723;
+        public static int appiumPort = 4723;
+        public static bool isServerStarted;
         public LoadingScreen()
         {
             InitializeComponent();
@@ -58,7 +59,7 @@ namespace Appium_Wizard
             Common.SetAndroidHomeEnvironmentVariable();
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
-            bool isFirstTimeRun = false;// Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
+            bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
             if (isFirstTimeRun)
             {
                 firstTimeRunLabel.Text = "First time run verifies the installation, This may take sometime, Please wait...";
@@ -119,33 +120,45 @@ namespace Appium_Wizard
             }
         }
 
-        private Task ExecuteBackgroundMethod()
+        private void ExecuteBackgroundMethod()
         {
-            UiAutomatorPort = Common.GetFreePort(8200, 8220);
-            //AndroidMethods.GetInstance().StartAndroidProxyServer(UiAutomatorPort, 6790);
-            int screenport = Common.GetFreePort();
+            bool isAppiumPortFree = !Common.IsPortBeingUsed(appiumPort);
+            if (isAppiumPortFree) 
+            {
+                StartServer();
+                isServerStarted = true;
+            }
+            else
+            {
+                isServerStarted = false;
+            }
+        }
+
+        private void StartServer()
+        {
             Task.Run(() =>
             {
                 serverSetup.StartAppiumServer(appiumPort, 1);
-                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
-                DialogResult result = DialogResult.None;
                 if (Common.IsNodeInstalled())
                 {
                     while (!serverSetup.serverStarted)
                     {
                         if (!string.IsNullOrEmpty(serverSetup.statusText))
                         {
-                            // UpdateStepLabel(AppiumServerSetup.statusText);
                             if (serverSetup.statusText.Contains("address already in use"))
                             {
-                                result = MessageBox.Show("Port " + appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(appiumPort).Item2 + ".Please try to configure in different port here, File-> Server config.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("Go to Server -> Config -> Set a port number -> Start the Appium Server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             }
                         }
                     }
+                    if (serverSetup.serverStarted)
+                    {
+                        MainScreen.runningProcessesPortNumbers.Add(appiumPort);
+                        isServerStarted = true;
+                    }
                 }
             });
-            return Task.Delay(500);
         }
 
         public void UpdateStepLabel(string stepText)

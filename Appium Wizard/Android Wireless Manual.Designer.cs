@@ -58,7 +58,7 @@
             // PairingIPTextBox
             // 
             PairingIPTextBox.Location = new Point(112, 115);
-            PairingIPTextBox.Margin = new Padding(2, 2, 2, 2);
+            PairingIPTextBox.Margin = new Padding(2);
             PairingIPTextBox.Name = "PairingIPTextBox";
             PairingIPTextBox.PlaceholderText = "IP Address";
             PairingIPTextBox.Size = new Size(124, 23);
@@ -69,7 +69,7 @@
             // 
             ConnectIPTextBox.Enabled = false;
             ConnectIPTextBox.Location = new Point(108, 307);
-            ConnectIPTextBox.Margin = new Padding(2, 2, 2, 2);
+            ConnectIPTextBox.Margin = new Padding(2);
             ConnectIPTextBox.Name = "ConnectIPTextBox";
             ConnectIPTextBox.PlaceholderText = "IP Address";
             ConnectIPTextBox.Size = new Size(124, 23);
@@ -78,7 +78,7 @@
             // PairingCodeTextbox
             // 
             PairingCodeTextbox.Location = new Point(112, 150);
-            PairingCodeTextbox.Margin = new Padding(2, 2, 2, 2);
+            PairingCodeTextbox.Margin = new Padding(2);
             PairingCodeTextbox.Name = "PairingCodeTextbox";
             PairingCodeTextbox.PlaceholderText = "6 digit code";
             PairingCodeTextbox.Size = new Size(89, 23);
@@ -153,7 +153,7 @@
             PairButton.AutoSize = true;
             PairButton.Enabled = false;
             PairButton.Location = new Point(274, 165);
-            PairButton.Margin = new Padding(2, 2, 2, 2);
+            PairButton.Margin = new Padding(2);
             PairButton.Name = "PairButton";
             PairButton.Size = new Size(78, 25);
             PairButton.TabIndex = 13;
@@ -165,7 +165,7 @@
             // 
             CancelButton.AutoSize = true;
             CancelButton.Location = new Point(176, 165);
-            CancelButton.Margin = new Padding(2, 2, 2, 2);
+            CancelButton.Margin = new Padding(2);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(78, 25);
             CancelButton.TabIndex = 14;
@@ -175,8 +175,8 @@
             // 
             // PairPortNumberTextbox
             // 
-            PairPortNumberTextbox.Location = new Point(248, 115);
-            PairPortNumberTextbox.Margin = new Padding(2, 2, 2, 2);
+            PairPortNumberTextbox.Location = new Point(246, 92);
+            PairPortNumberTextbox.Margin = new Padding(2);
             PairPortNumberTextbox.Name = "PairPortNumberTextbox";
             PairPortNumberTextbox.PlaceholderText = "Port number";
             PairPortNumberTextbox.Size = new Size(89, 23);
@@ -186,8 +186,8 @@
             // ConnectPortNumber
             // 
             ConnectPortNumber.Enabled = false;
-            ConnectPortNumber.Location = new Point(244, 307);
-            ConnectPortNumber.Margin = new Padding(2, 2, 2, 2);
+            ConnectPortNumber.Location = new Point(245, 307);
+            ConnectPortNumber.Margin = new Padding(2);
             ConnectPortNumber.Name = "ConnectPortNumber";
             ConnectPortNumber.PlaceholderText = "Port number";
             ConnectPortNumber.Size = new Size(89, 23);
@@ -198,7 +198,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(237, 116);
+            label2.Location = new Point(236, 95);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
             label2.Size = new Size(10, 15);
@@ -210,7 +210,7 @@
             label6.AutoSize = true;
             label6.Enabled = false;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label6.Location = new Point(232, 309);
+            label6.Location = new Point(234, 309);
             label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new Size(10, 15);
@@ -222,7 +222,7 @@
             CancelButton2.AutoSize = true;
             CancelButton2.Enabled = false;
             CancelButton2.Location = new Point(176, 137);
-            CancelButton2.Margin = new Padding(2, 2, 2, 2);
+            CancelButton2.Margin = new Padding(2);
             CancelButton2.Name = "CancelButton2";
             CancelButton2.Size = new Size(78, 25);
             CancelButton2.TabIndex = 20;
@@ -235,7 +235,7 @@
             ConnectButton.AutoSize = true;
             ConnectButton.Enabled = false;
             ConnectButton.Location = new Point(274, 137);
-            ConnectButton.Margin = new Padding(2, 2, 2, 2);
+            ConnectButton.Margin = new Padding(2);
             ConnectButton.Name = "ConnectButton";
             ConnectButton.Size = new Size(78, 25);
             ConnectButton.TabIndex = 19;
@@ -281,7 +281,7 @@
             panel1.Controls.Add(CancelButton2);
             panel1.Controls.Add(ConnectButton);
             panel1.Location = new Point(2, 220);
-            panel1.Margin = new Padding(2, 2, 2, 2);
+            panel1.Margin = new Padding(2);
             panel1.Name = "panel1";
             panel1.Size = new Size(553, 176);
             panel1.TabIndex = 24;
@@ -291,8 +291,10 @@
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(CancelButton);
             panel2.Controls.Add(PairButton);
+            panel2.Controls.Add(PairPortNumberTextbox);
+            panel2.Controls.Add(label2);
             panel2.Location = new Point(2, 22);
-            panel2.Margin = new Padding(2, 2, 2, 2);
+            panel2.Margin = new Padding(2);
             panel2.Name = "panel2";
             panel2.Size = new Size(553, 195);
             panel2.TabIndex = 0;
@@ -307,9 +309,7 @@
             Controls.Add(label10);
             Controls.Add(label9);
             Controls.Add(label6);
-            Controls.Add(label2);
             Controls.Add(ConnectPortNumber);
-            Controls.Add(PairPortNumberTextbox);
             Controls.Add(label8);
             Controls.Add(label7);
             Controls.Add(label5);
@@ -323,7 +323,7 @@
             Controls.Add(panel2);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AndroidWirelessManual";

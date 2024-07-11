@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using File = System.IO.File;
 
 namespace Appium_Wizard
@@ -76,14 +77,48 @@ namespace Appium_Wizard
             {
                 GoogleAnalytics.SendExceptionEvent("Check_Software_update_On_Load", ex.Message);
             }
-            var screenSize = Screen.PrimaryScreen.WorkingArea.Size;
-            var expectedSize = new Size(screenSize.Width * 66 / 100, screenSize.Height * 88 / 100);
-            tabControl1.Size = expectedSize;
-            richTextBox1.Size = expectedSize;
-            richTextBox2.Size = expectedSize;
-            richTextBox3.Size = expectedSize;
-            richTextBox4.Size = expectedSize;
-            richTextBox5.Size = expectedSize;
+
+            using (Graphics g = this.CreateGraphics())
+            {
+                // Get the current DPI scaling factor
+                float dpiX = g.DpiX / 96.0f;
+
+                // Calculate the new width based on the scaling factor
+                int baseListViewWidth = 405;
+                int newListViewWidth = (int)(baseListViewWidth * dpiX);
+
+                // Adjust column widths and calculate total column width
+                int totalColumnWidth = (int)((150 + 50 + 80 + 60 + 60) * dpiX);
+
+                // Ensure ListView width is enough to fit all columns without scroll bar
+                listView1.Width = Math.Max(newListViewWidth, totalColumnWidth);
+
+                // Adjust Form width accordingly
+                this.Width = listView1.Width + (this.Width - this.ClientSize.Width);
+
+                // Set column widths
+                listView1.Columns[0].Width = (int)(150 * dpiX);
+                listView1.Columns[1].Width = (int)(50 * dpiX);
+                listView1.Columns[2].Width = (int)(80 * dpiX);
+                listView1.Columns[3].Width = (int)(60 * dpiX);
+                listView1.Columns[4].Width = (int)(0 * dpiX);
+                listView1.Columns[5].Width = (int)(60 * dpiX);
+                listView1.Columns[6].Width = (int)(0 * dpiX);
+                var size = new Size(this.Width - totalColumnWidth - 100, this.Height - 150);
+                tabControl1.Left = listView1.Width + 50;
+                tabControl1.Size = size;
+                richTextBox1.Size = size;
+                richTextBox2.Size = size;
+                richTextBox3.Size = size;
+                richTextBox4.Size = size;
+                richTextBox5.Size = size;
+
+                int checkBoxX = tabControl1.Right - checkBox1.Width;
+                int checkBoxY = tabControl1.Top;
+
+                // Set the CheckBox location
+                checkBox1.Location = new System.Drawing.Point(checkBoxX, checkBoxY);
+            }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
@@ -94,6 +129,21 @@ namespace Appium_Wizard
         DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
+            if (!LoadingScreen.isServerStarted)
+            {
+                var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                if (result == DialogResult.Yes)
+                {
+                    Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
+                    AppiumServerSetup serverSetup = new AppiumServerSetup();
+                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
+                }
+                else
+                {
+                    ServerConfig serverConfig = new ServerConfig();
+                    serverConfig.ShowDialog();
+                }
+            }
             Task.Run(() =>
             {
                 while (true)
@@ -405,7 +455,7 @@ namespace Appium_Wizard
                         DeviceInfo.Add(IPAddress, Tuple.Create(DeviceName, OS));
                     }
                 }
-                
+
             }
             GoogleAnalytics.SendEvent("Device_Added_To_List");
         }

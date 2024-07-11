@@ -42,7 +42,7 @@
             DeviceInfolistView.GridLines = true;
             DeviceInfolistView.Location = new Point(0, 2);
             DeviceInfolistView.Name = "DeviceInfolistView";
-            DeviceInfolistView.Size = new Size(584, 332);
+            DeviceInfolistView.Size = new Size(575, 332);
             DeviceInfolistView.TabIndex = 0;
             DeviceInfolistView.UseCompatibleStateImageBehavior = false;
             DeviceInfolistView.View = View.Details;
@@ -59,6 +59,7 @@
             // 
             // Cancel
             // 
+            Cancel.AutoSize = true;
             Cancel.Location = new Point(144, 340);
             Cancel.Name = "Cancel";
             Cancel.Size = new Size(112, 34);
@@ -69,7 +70,8 @@
             // 
             // Add
             // 
-            Add.Location = new Point(321, 340);
+            Add.AutoSize = true;
+            Add.Location = new Point(286, 340);
             Add.Name = "Add";
             Add.Size = new Size(112, 34);
             Add.TabIndex = 2;
@@ -95,6 +97,7 @@
             Text = "Device Information";
             Shown += DeviceInformation_Shown;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

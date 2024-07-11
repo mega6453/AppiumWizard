@@ -38,18 +38,22 @@
             // 
             statusLabel.AutoSize = true;
             statusLabel.BackColor = Color.Transparent;
-            statusLabel.Location = new Point(30, 498);
+            statusLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            statusLabel.Location = new Point(27, 347);
+            statusLabel.Margin = new Padding(2, 0, 2, 0);
             statusLabel.Name = "statusLabel";
-            statusLabel.Size = new Size(0, 25);
+            statusLabel.Size = new Size(0, 15);
             statusLabel.TabIndex = 1;
             // 
             // productVersion
             // 
             productVersion.AutoSize = true;
             productVersion.BackColor = Color.Transparent;
-            productVersion.Location = new Point(830, 505);
+            productVersion.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            productVersion.Location = new Point(563, 343);
+            productVersion.Margin = new Padding(2, 0, 2, 0);
             productVersion.Name = "productVersion";
-            productVersion.Size = new Size(0, 25);
+            productVersion.Size = new Size(0, 15);
             productVersion.TabIndex = 2;
             // 
             // firstTimeRunLabel
@@ -57,23 +61,26 @@
             firstTimeRunLabel.AutoSize = true;
             firstTimeRunLabel.BackColor = Color.Transparent;
             firstTimeRunLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            firstTimeRunLabel.Location = new Point(30, 465);
+            firstTimeRunLabel.Location = new Point(27, 327);
+            firstTimeRunLabel.Margin = new Padding(2, 0, 2, 0);
             firstTimeRunLabel.Name = "firstTimeRunLabel";
-            firstTimeRunLabel.Size = new Size(0, 25);
+            firstTimeRunLabel.Size = new Size(0, 15);
             firstTimeRunLabel.TabIndex = 3;
             // 
             // LoadingScreen
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoSize = true;
             BackgroundImage = Properties.Resources.AppiumWizardSplashScreen;
             BackgroundImageLayout = ImageLayout.Zoom;
-            ClientSize = new Size(984, 539);
+            ClientSize = new Size(689, 384);
             Controls.Add(firstTimeRunLabel);
             Controls.Add(productVersion);
             Controls.Add(statusLabel);
             FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             Name = "LoadingScreen";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "LoadingScreen";

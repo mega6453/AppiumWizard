@@ -41,9 +41,11 @@
             // 
             // button1
             // 
-            button1.Location = new Point(12, 12);
+            button1.AutoSize = true;
+            button1.Location = new Point(8, 7);
+            button1.Margin = new Padding(2);
             button1.Name = "button1";
-            button1.Size = new Size(142, 34);
+            button1.Size = new Size(99, 25);
             button1.TabIndex = 0;
             button1.Text = "Import Profile";
             button1.UseVisualStyleBackColor = true;
@@ -54,9 +56,10 @@
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4, columnHeader6 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
-            listView1.Location = new Point(12, 52);
+            listView1.Location = new Point(8, 36);
+            listView1.Margin = new Padding(2);
             listView1.Name = "listView1";
-            listView1.Size = new Size(804, 331);
+            listView1.Size = new Size(811, 195);
             listView1.TabIndex = 1;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -88,10 +91,12 @@
             // 
             // deleteProfileButton
             // 
+            deleteProfileButton.AutoSize = true;
             deleteProfileButton.Enabled = false;
-            deleteProfileButton.Location = new Point(179, 12);
+            deleteProfileButton.Location = new Point(125, 7);
+            deleteProfileButton.Margin = new Padding(2);
             deleteProfileButton.Name = "deleteProfileButton";
-            deleteProfileButton.Size = new Size(139, 34);
+            deleteProfileButton.Size = new Size(97, 25);
             deleteProfileButton.TabIndex = 3;
             deleteProfileButton.Text = "Delete Profile";
             deleteProfileButton.UseVisualStyleBackColor = true;
@@ -99,15 +104,16 @@
             // 
             // iOSProfileManagement
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(819, 388);
+            ClientSize = new Size(821, 233);
             Controls.Add(deleteProfileButton);
             Controls.Add(listView1);
             Controls.Add(button1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "iOSProfileManagement";
@@ -117,6 +123,7 @@
             Load += iOSProfileManagement_Load;
             Shown += iOSProfileManagement_Shown;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

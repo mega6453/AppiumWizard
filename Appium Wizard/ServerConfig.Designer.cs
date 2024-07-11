@@ -58,10 +58,11 @@
             // 
             // PortTextBox1
             // 
-            PortTextBox1.Location = new Point(106, 22);
+            PortTextBox1.Location = new Point(74, 13);
+            PortTextBox1.Margin = new Padding(2, 2, 2, 2);
             PortTextBox1.Name = "PortTextBox1";
             PortTextBox1.PlaceholderText = "Appium Port Number";
-            PortTextBox1.Size = new Size(183, 31);
+            PortTextBox1.Size = new Size(129, 23);
             PortTextBox1.TabIndex = 0;
             PortTextBox1.Text = "4723";
             PortTextBox1.KeyPress += textBox1_KeyPress;
@@ -69,17 +70,20 @@
             // NumberLabel1
             // 
             NumberLabel1.AutoSize = true;
-            NumberLabel1.Location = new Point(23, 25);
+            NumberLabel1.Location = new Point(16, 15);
+            NumberLabel1.Margin = new Padding(2, 0, 2, 0);
             NumberLabel1.Name = "NumberLabel1";
-            NumberLabel1.Size = new Size(33, 25);
+            NumberLabel1.Size = new Size(20, 15);
             NumberLabel1.TabIndex = 1;
             NumberLabel1.Text = "#1";
             // 
             // StartButton1
             // 
-            StartButton1.Location = new Point(329, 20);
+            StartButton1.AutoSize = true;
+            StartButton1.Location = new Point(230, 12);
+            StartButton1.Margin = new Padding(2, 2, 2, 2);
             StartButton1.Name = "StartButton1";
-            StartButton1.Size = new Size(112, 34);
+            StartButton1.Size = new Size(78, 25);
             StartButton1.TabIndex = 2;
             StartButton1.Text = "Start";
             StartButton1.UseVisualStyleBackColor = true;
@@ -87,9 +91,11 @@
             // 
             // StartButton2
             // 
-            StartButton2.Location = new Point(329, 101);
+            StartButton2.AutoSize = true;
+            StartButton2.Location = new Point(230, 61);
+            StartButton2.Margin = new Padding(2, 2, 2, 2);
             StartButton2.Name = "StartButton2";
-            StartButton2.Size = new Size(112, 34);
+            StartButton2.Size = new Size(78, 25);
             StartButton2.TabIndex = 5;
             StartButton2.Text = "Start";
             StartButton2.UseVisualStyleBackColor = true;
@@ -98,26 +104,30 @@
             // NumberLabel2
             // 
             NumberLabel2.AutoSize = true;
-            NumberLabel2.Location = new Point(23, 106);
+            NumberLabel2.Location = new Point(16, 64);
+            NumberLabel2.Margin = new Padding(2, 0, 2, 0);
             NumberLabel2.Name = "NumberLabel2";
-            NumberLabel2.Size = new Size(33, 25);
+            NumberLabel2.Size = new Size(20, 15);
             NumberLabel2.TabIndex = 4;
             NumberLabel2.Text = "#2";
             // 
             // PortTextBox2
             // 
-            PortTextBox2.Location = new Point(106, 103);
+            PortTextBox2.Location = new Point(74, 62);
+            PortTextBox2.Margin = new Padding(2, 2, 2, 2);
             PortTextBox2.Name = "PortTextBox2";
             PortTextBox2.PlaceholderText = "Appium Port Number";
-            PortTextBox2.Size = new Size(183, 31);
+            PortTextBox2.Size = new Size(129, 23);
             PortTextBox2.TabIndex = 3;
             PortTextBox2.KeyPress += textBox2_KeyPress;
             // 
             // StartButton3
             // 
-            StartButton3.Location = new Point(329, 184);
+            StartButton3.AutoSize = true;
+            StartButton3.Location = new Point(230, 110);
+            StartButton3.Margin = new Padding(2, 2, 2, 2);
             StartButton3.Name = "StartButton3";
-            StartButton3.Size = new Size(112, 34);
+            StartButton3.Size = new Size(78, 25);
             StartButton3.TabIndex = 8;
             StartButton3.Text = "Start";
             StartButton3.UseVisualStyleBackColor = true;
@@ -126,26 +136,30 @@
             // NumberLabel3
             // 
             NumberLabel3.AutoSize = true;
-            NumberLabel3.Location = new Point(23, 189);
+            NumberLabel3.Location = new Point(16, 113);
+            NumberLabel3.Margin = new Padding(2, 0, 2, 0);
             NumberLabel3.Name = "NumberLabel3";
-            NumberLabel3.Size = new Size(33, 25);
+            NumberLabel3.Size = new Size(20, 15);
             NumberLabel3.TabIndex = 7;
             NumberLabel3.Text = "#3";
             // 
             // PortTextBox3
             // 
-            PortTextBox3.Location = new Point(106, 186);
+            PortTextBox3.Location = new Point(74, 112);
+            PortTextBox3.Margin = new Padding(2, 2, 2, 2);
             PortTextBox3.Name = "PortTextBox3";
             PortTextBox3.PlaceholderText = "Appium Port Number";
-            PortTextBox3.Size = new Size(183, 31);
+            PortTextBox3.Size = new Size(129, 23);
             PortTextBox3.TabIndex = 6;
             PortTextBox3.KeyPress += textBox3_KeyPress;
             // 
             // StartButton4
             // 
-            StartButton4.Location = new Point(329, 268);
+            StartButton4.AutoSize = true;
+            StartButton4.Location = new Point(230, 161);
+            StartButton4.Margin = new Padding(2, 2, 2, 2);
             StartButton4.Name = "StartButton4";
-            StartButton4.Size = new Size(112, 34);
+            StartButton4.Size = new Size(78, 25);
             StartButton4.TabIndex = 11;
             StartButton4.Text = "Start";
             StartButton4.UseVisualStyleBackColor = true;
@@ -154,26 +168,30 @@
             // NumberLabel4
             // 
             NumberLabel4.AutoSize = true;
-            NumberLabel4.Location = new Point(23, 273);
+            NumberLabel4.Location = new Point(16, 164);
+            NumberLabel4.Margin = new Padding(2, 0, 2, 0);
             NumberLabel4.Name = "NumberLabel4";
-            NumberLabel4.Size = new Size(33, 25);
+            NumberLabel4.Size = new Size(20, 15);
             NumberLabel4.TabIndex = 10;
             NumberLabel4.Text = "#4";
             // 
             // PortTextBox4
             // 
-            PortTextBox4.Location = new Point(106, 270);
+            PortTextBox4.Location = new Point(74, 162);
+            PortTextBox4.Margin = new Padding(2, 2, 2, 2);
             PortTextBox4.Name = "PortTextBox4";
             PortTextBox4.PlaceholderText = "Appium Port Number";
-            PortTextBox4.Size = new Size(183, 31);
+            PortTextBox4.Size = new Size(129, 23);
             PortTextBox4.TabIndex = 9;
             PortTextBox4.KeyPress += textBox4_KeyPress;
             // 
             // StartButton5
             // 
-            StartButton5.Location = new Point(329, 354);
+            StartButton5.AutoSize = true;
+            StartButton5.Location = new Point(230, 212);
+            StartButton5.Margin = new Padding(2, 2, 2, 2);
             StartButton5.Name = "StartButton5";
-            StartButton5.Size = new Size(112, 34);
+            StartButton5.Size = new Size(78, 25);
             StartButton5.TabIndex = 14;
             StartButton5.Text = "Start";
             StartButton5.UseVisualStyleBackColor = true;
@@ -182,26 +200,30 @@
             // NumberLabel5
             // 
             NumberLabel5.AutoSize = true;
-            NumberLabel5.Location = new Point(23, 359);
+            NumberLabel5.Location = new Point(16, 215);
+            NumberLabel5.Margin = new Padding(2, 0, 2, 0);
             NumberLabel5.Name = "NumberLabel5";
-            NumberLabel5.Size = new Size(33, 25);
+            NumberLabel5.Size = new Size(20, 15);
             NumberLabel5.TabIndex = 13;
             NumberLabel5.Text = "#5";
             // 
             // PortTextBox5
             // 
-            PortTextBox5.Location = new Point(106, 356);
+            PortTextBox5.Location = new Point(74, 214);
+            PortTextBox5.Margin = new Padding(2, 2, 2, 2);
             PortTextBox5.Name = "PortTextBox5";
             PortTextBox5.PlaceholderText = "Appium Port Number";
-            PortTextBox5.Size = new Size(183, 31);
+            PortTextBox5.Size = new Size(129, 23);
             PortTextBox5.TabIndex = 12;
             PortTextBox5.KeyPress += textBox5_KeyPress;
             // 
             // StopButton5
             // 
-            StopButton5.Location = new Point(461, 356);
+            StopButton5.AutoSize = true;
+            StopButton5.Location = new Point(323, 214);
+            StopButton5.Margin = new Padding(2, 2, 2, 2);
             StopButton5.Name = "StopButton5";
-            StopButton5.Size = new Size(112, 34);
+            StopButton5.Size = new Size(78, 25);
             StopButton5.TabIndex = 19;
             StopButton5.Text = "Stop";
             StopButton5.UseVisualStyleBackColor = true;
@@ -209,9 +231,11 @@
             // 
             // StopButton4
             // 
-            StopButton4.Location = new Point(461, 270);
+            StopButton4.AutoSize = true;
+            StopButton4.Location = new Point(323, 162);
+            StopButton4.Margin = new Padding(2, 2, 2, 2);
             StopButton4.Name = "StopButton4";
-            StopButton4.Size = new Size(112, 34);
+            StopButton4.Size = new Size(78, 25);
             StopButton4.TabIndex = 18;
             StopButton4.Text = "Stop";
             StopButton4.UseVisualStyleBackColor = true;
@@ -219,9 +243,11 @@
             // 
             // StopButton3
             // 
-            StopButton3.Location = new Point(461, 186);
+            StopButton3.AutoSize = true;
+            StopButton3.Location = new Point(323, 112);
+            StopButton3.Margin = new Padding(2, 2, 2, 2);
             StopButton3.Name = "StopButton3";
-            StopButton3.Size = new Size(112, 34);
+            StopButton3.Size = new Size(78, 25);
             StopButton3.TabIndex = 17;
             StopButton3.Text = "Stop";
             StopButton3.UseVisualStyleBackColor = true;
@@ -229,9 +255,11 @@
             // 
             // StopButton2
             // 
-            StopButton2.Location = new Point(461, 103);
+            StopButton2.AutoSize = true;
+            StopButton2.Location = new Point(323, 62);
+            StopButton2.Margin = new Padding(2, 2, 2, 2);
             StopButton2.Name = "StopButton2";
-            StopButton2.Size = new Size(112, 34);
+            StopButton2.Size = new Size(78, 25);
             StopButton2.TabIndex = 16;
             StopButton2.Text = "Stop";
             StopButton2.UseVisualStyleBackColor = true;
@@ -239,9 +267,11 @@
             // 
             // StopButton1
             // 
-            StopButton1.Location = new Point(461, 22);
+            StopButton1.AutoSize = true;
+            StopButton1.Location = new Point(323, 13);
+            StopButton1.Margin = new Padding(2, 2, 2, 2);
             StopButton1.Name = "StopButton1";
-            StopButton1.Size = new Size(112, 34);
+            StopButton1.Size = new Size(78, 25);
             StopButton1.TabIndex = 15;
             StopButton1.Text = "Stop";
             StopButton1.UseVisualStyleBackColor = true;
@@ -250,54 +280,59 @@
             // StatusLabel1
             // 
             StatusLabel1.AutoSize = true;
-            StatusLabel1.Location = new Point(603, 31);
+            StatusLabel1.Location = new Point(422, 19);
+            StatusLabel1.Margin = new Padding(2, 0, 2, 0);
             StatusLabel1.Name = "StatusLabel1";
-            StatusLabel1.Size = new Size(0, 25);
+            StatusLabel1.Size = new Size(0, 15);
             StatusLabel1.TabIndex = 20;
             StatusLabel1.TextChanged += StatusLabel1_TextChanged;
             // 
             // StatusLabel2
             // 
             StatusLabel2.AutoSize = true;
-            StatusLabel2.Location = new Point(603, 112);
+            StatusLabel2.Location = new Point(422, 67);
+            StatusLabel2.Margin = new Padding(2, 0, 2, 0);
             StatusLabel2.Name = "StatusLabel2";
-            StatusLabel2.Size = new Size(0, 25);
+            StatusLabel2.Size = new Size(0, 15);
             StatusLabel2.TabIndex = 21;
             StatusLabel2.TextChanged += StatusLabel2_TextChanged;
             // 
             // StatusLabel3
             // 
             StatusLabel3.AutoSize = true;
-            StatusLabel3.Location = new Point(603, 193);
+            StatusLabel3.Location = new Point(422, 116);
+            StatusLabel3.Margin = new Padding(2, 0, 2, 0);
             StatusLabel3.Name = "StatusLabel3";
-            StatusLabel3.Size = new Size(0, 25);
+            StatusLabel3.Size = new Size(0, 15);
             StatusLabel3.TabIndex = 22;
             StatusLabel3.TextChanged += StatusLabel3_TextChanged;
             // 
             // StatusLabel4
             // 
             StatusLabel4.AutoSize = true;
-            StatusLabel4.Location = new Point(603, 275);
+            StatusLabel4.Location = new Point(422, 165);
+            StatusLabel4.Margin = new Padding(2, 0, 2, 0);
             StatusLabel4.Name = "StatusLabel4";
-            StatusLabel4.Size = new Size(0, 25);
+            StatusLabel4.Size = new Size(0, 15);
             StatusLabel4.TabIndex = 23;
             StatusLabel4.TextChanged += StatusLabel4_TextChanged;
             // 
             // StatusLabel5
             // 
             StatusLabel5.AutoSize = true;
-            StatusLabel5.Location = new Point(603, 362);
+            StatusLabel5.Location = new Point(422, 217);
+            StatusLabel5.Margin = new Padding(2, 0, 2, 0);
             StatusLabel5.Name = "StatusLabel5";
-            StatusLabel5.Size = new Size(0, 25);
+            StatusLabel5.Size = new Size(0, 15);
             StatusLabel5.TabIndex = 24;
             StatusLabel5.TextChanged += StatusLabel5_TextChanged;
             // 
             // ServerConfig
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(749, 427);
+            ClientSize = new Size(524, 256);
             Controls.Add(StatusLabel5);
             Controls.Add(StatusLabel4);
             Controls.Add(StatusLabel3);
@@ -325,6 +360,7 @@
             Controls.Add(PortTextBox1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2, 2, 2, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ServerConfig";

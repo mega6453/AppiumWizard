@@ -44,26 +44,31 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(12, 22);
+            label1.Location = new Point(8, 13);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(542, 25);
+            label1.Size = new Size(354, 15);
             label1.TabIndex = 0;
             label1.Text = "Follow the below steps to Add Android 11+ Device Over Wi-Fi:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 60);
+            label2.Location = new Point(8, 36);
+            label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(659, 75);
+            label2.Size = new Size(434, 45);
             label2.TabIndex = 1;
             label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging > Pair device with pairing code.\r\n3. Click any one of the below options.";
+            label2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // FindDeviceButton
             // 
-            FindDeviceButton.Location = new Point(160, 159);
+            FindDeviceButton.AutoSize = true;
+            FindDeviceButton.Location = new Point(112, 95);
+            FindDeviceButton.Margin = new Padding(2);
             FindDeviceButton.Name = "FindDeviceButton";
-            FindDeviceButton.Size = new Size(169, 34);
+            FindDeviceButton.Size = new Size(118, 25);
             FindDeviceButton.TabIndex = 4;
             FindDeviceButton.Text = "Find automatically";
             FindDeviceButton.UseVisualStyleBackColor = true;
@@ -74,9 +79,10 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
             label3.ForeColor = Color.Red;
-            label3.Location = new Point(12, 424);
+            label3.Location = new Point(8, 254);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(599, 25);
+            label3.Size = new Size(393, 15);
             label3.TabIndex = 6;
             label3.Text = "Note : Device connected over Wi-Fi may be slower when compared to USB.";
             // 
@@ -85,9 +91,10 @@
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
-            listView1.Location = new Point(87, 210);
+            listView1.Location = new Point(61, 126);
+            listView1.Margin = new Padding(2);
             listView1.Name = "listView1";
-            listView1.Size = new Size(501, 153);
+            listView1.Size = new Size(352, 93);
             listView1.TabIndex = 7;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -105,10 +112,12 @@
             // 
             // PairButton
             // 
+            PairButton.AutoSize = true;
             PairButton.Enabled = false;
-            PairButton.Location = new Point(273, 369);
+            PairButton.Location = new Point(191, 223);
+            PairButton.Margin = new Padding(2);
             PairButton.Name = "PairButton";
-            PairButton.Size = new Size(132, 34);
+            PairButton.Size = new Size(92, 25);
             PairButton.TabIndex = 8;
             PairButton.Text = "Pair";
             PairButton.UseVisualStyleBackColor = true;
@@ -116,9 +125,11 @@
             // 
             // ManualButton
             // 
-            ManualButton.Location = new Point(351, 159);
+            ManualButton.AutoSize = true;
+            ManualButton.Location = new Point(246, 95);
+            ManualButton.Margin = new Padding(2);
             ManualButton.Name = "ManualButton";
-            ManualButton.Size = new Size(146, 34);
+            ManualButton.Size = new Size(102, 25);
             ManualButton.TabIndex = 9;
             ManualButton.Text = "Pair Manually";
             ManualButton.UseVisualStyleBackColor = true;
@@ -126,10 +137,10 @@
             // 
             // AndroidWireless
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(690, 458);
+            ClientSize = new Size(489, 275);
             Controls.Add(ManualButton);
             Controls.Add(PairButton);
             Controls.Add(listView1);
@@ -139,6 +150,7 @@
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AndroidWireless";

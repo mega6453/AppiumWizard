@@ -39,34 +39,39 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(22, 22);
+            label1.Location = new Point(15, 13);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(411, 25);
+            label1.Size = new Size(271, 15);
             label1.TabIndex = 0;
             label1.Text = "Enter the 6 digit code shown on the device to pair.";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(22, 67);
+            label2.Location = new Point(15, 40);
+            label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(0, 25);
+            label2.Size = new Size(0, 15);
             label2.TabIndex = 1;
             // 
             // PairingCodeTextBox
             // 
-            PairingCodeTextBox.Location = new Point(78, 122);
+            PairingCodeTextBox.Location = new Point(55, 73);
+            PairingCodeTextBox.Margin = new Padding(2);
             PairingCodeTextBox.Name = "PairingCodeTextBox";
-            PairingCodeTextBox.Size = new Size(273, 31);
+            PairingCodeTextBox.Size = new Size(192, 23);
             PairingCodeTextBox.TabIndex = 2;
             PairingCodeTextBox.TextChanged += PairingCodeTextBox_TextChanged;
             // 
             // button1
             // 
+            button1.AutoSize = true;
             button1.Enabled = false;
-            button1.Location = new Point(239, 188);
+            button1.Location = new Point(169, 113);
+            button1.Margin = new Padding(2);
             button1.Name = "button1";
-            button1.Size = new Size(112, 34);
+            button1.Size = new Size(78, 25);
             button1.TabIndex = 3;
             button1.Text = "Pair";
             button1.UseVisualStyleBackColor = true;
@@ -74,9 +79,11 @@
             // 
             // button2
             // 
-            button2.Location = new Point(78, 188);
+            button2.AutoSize = true;
+            button2.Location = new Point(55, 113);
+            button2.Margin = new Padding(2);
             button2.Name = "button2";
-            button2.Size = new Size(112, 34);
+            button2.Size = new Size(78, 25);
             button2.TabIndex = 4;
             button2.Text = "Cancel";
             button2.UseVisualStyleBackColor = true;
@@ -84,10 +91,10 @@
             // 
             // PairingCodePrompt
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(452, 254);
+            ClientSize = new Size(316, 152);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(PairingCodeTextBox);
@@ -95,11 +102,12 @@
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "PairingCodePrompt";
             ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Enter Pairing Code";
             ResumeLayout(false);
             PerformLayout();

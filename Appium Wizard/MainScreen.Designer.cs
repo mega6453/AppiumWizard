@@ -113,11 +113,12 @@ namespace Appium_Wizard
             // 
             // Open
             // 
+            Open.AutoSize = true;
             Open.Enabled = false;
-            Open.Location = new Point(237, 44);
+            Open.Location = new Point(237, 50);
             Open.Margin = new Padding(2);
             Open.Name = "Open";
-            Open.Size = new Size(89, 20);
+            Open.Size = new Size(91, 26);
             Open.TabIndex = 0;
             Open.Text = "Open Device";
             Open.UseVisualStyleBackColor = true;
@@ -128,10 +129,10 @@ namespace Appium_Wizard
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
-            listView1.Location = new Point(21, 75);
+            listView1.Location = new Point(21, 80);
             listView1.Margin = new Padding(2);
             listView1.Name = "listView1";
-            listView1.Size = new Size(409, 110);
+            listView1.Size = new Size(408, 126);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -141,24 +142,24 @@ namespace Appium_Wizard
             // columnHeader4
             // 
             columnHeader4.Text = "Name";
-            columnHeader4.Width = 230;
+            columnHeader4.Width = 150;
             // 
             // columnHeader2
             // 
             columnHeader2.DisplayIndex = 2;
             columnHeader2.Text = "Version";
-            columnHeader2.Width = 80;
+            columnHeader2.Width = 50;
             // 
             // columnHeader3
             // 
             columnHeader3.DisplayIndex = 1;
             columnHeader3.Text = "OS";
-            columnHeader3.Width = 100;
+            columnHeader3.Width = 80;
             // 
             // columnHeader1
             // 
             columnHeader1.Text = "Status";
-            columnHeader1.Width = 100;
+            columnHeader1.Width = 80;
             // 
             // columnHeader5
             // 
@@ -207,10 +208,11 @@ namespace Appium_Wizard
             // 
             // AddDevice
             // 
-            AddDevice.Location = new Point(21, 44);
+            AddDevice.AutoSize = true;
+            AddDevice.Location = new Point(21, 50);
             AddDevice.Margin = new Padding(2);
             AddDevice.Name = "AddDevice";
-            AddDevice.Size = new Size(78, 20);
+            AddDevice.Size = new Size(84, 26);
             AddDevice.TabIndex = 4;
             AddDevice.Text = "Add Device";
             AddDevice.UseVisualStyleBackColor = true;
@@ -218,11 +220,12 @@ namespace Appium_Wizard
             // 
             // DeleteDevice
             // 
+            DeleteDevice.AutoSize = true;
             DeleteDevice.Enabled = false;
-            DeleteDevice.Location = new Point(121, 44);
+            DeleteDevice.Location = new Point(121, 50);
             DeleteDevice.Margin = new Padding(2);
             DeleteDevice.Name = "DeleteDevice";
-            DeleteDevice.Size = new Size(94, 20);
+            DeleteDevice.Size = new Size(98, 26);
             DeleteDevice.TabIndex = 5;
             DeleteDevice.Text = "Delete Device";
             DeleteDevice.UseVisualStyleBackColor = true;
@@ -233,18 +236,17 @@ namespace Appium_Wizard
             richTextBox1.Location = new Point(0, 0);
             richTextBox1.Margin = new Padding(2);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(524, 300);
+            richTextBox1.Size = new Size(1000, 602);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
             richTextBox1.TextChanged += richTextBox1_TextChanged;
             // 
             // checkBox1
             // 
-            checkBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox1.AutoSize = true;
             checkBox1.Checked = true;
             checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(893, 45);
+            checkBox1.Location = new Point(1353, 57);
             checkBox1.Margin = new Padding(2);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(84, 19);
@@ -255,11 +257,12 @@ namespace Appium_Wizard
             // 
             // MoreButton
             // 
+            MoreButton.AutoSize = true;
             MoreButton.Enabled = false;
-            MoreButton.Location = new Point(351, 44);
+            MoreButton.Location = new Point(351, 50);
             MoreButton.Margin = new Padding(2);
             MoreButton.Name = "MoreButton";
-            MoreButton.Size = new Size(78, 20);
+            MoreButton.Size = new Size(78, 26);
             MoreButton.TabIndex = 9;
             MoreButton.Text = "More...";
             MoreButton.UseVisualStyleBackColor = true;
@@ -273,8 +276,8 @@ namespace Appium_Wizard
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(2, 1, 0, 1);
-            menuStrip1.Size = new Size(899, 24);
+            menuStrip1.Padding = new Padding(2, 2, 0, 2);
+            menuStrip1.Size = new Size(1441, 24);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -282,7 +285,7 @@ namespace Appium_Wizard
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(51, 22);
+            fileToolStripMenuItem.Size = new Size(51, 20);
             fileToolStripMenuItem.Text = "Server";
             // 
             // serverSetupToolStripMenuItem
@@ -313,7 +316,7 @@ namespace Appium_Wizard
             // 
             toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            toolsToolStripMenuItem.Size = new Size(46, 22);
+            toolsToolStripMenuItem.Size = new Size(46, 20);
             toolsToolStripMenuItem.Text = "Tools";
             // 
             // inspectorToolStripMenuItem1
@@ -344,7 +347,7 @@ namespace Appium_Wizard
             // 
             helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(44, 22);
+            helpToolStripMenuItem.Size = new Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
             // 
             // appiumDocsToolStripMenuItem
@@ -426,11 +429,11 @@ namespace Appium_Wizard
             tabControl1.Controls.Add(tabPage3);
             tabControl1.Controls.Add(tabPage4);
             tabControl1.Controls.Add(tabPage5);
-            tabControl1.Location = new Point(448, 44);
+            tabControl1.Location = new Point(434, 54);
             tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(528, 296);
+            tabControl1.Size = new Size(1004, 626);
             tabControl1.TabIndex = 11;
             // 
             // tabPage1
@@ -440,7 +443,7 @@ namespace Appium_Wizard
             tabPage1.Margin = new Padding(2);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(2);
-            tabPage1.Size = new Size(520, 268);
+            tabPage1.Size = new Size(996, 598);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
             tabPage1.UseVisualStyleBackColor = true;
@@ -452,7 +455,7 @@ namespace Appium_Wizard
             tabPage2.Margin = new Padding(2);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(2);
-            tabPage2.Size = new Size(520, 268);
+            tabPage2.Size = new Size(996, 598);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
             tabPage2.UseVisualStyleBackColor = true;
@@ -474,7 +477,7 @@ namespace Appium_Wizard
             tabPage3.Margin = new Padding(2);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(2);
-            tabPage3.Size = new Size(520, 268);
+            tabPage3.Size = new Size(996, 598);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
             tabPage3.UseVisualStyleBackColor = true;
@@ -484,7 +487,7 @@ namespace Appium_Wizard
             richTextBox3.Location = new Point(0, 0);
             richTextBox3.Margin = new Padding(2);
             richTextBox3.Name = "richTextBox3";
-            richTextBox3.Size = new Size(524, 275);
+            richTextBox3.Size = new Size(524, 276);
             richTextBox3.TabIndex = 0;
             richTextBox3.Text = "";
             richTextBox3.TextChanged += richTextBox3_TextChanged;
@@ -496,7 +499,7 @@ namespace Appium_Wizard
             tabPage4.Margin = new Padding(2);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(2);
-            tabPage4.Size = new Size(520, 268);
+            tabPage4.Size = new Size(996, 598);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
             tabPage4.UseVisualStyleBackColor = true;
@@ -506,7 +509,7 @@ namespace Appium_Wizard
             richTextBox4.Location = new Point(0, 0);
             richTextBox4.Margin = new Padding(2);
             richTextBox4.Name = "richTextBox4";
-            richTextBox4.Size = new Size(524, 275);
+            richTextBox4.Size = new Size(524, 276);
             richTextBox4.TabIndex = 0;
             richTextBox4.Text = "";
             richTextBox4.TextChanged += richTextBox4_TextChanged;
@@ -518,7 +521,7 @@ namespace Appium_Wizard
             tabPage5.Margin = new Padding(2);
             tabPage5.Name = "tabPage5";
             tabPage5.Padding = new Padding(2);
-            tabPage5.Size = new Size(520, 268);
+            tabPage5.Size = new Size(996, 598);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";
             tabPage5.UseVisualStyleBackColor = true;
@@ -553,10 +556,10 @@ namespace Appium_Wizard
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(capabilityCopyButton);
             panel1.Controls.Add(richTextBox6);
-            panel1.Location = new Point(21, 242);
+            panel1.Location = new Point(21, 269);
             panel1.Margin = new Padding(2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(409, 142);
+            panel1.Size = new Size(409, 113);
             panel1.TabIndex = 13;
             panel1.Visible = false;
             // 
@@ -565,10 +568,10 @@ namespace Appium_Wizard
             capabilityCopyButton.BackColor = SystemColors.ControlLightLight;
             capabilityCopyButton.BackgroundImage = Properties.Resources.files;
             capabilityCopyButton.BackgroundImageLayout = ImageLayout.Stretch;
-            capabilityCopyButton.Location = new Point(368, -1);
+            capabilityCopyButton.Location = new Point(368, -2);
             capabilityCopyButton.Margin = new Padding(2);
             capabilityCopyButton.Name = "capabilityCopyButton";
-            capabilityCopyButton.Size = new Size(40, 31);
+            capabilityCopyButton.Size = new Size(40, 32);
             capabilityCopyButton.TabIndex = 18;
             capabilityCopyButton.UseVisualStyleBackColor = false;
             capabilityCopyButton.Click += capabilityCopyButton_Click;
@@ -579,7 +582,7 @@ namespace Appium_Wizard
             richTextBox6.Margin = new Padding(2);
             richTextBox6.Name = "richTextBox6";
             richTextBox6.ReadOnly = true;
-            richTextBox6.Size = new Size(409, 143);
+            richTextBox6.Size = new Size(409, 114);
             richTextBox6.TabIndex = 20;
             richTextBox6.Text = "";
             // 
@@ -647,7 +650,8 @@ namespace Appium_Wizard
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(23, 21);
+            label1.Dock = DockStyle.Fill;
+            label1.Location = new Point(0, 24);
             label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
             label1.Size = new Size(0, 15);
@@ -664,7 +668,7 @@ namespace Appium_Wizard
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(948, 23);
+            tableLayoutPanel1.Size = new Size(1413, 28);
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
             // 
@@ -672,7 +676,7 @@ namespace Appium_Wizard
             // 
             capabilityLabel.AutoSize = true;
             capabilityLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            capabilityLabel.Location = new Point(21, 225);
+            capabilityLabel.Location = new Point(21, 254);
             capabilityLabel.Margin = new Padding(2, 0, 2, 0);
             capabilityLabel.Name = "capabilityLabel";
             capabilityLabel.Size = new Size(60, 15);
@@ -685,7 +689,7 @@ namespace Appium_Wizard
             label4.AutoSize = true;
             label4.BackColor = SystemColors.ControlLightLight;
             label4.ForeColor = Color.IndianRed;
-            label4.Location = new Point(21, 185);
+            label4.Location = new Point(21, 207);
             label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new Size(367, 15);
@@ -702,20 +706,20 @@ namespace Appium_Wizard
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(899, 407);
+            ClientSize = new Size(1441, 682);
+            Controls.Add(checkBox1);
             Controls.Add(label4);
             Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
-            Controls.Add(checkBox1);
             Controls.Add(label1);
             Controls.Add(panel1);
-            Controls.Add(tabControl1);
             Controls.Add(menuStrip1);
             Controls.Add(MoreButton);
             Controls.Add(DeleteDevice);
             Controls.Add(AddDevice);
             Controls.Add(listView1);
             Controls.Add(Open);
+            Controls.Add(tabControl1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Margin = new Padding(2);

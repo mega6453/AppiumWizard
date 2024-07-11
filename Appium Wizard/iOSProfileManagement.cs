@@ -90,7 +90,7 @@ namespace Appium_Wizard
                             }
                             string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
                             // listView1.Items.Add(new ListViewItem(item1));
-                            profilesList.Add(item1); 
+                            profilesList.Add(item1);
                         }
                         catch (Exception)
                         {

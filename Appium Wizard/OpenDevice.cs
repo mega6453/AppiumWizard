@@ -41,23 +41,23 @@
             return (0, 0);
         }
 
-        public bool StartBackgroundTasks()
+        public async Task<bool> StartBackgroundTasks()
         {
             commonProgress.Show();
-            commonProgress.UpdateStepLabel(title, "Initializing...");
+            commonProgress.UpdateStepLabel(title, "Initializing...", 5);
             if (OSType.Equals("Android"))
             {
-                ExecuteAndroid();
+                await ExecuteAndroid();
             }
             else
             {
-                ExecuteiOSBackgroundMethod();
+                await ExecuteiOSBackgroundMethod();
             }
             if (isScreenServerStarted)
             {
-                commonProgress.UpdateStepLabel(title, "Screen server started...");
+                commonProgress.UpdateStepLabel(title, "Screen server started...", 100);
                 commonProgress.Close();
-                ExecuteBackgroundMethod2();
+                await ExecuteBackgroundMethod2();
             }
             else
             {
@@ -71,144 +71,53 @@
         Dictionary<object, object> keyValuePairs;
 
 
-        private void ExecuteiOSBackgroundMethod()
+        private async Task ExecuteiOSBackgroundMethod()
         {
-            var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-            if (!deviceList.Contains(udid))
+            await Task.Run(() =>
             {
-                MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            try
-            {
-                bool wdaCheck = iOSMethods.GetInstance().iSWDAInstalled(udid);
-                bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
-                if (wdaCheck | profileCheck)
+                var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                if (!deviceList.Contains(udid))
                 {
-                    keyValuePairs = new Dictionary<object, object>();
-                    if (!deviceDetails.ContainsKey(udid))
+                    MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                try
+                {
+                    bool wdaCheck = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                    bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
+                    if (wdaCheck | profileCheck)
                     {
-                        bool installedNow = false;
-                        bool isRunning = false;
-                        commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...");
-                        if (!iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid))
+                        keyValuePairs = new Dictionary<object, object>();
+                        if (!deviceDetails.ContainsKey(udid))
                         {
-                            commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...");
-                            iOSMethods.GetInstance().InstallWDA(udid);
-                            installedNow = true;
-                        }
-                        commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...");
-                        proxyPort = Common.GetFreePort();
-                        screenServerPort = Common.GetFreePort();
-                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
-                        if (installedNow)
-                        {
-                            isRunning = false;
-                        }
-                        else
-                        {
-                            isRunning = iOSAPIMethods.IsWDARunning(proxyPort);
-                        }                      
-                        if (isRunning)
-                        {
-                            commonProgress.UpdateStepLabel(title, "Getting device screen size...");
-                            var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
-                            width = screenSize.Item1;
-                            height = screenSize.Item2;
-                            commonProgress.UpdateStepLabel(title, "Starting device screen streaming...");
-                            isScreenServerStarted = true;
-                            keyValuePairs.Add("proxyPort", proxyPort);
-                            keyValuePairs.Add("screenPort", screenServerPort);
-                            keyValuePairs.Add("sessionId", WDAsessionId);
-                            keyValuePairs.Add("width", width);
-                            keyValuePairs.Add("height", height);
-                            deviceDetails.Add(udid, keyValuePairs);
-                            if (MainScreen.udidProxyPort.ContainsKey(udid))
+                            bool installedNow = false;
+                            bool isRunning = false;
+                            commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
+                            if (!iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid))
                             {
-                                MainScreen.udidProxyPort[udid] = proxyPort;
-                            }
-                            else
-                            {
-                                MainScreen.udidProxyPort.Add(udid, proxyPort);
-                            }
-                        }
-                        else
-                        {
-                            Version deviceVersion = new Version(OSVersion);
-                            Version version17Plus = new Version("17.0.0");
-                            commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...");
-                            var output = iOSMethods.GetInstance().MountImage(udid);
-                            if (deviceVersion >= version17Plus)
-                            {
-                                if (output.Contains("tunnel not created"))
-                                {
-                                    commonProgress.Close();
-                                    isScreenServerStarted = false;
-                                    MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    return;
-                                }
-                            }
-                            if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
-                            if (isWDAInstalled)
-                            {
-                                commonProgress.UpdateStepLabel(title, "WebDriverAgent Installed. Starting WebDriverAgent...");
-                            }
-                            else
-                            {
-                                commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...");
+                                commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 20);
                                 iOSMethods.GetInstance().InstallWDA(udid);
+                                installedNow = true;
                             }
-                            commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...");
-                            WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
-                            if (WDAsessionId.Equals("Enable Developer Mode"))
+                            commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
+                            proxyPort = Common.GetFreePort();
+                            screenServerPort = Common.GetFreePort();
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            if (installedNow)
                             {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
+                                isRunning = false;
                             }
-                            else if (WDAsessionId.Equals("Password Protected"))
+                            else
                             {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
+                                isRunning = iOSAPIMethods.IsWDARunning(proxyPort);
                             }
-                            else if (WDAsessionId.Equals("WDA Not Installed"))
+                            if (isRunning)
                             {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (WDAsessionId.Equals("unhandled"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (!WDAsessionId.Equals("nosession"))
-                            {
-                                commonProgress.UpdateStepLabel(title, "Getting device screen size...");
+                                commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
                                 var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
                                 width = screenSize.Item1;
                                 height = screenSize.Item2;
-                                commonProgress.UpdateStepLabel(title, "Starting device screen streaming...");
+                                commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
                                 isScreenServerStarted = true;
                                 keyValuePairs.Add("proxyPort", proxyPort);
                                 keyValuePairs.Add("screenPort", screenServerPort);
@@ -227,81 +136,104 @@
                             }
                             else
                             {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        proxyPort = (int)deviceDetails[udid]["proxyPort"];
-                        screenServerPort = (int)deviceDetails[udid]["screenPort"];
-                        width = (int)deviceDetails[udid]["width"];
-                        height = (int)deviceDetails[udid]["height"];
-                        WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
-                        isScreenServerStarted = true;
-                        WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
-                        bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
-                        if (!isLoaded)
-                        {
-                            commonProgress.UpdateStepLabel(title, "Starting screen server...");
-                            Common.KillProcessByPortNumber(screenServerPort);
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
-                        }
-                        if (WDAsessionId.Equals("nosession"))
-                        {
-                            commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...");
-                            bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
-                            if (isWDAInstalled)
-                            {
-                                commonProgress.UpdateStepLabel(title, "WebDriverAgent Installed. Starting WebDriverAgent...");
-                            }
-                            else
-                            {
-                                commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...");
-                                iOSMethods.GetInstance().InstallWDA(udid);
-                            }
-                            commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...");
-                            WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
-                            if (WDAsessionId.Equals("Enable Developer Mode"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (WDAsessionId.Equals("Password Protected"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (WDAsessionId.Equals("WDA Not Installed"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (WDAsessionId.Equals("nosession passcode required"))
-                            {
-                                commonProgress.Close();
-                                isScreenServerStarted = false;
-                                MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-                            else if (!WDAsessionId.Equals("nosession"))
-                            {
-                                isScreenServerStarted = true;
-                                deviceDetails[udid]["sessionId"] = WDAsessionId;
-                            }
-                            else
-                            {
-                                isScreenServerStarted = false;
-                                deviceDetails.Remove(udid);
+                                Version deviceVersion = new Version(OSVersion);
+                                Version version17Plus = new Version("17.0.0");
+                                commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 40);
+                                var output = iOSMethods.GetInstance().MountImage(udid);
+                                if (deviceVersion >= version17Plus)
+                                {
+                                    if (output.Contains("tunnel not created"))
+                                    {
+                                        commonProgress.Close();
+                                        isScreenServerStarted = false;
+                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
+                                }
+                                if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                                if (isWDAInstalled)
+                                {
+                                    commonProgress.UpdateStepLabel(title, "WebDriverAgent Installed. Starting WebDriverAgent...", 60);
+                                }
+                                else
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 50);
+                                    iOSMethods.GetInstance().InstallWDA(udid);
+                                }
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 70);
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
+                                if (WDAsessionId.Equals("Enable Developer Mode"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("Password Protected"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("WDA Not Installed"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("unhandled"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (!WDAsessionId.Equals("nosession"))
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
+                                    var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
+                                    width = screenSize.Item1;
+                                    height = screenSize.Item2;
+                                    commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                                    isScreenServerStarted = true;
+                                    keyValuePairs.Add("proxyPort", proxyPort);
+                                    keyValuePairs.Add("screenPort", screenServerPort);
+                                    keyValuePairs.Add("sessionId", WDAsessionId);
+                                    keyValuePairs.Add("width", width);
+                                    keyValuePairs.Add("height", height);
+                                    deviceDetails.Add(udid, keyValuePairs);
+                                    if (MainScreen.udidProxyPort.ContainsKey(udid))
+                                    {
+                                        MainScreen.udidProxyPort[udid] = proxyPort;
+                                    }
+                                    else
+                                    {
+                                        MainScreen.udidProxyPort.Add(udid, proxyPort);
+                                    }
+                                }
+                                else
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
                             }
                         }
                         else
@@ -312,142 +244,216 @@
                             height = (int)deviceDetails[udid]["height"];
                             WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
                             isScreenServerStarted = true;
+                            WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
+                            bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
+                            if (!isLoaded)
+                            {
+                                commonProgress.UpdateStepLabel(title, "Starting screen server...", 95);
+                                Common.KillProcessByPortNumber(screenServerPort);
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            }
+                            if (WDAsessionId.Equals("nosession"))
+                            {
+                                commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...", 10);
+                                bool isWDAInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                                if (isWDAInstalled)
+                                {
+                                    commonProgress.UpdateStepLabel(title, "WebDriverAgent Installed. Starting WebDriverAgent...", 30);
+                                }
+                                else
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 50);
+                                    iOSMethods.GetInstance().InstallWDA(udid);
+                                }
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 80);
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
+                                if (WDAsessionId.Equals("Enable Developer Mode"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("Password Protected"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("WDA Not Installed"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (WDAsessionId.Equals("nosession passcode required"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                                else if (!WDAsessionId.Equals("nosession"))
+                                {
+                                    isScreenServerStarted = true;
+                                    deviceDetails[udid]["sessionId"] = WDAsessionId;
+                                }
+                                else
+                                {
+                                    isScreenServerStarted = false;
+                                    deviceDetails.Remove(udid);
+                                }
+                            }
+                            else
+                            {
+                                proxyPort = (int)deviceDetails[udid]["proxyPort"];
+                                screenServerPort = (int)deviceDetails[udid]["screenPort"];
+                                width = (int)deviceDetails[udid]["width"];
+                                height = (int)deviceDetails[udid]["height"];
+                                WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
+                                isScreenServerStarted = true;
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    commonProgress.Close();
-                    MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                commonProgress.Hide();
-                MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                commonProgress.Close();
-                return;
-            }
-        }
-
-        public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        private Task ExecuteAndroid()
-        {
-            keyValuePairs = new Dictionary<object, object>();
-            string sessionIdCreatedForScreenServer = string.Empty;
-            string sessionIdAvailableForAutomation = string.Empty;
-            try
-            {
-                commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...");
-                bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid);
-                if (!isUIAutomatorInstalled)
-                {
-                    commonProgress.UpdateStepLabel(title, "Installing UIAutomator...");
-                    AndroidMethods.GetInstance().InstallUIAutomator(udid);
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                isScreenServerStarted = false;
-                return Task.Delay(100);
-            }
-            try
-            {
-                int forwardedProxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
-                if (forwardedProxyPort != -1)
-                {
-                    proxyPort = forwardedProxyPort;
-                }
-                else
-                {
-                    commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...");
-                    proxyPort = Common.GetFreePort(8221, 8299);
-                    AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                }
-                int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
-                if (forwardedScreenPort != -1)
-                {
-                    screenServerPort = forwardedScreenPort;
-                }
-                else
-                {
-                    commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...");
-                    screenServerPort = Common.GetFreePort();
-                    AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
-                }
-                commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...");
-                bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                if (!IsUIAutomatorRunning)
-                {
-                    commonProgress.UpdateStepLabel(title, "Starting UIAutomator...");
-                    AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                    sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
-                }
-                else
-                {
-                    commonProgress.UpdateStepLabel(title, "Checking for existing session...");
-                    bool isSessionCreated = false, isItValidSession = false;
-                    if (deviceSessionId.ContainsKey(udid))
-                    {
-                        AndroidAPIMethods.DeleteSession(proxyPort);
                     }
                     else
                     {
-                        sessionIdAvailableForAutomation = AndroidAPIMethods.GetSessionID(proxyPort);
-                        isSessionCreated = !sessionIdAvailableForAutomation.Equals("nosession");
+                        commonProgress.Close();
+                        MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
-                    if (isSessionCreated)
+                }
+                catch (Exception e)
+                {
+                    commonProgress.Hide();
+                    MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    commonProgress.Close();
+                    return;
+                }
+            });
+        }
+
+        public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
+        private async Task ExecuteAndroid()
+        {
+            await Task.Run(() =>
+            {
+                keyValuePairs = new Dictionary<object, object>();
+                string sessionIdCreatedForScreenServer = string.Empty;
+                string sessionIdAvailableForAutomation = string.Empty;
+                try
+                {
+                    commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 10);
+                    bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid);
+                    if (!isUIAutomatorInstalled)
                     {
-                        string androidId = AppiumServerSetup.GetAndroidId(proxyPort, sessionIdAvailableForAutomation);
-                        isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(androidId);
-                        if (isItValidSession == false)
-                        {
-                            isSessionCreated = false;
-                        }
+                        commonProgress.UpdateStepLabel(title, "Installing UIAutomator...", 30);
+                        AndroidMethods.GetInstance().InstallUIAutomator(udid);
                     }
-                    if (!isSessionCreated & !isItValidSession)
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    isScreenServerStarted = false;
+                }
+                try
+                {
+                    int forwardedProxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
+                    if (forwardedProxyPort != -1)
                     {
-                        commonProgress.UpdateStepLabel(title, "Restarting UIAutomator...");
-                        AndroidMethods.GetInstance().StopUIAutomator(udid);
+                        proxyPort = forwardedProxyPort;
+                    }
+                    else
+                    {
+                        commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...", 50);
+                        proxyPort = Common.GetFreePort(8221, 8299);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                    }
+                    int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                    if (forwardedScreenPort != -1)
+                    {
+                        screenServerPort = forwardedScreenPort;
+                    }
+                    else
+                    {
+                        commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...", 60);
+                        screenServerPort = Common.GetFreePort();
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
+                    }
+                    commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...",70);
+                    bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                    if (!IsUIAutomatorRunning)
+                    {
+                        commonProgress.UpdateStepLabel(title, "Starting UIAutomator...",75);
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                         sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
                     }
-                }
-                if (sessionIdCreatedForScreenServer != string.Empty)
-                {
-                    deviceSessionId.Add(udid, sessionIdCreatedForScreenServer);
-                    UIAutomatorSessionId = sessionIdCreatedForScreenServer;
-                    isScreenServerStarted = true;
-                }
-                else if (sessionIdAvailableForAutomation != string.Empty)
-                {
-                    UIAutomatorSessionId = sessionIdAvailableForAutomation;
-                    isScreenServerStarted = true;
-                }
-                else
-                {
-                    isScreenServerStarted = false;
-                }
-                if (isScreenServerStarted)
-                {
-                    if (!deviceDetails.ContainsKey(udid))
+                    else
                     {
-                        keyValuePairs.Add("proxyPort", proxyPort);
-                        keyValuePairs.Add("screenPort", screenServerPort);
-                        deviceDetails.Add(udid, keyValuePairs);
+                        commonProgress.UpdateStepLabel(title, "Checking for existing session...",75);
+                        bool isSessionCreated = false, isItValidSession = false;
+                        if (deviceSessionId.ContainsKey(udid))
+                        {
+                            AndroidAPIMethods.DeleteSession(proxyPort);
+                        }
+                        else
+                        {
+                            sessionIdAvailableForAutomation = AndroidAPIMethods.GetSessionID(proxyPort);
+                            isSessionCreated = !sessionIdAvailableForAutomation.Equals("nosession");
+                        }
+                        if (isSessionCreated)
+                        {
+                            string androidId = AppiumServerSetup.GetAndroidId(proxyPort, sessionIdAvailableForAutomation);
+                            isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(androidId);
+                            if (isItValidSession == false)
+                            {
+                                isSessionCreated = false;
+                            }
+                        }
+                        if (!isSessionCreated & !isItValidSession)
+                        {
+                            commonProgress.UpdateStepLabel(title, "Restarting UIAutomator...", 80);
+                            AndroidMethods.GetInstance().StopUIAutomator(udid);
+                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                            sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                        }
+                    }
+                    if (sessionIdCreatedForScreenServer != string.Empty)
+                    {
+                        deviceSessionId.Add(udid, sessionIdCreatedForScreenServer);
+                        UIAutomatorSessionId = sessionIdCreatedForScreenServer;
+                        isScreenServerStarted = true;
+                    }
+                    else if (sessionIdAvailableForAutomation != string.Empty)
+                    {
+                        UIAutomatorSessionId = sessionIdAvailableForAutomation;
+                        isScreenServerStarted = true;
+                    }
+                    else
+                    {
+                        isScreenServerStarted = false;
+                    }
+                    if (isScreenServerStarted)
+                    {
+                        commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                        if (!deviceDetails.ContainsKey(udid))
+                        {
+                            keyValuePairs.Add("proxyPort", proxyPort);
+                            keyValuePairs.Add("screenPort", screenServerPort);
+                            deviceDetails.Add(udid, keyValuePairs);
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            return Task.Delay(100);
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            });
         }
 
-        private Task ExecuteBackgroundMethod2()
+
+        private async Task ExecuteBackgroundMethod2()
         {
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
@@ -460,7 +466,6 @@
             }
             screenForm.Name = udid;
             screenForm.Show();
-            return Task.Delay(500);
         }
     }
 }

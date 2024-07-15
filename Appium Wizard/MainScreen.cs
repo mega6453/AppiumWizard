@@ -396,7 +396,7 @@ namespace Appium_Wizard
             dynamic parsedJson = JsonConvert.DeserializeObject(jsonString);
             return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
         }
-        private void Open_Click(object sender, EventArgs e)
+        private async void Open_Click(object sender, EventArgs e)
         {
             if (selectedDeviceStatus.Equals("Online"))
             {
@@ -409,13 +409,14 @@ namespace Appium_Wizard
                     }
                 }
                 OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                var isStarted = openDevice.StartBackgroundTasks();
+                var isStarted = await openDevice.StartBackgroundTasks();
                 if (isStarted)
                 {
                     ShowCapability();
                 }
                 foreach (ScreenControl screenForm in Application.OpenForms.OfType<ScreenControl>())
-                {                                           //Open screen in progress class and brings foreground if opened already
+                {
+                    //Open screen in progress class and brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
                     {
                         screenForm.Activate();

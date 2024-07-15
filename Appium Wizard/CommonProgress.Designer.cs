@@ -30,17 +30,25 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CommonProgress));
             commonProgressLabel = new Label();
+            progressBar1 = new ProgressBar();
             SuspendLayout();
             // 
             // commonProgressLabel
             // 
             commonProgressLabel.AutoSize = true;
             commonProgressLabel.ForeColor = SystemColors.ControlText;
-            commonProgressLabel.Location = new Point(12, 45);
+            commonProgressLabel.Location = new Point(9, 29);
             commonProgressLabel.Name = "commonProgressLabel";
             commonProgressLabel.Size = new Size(101, 25);
             commonProgressLabel.TabIndex = 0;
             commonProgressLabel.Text = "In Progress";
+            // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(49, 99);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(639, 34);
+            progressBar1.TabIndex = 3;
             // 
             // CommonProgress
             // 
@@ -49,6 +57,7 @@
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(728, 176);
             ControlBox = false;
+            Controls.Add(progressBar1);
             Controls.Add(commonProgressLabel);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -65,5 +74,6 @@
         #endregion
 
         private Label commonProgressLabel;
+        private ProgressBar progressBar1;
     }
 }

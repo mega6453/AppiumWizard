@@ -129,21 +129,21 @@ namespace Appium_Wizard
         DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
-            if (!LoadingScreen.isServerStarted)
-            {
-                var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                if (result == DialogResult.Yes)
-                {
-                    Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
-                    AppiumServerSetup serverSetup = new AppiumServerSetup();
-                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
-                }
-                else
-                {
-                    ServerConfig serverConfig = new ServerConfig();
-                    serverConfig.ShowDialog();
-                }
-            }
+            //if (!LoadingScreen.isServerStarted)
+            //{
+            //    var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+            //    if (result == DialogResult.Yes)
+            //    {
+            //        Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
+            //        AppiumServerSetup serverSetup = new AppiumServerSetup();
+            //        serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
+            //    }
+            //    else
+            //    {
+            //        ServerConfig serverConfig = new ServerConfig();
+            //        serverConfig.ShowDialog();
+            //    }
+            //}
             Task.Run(() =>
             {
                 while (true)
@@ -1545,9 +1545,10 @@ namespace Appium_Wizard
             commonProgress.Close();
         }
 
-        private void updaterToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void updaterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Updater updater = new Updater();
+            await updater.GetVersionInformation();
             updater.ShowDialog();
         }
 

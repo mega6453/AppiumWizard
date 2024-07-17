@@ -1550,7 +1550,7 @@ namespace Appium_Wizard
         private async void updaterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Updater updater = new Updater();
-            await updater.GetVersionInformation();
+            await updater.GetVersionInformation(main);
             updater.ShowDialog();
         }
 

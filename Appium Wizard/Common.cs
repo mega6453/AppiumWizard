@@ -457,7 +457,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static string AavailableAppiumVersion()
+        public static string AvailableAppiumVersion()
         {
             try
             {
@@ -481,7 +481,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static string AavailableXCUITestVersion()
+        public static string AvailableXCUITestVersion()
         {
             try
             {
@@ -505,7 +505,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static string AavailableUIAutomatorVersion()
+        public static string AvailableUIAutomatorVersion()
         {
             try
             {

@@ -956,7 +956,7 @@ namespace Appium_Wizard
         }
 
 
-        private void serverSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void serverSetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Common.IsNodeInstalled())
             {
@@ -969,6 +969,7 @@ namespace Appium_Wizard
                 if (result == DialogResult.OK)
                 {
                     TroubleShooter troubleShooter = new TroubleShooter();
+                    await troubleShooter.FindIssues(main);
                     troubleShooter.ShowDialog();
                     GoogleAnalytics.SendEvent("Server_Node_Not_Installed_Show_Trouble");
                 }
@@ -1191,10 +1192,11 @@ namespace Appium_Wizard
             }
         }
 
-        private void fixInstallationToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void fixInstallationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TroubleShooter troubleShooter = new TroubleShooter();
-            troubleShooter.ShowDialog();
+            await troubleShooter.FindIssues(main);
+            troubleShooter.ShowDialog(this);
         }
 
         private void AutoScrollCheckbox_CheckedChanged(object sender, EventArgs e)

@@ -8,18 +8,33 @@ namespace Appium_Wizard
         {
             InitializeComponent();
         }
-
-        private void TroubleShooter_Load(object sender, EventArgs e)
+        public async Task FindIssues(MainScreen mainScreen = null)
         {
-            FindIssues();
-        }
-
-        private void FindIssues()
-        {
+            bool IsNodeInstalled = false;
+            bool IsAppiumInstalled = false;
+            bool IsXCUITestDriverInstalled = false;
+            bool IsUIAutomatorDriverInstalled = false;
             CommonProgress commonProgress = new CommonProgress();
+            if (mainScreen == null)
+            {
+                commonProgress.Owner = this;
+            }
+            else
+            {
+                commonProgress.Owner = mainScreen;
+            }
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Find Issues", "Please wait while looking for the issues...");
-            bool IsNodeInstalled = Common.IsNodeInstalled();
+            await Task.Run(() =>
+            {
+                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for NodeJS installation...", 10);
+                IsNodeInstalled = Common.IsNodeInstalled();
+                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for Appium installation...", 50);
+                IsAppiumInstalled = Common.IsAppiumInstalled();
+                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for drivers installation...", 75);
+                string InstalledDriverList = Common.AppiumInstalledDriverList();
+                IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
+                IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
+            });
             if (!IsNodeInstalled)
             {
                 NodeJSStatusLabel.Text = "Not OK";
@@ -33,7 +48,6 @@ namespace Appium_Wizard
             {
                 NodeJSStatusLabel.Text = "OK";
                 FixNodeJSButton.Enabled = false;
-                bool IsAppiumInstalled = Common.IsAppiumInstalled();
                 if (!IsAppiumInstalled)
                 {
                     AppiumStatusLabel.Text = "Not OK";
@@ -46,9 +60,6 @@ namespace Appium_Wizard
                 {
                     AppiumStatusLabel.Text = "OK";
                     FixAppiumButton.Enabled = false;
-                    string InstalledDriverList = Common.AppiumInstalledDriverList();
-                    bool IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
-                    bool IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
                     if (!IsXCUITestDriverInstalled)
                     {
                         XCUITestStatusLabel.Text = "Not OK";
@@ -73,59 +84,70 @@ namespace Appium_Wizard
                     }
                 }
             }
-            commonProgress.Close();
+            commonProgress.Close();        
         }
 
-
-        private void FixNodeJSButton_Click(object sender, EventArgs e)
+        private async void FixNodeJSButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
-            Common.InstallNodeJs();
+            await Task.Run(() =>
+            {
+                Common.InstallNodeJs();
+            });
             commonProgress.Close();
-            FindIssues();
+            await FindIssues();
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void FixAppiumButton_Click(object sender, EventArgs e)
+        private async void FixAppiumButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install Appium", "Installing Appium Server, This may take sometime, Please wait...");
-            Common.InstallAppiumGlobally();
+            await Task.Run(() =>
+            {
+                Common.InstallAppiumGlobally();
+            });
             commonProgress.Close();
-            FindIssues();
+            await FindIssues();
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void FixXCUITestButton_Click(object sender, EventArgs e)
+        private async void FixXCUITestButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install XCUITest", "Installing XCUITest(iOS) driver, This may take sometime, Please wait...");
-            Common.InstallXCUITestDriver();
+            await Task.Run(() =>
+            {
+                Common.InstallXCUITestDriver();
+            });
             commonProgress.Close();
-            FindIssues();
+            await FindIssues();
             MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void FixUIAutomatorButton_Click(object sender, EventArgs e)
+        private async void FixUIAutomatorButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install UIAutomator2", "Installing UIAutomator2(android) driver, This may take sometime, Please wait...");
-            Common.InstallUIAutomatorDriver();
+            await Task.Run(() =>
+            {
+                Common.InstallUIAutomatorDriver();
+            });
             commonProgress.Close();
-            FindIssues();
+            await FindIssues();
             MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void checkForIssues_Click(object sender, EventArgs e)
+        private async void checkForIssues_Click(object sender, EventArgs e)
         {
-            FindIssues();
+            await FindIssues();
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 

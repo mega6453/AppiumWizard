@@ -31,7 +31,7 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("Sign_IPA_CancelButton_Clicked");
         }
 
-        private void SignButton_Click(object sender, EventArgs e)
+        private async void SignButton_Click(object sender, EventArgs e)
         {
             if (profilesListComboBox.SelectedIndex.Equals(-1) || string.IsNullOrEmpty(IPAFilePathTextBox.Text) || string.IsNullOrEmpty(OutputPathTextBox.Text))
             {
@@ -39,33 +39,52 @@ namespace Appium_Wizard
             }
             else
             {
+                string output = string.Empty;
+                string message = string.Empty;
                 string profilePath = profilesDictionary[profilesListComboBox.SelectedIndex];
                 CommonProgress commonProgress = new CommonProgress();
-                commonProgress.Show();
                 if (UDIDTextbox.Text == "")
                 {
-                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem);
+                    commonProgress.Show();
+                    message = "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem;
+                    commonProgress.UpdateStepLabel("Sign App", message, 10);
+                    await Task.Run(() =>
+                    {
+                        output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message);
+                    });
                 }
                 else
                 {
-                    commonProgress.UpdateStepLabel("Sign App", "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nDevice : " + UDIDTextbox.Text + "\nProfile : " + profilesListComboBox.SelectedItem);
-                }
-                string output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text);
-                commonProgress.Hide();
-                if (output.Equals("ProfileNotAvailable"))
-                {
-                    var dialogResult = MessageBox.Show("The selected profile does not have the given UDID. Do you want to still Sign this IPA?", "Profile does not have UDID", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (dialogResult == DialogResult.Yes)
+                    message = "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + " | Device : " + UDIDTextbox.Text + "\nProfile : " + profilesListComboBox.SelectedItem;
+                    bool isProfileHasUDID = iOSMethods.GetInstance().isProfileHasUDID(profilePath, UDIDTextbox.Text);
+                    if (isProfileHasUDID)
                     {
                         commonProgress.Show();
-                        commonProgress.UpdateStepLabel("Sign App", "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem);
-                        output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, "");
-                        GoogleAnalytics.SendEvent("ProfileNotAvailable_Yes_Sign");
+                        commonProgress.UpdateStepLabel("Sign App", message, 10);
+                        await Task.Run(() =>
+                        {
+                            output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message);
+                        });
                     }
                     else
                     {
-                        GoogleAnalytics.SendEvent("ProfileNotAvailable_Dont_Sign");
-                        return;
+                        var dialogResult = MessageBox.Show("The selected profile does not have the given UDID. Do you want to still Sign this IPA?", "Profile does not have UDID", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            message = "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem;
+                            commonProgress.Show();
+                            commonProgress.UpdateStepLabel("Sign App", message, 10);
+                            await Task.Run(() =>
+                            {
+                                output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, "", commonProgress, message);
+                            });
+                            GoogleAnalytics.SendEvent("ProfileNotAvailable_Yes_Sign");
+                        }
+                        else
+                        {
+                            GoogleAnalytics.SendEvent("ProfileNotAvailable_Dont_Sign");
+                            return;
+                        }
                     }
                 }
                 if (output.Equals("Sign_IPA_Failed"))
@@ -75,6 +94,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
+                    commonProgress.Close();
                     var result = MessageBox.Show("Do you want to open the output folder?", "Signing Success", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {

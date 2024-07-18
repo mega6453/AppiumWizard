@@ -6,6 +6,12 @@
         {
             InitializeComponent();
             //Icon = Properties.Resources.appiumlogo;
+
+            int labelStartX = commonProgressLabel.Location.X;
+            int formWidth = this.ClientSize.Width;
+            int availableWidth = formWidth - labelStartX;
+            commonProgressLabel.Width = availableWidth;
+            commonProgressLabel.MaximumSize = new Size(availableWidth, 0);
         }
 
         public void UpdateStepLabel(string title, string stepText, int progressPercent = 50)

@@ -440,7 +440,7 @@ namespace Appium_Wizard
         }
 
 
-        static string stackTrace = "";
+        public static string signIPAStackTrace = "";
         public string SignIPA(string udid, string IPAFilePath)
         {
             var output = isProfileAvailableToSign(udid);
@@ -461,14 +461,14 @@ namespace Appium_Wizard
         }
 
 
-        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid)
+        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid, CommonProgress commonProgress = null, string message = null)
         {
             if (udid != "")
             {
                 bool isProfileAvailable = isProfileHasUDID(profilePath, udid);
                 if (isProfileAvailable)
                 {
-                    return SignIPA(profilePath, IPAFilePath, outputPath);
+                    return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
                 }
                 else
                 {
@@ -477,11 +477,11 @@ namespace Appium_Wizard
             }
             else
             {
-                return SignIPA(profilePath, IPAFilePath, outputPath);
+                return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
             }
         }
 
-        private string SignIPA(string profilePath, string IPAFilePath, string outputPath)
+        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress = null, string message = null)
         {
             string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
             string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
@@ -502,8 +502,9 @@ namespace Appium_Wizard
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardInput = true;
 
-            process.OutputDataReceived += Process_OutputDataReceived;
-            process.ErrorDataReceived += Process_ErrorDataReceived;
+            process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, commonProgress, message);
+            process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, commonProgress, message);
+
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -517,11 +518,11 @@ namespace Appium_Wizard
             int exitCode = process.ExitCode;
             process.Close();
 
-            if (stackTrace == "Archive Failed")
+            if (signIPAStackTrace == "Archive Failed")
             {
                 return "Sign_IPA_Failed";
             }
-            else if (stackTrace == "Archive OK")
+            else if (signIPAStackTrace == "Archive OK")
             {
                 return outputPath;
             }
@@ -531,32 +532,66 @@ namespace Appium_Wizard
             }
         }
 
-        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 if (e.Data.Contains("Archive Failed"))
                 {
-                    stackTrace = "Sign IPA Archive Failed";
+                    signIPAStackTrace = "Sign IPA Archive Failed";
                 }
                 if (e.Data.Contains("Archive OK"))
                 {
-                    stackTrace = "Archive OK";
+                    signIPAStackTrace = "Archive OK";
+                }
+                int percent = 0;
+                if (e.Data.Contains("Unzip OK!"))
+                {
+                    percent = 40;
+                }
+                else if (e.Data.Contains("Signed OK!"))
+                {
+                    percent = 70;
+                }
+                else if (e.Data.Contains("Archive OK!"))
+                {
+                    percent = 100;
+                }
+                if (percent != 0)
+                {
+                    commonProgress.UpdateStepLabel("Sign App",message, percent);
                 }
             }
         }
 
-        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 if (e.Data.Contains("Archive Failed"))
                 {
-                    stackTrace = "Sign IPA Archive Failed";
+                    signIPAStackTrace = "Sign IPA Archive Failed";
                 }
                 if (e.Data.Contains("Archive OK"))
                 {
-                    stackTrace = "Archive OK";
+                    signIPAStackTrace = "Archive OK";
+                }
+                int percent = 0;
+                if (e.Data.Contains("Unzip OK!"))
+                {
+                    percent = 40;
+                }
+                else if (e.Data.Contains("Signed OK!"))
+                {
+                    percent = 70;
+                }
+                else if (e.Data.Contains("Archive OK!"))
+                {
+                    percent = 100;
+                }
+                if (percent != 0)
+                {
+                    commonProgress.UpdateStepLabel("Sign App", message, percent);
                 }
             }
         }

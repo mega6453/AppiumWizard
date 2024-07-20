@@ -441,7 +441,7 @@ namespace Appium_Wizard
 
 
         public static string signIPAStackTrace = "";
-        public string SignIPA(string udid, string IPAFilePath)
+        public string SignIPA(string udid, string IPAFilePath, CommonProgress commonProgress = null, string message = null)
         {
             var output = isProfileAvailableToSign(udid);
             bool isProfileAvailable = output.Item1;
@@ -452,7 +452,7 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath);
+                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress,message);
             }
             else
             {
@@ -559,7 +559,10 @@ namespace Appium_Wizard
                 }
                 if (percent != 0)
                 {
-                    commonProgress.UpdateStepLabel("Sign App",message, percent);
+                    if (commonProgress != null)
+                    {
+                        commonProgress.UpdateStepLabel("Sign App", message, percent);
+                    }
                 }
             }
         }

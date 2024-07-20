@@ -864,46 +864,66 @@ namespace Appium_Wizard
         }
 
 
-        public static void InstalliOSApp(string selectedDeviceName, string selectedUDID, string filePath, InstalliOSApp installApp)
+        public static async Task InstalliOSApp(string selectedDeviceName, string selectedUDID, string filePath)
         {
-            installApp.Close();
             CommonProgress commonProgress = new CommonProgress();
             string fileName = Path.GetFileName(filePath);
-            commonProgress.Text = "Installing " + fileName + " in " + selectedDeviceName;
+            commonProgress.Owner = main;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install App", "Starting Installation...");
             Dictionary<string, string> IPAInfo = new Dictionary<string, string>();
             string bundleId = "", appName = "", version = "";
             bool isPListRead = false;
             try
             {
-                IPAInfo = iOSMethods.GetInstance().GetIPAInformation(filePath);
-                bundleId = IPAInfo["CFBundleIdentifier"];
-                appName = IPAInfo["CFBundleExecutable"];
-                version = IPAInfo["CFBundleShortVersionString"] + "[" + IPAInfo["CFBundleVersion"] + "]";
-                isPListRead = true;
+                await Task.Run(() =>
+                {
+                    commonProgress.UpdateStepLabel("Install App", "Getting IPA information...", 5);
+                    IPAInfo = iOSMethods.GetInstance().GetIPAInformation(filePath);
+                    bundleId = IPAInfo["CFBundleIdentifier"];
+                    appName = IPAInfo["CFBundleExecutable"];
+                    version = IPAInfo["CFBundleShortVersionString"] + "[" + IPAInfo["CFBundleVersion"] + "]";
+                    isPListRead = true;
+                });
             }
             catch (Exception)
             {
                 isPListRead = false;
             }
-            bool completed = false;
-            Task.Run(() =>
+            bool completed = false; int percent = 5;
+            _ = Task.Run(() =>
+            {
+                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
+                while (completed == false)
+                {
+                    try
+                    {                        
+                        percent = int.Parse(iOSAsyncMethods.installationProgress);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    commonProgress.Invoke((MethodInvoker)(() =>
+                    {
+                        if (percent != 0)
+                        {
+                            if (isPListRead)
+                            {
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
+                            }
+                            else
+                            {
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
+                            }
+                        }
+                    }));
+                }
+            });
+
+            await Task.Run(() =>
             {
                 iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, filePath);
                 completed = true;
             });
-            while (completed == false)
-            {
-                if (isPListRead)
-                {
-                    commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%");
-                }
-                else
-                {
-                    commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%");
-                }
-            }
             if (iOSAsyncMethods.installationProgress.Contains("installation successful") | iOSAsyncMethods.installationProgress == "100")
             {
                 commonProgress.Close();

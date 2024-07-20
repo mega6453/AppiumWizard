@@ -1383,9 +1383,10 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("Refresh_Status");
         }
 
-        private void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
         {
             InstalledAppsList installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
+            await installedAppsList.GetInstalledAppsList(main);
             installedAppsList.ShowDialog();
         }
 

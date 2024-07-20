@@ -125,7 +125,6 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Installed Apps List";
-            Load += InstalledAppsList_Load;
             Shown += InstalledAppsList_Shown;
             ResumeLayout(false);
             PerformLayout();

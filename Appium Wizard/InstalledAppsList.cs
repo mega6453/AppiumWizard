@@ -15,16 +15,19 @@ namespace Appium_Wizard
             InitializeComponent();
         }
 
-        private void InstalledAppsList_Load(object sender, EventArgs e)
+        public async Task GetInstalledAppsList(MainScreen main)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = main;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Installed Apps List", "Please wait while fetching list of installed apps...");
-            GetListOfAppsAndUpdateListView();
+            await Task.Run(() => {
+                GetListOfAppsAndUpdateListView();
+            });
             commonProgress.Close();
         }
 
-        public void GetListOfAppsAndUpdateListView(bool update = false)
+        public void GetListOfAppsAndUpdateListView()
         {
             if (os.Equals("Android"))
             {
@@ -75,28 +78,32 @@ namespace Appium_Wizard
             }
         }
 
-        private void LaunchButton_Click(object sender, EventArgs e)
+        private async void LaunchButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Launch App", "Please wait while launching app : " + selectedPackageName);
-            if (os.Equals("Android"))
-            {
-                string activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
-                AndroidMethods.GetInstance().LaunchApp(udid, activityName);
-                GoogleAnalytics.SendEvent("Android_App_Launched");
-            }
-            else
-            {
-                iOSMethods.GetInstance().LaunchApp(udid, selectedPackageName);
-                GoogleAnalytics.SendEvent("iOS_App_Launched");
-            }
+            await Task.Run(() => {
+                if (os.Equals("Android"))
+                {
+                    string activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
+                    AndroidMethods.GetInstance().LaunchApp(udid, activityName);
+                    GoogleAnalytics.SendEvent("Android_App_Launched");
+                }
+                else
+                {
+                    iOSMethods.GetInstance().LaunchApp(udid, selectedPackageName);
+                    GoogleAnalytics.SendEvent("iOS_App_Launched");
+                }
+            });
             commonProgress.Close();
         }
 
-        private void UninstallButton_Click(object sender, EventArgs e)
+        private async void UninstallButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             if (os.Equals("Android"))
             {
                 var result = MessageBox.Show("Are you sure you want to uninstall " + selectedPackageName + " from " + deviceName + "?", "Uninstall App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -104,7 +111,9 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
-                    AndroidMethods.GetInstance().UnInstallApp(udid, selectedPackageName);
+                    await Task.Run(() => {
+                        AndroidMethods.GetInstance().UnInstallApp(udid, selectedPackageName);
+                    });                    
                     GoogleAnalytics.SendEvent("Android_App_Uninstalled");
                 }
             }
@@ -115,7 +124,9 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
-                    iOSMethods.GetInstance().UninstallApp(udid, selectedPackageName);
+                    await Task.Run(() => {
+                        iOSMethods.GetInstance().UninstallApp(udid, selectedPackageName);
+                    });
                     GoogleAnalytics.SendEvent("iOS_App_Uninstalled");
                 }
             }
@@ -127,9 +138,10 @@ namespace Appium_Wizard
             commonProgress.Close();
         }
 
-        private void KillAppButton_Click(object sender, EventArgs e)
+        private async void KillAppButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             if (os.Equals("Android"))
             {
                 var result = MessageBox.Show("Are you sure you want to kill " + selectedPackageName + " in " + deviceName + "?", "Kill App", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -137,7 +149,9 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
-                    AndroidMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    await Task.Run(() => {
+                        AndroidMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    });
                     GoogleAnalytics.SendEvent("Android_App_Killed");
                 }
             }
@@ -148,7 +162,9 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
-                    iOSMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    await Task.Run(() => {
+                        iOSMethods.GetInstance().KillApp(udid, selectedPackageName);
+                    });
                     GoogleAnalytics.SendEvent("iOS_App_Killed");
                 }
             }

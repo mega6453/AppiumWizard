@@ -54,12 +54,20 @@ namespace Appium_Wizard
 
         private void StartBackgroundTasks()
         {
+            bool isFirstTimeRun = false;
             var startTime = DateTime.Now;
             Show();
             Common.SetAndroidHomeEnvironmentVariable();
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
-            bool isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
+#if DEBUG
+            Console.WriteLine("Running in Debug mode.");
+            isFirstTimeRun = false;
+#else
+            Console.WriteLine("Running in Release mode.");
+            isFirstTimeRun = Database.QueryDataFromFirstTimeRunTable().Contains("Yes");
+
+#endif
             if (isFirstTimeRun)
             {
                 firstTimeRunLabel.Text = "First time run verifies the installation, This may take sometime, Please wait...";

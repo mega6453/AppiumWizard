@@ -129,21 +129,21 @@ namespace Appium_Wizard
         DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
-            //if (!LoadingScreen.isServerStarted)
-            //{
-            //    var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-            //    if (result == DialogResult.Yes)
-            //    {
-            //        Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
-            //        AppiumServerSetup serverSetup = new AppiumServerSetup();
-            //        serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
-            //    }
-            //    else
-            //    {
-            //        ServerConfig serverConfig = new ServerConfig();
-            //        serverConfig.ShowDialog();
-            //    }
-            //}
+            if (!LoadingScreen.isServerStarted)
+            {
+                var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                if (result == DialogResult.Yes)
+                {
+                    Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
+                    AppiumServerSetup serverSetup = new AppiumServerSetup();
+                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
+                }
+                else
+                {
+                    ServerConfig serverConfig = new ServerConfig();
+                    serverConfig.ShowDialog();
+                }
+            }
             Task.Run(() =>
             {
                 while (true)
@@ -825,6 +825,7 @@ namespace Appium_Wizard
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
             try
@@ -1277,7 +1278,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void installAppToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void installAppToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (selectedDeviceStatus.Equals("Online"))
             {
@@ -1306,15 +1307,18 @@ namespace Appium_Wizard
                         string filePath = dialog.FileName;
                         string fileName = Path.GetFileName(filePath);
                         commonProgress.Text = "Install App";
+                        commonProgress.Owner = this;
                         commonProgress.Show();
-                        commonProgress.UpdateStepLabel("Install App", "Starting Installation...");
+                        commonProgress.UpdateStepLabel("Install App", "Getting APK Information...",20);
                         bool completed = false;
                         Dictionary<string, string> APKInfo = new Dictionary<string, string>();
                         string appName = "", packageName = "", activityName = "", version = "";
                         bool isAPKInfoRead;
                         try
                         {
-                            APKInfo = AndroidMethods.GetInstance().GetApkInformation(filePath);
+                            await Task.Run(() => {
+                                APKInfo = AndroidMethods.GetInstance().GetApkInformation(filePath);
+                            });
                             appName = APKInfo["AppName"];
                             packageName = APKInfo["PackageName"];
                             activityName = APKInfo["ActivityName"];
@@ -1327,22 +1331,26 @@ namespace Appium_Wizard
                             isAPKInfoRead = false;
                         }
                         bool isInstalled = false;
-                        Task.Run(() =>
+                        _ = Task.Run(() =>
+                        {
+                            while (completed == false)
+                            {
+                                if (isAPKInfoRead)
+                                {
+                                    commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName);
+                                }
+                                else
+                                {
+                                    commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName);
+                                }
+                            }
+                        });
+                        await Task.Run(() =>
                         {
                             isInstalled = AndroidMethods.GetInstance().InstallApp(selectedUDID, filePath);
                             completed = true;
                         });
-                        while (completed == false)
-                        {
-                            if (isAPKInfoRead)
-                            {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName);
-                            }
-                            else
-                            {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName);
-                            }
-                        }
+
                         if (isInstalled)
                         {
                             if (isAPKInfoRead)
@@ -1350,7 +1358,9 @@ namespace Appium_Wizard
                                 DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                                 if (result == DialogResult.Yes)
                                 {
-                                    AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
+                                    await Task.Run(() => {
+                                        AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
+                                    });
                                     GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "Yes");
                                 }
                                 else
@@ -1390,7 +1400,7 @@ namespace Appium_Wizard
             installedAppsList.ShowDialog();
         }
 
-        private void takeScreenshotToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void takeScreenshotToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "PNG Files (*.png)|*.png";
@@ -1403,19 +1413,22 @@ namespace Appium_Wizard
                 {
                     CommonProgress commonProgress = new CommonProgress();
                     commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
+                    commonProgress.Owner = this;
                     commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
                     try
                     {
-                        if (selectedDeviceConnection.Equals("Wi-Fi"))
-                        {
-                            AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
-                        }
-                        else
-                        {
-                            AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
-                        }
+                        await Task.Run(() => {
+                            if (selectedDeviceConnection.Equals("Wi-Fi"))
+                            {
+                                AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
+                            }
+                            else
+                            {
+                                AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                            }
+                        });
                         commonProgress.Close();
                     }
                     catch (Exception)
@@ -1433,12 +1446,15 @@ namespace Appium_Wizard
                 {
                     CommonProgress commonProgress = new CommonProgress();
                     commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
+                    commonProgress.Owner = this;
                     commonProgress.Show();
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
                     try
                     {
-                        iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                        await Task.Run(() => {
+                            iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
+                        });
                         commonProgress.Close();
                     }
                     catch (Exception)
@@ -1502,17 +1518,25 @@ namespace Appium_Wizard
             }
         }
 
-        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Check for Appium Wizard updates", "Please wait while checking for updates...");
             GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click");
-            if (Common.isInternetAvailable())
+            bool isInternetAvailable = false;
+            await Task.Run(() => {
+                isInternetAvailable = Common.isInternetAvailable();
+            });
+            if (isInternetAvailable)
             {
                 try
                 {
-                    var releaseInfo = Common.GetLatestReleaseInfo();
+                    await Task.Run(()=> {
+                        releaseInfo = Common.GetLatestReleaseInfo(); 
+                    });                   
                     string tagName = releaseInfo["tag_name"];
                     string releaseNotes = releaseInfo["body"].Trim();
                     Version thisAppVersion = new Version(VersionInfo.VersionNumber);

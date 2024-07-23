@@ -49,6 +49,7 @@ namespace Appium_Wizard
         public async Task isServerRunning(MainScreen mainScreen = null)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = mainScreen;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 10);
             bool isRunning1 = false;

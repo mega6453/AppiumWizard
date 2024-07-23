@@ -878,8 +878,9 @@ namespace Appium_Wizard
             {
                 await Task.Run(() =>
                 {
-                    commonProgress.UpdateStepLabel("Install App", "Getting IPA information...", 5);
+                    commonProgress.UpdateStepLabel("Install App", "Getting IPA information...", 10);
                     IPAInfo = iOSMethods.GetInstance().GetIPAInformation(filePath);
+                    commonProgress.UpdateStepLabel("Install App", "Getting IPA information...", 30);
                     bundleId = IPAInfo["CFBundleIdentifier"];
                     appName = IPAInfo["CFBundleExecutable"];
                     version = IPAInfo["CFBundleShortVersionString"] + "[" + IPAInfo["CFBundleVersion"] + "]";
@@ -890,36 +891,42 @@ namespace Appium_Wizard
             {
                 isPListRead = false;
             }
-            bool completed = false; int percent = 5;
-            _ = Task.Run(() =>
+            bool completed = false; int percent = 5; int countPercentageforPreparing = 31;
+            _ = Task.Run(async () =>
             {
-                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
-                while (completed == false)
+                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\nPercentage Completion: " + iOSAsyncMethods.installationProgress + " % ", percent);
+                while (!completed)
                 {
                     try
-                    {                        
+                    {
                         percent = int.Parse(iOSAsyncMethods.installationProgress);
                     }
                     catch (Exception)
                     {
                     }
-                    commonProgress.Invoke((MethodInvoker)(() =>
+
+                    await commonProgress.Invoke(async () =>
                     {
-                        if (percent != 0)
+                        if (percent == 0)
+                        {
+                            commonProgress.UpdateStepLabel("Install App", "Preparing for installation. Please wait, this may take some time depending on the file size...", countPercentageforPreparing);
+                            countPercentageforPreparing++;
+                            await Task.Delay(1000);
+                        }
+                        else
                         {
                             if (isPListRead)
                             {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ")" + " into " + selectedDeviceName + "\nPercentage Completion: " + iOSAsyncMethods.installationProgress + " % ", percent);
                             }
                             else
                             {
-                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName + "\n\nPercentage Completion : " + iOSAsyncMethods.installationProgress + "%", percent);
+                                commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName + "\nPercentage Completion: " + iOSAsyncMethods.installationProgress + " % ", percent);
                             }
                         }
-                    }));
+                    });
                 }
             });
-
             await Task.Run(() =>
             {
                 iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, filePath);
@@ -1309,14 +1316,15 @@ namespace Appium_Wizard
                         commonProgress.Text = "Install App";
                         commonProgress.Owner = this;
                         commonProgress.Show();
-                        commonProgress.UpdateStepLabel("Install App", "Getting APK Information...",20);
+                        commonProgress.UpdateStepLabel("Install App", "Getting APK Information...", 20);
                         bool completed = false;
                         Dictionary<string, string> APKInfo = new Dictionary<string, string>();
                         string appName = "", packageName = "", activityName = "", version = "";
                         bool isAPKInfoRead;
                         try
                         {
-                            await Task.Run(() => {
+                            await Task.Run(() =>
+                            {
                                 APKInfo = AndroidMethods.GetInstance().GetApkInformation(filePath);
                             });
                             appName = APKInfo["AppName"];
@@ -1331,20 +1339,27 @@ namespace Appium_Wizard
                             isAPKInfoRead = false;
                         }
                         bool isInstalled = false;
-                        _ = Task.Run(() =>
+                        int countPercentageforPreparing = 20;
+                        _ = Task.Run(async () =>
                         {
-                            while (completed == false)
+                            while (!completed)
                             {
-                                if (isAPKInfoRead)
+                                await commonProgress.Invoke(async () =>
                                 {
-                                    commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName);
-                                }
-                                else
-                                {
-                                    commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName);
-                                }
+                                    if (isAPKInfoRead)
+                                    {
+                                        commonProgress.UpdateStepLabel("Install App", "Installing " + appName + "(" + version + ") into " + selectedDeviceName, countPercentageforPreparing);
+                                    }
+                                    else
+                                    {
+                                        commonProgress.UpdateStepLabel("Install App", "Installing " + fileName + " into " + selectedDeviceName, countPercentageforPreparing);
+                                    }
+                                    countPercentageforPreparing = countPercentageforPreparing + 5;
+                                    await Task.Delay(1000);
+                                });
                             }
                         });
+
                         await Task.Run(() =>
                         {
                             isInstalled = AndroidMethods.GetInstance().InstallApp(selectedUDID, filePath);
@@ -1358,7 +1373,8 @@ namespace Appium_Wizard
                                 DialogResult result = MessageBox.Show("Installation Successful. Would you like to launch the app?", "Launch App", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                                 if (result == DialogResult.Yes)
                                 {
-                                    await Task.Run(() => {
+                                    await Task.Run(() =>
+                                    {
                                         AndroidMethods.GetInstance().LaunchApp(selectedUDID, packageName, activityName);
                                     });
                                     GoogleAnalytics.SendEvent("Launch_Installed_Android_App", "Yes");
@@ -1419,7 +1435,8 @@ namespace Appium_Wizard
                     filePath = "\"" + filePath + "\"";
                     try
                     {
-                        await Task.Run(() => {
+                        await Task.Run(() =>
+                        {
                             if (selectedDeviceConnection.Equals("Wi-Fi"))
                             {
                                 AndroidMethods.GetInstance().TakeScreenshot(selectedDeviceIP, filePath);
@@ -1452,7 +1469,8 @@ namespace Appium_Wizard
                     filePath = "\"" + filePath + "\"";
                     try
                     {
-                        await Task.Run(() => {
+                        await Task.Run(() =>
+                        {
                             iOSMethods.GetInstance().TakeScreenshot(selectedUDID, filePath);
                         });
                         commonProgress.Close();
@@ -1527,16 +1545,18 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel("Check for Appium Wizard updates", "Please wait while checking for updates...");
             GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click");
             bool isInternetAvailable = false;
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 isInternetAvailable = Common.isInternetAvailable();
             });
             if (isInternetAvailable)
             {
                 try
                 {
-                    await Task.Run(()=> {
-                        releaseInfo = Common.GetLatestReleaseInfo(); 
-                    });                   
+                    await Task.Run(() =>
+                    {
+                        releaseInfo = Common.GetLatestReleaseInfo();
+                    });
                     string tagName = releaseInfo["tag_name"];
                     string releaseNotes = releaseInfo["body"].Trim();
                     Version thisAppVersion = new Version(VersionInfo.VersionNumber);

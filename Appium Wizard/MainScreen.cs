@@ -989,6 +989,7 @@ namespace Appium_Wizard
             if (Common.IsNodeInstalled())
             {
                 ServerConfig serverSetup = new ServerConfig();
+                serverSetup.Owner = this;
                 await serverSetup.isServerRunning(main);
                 serverSetup.ShowDialog();
             }

@@ -21,6 +21,12 @@ namespace Appium_Wizard
 
         private void ServerConfig_Load(object sender, EventArgs e)
         {
+            PortTextBox1.Text = port1 == 0 ? string.Empty : port1.ToString();
+            PortTextBox2.Text = port2 == 0 ? string.Empty : port2.ToString();
+            PortTextBox3.Text = port3 == 0 ? string.Empty : port3.ToString();
+            PortTextBox4.Text = port4 == 0 ? string.Empty : port4.ToString();
+            PortTextBox5.Text = port5 == 0 ? string.Empty : port5.ToString();
+
             Task.Run(() =>
             {
                 while (true)
@@ -163,8 +169,9 @@ namespace Appium_Wizard
                     serverSetup.StartAppiumServer(portNumber, serverNumber);
                 });
                 int count = 1;
+
                 while (!serverSetup.serverStarted)
-                {                   
+                {
                     if (!string.IsNullOrEmpty(serverSetup.statusText))
                     {
                         if (serverSetup.statusText.Equals("address already in use"))
@@ -182,9 +189,8 @@ namespace Appium_Wizard
                     }
                     commonProgress.Invoke((MethodInvoker)(() =>
                     {
-                        commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...",15*count);
+                        commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 15 * count);
                     }));
-                    await Task.Delay(3000);
                     count++;
                     if (count == 15)
                     {
@@ -192,6 +198,7 @@ namespace Appium_Wizard
                         GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                         break;
                     }
+                    await Task.Delay(3000);
                 }
                 if (serverSetup.serverStarted)
                 {

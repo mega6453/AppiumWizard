@@ -1203,7 +1203,7 @@ namespace Appium_Wizard
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
+        public async Task<string> RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             if (MainScreen.udidProxyPort.ContainsKey(udid))
             {
@@ -1236,7 +1236,8 @@ namespace Appium_Wizard
                 process.Start();
                 var processId = process.Id;
                 MainScreen.runningProcesses.Add(processId);
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
+                await Task.Delay(2000);
                 // Begin asynchronous reading of the output/error streams
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
@@ -1249,6 +1250,7 @@ namespace Appium_Wizard
                 bool isPasscodeRequired = false;
                 int count = 1;
                 string sessionId = string.Empty;
+                bool isWDARanAtleaseOnce = false;
                 while (!process.HasExited)
                 {
                     if (!string.IsNullOrEmpty(runwdaError))
@@ -1258,14 +1260,28 @@ namespace Appium_Wizard
                             sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                             while (sessionId.Equals("nosession") && count <= 6)
                             {
-                                Thread.Sleep(5000);
-                                sessionId = iOSAPIMethods.CreateWDASession(port);
-                                if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
-                                {
-                                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                    isPasscodeRequired = true;
-                                }
-                                count++;
+                                await Task.Run(async () => {
+                                    //Thread.Sleep(5000);
+                                    await Task.Delay(5000);
+                                    sessionId = iOSAPIMethods.CreateWDASession(port);
+                                    bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
+                                    if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
+                                    {
+                                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                        isPasscodeRequired = true;
+                                        isWDARanAtleaseOnce = true;
+                                    }
+                                    else if (!IsWDARunningInAppsList)
+                                    {
+                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                        if (isWDARanAtleaseOnce)
+                                        {
+                                            commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                        }                                        
+                                        isPasscodeRequired = true;
+                                    }
+                                    count++;
+                                });
                             }
                             //if (runwdaError.Contains("Timed out while enabling automation mode"))
                             //{

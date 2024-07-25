@@ -37,7 +37,7 @@
             // 
             commonProgressLabel.AutoSize = true;
             commonProgressLabel.ForeColor = SystemColors.ControlText;
-            commonProgressLabel.Location = new Point(19, 63);
+            commonProgressLabel.Location = new Point(19, 47);
             commonProgressLabel.Name = "commonProgressLabel";
             commonProgressLabel.Size = new Size(101, 25);
             commonProgressLabel.TabIndex = 0;
@@ -45,7 +45,7 @@
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(25, 26);
+            progressBar1.Location = new Point(25, 12);
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(673, 34);
             progressBar1.TabIndex = 3;

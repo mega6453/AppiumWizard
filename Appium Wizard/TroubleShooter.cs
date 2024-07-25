@@ -91,7 +91,7 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
+            commonProgress.UpdateStepLabel("Install NodeJS","Installing NodeJS, This may take sometime, Please wait...");
             await Task.Run(() =>
             {
                 Common.InstallNodeJs();

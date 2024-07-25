@@ -100,6 +100,7 @@
         private async void AppiumButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Update Appium Server", "Please wait while updating appium server version to " + AppiumAvailableVersionLabel.Text);
             await Task.Run(() =>
@@ -115,6 +116,7 @@
         private async void UIAutomatorButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Update UIAutomator driver", "Please wait while updating UIAutomator driver version to " + UIAutomatorAvailableVersionLabel.Text);
             await Task.Run(() =>
@@ -130,6 +132,7 @@
         private async void XCUITestButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Update XCUITest driver", "Please wait while updating XCUITest driver version to " + XCUITestAvailableVersionLabel.Text);
             await Task.Run(() =>

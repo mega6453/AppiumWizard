@@ -43,9 +43,57 @@
 
         public void UpdateStepLabel(string stepText)
         {
-            commonProgressLabel.ForeColor = Color.Red;
-            commonProgressLabel.Text = stepText;
-            commonProgressLabel.Refresh();
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    this.Text = "Run WebDriverAgent";
+                    commonProgressLabel.ForeColor = Color.Red;
+                    commonProgressLabel.Text = stepText;
+                    commonProgressLabel.Refresh();
+                });
+            }
+            else
+            {
+                this.Text = "Run WebDriverAgent";
+                commonProgressLabel.ForeColor = Color.Red;
+                commonProgressLabel.Text = stepText;
+                commonProgressLabel.Refresh();
+            }
         }
+
+        public new void Close()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    base.Close();
+                });
+            }
+            else
+            {
+                base.Close();
+            }
+        }
+
+
+        public new void Hide()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    base.Hide();
+                });
+            }
+            else
+            {
+                base.Hide();
+            }
+        }
+
+
+        //MessageBox.Show("Sorry, Cannot cancel the execution in the current version.\nMay be in future version 😊", "Cancel Execution", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

@@ -43,6 +43,7 @@
 
         public async Task<bool> StartBackgroundTasks()
         {
+            commonProgress.Owner = MainScreen.main;
             commonProgress.Show();
             commonProgress.UpdateStepLabel(title, "Initializing...", 5);
             if (OSType.Equals("Android"))
@@ -168,7 +169,7 @@
                                     iOSMethods.GetInstance().InstallWDA(udid);
                                 }
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 70);
-                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
                                     commonProgress.Close();
@@ -190,7 +191,7 @@
                                     MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
-                                else if (WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
+                                else if (WDAsessionId.Equals("nosession") | WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
@@ -266,7 +267,7 @@
                                     iOSMethods.GetInstance().InstallWDA(udid);
                                 }
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 80);
-                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
                                     commonProgress.Close();
@@ -288,7 +289,7 @@
                                     MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
-                                else if (WDAsessionId.Equals("nosession passcode required"))
+                                else if (WDAsessionId.Equals("nosession") | WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
@@ -326,9 +327,8 @@
                 }
                 catch (Exception e)
                 {
-                    commonProgress.Hide();
-                    MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     commonProgress.Close();
+                    MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             });

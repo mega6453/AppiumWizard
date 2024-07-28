@@ -72,28 +72,8 @@ namespace Appium_Wizard
                             {
                                 if (OS.Equals("iOS"))
                                 {
+                                    isiOSScreenLoaded(udid);
                                     int screenPort = ScreenControl.devicePorts[udid].Item1;
-                                    int proxyPort = ScreenControl.devicePorts[udid].Item2;
-                                    Common.KillProcessByPortNumber(proxyPort);
-                                    Common.KillProcessByPortNumber(screenPort);
-                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenPort, 9100);
-                                    bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
-                                    if (!isRunning)
-                                    {
-                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                    }
-                                    bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                    int count = 0;
-                                    while (!isLoaded && count == 5)
-                                    {
-                                        isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
-                                        if (!isLoaded)
-                                        {
-                                            Thread.Sleep(2000);
-                                        }
-                                        count++;
-                                    }
                                     var control = ScreenControl.udidScreenControl[udid];
                                     control.LoadScreen(udid,screenPort);
                                 }
@@ -197,6 +177,16 @@ namespace Appium_Wizard
                                     item.SubItems[3].Text = "Online";
                                     item.SubItems[5].Text = "Wi-Fi";
                                     Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
+
+                                    bool isLoaded = isiOSScreenLoaded(udid);
+                                    if (isLoaded)
+                                    {
+                                        var control = ScreenControl.udidScreenControl[udid];
+                                        int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                        control.LoadScreen(udid, screenPort);
+                                        GoogleAnalytics.SendEvent("iOSConnectedOverWiFi", OSVersion);
+                                        return;
+                                    }                                   
                                 }
                                 else
                                 {
@@ -252,6 +242,33 @@ namespace Appium_Wizard
                     }
                 });
             }
+        }
+
+        private bool isiOSScreenLoaded(string udid)
+        {
+            int screenPort = ScreenControl.devicePorts[udid].Item1;
+            int proxyPort = ScreenControl.devicePorts[udid].Item2;
+            Common.KillProcessByPortNumber(proxyPort);
+            Common.KillProcessByPortNumber(screenPort);
+            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenPort, 9100);
+            bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
+            if (!isRunning)
+            {
+                iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+            }
+            bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+            int count = 0;
+            while (!isLoaded && count == 5)
+            {
+                isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                if (!isLoaded)
+                {
+                    Thread.Sleep(2000);
+                }
+                count++;
+            }
+            return isLoaded;
         }
     }
 }

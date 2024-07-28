@@ -144,6 +144,11 @@ namespace Appium_Wizard
         private async Task StartServer(TextBox portTextbox, Label statusLabel, int serverNumber)
         {
             int portNumber = int.Parse(portTextbox.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1024 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                return;
+            }
             serverSetup = new AppiumServerSetup();
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
@@ -385,6 +390,18 @@ namespace Appium_Wizard
         private void ServerConfig_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
+
+        private bool isValidPortNumber(int port)
+        {
+            if (port < 1024 | port > 65535)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

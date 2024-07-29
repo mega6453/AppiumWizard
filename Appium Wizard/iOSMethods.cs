@@ -5,6 +5,7 @@ using RestSharp;
 using System;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
@@ -620,9 +621,25 @@ namespace Appium_Wizard
         {
             if (isGo)
             {
+                //iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                //iOSProcess.Start();
+                //return "";
                 iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                iOSProcess.StartInfo.RedirectStandardOutput = true;
+                iOSProcess.StartInfo.RedirectStandardError = true;
+                iOSProcess.StartInfo.UseShellExecute = false;
+                iOSProcess.StartInfo.CreateNoWindow = true;
+
                 iOSProcess.Start();
-                return "";
+
+                // Read the standard output and standard error
+                string output = iOSProcess.StandardOutput.ReadToEnd();
+                string error = iOSProcess.StandardError.ReadToEnd();
+
+                iOSProcess.WaitForExit();
+
+                // Combine the output and error messages
+                return output + error;
             }
             else
             {
@@ -946,6 +963,8 @@ namespace Appium_Wizard
         public static Dictionary<int, int>? PortProcessId;
         public enum iOSExecutable { go, py }
         public static bool isGo;
+        public static bool is17Plus;
+
         public iOSAsyncMethods()
         {
             InitializeProcess();
@@ -1214,7 +1233,7 @@ namespace Appium_Wizard
                     return sessionId;
                 }
             }
-            if (isGo)
+            if (isGo && !is17Plus)
             {
                 // Create a new process
                 Process process = new Process();
@@ -1283,10 +1302,6 @@ namespace Appium_Wizard
                                     count++;
                                 });
                             }
-                            //if (runwdaError.Contains("Timed out while enabling automation mode"))
-                            //{
-                            //    return "Timed out";
-                            //}
                             if (sessionId.Equals("nosession") & isPasscodeRequired)
                             {
                                 process.Close();
@@ -1298,15 +1313,6 @@ namespace Appium_Wizard
                                 sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                                 return sessionId;
                             }
-                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'InvalidService'"))
-                            //{
-                            //    return "Enable Developer Mode";
-                            //}
-                            //if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-                            //{
-                            //    return "Password Protected";
-                            //}
-
                         }
                     }
                 }
@@ -1322,38 +1328,15 @@ namespace Appium_Wizard
                 {
                     return "Timed out";
                 }
+                //if (runwdaError.Contains("WDA process ended unexpectedly"))
+                //{
+                //    return RunWebDriverAgentQuick(commonProgress,udid,port);
+                //}
                 return "unhandled";
             }
             else
             {
-                int count = 1;
-                string sessionId = string.Empty;
-                string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                if (output.Contains("Process launched with pid"))
-                {
-                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    while (sessionId.Equals("nosession") && count <= 6)
-                    {
-                        Thread.Sleep(5000);
-                        sessionId = iOSAPIMethods.CreateWDASession(port);
-                        if (sessionId.Equals("nosession"))
-                        {
-                            commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nRetry " + count + "/6.");
-                            Thread.Sleep(5000);
-                            iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                        }
-                        count++;
-                    }
-                }
-                else if (output.Contains("'BSErrorCodeDescription': 'Locked'") | output.Contains("'PasswordProtected'"))
-                {
-                    return "Password Protected";
-                }
-                else if (!iOSMethods.GetInstance().isDeveloperModeDisabled(udid))
-                {
-                    return "Enable Developer Mode";
-                }
-                return sessionId;
+                return RunWebDriverAgentQuick(commonProgress, udid, port);
             }
         }
         public void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -1374,6 +1357,46 @@ namespace Appium_Wizard
                 runwdaOutput += e.Data;
             }
         }
+
+
+        public string RunWebDriverAgentQuick(CommonProgress commonProgress, string udid, int port)
+        {
+            int count = 1;
+            string sessionId = string.Empty;
+            string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+            if (output.Contains("Process launched"))
+            {
+                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                while (sessionId.Equals("nosession") && count <= 6)
+                {
+                    Thread.Sleep(5000);
+                    sessionId = iOSAPIMethods.CreateWDASession(port);
+                    if (sessionId.Equals("nosession"))
+                    {
+                        if (iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
+                        {
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, port, 8100);
+                        }
+                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nRetry " + count + "/6.");
+                        Thread.Sleep(5000);
+                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                    }
+                    count++;
+                }
+            }
+            else if (output.Contains("'BSErrorCodeDescription': 'Locked'") | output.Contains("'PasswordProtected'"))
+            {
+                return "Password Protected";
+            }
+            //else if (!iOSMethods.GetInstance().isDeveloperModeDisabled(udid))
+            //{
+            //    return "Enable Developer Mode";
+            //}
+            return sessionId;
+
+        }
+
+
 
         Process tunnelProcess;
         public bool CreateTunnel()
@@ -1461,12 +1484,67 @@ namespace Appium_Wizard
             return clickedOK;
         }
 
+        public bool CreateTunnelGo()
+        {
+            try
+            {
+                tunnelProcess = new Process();
+                tunnelProcess.StartInfo.FileName = iOSServerFilePath;
+                tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
+                tunnelProcess.StartInfo.UseShellExecute = false;
+                tunnelProcess.StartInfo.CreateNoWindow = true;
+                tunnelProcess.Start();
+                Thread.Sleep(5000);
+                var processId = tunnelProcess.Id;
+                MainScreen.runningProcesses.Add(processId);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        //public bool CreateTunnelGo(CommonProgress commonProgress, int percent)
+        //{
+        //    commonProgress.Show();
+        //    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...", percent);
+        //    try
+        //    {
+        //        tunnelProcess = new Process();
+        //        tunnelProcess.StartInfo.FileName = iOSServerFilePath;
+        //        tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
+        //        tunnelProcess.StartInfo.UseShellExecute = false;
+        //        tunnelProcess.StartInfo.CreateNoWindow = true;
+        //        tunnelProcess.Start();
+        //        Thread.Sleep(5000);              
+        //        var processId = tunnelProcess.Id;
+        //        MainScreen.runningProcesses.Add(processId);
+        //        commonProgress.Close();
+        //        return true;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        commonProgress.Close();
+        //        MessageBox.Show("Failed to create Tunnel. Please try again.", "Create Tunnel", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        //        return false;
+        //    }
+        //}
+
         public void CloseTunnel()
         {
-            if (tunnelProcess != null)
+            try
             {
-                tunnelProcess.Kill();
-                tunnelProcess.Close();
+                if (tunnelProcess != null)
+                {
+                    if (!tunnelProcess.HasExited)
+                    {
+                        tunnelProcess.Kill();
+                    }
+                    tunnelProcess.Close();
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

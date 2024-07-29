@@ -139,6 +139,18 @@
                             {
                                 Version deviceVersion = new Version(OSVersion);
                                 Version version17Plus = new Version("17.0.0");
+                                if (deviceVersion >= version17Plus)
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 35);
+                                    var isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
+                                    if (!isTunnelStarted)
+                                    {
+                                        commonProgress.Close();
+                                        isScreenServerStarted = false;
+                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
+                                }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 40);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
                                 if (deviceVersion >= version17Plus)
@@ -230,6 +242,7 @@
                                 }
                                 else
                                 {
+                                    iOSAsyncMethods.GetInstance().CloseTunnel();
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
                                     MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

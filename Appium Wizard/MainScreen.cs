@@ -292,15 +292,17 @@ namespace Appium_Wizard
                 {
                     Version deviceVersion = new Version(selectedDeviceVersion);
                     Version version17Plus = new Version("17.0.0");
-                    if (deviceVersion >= version17Plus) // >=17
-                    {
-                        iOSMethods.isGo = false;
-                        iOSAsyncMethods.isGo = false;
+                    if (deviceVersion >= version17Plus) // >=17  -- Setting as true, as go-ios supports iOS 17+ now.
+                    {   
+                        iOSMethods.isGo = true;  
+                        iOSAsyncMethods.isGo = true;
+                        iOSAsyncMethods.is17Plus = true;
                     }
                     else // <17
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
+                        iOSAsyncMethods.is17Plus = false;
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))

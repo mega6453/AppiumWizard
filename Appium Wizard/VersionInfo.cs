@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "2.0.0";
-        public const string ReleaseNotes = "iOS >=17.4 support";
+        public const string VersionNumber = "3.0.0";
+        public const string ReleaseNotes = "Fixed UI Not responding issue.\nFixed UI issues for different screen sizes.\nOther bug fixes and improvements.";
     }
 }

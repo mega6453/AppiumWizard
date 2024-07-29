@@ -822,40 +822,77 @@ namespace Appium_Wizard
             }
         }
 
-        private void onFormClosing(object sender, FormClosingEventArgs e)
+
+        private async void onFormClosing(object sender, FormClosingEventArgs e)
         {
+            // Prevent the form from closing immediately
+            e.Cancel = true;
+
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-            try
+
+            await Task.Run(() => {
+                try
+                {
+                    foreach (var item in runningProcessesPortNumbers)
+                    {
+                        Common.KillProcessByPortNumber(item);
+                    }
+                    foreach (var item in runningProcesses)
+                    {
+                        Common.KillProcessById(item);
+                    }
+
+                    List<Form> childFormsToClose = new List<Form>();
+                    foreach (Form form in Application.OpenForms)
+                    {
+                        if (form != this)
+                        {
+                            childFormsToClose.Add(form);
+                        }
+                    }
+
+                    // Close child forms on the UI thread
+                    foreach (Form formToClose in childFormsToClose)
+                    {
+                        if (formToClose.InvokeRequired)
+                        {
+                            formToClose.Invoke(new Action(() => formToClose.Close()));
+                        }
+                        else
+                        {
+                            formToClose.Close();
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Handle exceptions if necessary
+                }
+            });
+
+            GoogleAnalytics.SendEvent("App_Closed", "Closed");
+
+            // Close the commonProgress form and the main form on the UI thread
+            if (commonProgress.InvokeRequired)
             {
-                foreach (var item in runningProcessesPortNumbers)
-                {
-                    Common.KillProcessByPortNumber(item);
-                }
-                foreach (var item in runningProcesses)
-                {
-                    Common.KillProcessById(item);
-                }
+                commonProgress.Invoke(new Action(() => commonProgress.Close()));
             }
-            catch (Exception)
+            else
             {
+                commonProgress.Close();
             }
 
-            List<Form> childFormsToClose = new List<Form>();
-            foreach (Form form in Application.OpenForms)
+            if (this.InvokeRequired)
             {
-                if (form != this)
-                {
-                    childFormsToClose.Add(form);
-                }
+                this.Invoke(new Action(() => this.Close()));
             }
-            foreach (Form formToClose in childFormsToClose)
+            else
             {
-                formToClose.Close();
+                this.Close();
             }
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         private void MoreButton_Click(object sender, EventArgs e)

@@ -11,6 +11,7 @@ namespace Appium_Wizard
         public LoadingScreen()
         {
             InitializeComponent();
+            statusLabel.Text = "Initializing...";            
             try
             {
                 Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
@@ -47,17 +48,20 @@ namespace Appium_Wizard
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
             }
         }
-        private void LoadingScreen_Load(object sender, EventArgs e)
+        private async void LoadingScreen_Load(object sender, EventArgs e)
         {
-            StartBackgroundTasks();
+            await StartBackgroundTasks();
         }
 
-        private void StartBackgroundTasks()
+        private async Task StartBackgroundTasks()
         {
             bool isFirstTimeRun = false;
             var startTime = DateTime.Now;
             Show();
-            Common.SetAndroidHomeEnvironmentVariable();
+            await Task.Run(() =>
+            {
+                Common.SetAndroidHomeEnvironmentVariable();
+            });
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
             productVersion.Refresh();
 #if DEBUG
@@ -72,42 +76,44 @@ namespace Appium_Wizard
             {
                 firstTimeRunLabel.Text = "First time run verifies the installation, This may take sometime, Please wait...";
                 firstTimeRunLabel.Refresh();
-                bool isNodeInstalled = Common.IsNodeInstalled();
-                if (!isNodeInstalled)
+                await Task.Run(() =>
                 {
-                    UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
-                    Common.InstallNodeJs();
-                    GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "NodeJS not installed");
-                }
-                bool iSAppiumInstalled = Common.IsAppiumInstalled();
-                if (!iSAppiumInstalled)
-                {
-                    UpdateStepLabel("Installing Appium Server, This may take sometime, Please wait...");
-                    Common.InstallAppiumGlobally();
-                    GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "Appium not installed");
-                }
-                string InstalledDriverList = Common.AppiumInstalledDriverList();
-                bool IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
-                bool IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
-                if (!IsXCUITestDriverInstalled)
-                {
-                    UpdateStepLabel("Installing XCUITest driver, This may take sometime, Please wait...");
-                    Common.InstallXCUITestDriver();
-                    GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "XCUITest not installed");
-                }
-                if (!IsUIAutomatorDriverInstalled)
-                {
-                    UpdateStepLabel("Installing UIAutomator2 driver, This may take sometime, Please wait...");
-                    Common.InstallUIAutomatorDriver();
-                    GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "UIAutomator2 not installed");
-                }
+                    bool isNodeInstalled = Common.IsNodeInstalled();
+                    if (!isNodeInstalled)
+                    {
+                        UpdateStepLabel("Installing NodeJS, This may take sometime, Please wait...");
+                        Common.InstallNodeJs();
+                        GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "NodeJS not installed");
+                    }
+                    bool iSAppiumInstalled = Common.IsAppiumInstalled();
+                    if (!iSAppiumInstalled)
+                    {
+                        UpdateStepLabel("Installing Appium Server, This may take sometime, Please wait...");
+                        Common.InstallAppiumGlobally();
+                        GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "Appium not installed");
+                    }
+                    string InstalledDriverList = Common.AppiumInstalledDriverList();
+                    bool IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
+                    bool IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
+                    if (!IsXCUITestDriverInstalled)
+                    {
+                        UpdateStepLabel("Installing XCUITest driver, This may take sometime, Please wait...");
+                        Common.InstallXCUITestDriver();
+                        GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "XCUITest not installed");
+                    }
+                    if (!IsUIAutomatorDriverInstalled)
+                    {
+                        UpdateStepLabel("Installing UIAutomator2 driver, This may take sometime, Please wait...");
+                        Common.InstallUIAutomatorDriver();
+                        GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "UIAutomator2 not installed");
+                    }
+                });
                 firstTimeRunLabel.Text = "";
             }
-            Database.UpdateDataIntoFirstTimeRunTable("No");
             UpdateStepLabel("Starting Appium Server...");
-            ExecuteBackgroundMethod();
+            Database.UpdateDataIntoFirstTimeRunTable("No");
+            _ = ExecuteBackgroundMethod();
             UpdateStepLabel("Loading Modules...");
-            //int adbPort = Common.GetFreePort();
             int adbPort = 5037;
             AndroidMethods.GetInstance().StartAdbServer(adbPort);
             UpdateStepLabel("Initializing User Interface...");
@@ -123,17 +129,17 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                GoogleAnalytics.SendEvent("App_Crashed",ex.Message);
+                GoogleAnalytics.SendEvent("App_Crashed", ex.Message);
                 Close();
             }
         }
 
-        private void ExecuteBackgroundMethod()
+        private async Task ExecuteBackgroundMethod()
         {
             bool isAppiumPortFree = !Common.IsPortBeingUsed(appiumPort);
-            if (isAppiumPortFree) 
+            if (isAppiumPortFree)
             {
-                StartServer();
+                _ = StartServer();
                 isServerStarted = true;
             }
             else
@@ -142,11 +148,12 @@ namespace Appium_Wizard
             }
         }
 
-        private void StartServer()
+        private async Task StartServer()
         {
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 serverSetup.StartAppiumServer(appiumPort, 1);
+                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 if (Common.IsNodeInstalled())
                 {
                     while (!serverSetup.serverStarted)
@@ -162,7 +169,6 @@ namespace Appium_Wizard
                     }
                     if (serverSetup.serverStarted)
                     {
-                        MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                         isServerStarted = true;
                     }
                 }
@@ -171,8 +177,15 @@ namespace Appium_Wizard
 
         public void UpdateStepLabel(string stepText)
         {
-            statusLabel.Text = stepText;
-            statusLabel.Refresh();
+            if (statusLabel.InvokeRequired)
+            {
+                statusLabel.Invoke(new Action<string>(UpdateStepLabel), stepText);
+            }
+            else
+            {
+                statusLabel.Text = stepText;
+                statusLabel.Refresh();
+            }
         }
 
         private void LoadingScreen_Shown(object sender, EventArgs e)

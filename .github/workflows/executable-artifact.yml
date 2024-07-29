@@ -49,11 +49,11 @@ jobs:
     - name: Build and publish app
       run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:ReadyToRun=true   
 
-    # - name: Archive artifacts
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: app
-    #     path: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish"
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish"
         
     - name: Install Chocolatey
       run: |

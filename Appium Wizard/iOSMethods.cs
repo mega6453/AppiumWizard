@@ -237,23 +237,35 @@ namespace Appium_Wizard
 
         public void TakeScreenshot(string udid, string path)
         {
+            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            {
+                int port = MainScreen.udidProxyPort[udid];
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    string url = "http://localhost:" + port;
+                    iOSAPIMethods.TakeScreenshot(url, path.Replace("\"", ""));
+                    return;
+                }
+                else
+                {
+                    TakeScreenshotUsingExecutable(udid, path);
+                }
+            }
+            else
+            {
+                TakeScreenshotUsingExecutable(udid,path);
+            }
+        }
+
+        public void TakeScreenshotUsingExecutable(string udid, string path)
+        {
             if (isGo)
             {
                 ExecuteCommand("screenshot --output=" + path, udid);
             }
             else
             {
-                if (MainScreen.udidProxyPort.ContainsKey(udid))
-                {
-                    int port = MainScreen.udidProxyPort[udid];
-                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    if (!sessionId.Equals("nosession"))
-                    {
-                        string url = "http://localhost:" + port;
-                        iOSAPIMethods.TakeScreenshot(url, path.Replace("\"",""));
-                        return;
-                    }
-                }
                 ExecuteCommandPy("developer dvt screenshot " + path, udid);
             }
         }
@@ -764,46 +776,74 @@ namespace Appium_Wizard
 
         public string LaunchApp(string udid, string bundleId)
         {
+            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            {
+                int port = MainScreen.udidProxyPort[udid];
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    string url = "http://localhost:" + port;
+                    return iOSAPIMethods.LaunchApp(url, sessionId, bundleId);
+                }
+                else
+                {
+                    return LaunchAppUsingExecutable(bundleId, udid);
+                }
+            }
+            else 
+            {
+                return LaunchAppUsingExecutable(bundleId,udid);
+            }
+        }
+
+        public string LaunchAppUsingExecutable(string bundleId, string udid)
+        {
             if (isGo)
             {
                 return ExecuteCommand("launch " + bundleId, udid);
             }
             else
             {
-                if (MainScreen.udidProxyPort.ContainsKey(udid))
-                {
-                    int port = MainScreen.udidProxyPort[udid];
-                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    if (!sessionId.Equals("nosession"))
-                    {
-                        string url = "http://localhost:" + port;
-                        return iOSAPIMethods.LaunchApp(url,sessionId,bundleId);
-                    }
-                }
+
                 return ExecuteCommandPy("developer dvt launch " + bundleId, udid);
             }
         }
-        public string KillApp(string udid, string bundleId)
+
+        public void KillApp(string udid, string bundleId)
         {
-            if (isGo)
+            if (MainScreen.udidProxyPort.ContainsKey(udid))
             {
-                return ExecuteCommand("kill " + bundleId, udid);
+                int port = MainScreen.udidProxyPort[udid];
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    string url = "http://localhost:" + port;
+                    iOSAPIMethods.KillApp(url, sessionId, bundleId);
+                }
+                else
+                {
+                    KillAppUsingExecutable(bundleId, udid);
+                }
             }
             else
             {
-                if (MainScreen.udidProxyPort.ContainsKey(udid))
-                {
-                    int port = MainScreen.udidProxyPort[udid];
-                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    if (!sessionId.Equals("nosession"))
-                    {
-                        string url = "http://localhost:" + port;
-                        return iOSAPIMethods.KillApp(url, sessionId, bundleId);
-                    }
-                }
-                return ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
+                KillAppUsingExecutable(bundleId, udid);
+            }
+           
+        }
+
+        public void KillAppUsingExecutable(string udid, string bundleId)
+        {
+            if (isGo)
+            {
+                ExecuteCommand("kill " + bundleId, udid);
+            }
+            else
+            {
+                ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
             }
         }
+
 
         public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true)
         {
@@ -1233,6 +1273,7 @@ namespace Appium_Wizard
                     return sessionId;
                 }
             }
+            
             if (isGo && !is17Plus)
             {
                 // Create a new process
@@ -1492,7 +1533,7 @@ namespace Appium_Wizard
                 tunnelProcess.StartInfo.FileName = iOSServerFilePath;
                 tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
                 tunnelProcess.StartInfo.UseShellExecute = false;
-                tunnelProcess.StartInfo.CreateNoWindow = true;
+                tunnelProcess.StartInfo.CreateNoWindow = false;
                 tunnelProcess.Start();
                 Thread.Sleep(5000);
                 var processId = tunnelProcess.Id;
@@ -1743,6 +1784,23 @@ namespace Appium_Wizard
                 return response.Content.Contains("Hello, I'm alive");
             }
             else { return false; }  
+        }
+
+        public static bool isTunnelRunningGo()
+        {
+            var options = new RestClientOptions("http://127.0.0.1:60105")
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound || response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return true;
+            }
+            return false;
         }
 
         public static string LaunchApp(string URL, string sessionId, string bundleId)

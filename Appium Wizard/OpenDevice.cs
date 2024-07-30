@@ -102,6 +102,7 @@
                             commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
                             proxyPort = Common.GetFreePort();
                             screenServerPort = Common.GetFreePort();
+                            iOSAsyncMethods.GetInstance().CloseTunnel();
                             iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
                             iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
                             if (installedNow)
@@ -133,6 +134,14 @@
                                 else
                                 {
                                     MainScreen.udidProxyPort.Add(udid, proxyPort);
+                                }
+                                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                                {
+                                    MainScreen.udidScreenPort[udid] = screenServerPort;
+                                }
+                                else
+                                {
+                                    MainScreen.udidScreenPort.Add(udid, screenServerPort);
                                 }
                             }
                             else
@@ -238,6 +247,14 @@
                                     else
                                     {
                                         MainScreen.udidProxyPort.Add(udid, proxyPort);
+                                    }
+                                    if (MainScreen.udidScreenPort.ContainsKey(udid))
+                                    {
+                                        MainScreen.udidScreenPort[udid] = screenServerPort;
+                                    }
+                                    else
+                                    {
+                                        MainScreen.udidScreenPort.Add(udid, screenServerPort);
                                     }
                                 }
                                 else

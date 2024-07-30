@@ -24,6 +24,7 @@ namespace Appium_Wizard
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
         public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
+        public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
 
         public MainScreen()
         {
@@ -302,7 +303,7 @@ namespace Appium_Wizard
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
-                        iOSAsyncMethods.is17Plus = false;
+                        iOSAsyncMethods.is17Plus = true;
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))
@@ -550,7 +551,7 @@ namespace Appium_Wizard
 
         private void DeleteDevice_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedDeviceName + " device?", "Delete Device", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            DialogResult result = MessageBox.Show("Deleting device will interrupt any running tests.\nAre you sure you want to delete " + selectedDeviceName + " device?", "Delete Device", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
                 bool valueExists = false;
@@ -576,6 +577,24 @@ namespace Appium_Wizard
                     if (selectedOS.Equals("Android"))
                     {
                         AndroidMethods.GetInstance().DisconnectAndroidWireless(selectedDeviceIP);
+                    }
+                    else
+                    {
+                        if (udidProxyPort.ContainsKey(selectedUDID))
+                        {
+                            Common.KillProcessByPortNumber(udidProxyPort[selectedUDID]);
+                            udidProxyPort.Remove(selectedUDID);
+                        }
+                        if (udidScreenPort.ContainsKey(selectedUDID))
+                        {
+                            Common.KillProcessByPortNumber(udidScreenPort[selectedUDID]);
+                            udidScreenPort.Remove(selectedUDID);
+                        }
+                    }
+                    if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
+                    {
+                        ScreenControl.udidScreenControl[selectedUDID].Close();
+                        ScreenControl.udidScreenControl.Remove(selectedUDID);
                     }
                     DeleteDevice.Enabled = false;
                     Open.Enabled = false;

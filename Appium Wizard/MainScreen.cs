@@ -294,8 +294,8 @@ namespace Appium_Wizard
                     Version deviceVersion = new Version(selectedDeviceVersion);
                     Version version17Plus = new Version("17.0.0");
                     if (deviceVersion >= version17Plus) // >=17  -- Setting as true, as go-ios supports iOS 17+ now.
-                    {   
-                        iOSMethods.isGo = true;  
+                    {
+                        iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
                         iOSAsyncMethods.is17Plus = true;
                     }
@@ -854,7 +854,8 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 try
                 {
                     foreach (var item in runningProcessesPortNumbers)

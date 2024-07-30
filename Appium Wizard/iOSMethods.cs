@@ -1527,49 +1527,29 @@ namespace Appium_Wizard
 
         public bool CreateTunnelGo()
         {
-            try
+            bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+            if (!isTunnelRunning)
             {
-                tunnelProcess = new Process();
-                tunnelProcess.StartInfo.FileName = iOSServerFilePath;
-                tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
-                tunnelProcess.StartInfo.UseShellExecute = false;
-                tunnelProcess.StartInfo.CreateNoWindow = false;
-                tunnelProcess.Start();
-                Thread.Sleep(5000);
-                var processId = tunnelProcess.Id;
-                MainScreen.runningProcesses.Add(processId);
-                return true;
+                try
+                {
+                    tunnelProcess = new Process();
+                    tunnelProcess.StartInfo.FileName = iOSServerFilePath;
+                    tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
+                    tunnelProcess.StartInfo.UseShellExecute = false;
+                    tunnelProcess.StartInfo.CreateNoWindow = false;
+                    tunnelProcess.Start();
+                    Thread.Sleep(5000);
+                    var processId = tunnelProcess.Id;
+                    MainScreen.runningProcesses.Add(processId);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            return isTunnelRunning;
         }
-        //public bool CreateTunnelGo(CommonProgress commonProgress, int percent)
-        //{
-        //    commonProgress.Show();
-        //    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...", percent);
-        //    try
-        //    {
-        //        tunnelProcess = new Process();
-        //        tunnelProcess.StartInfo.FileName = iOSServerFilePath;
-        //        tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
-        //        tunnelProcess.StartInfo.UseShellExecute = false;
-        //        tunnelProcess.StartInfo.CreateNoWindow = true;
-        //        tunnelProcess.Start();
-        //        Thread.Sleep(5000);              
-        //        var processId = tunnelProcess.Id;
-        //        MainScreen.runningProcesses.Add(processId);
-        //        commonProgress.Close();
-        //        return true;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        commonProgress.Close();
-        //        MessageBox.Show("Failed to create Tunnel. Please try again.", "Create Tunnel", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        //        return false;
-        //    }
-        //}
 
         public void CloseTunnel()
         {

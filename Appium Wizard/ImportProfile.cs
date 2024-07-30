@@ -47,26 +47,44 @@ namespace Appium_Wizard
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
             //GoogleAnalytics.SendEvent("ImportProfileButton_Clicked");
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 10);
             try
             {
                 string password = maskedTextBox1.Text;
                 string command = $"pkcs12 -info -in \"{p12InputFilePath}\" -noout -passin pass:\"{password}\"";
-                string output = ExecuteCommand(opensslFilePath, command, true);
+                string output = string.Empty;
+                await Task.Run(() =>
+                {
+                    output = ExecuteCommand(opensslFilePath, command, true);
+                });
+                commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 30);
                 if (output.Contains("invalid password"))
                 {
+                    commonProgress.Close();
                     MessageBox.Show("Incorrect password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     //GoogleAnalytics.SendEvent("iOS_Profile_Password_Wrong");
                 }
                 else if (output.Contains("MAC verified OK"))
                 {
-                    string certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
-                    var provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
+                    string certificate = string.Empty;
+                    Dictionary<object, object> provisionDetails = new Dictionary<object, object>();
+                    await Task.Run(() =>
+                    {
+                        certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
+                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 50);
+                        provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
+                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 70);
+                    });
                     string certificates = provisionDetails["DeveloperCertificates"].ToString();
                     if (!certificates.Contains(certificate))
                     {
+                        commonProgress.Close();
                         MessageBox.Show("P12 file does not match with mobileprovision file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         //GoogleAnalytics.SendEvent("iOS_P12_Provision_Not_Matching");
                     }
@@ -87,8 +105,10 @@ namespace Appium_Wizard
                         File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
 
                         command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
-                        ExecuteCommand(opensslFilePath, command, true);
-
+                        await Task.Run(() => {
+                            ExecuteCommand(opensslFilePath, command, true);
+                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 80);
+                        });                        
                         string profileName = provisionDetails["Name"].ToString();
                         int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
                         string appId = provisionDetails["application-identifier"].ToString();
@@ -102,24 +122,30 @@ namespace Appium_Wizard
                             }
                             string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
                             listView1.Items.Add(new ListViewItem(item1));
+                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 100);
+                            commonProgress.Close();
                             Close();
                             MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             listView1.Refresh();
                             GoogleAnalytics.SendEvent("iOS_Profile_Added_Successfully");
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            commonProgress.Close();
+                            MessageBox.Show("Unhandled exception : \n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
                 else
                 {
+                    commonProgress.Close();
                     MessageBox.Show("Unhandled exception : \n" + output, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     GoogleAnalytics.SendEvent("ImportProfileButton_Clicked_Unhandled", "Unhandled Scenario");
                 }
             }
             catch (Exception exception)
             {
+                commonProgress.Close();
                 GoogleAnalytics.SendExceptionEvent("ImportProfileButton_Clicked", exception.Message);
             }
         }

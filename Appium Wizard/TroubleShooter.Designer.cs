@@ -54,10 +54,9 @@
             FixNodeJSButton.Anchor = AnchorStyles.None;
             FixNodeJSButton.AutoSize = true;
             FixNodeJSButton.Enabled = false;
-            FixNodeJSButton.Location = new Point(392, 34);
-            FixNodeJSButton.Margin = new Padding(2);
+            FixNodeJSButton.Location = new Point(559, 52);
             FixNodeJSButton.Name = "FixNodeJSButton";
-            FixNodeJSButton.Size = new Size(108, 25);
+            FixNodeJSButton.Size = new Size(154, 57);
             FixNodeJSButton.TabIndex = 0;
             FixNodeJSButton.Text = "Fix NodeJS";
             FixNodeJSButton.UseVisualStyleBackColor = true;
@@ -68,10 +67,9 @@
             FixAppiumButton.Anchor = AnchorStyles.None;
             FixAppiumButton.AutoSize = true;
             FixAppiumButton.Enabled = false;
-            FixAppiumButton.Location = new Point(392, 74);
-            FixAppiumButton.Margin = new Padding(2);
+            FixAppiumButton.Location = new Point(556, 118);
             FixAppiumButton.Name = "FixAppiumButton";
-            FixAppiumButton.Size = new Size(108, 25);
+            FixAppiumButton.Size = new Size(160, 58);
             FixAppiumButton.TabIndex = 2;
             FixAppiumButton.Text = "Fix Appium";
             FixAppiumButton.UseVisualStyleBackColor = true;
@@ -82,10 +80,9 @@
             FixXCUITestButton.Anchor = AnchorStyles.None;
             FixXCUITestButton.AutoSize = true;
             FixXCUITestButton.Enabled = false;
-            FixXCUITestButton.Location = new Point(392, 115);
-            FixXCUITestButton.Margin = new Padding(2);
+            FixXCUITestButton.Location = new Point(553, 187);
             FixXCUITestButton.Name = "FixXCUITestButton";
-            FixXCUITestButton.Size = new Size(108, 25);
+            FixXCUITestButton.Size = new Size(167, 58);
             FixXCUITestButton.TabIndex = 3;
             FixXCUITestButton.Text = "Fix XCUITest";
             FixXCUITestButton.UseVisualStyleBackColor = true;
@@ -96,10 +93,9 @@
             FixUIAutomatorButton.Anchor = AnchorStyles.None;
             FixUIAutomatorButton.AutoSize = true;
             FixUIAutomatorButton.Enabled = false;
-            FixUIAutomatorButton.Location = new Point(392, 160);
-            FixUIAutomatorButton.Margin = new Padding(2);
+            FixUIAutomatorButton.Location = new Point(528, 260);
             FixUIAutomatorButton.Name = "FixUIAutomatorButton";
-            FixUIAutomatorButton.Size = new Size(108, 25);
+            FixUIAutomatorButton.Size = new Size(217, 58);
             FixUIAutomatorButton.TabIndex = 4;
             FixUIAutomatorButton.Text = "Fix UIAutomator";
             FixUIAutomatorButton.UseVisualStyleBackColor = true;
@@ -109,10 +105,9 @@
             // 
             NodeJSLabel.AutoSize = true;
             NodeJSLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            NodeJSLabel.Location = new Point(20, 43);
-            NodeJSLabel.Margin = new Padding(2, 0, 2, 0);
+            NodeJSLabel.Location = new Point(29, 72);
             NodeJSLabel.Name = "NodeJSLabel";
-            NodeJSLabel.Size = new Size(49, 15);
+            NodeJSLabel.Size = new Size(76, 25);
             NodeJSLabel.TabIndex = 6;
             NodeJSLabel.Text = "NodeJS";
             // 
@@ -120,10 +115,9 @@
             // 
             AppiumLabel.AutoSize = true;
             AppiumLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            AppiumLabel.Location = new Point(20, 81);
-            AppiumLabel.Margin = new Padding(2, 0, 2, 0);
+            AppiumLabel.Location = new Point(29, 135);
             AppiumLabel.Name = "AppiumLabel";
-            AppiumLabel.Size = new Size(50, 15);
+            AppiumLabel.Size = new Size(79, 25);
             AppiumLabel.TabIndex = 7;
             AppiumLabel.Text = "Appium";
             // 
@@ -131,10 +125,9 @@
             // 
             XCUITestLabel.AutoSize = true;
             XCUITestLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            XCUITestLabel.Location = new Point(20, 122);
-            XCUITestLabel.Margin = new Padding(2, 0, 2, 0);
+            XCUITestLabel.Location = new Point(29, 203);
             XCUITestLabel.Name = "XCUITestLabel";
-            XCUITestLabel.Size = new Size(58, 15);
+            XCUITestLabel.Size = new Size(88, 25);
             XCUITestLabel.TabIndex = 8;
             XCUITestLabel.Text = "XCUITest";
             // 
@@ -142,10 +135,9 @@
             // 
             UIAutomatorLabel.AutoSize = true;
             UIAutomatorLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            UIAutomatorLabel.Location = new Point(20, 161);
-            UIAutomatorLabel.Margin = new Padding(2, 0, 2, 0);
+            UIAutomatorLabel.Location = new Point(29, 268);
             UIAutomatorLabel.Name = "UIAutomatorLabel";
-            UIAutomatorLabel.Size = new Size(88, 15);
+            UIAutomatorLabel.Size = new Size(134, 25);
             UIAutomatorLabel.TabIndex = 9;
             UIAutomatorLabel.Text = "UIAutomator2";
             // 
@@ -153,10 +145,9 @@
             // 
             ComponentsLabel.AutoSize = true;
             ComponentsLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            ComponentsLabel.Location = new Point(20, 5);
-            ComponentsLabel.Margin = new Padding(2, 0, 2, 0);
+            ComponentsLabel.Location = new Point(29, 8);
             ComponentsLabel.Name = "ComponentsLabel";
-            ComponentsLabel.Size = new Size(77, 15);
+            ComponentsLabel.Size = new Size(119, 25);
             ComponentsLabel.TabIndex = 10;
             ComponentsLabel.Text = "Components";
             // 
@@ -164,10 +155,9 @@
             // 
             StatusLabel.AutoSize = true;
             StatusLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            StatusLabel.Location = new Point(249, 5);
-            StatusLabel.Margin = new Padding(2, 0, 2, 0);
+            StatusLabel.Location = new Point(356, 8);
             StatusLabel.Name = "StatusLabel";
-            StatusLabel.Size = new Size(42, 15);
+            StatusLabel.Size = new Size(65, 25);
             StatusLabel.TabIndex = 11;
             StatusLabel.Text = "Status";
             // 
@@ -175,10 +165,9 @@
             // 
             NodeJSStatusLabel.Anchor = AnchorStyles.None;
             NodeJSStatusLabel.AutoSize = true;
-            NodeJSStatusLabel.Location = new Point(270, 39);
-            NodeJSStatusLabel.Margin = new Padding(2, 0, 2, 0);
+            NodeJSStatusLabel.Location = new Point(384, 68);
             NodeJSStatusLabel.Name = "NodeJSStatusLabel";
-            NodeJSStatusLabel.Size = new Size(0, 15);
+            NodeJSStatusLabel.Size = new Size(0, 25);
             NodeJSStatusLabel.TabIndex = 13;
             NodeJSStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
@@ -186,10 +175,9 @@
             // 
             AppiumStatusLabel.Anchor = AnchorStyles.None;
             AppiumStatusLabel.AutoSize = true;
-            AppiumStatusLabel.Location = new Point(270, 79);
-            AppiumStatusLabel.Margin = new Padding(2, 0, 2, 0);
+            AppiumStatusLabel.Location = new Point(384, 135);
             AppiumStatusLabel.Name = "AppiumStatusLabel";
-            AppiumStatusLabel.Size = new Size(0, 15);
+            AppiumStatusLabel.Size = new Size(0, 25);
             AppiumStatusLabel.TabIndex = 14;
             AppiumStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
@@ -197,10 +185,9 @@
             // 
             XCUITestStatusLabel.Anchor = AnchorStyles.None;
             XCUITestStatusLabel.AutoSize = true;
-            XCUITestStatusLabel.Location = new Point(270, 120);
-            XCUITestStatusLabel.Margin = new Padding(2, 0, 2, 0);
+            XCUITestStatusLabel.Location = new Point(384, 203);
             XCUITestStatusLabel.Name = "XCUITestStatusLabel";
-            XCUITestStatusLabel.Size = new Size(0, 15);
+            XCUITestStatusLabel.Size = new Size(0, 25);
             XCUITestStatusLabel.TabIndex = 15;
             XCUITestStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
@@ -208,10 +195,9 @@
             // 
             UIAutomatorStatusLabel.Anchor = AnchorStyles.None;
             UIAutomatorStatusLabel.AutoSize = true;
-            UIAutomatorStatusLabel.Location = new Point(270, 165);
-            UIAutomatorStatusLabel.Margin = new Padding(2, 0, 2, 0);
+            UIAutomatorStatusLabel.Location = new Point(384, 276);
             UIAutomatorStatusLabel.Name = "UIAutomatorStatusLabel";
-            UIAutomatorStatusLabel.Size = new Size(0, 15);
+            UIAutomatorStatusLabel.Size = new Size(0, 25);
             UIAutomatorStatusLabel.TabIndex = 16;
             UIAutomatorStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
@@ -219,20 +205,18 @@
             // 
             FixLabel.AutoSize = true;
             FixLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            FixLabel.Location = new Point(442, 5);
-            FixLabel.Margin = new Padding(2, 0, 2, 0);
+            FixLabel.Location = new Point(631, 8);
             FixLabel.Name = "FixLabel";
-            FixLabel.Size = new Size(23, 15);
+            FixLabel.Size = new Size(36, 25);
             FixLabel.TabIndex = 17;
             FixLabel.Text = "Fix";
             // 
             // checkForIssues
             // 
             checkForIssues.AutoSize = true;
-            checkForIssues.Location = new Point(218, 201);
-            checkForIssues.Margin = new Padding(2);
+            checkForIssues.Location = new Point(311, 335);
             checkForIssues.Name = "checkForIssues";
-            checkForIssues.Size = new Size(106, 25);
+            checkForIssues.Size = new Size(151, 42);
             checkForIssues.TabIndex = 18;
             checkForIssues.Text = "Check for Issues";
             checkForIssues.UseVisualStyleBackColor = true;
@@ -245,7 +229,7 @@
             tableLayoutPanel1.ColumnCount = 3;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 246F));
             tableLayoutPanel1.Controls.Add(FixNodeJSButton, 2, 1);
             tableLayoutPanel1.Controls.Add(FixAppiumButton, 2, 2);
             tableLayoutPanel1.Controls.Add(NodeJSStatusLabel, 1, 1);
@@ -255,22 +239,23 @@
             tableLayoutPanel1.Controls.Add(FixXCUITestButton, 2, 3);
             tableLayoutPanel1.Controls.Add(FixUIAutomatorButton, 2, 4);
             tableLayoutPanel1.Location = new Point(0, 0);
+            tableLayoutPanel1.Margin = new Padding(4, 5, 4, 5);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 5;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 41.42857F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 58.57143F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 39F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
-            tableLayoutPanel1.Size = new Size(533, 196);
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 65F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 73F));
+            tableLayoutPanel1.Size = new Size(761, 327);
             tableLayoutPanel1.TabIndex = 19;
             // 
             // TroubleShooter
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(538, 229);
+            ClientSize = new Size(769, 382);
             Controls.Add(checkForIssues);
             Controls.Add(FixLabel);
             Controls.Add(StatusLabel);
@@ -282,14 +267,12 @@
             Controls.Add(tableLayoutPanel1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "TroubleShooter";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Troubleshooter";
-            Load += TroubleShooter_Load;
             Shown += TroubleShooter_Shown;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

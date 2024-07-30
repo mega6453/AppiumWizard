@@ -744,6 +744,26 @@
         rkJggg==
 </value>
   </data>
+  <data name="richTextBox2.Text" xml:space="preserve">
+    <value>				------------------------------ Appium Server Not Running ------------------------------                 
+                                                          ------------------------ Go to Server -&gt; Config -&gt; Start Server -------------------------                
+</value>
+  </data>
+  <data name="richTextBox3.Text" xml:space="preserve">
+    <value>				------------------------------ Appium Server Not Running ------------------------------                 
+                                                          ------------------------ Go to Server -&gt; Config -&gt; Start Server -------------------------                
+</value>
+  </data>
+  <data name="richTextBox4.Text" xml:space="preserve">
+    <value>				------------------------------ Appium Server Not Running ------------------------------                 
+                                                          ------------------------ Go to Server -&gt; Config -&gt; Start Server -------------------------                
+</value>
+  </data>
+  <data name="richTextBox5.Text" xml:space="preserve">
+    <value>				------------------------------ Appium Server Not Running ------------------------------                 
+                                                          ------------------------ Go to Server -&gt; Config -&gt; Start Server -------------------------                
+</value>
+  </data>
   <metadata name="contextMenuStrip2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>390, 17</value>
   </metadata>

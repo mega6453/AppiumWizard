@@ -25,16 +25,21 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(selectedUDID).Item1;
             if (profileCheck)
             {
-                Close();
+                string message = "Attempting to Sign " + fileName + ". \nPlease wait, this may take some time...";
                 CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
                 commonProgress.Show();
-                commonProgress.UpdateStepLabel("Sign App", "Attempting to Sign " + fileName + ". \nPlease wait, this may take some time...");
-                string signediPAPath = iOSMethods.GetInstance().SignIPA(selectedUDID, filePath);
+                commonProgress.UpdateStepLabel("Sign App", message, 20);
+                string signediPAPath = "";
+                await Task.Run(() =>
+                {
+                    signediPAPath = iOSMethods.GetInstance().SignIPA(selectedUDID, filePath, commonProgress, message);
+                });
                 commonProgress.Close();
                 if (signediPAPath.Equals("notsigned"))
                 {
@@ -43,7 +48,8 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    MainScreen.InstalliOSApp(selectedDeviceName, selectedUDID, signediPAPath, installApp);
+                    installApp.Close();
+                    await MainScreen.InstalliOSApp(selectedDeviceName, selectedUDID, signediPAPath);
                     GoogleAnalytics.SendEvent("IPA_Signed_Successfully");
                 }
             }
@@ -55,10 +61,10 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("InstallApp_SignAndInstall_Clicked");
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             Close();
-            MainScreen.InstalliOSApp(selectedDeviceName, selectedUDID, filePath, installApp);
+            await MainScreen.InstalliOSApp(selectedDeviceName, selectedUDID, filePath);
             GoogleAnalytics.SendEvent("InstallApp_JustInstall_Clicked");
         }
 

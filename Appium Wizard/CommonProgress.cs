@@ -6,21 +6,94 @@
         {
             InitializeComponent();
             //Icon = Properties.Resources.appiumlogo;
+
+            int labelStartX = commonProgressLabel.Location.X;
+            int formWidth = this.ClientSize.Width;
+            int availableWidth = formWidth - labelStartX;
+            commonProgressLabel.Width = availableWidth;
+            commonProgressLabel.MaximumSize = new Size(availableWidth, 0);
         }
 
-        public void UpdateStepLabel(string title, string stepText)
+        public void UpdateStepLabel(string title, string stepText, int progressPercent = 50)
         {
-            this.Text = title;
-            commonProgressLabel.ForeColor = Color.Black;
-            commonProgressLabel.Text = stepText;
-            commonProgressLabel.Refresh();
+            if (progressPercent >= 100)
+            {
+                progressPercent = 100;
+            }
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    this.Text = title;
+                    commonProgressLabel.ForeColor = Color.Black;
+                    commonProgressLabel.Text = stepText;
+                    commonProgressLabel.Refresh();
+                    progressBar1.Value = progressPercent;
+                });
+            }
+            else
+            {
+                this.Text = title;
+                commonProgressLabel.ForeColor = Color.Black;
+                commonProgressLabel.Text = stepText;
+                commonProgressLabel.Refresh();
+                progressBar1.Value = progressPercent;
+            }
         }
 
         public void UpdateStepLabel(string stepText)
         {
-            commonProgressLabel.ForeColor = Color.Red;
-            commonProgressLabel.Text = stepText;
-            commonProgressLabel.Refresh();
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    this.Text = "Run WebDriverAgent";
+                    commonProgressLabel.ForeColor = Color.Red;
+                    commonProgressLabel.Text = stepText;
+                    commonProgressLabel.Refresh();
+                });
+            }
+            else
+            {
+                this.Text = "Run WebDriverAgent";
+                commonProgressLabel.ForeColor = Color.Red;
+                commonProgressLabel.Text = stepText;
+                commonProgressLabel.Refresh();
+            }
         }
+
+        public new void Close()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    base.Close();
+                });
+            }
+            else
+            {
+                base.Close();
+            }
+        }
+
+
+        public new void Hide()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    base.Hide();
+                });
+            }
+            else
+            {
+                base.Hide();
+            }
+        }
+
+
+        //MessageBox.Show("Sorry, Cannot cancel the execution in the current version.\nMay be in future version 😊", "Cancel Execution", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

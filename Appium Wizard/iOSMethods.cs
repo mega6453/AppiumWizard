@@ -440,8 +440,8 @@ namespace Appium_Wizard
         }
 
 
-        static string stackTrace = "";
-        public string SignIPA(string udid, string IPAFilePath)
+        public static string signIPAStackTrace = "";
+        public string SignIPA(string udid, string IPAFilePath, CommonProgress commonProgress = null, string message = null)
         {
             var output = isProfileAvailableToSign(udid);
             bool isProfileAvailable = output.Item1;
@@ -452,7 +452,7 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath);
+                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress,message);
             }
             else
             {
@@ -461,14 +461,14 @@ namespace Appium_Wizard
         }
 
 
-        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid)
+        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid, CommonProgress commonProgress = null, string message = null)
         {
             if (udid != "")
             {
                 bool isProfileAvailable = isProfileHasUDID(profilePath, udid);
                 if (isProfileAvailable)
                 {
-                    return SignIPA(profilePath, IPAFilePath, outputPath);
+                    return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
                 }
                 else
                 {
@@ -477,11 +477,11 @@ namespace Appium_Wizard
             }
             else
             {
-                return SignIPA(profilePath, IPAFilePath, outputPath);
+                return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
             }
         }
 
-        private string SignIPA(string profilePath, string IPAFilePath, string outputPath)
+        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress = null, string message = null)
         {
             string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
             string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
@@ -502,8 +502,9 @@ namespace Appium_Wizard
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardInput = true;
 
-            process.OutputDataReceived += Process_OutputDataReceived;
-            process.ErrorDataReceived += Process_ErrorDataReceived;
+            process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, commonProgress, message);
+            process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, commonProgress, message);
+
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -517,11 +518,11 @@ namespace Appium_Wizard
             int exitCode = process.ExitCode;
             process.Close();
 
-            if (stackTrace == "Archive Failed")
+            if (signIPAStackTrace == "Archive Failed")
             {
                 return "Sign_IPA_Failed";
             }
-            else if (stackTrace == "Archive OK")
+            else if (signIPAStackTrace == "Archive OK")
             {
                 return outputPath;
             }
@@ -531,32 +532,69 @@ namespace Appium_Wizard
             }
         }
 
-        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 if (e.Data.Contains("Archive Failed"))
                 {
-                    stackTrace = "Sign IPA Archive Failed";
+                    signIPAStackTrace = "Sign IPA Archive Failed";
                 }
                 if (e.Data.Contains("Archive OK"))
                 {
-                    stackTrace = "Archive OK";
+                    signIPAStackTrace = "Archive OK";
+                }
+                int percent = 0;
+                if (e.Data.Contains("Unzip OK!"))
+                {
+                    percent = 40;
+                }
+                else if (e.Data.Contains("Signed OK!"))
+                {
+                    percent = 70;
+                }
+                else if (e.Data.Contains("Archive OK!"))
+                {
+                    percent = 100;
+                }
+                if (percent != 0)
+                {
+                    if (commonProgress != null)
+                    {
+                        commonProgress.UpdateStepLabel("Sign App", message, percent);
+                    }
                 }
             }
         }
 
-        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 if (e.Data.Contains("Archive Failed"))
                 {
-                    stackTrace = "Sign IPA Archive Failed";
+                    signIPAStackTrace = "Sign IPA Archive Failed";
                 }
                 if (e.Data.Contains("Archive OK"))
                 {
-                    stackTrace = "Archive OK";
+                    signIPAStackTrace = "Archive OK";
+                }
+                int percent = 0;
+                if (e.Data.Contains("Unzip OK!"))
+                {
+                    percent = 40;
+                }
+                else if (e.Data.Contains("Signed OK!"))
+                {
+                    percent = 70;
+                }
+                else if (e.Data.Contains("Archive OK!"))
+                {
+                    percent = 100;
+                }
+                if (percent != 0)
+                {
+                    commonProgress.UpdateStepLabel("Sign App", message, percent);
                 }
             }
         }
@@ -1165,7 +1203,7 @@ namespace Appium_Wizard
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
+        public async Task<string> RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             if (MainScreen.udidProxyPort.ContainsKey(udid))
             {
@@ -1198,7 +1236,8 @@ namespace Appium_Wizard
                 process.Start();
                 var processId = process.Id;
                 MainScreen.runningProcesses.Add(processId);
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
+                await Task.Delay(2000);
                 // Begin asynchronous reading of the output/error streams
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
@@ -1211,6 +1250,7 @@ namespace Appium_Wizard
                 bool isPasscodeRequired = false;
                 int count = 1;
                 string sessionId = string.Empty;
+                bool isWDARanAtleaseOnce = false;
                 while (!process.HasExited)
                 {
                     if (!string.IsNullOrEmpty(runwdaError))
@@ -1220,14 +1260,28 @@ namespace Appium_Wizard
                             sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                             while (sessionId.Equals("nosession") && count <= 6)
                             {
-                                Thread.Sleep(5000);
-                                sessionId = iOSAPIMethods.CreateWDASession(port);
-                                if (sessionId.Equals("nosession") & iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
-                                {
-                                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                    isPasscodeRequired = true;
-                                }
-                                count++;
+                                await Task.Run(async () => {
+                                    //Thread.Sleep(5000);
+                                    await Task.Delay(5000);
+                                    sessionId = iOSAPIMethods.CreateWDASession(port);
+                                    bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
+                                    if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
+                                    {
+                                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                        isPasscodeRequired = true;
+                                        isWDARanAtleaseOnce = true;
+                                    }
+                                    else if (!IsWDARunningInAppsList)
+                                    {
+                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                        if (isWDARanAtleaseOnce)
+                                        {
+                                            commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                        }                                        
+                                        isPasscodeRequired = true;
+                                    }
+                                    count++;
+                                });
                             }
                             //if (runwdaError.Contains("Timed out while enabling automation mode"))
                             //{

@@ -5,121 +5,160 @@ namespace Appium_Wizard
     public partial class ServerConfig : Form
     {
         AppiumServerSetup serverSetup;
+        Dictionary<string, string> readPortData;
+        int port1, port2, port3, port4, port5;
         public ServerConfig()
         {
             InitializeComponent();
             serverSetup = new AppiumServerSetup();
+            readPortData = Database.QueryDataFromPortNumberTable();
+            port1 = int.Parse(readPortData["PortNumber1"]);
+            port2 = int.Parse(readPortData["PortNumber2"]);
+            port3 = int.Parse(readPortData["PortNumber3"]);
+            port4 = int.Parse(readPortData["PortNumber4"]);
+            port5 = int.Parse(readPortData["PortNumber5"]);
         }
 
         private void ServerConfig_Load(object sender, EventArgs e)
         {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...");
+            PortTextBox1.Text = port1 == 0 ? string.Empty : port1.ToString();
+            PortTextBox2.Text = port2 == 0 ? string.Empty : port2.ToString();
+            PortTextBox3.Text = port3 == 0 ? string.Empty : port3.ToString();
+            PortTextBox4.Text = port4 == 0 ? string.Empty : port4.ToString();
+            PortTextBox5.Text = port5 == 0 ? string.Empty : port5.ToString();
 
-            Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
-            PortTextBox1.Text = readPortData["PortNumber1"];
-            PortTextBox2.Text = readPortData["PortNumber2"];
-            PortTextBox3.Text = readPortData["PortNumber3"];
-            PortTextBox4.Text = readPortData["PortNumber4"];
-            PortTextBox5.Text = readPortData["PortNumber5"];
-
-            if (PortTextBox1.Text != string.Empty)
-            {
-                bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox1.Text));
-                if (isRunning)
-                {
-                    StatusLabel1.Text = "Running";
-                }
-                else
-                {
-                    StatusLabel1.Text = "Not Running";
-                }
-            }
-
-            if (PortTextBox2.Text != string.Empty)
-            {
-                bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox2.Text));
-                if (isRunning)
-                {
-                    StatusLabel2.Text = "Running";
-                }
-                else
-                {
-                    StatusLabel2.Text = "Not Running";
-                }
-            }
-
-            if (PortTextBox3.Text != string.Empty)
-            {
-                bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox3.Text));
-                if (isRunning)
-                {
-                    StatusLabel3.Text = "Running";
-                }
-                else
-                {
-                    StatusLabel3.Text = "Not Running";
-                }
-            }
-
-            if (PortTextBox4.Text != string.Empty)
-            {
-                bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox4.Text));
-                if (isRunning)
-                {
-                    StatusLabel4.Text = "Running";
-                }
-                else
-                {
-                    StatusLabel4.Text = "Not Running";
-                }
-            }
-
-            if (PortTextBox5.Text != string.Empty)
-            {
-                bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox5.Text));
-                if (isRunning)
-                {
-                    StatusLabel5.Text = "Running";
-                }
-                else
-                {
-                    StatusLabel5.Text = "Not Running";
-                }
-            }
-
-            commonProgress.Close();
             Task.Run(() =>
             {
                 while (true)
                 {
-                    bool isRunning = serverSetup.IsAppiumServerRunning(int.Parse(PortTextBox1.Text));
-                    if (isRunning)
+                    if (port1 != 0)
                     {
-                        try
+                        bool isRunning = serverSetup.IsAppiumServerRunning(port1);
+                        if (isRunning)
                         {
-                            Invoke(new Action(() => StatusLabel1.Text = "Running"));
-                            GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
-                            break;
-                        }
-                        catch (Exception)
-                        {
+                            try
+                            {
+                                Invoke(new Action(() => StatusLabel1.Text = "Running"));
+                                GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
+                                break;
+                            }
+                            catch (Exception)
+                            {
+                            }
                         }
                     }
-                    Thread.Sleep(2000);
+                    Task.Delay(2000);
                 }
             });
         }
 
-        private void StartServer(TextBox portTextbox, Label statusLabel, int serverNumber)
+        public async Task isServerRunning(MainScreen mainScreen = null)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = mainScreen;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 10);
+            bool isRunning1 = false;
+            bool isRunning2 = false;
+            bool isRunning3 = false;
+            bool isRunning4 = false;
+            bool isRunning5 = false;
+            await Task.Run(() =>
+            {
+                if (port1 != 0)
+                {
+                    isRunning1 = serverSetup.IsAppiumServerRunning(port1);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 20);
+                }
+                if (port2 != 0)
+                {
+                    isRunning2 = serverSetup.IsAppiumServerRunning(port2);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 40);
+                }
+                if (port3 != 0)
+                {
+                    isRunning3 = serverSetup.IsAppiumServerRunning(port3);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 60);
+                }
+                if (port4 != 0)
+                {
+                    isRunning4 = serverSetup.IsAppiumServerRunning(port4);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 80);
+                }
+                if (port5 != 0)
+                {
+                    isRunning5 = serverSetup.IsAppiumServerRunning(port5);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 100);
+                }
+            });
+
+            //-----
+            if (isRunning1)
+            {
+                StatusLabel1.Text = "Running";
+            }
+            else
+            {
+                StatusLabel1.Text = "Not Running";
+            }
+            //-----
+            if (isRunning2)
+            {
+                StatusLabel2.Text = "Running";
+            }
+            else
+            {
+                StatusLabel2.Text = "Not Running";
+            }
+            //-----
+            if (isRunning3)
+            {
+                StatusLabel3.Text = "Running";
+            }
+            else
+            {
+                StatusLabel3.Text = "Not Running";
+            }
+            //-----
+            if (isRunning4)
+            {
+                StatusLabel4.Text = "Running";
+            }
+            else
+            {
+                StatusLabel4.Text = "Not Running";
+            }
+            //-----
+            if (isRunning5)
+            {
+                StatusLabel5.Text = "Running";
+            }
+            else
+            {
+                StatusLabel5.Text = "Not Running";
+            }
+            commonProgress.Close();
+        }
+
+
+        private async Task StartServer(TextBox portTextbox, Label statusLabel, int serverNumber)
         {
             int portNumber = int.Parse(portTextbox.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1024 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                return;
+            }
             serverSetup = new AppiumServerSetup();
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30 seconds...");
-            bool result = Common.IsPortBeingUsed(portNumber);
+            bool result = false;
+            await Task.Run(() =>
+            {
+                commonProgress.UpdateStepLabel("Start Server", "Please wait while checking the availability of the port " + portNumber + "...", 10);
+                result = Common.IsPortBeingUsed(portNumber);
+            });
             if (result)
             {
                 statusLabel.Text = "Not Running";
@@ -129,10 +168,13 @@ namespace Appium_Wizard
             }
             else
             {
-                int wdaLocalPort = Common.GetFreePort();
-                int screenport = Common.GetFreePort();
-                serverSetup.StartAppiumServer(portNumber, serverNumber);
+                commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
+                await Task.Run(() =>
+                {
+                    serverSetup.StartAppiumServer(portNumber, serverNumber);
+                });
                 int count = 1;
+
                 while (!serverSetup.serverStarted)
                 {
                     if (!string.IsNullOrEmpty(serverSetup.statusText))
@@ -143,21 +185,25 @@ namespace Appium_Wizard
                             MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         }
-                        else if (count == 10)
+                        else if (count == 15)
                         {
-                            MessageBox.Show("Timed out after 30 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            GoogleAnalytics.SendEvent("StartServer_30Sec_Timedout");
+                            MessageBox.Show("Timed out after 45 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                             break;
                         }
                     }
-                    Thread.Sleep(3000);
-                    count++;
-                    if (count == 10)
+                    commonProgress.Invoke((MethodInvoker)(() =>
                     {
-                        MessageBox.Show("Timed out after 30 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        GoogleAnalytics.SendEvent("StartServer_30Sec_Timedout");
+                        commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 15 * count);
+                    }));
+                    count++;
+                    if (count == 15)
+                    {
+                        MessageBox.Show("Timed out after 45 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                         break;
                     }
+                    await Task.Delay(3000);
                 }
                 if (serverSetup.serverStarted)
                 {
@@ -170,75 +216,87 @@ namespace Appium_Wizard
             commonProgress.Close();
         }
 
-        private void StopServer(TextBox portTextbox, Label statusLabel)
+        private async Task StopServer(TextBox portTextbox, Label statusLabel)
         {
             int portNumber = int.Parse(portTextbox.Text);
+            bool isRunning = false;
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Stop Server", "Please wait while Stopping Appium server on port " + portNumber + "...");
-            serverSetup.StopAppiumServer(portNumber);
-            CheckPortAndUpdateLabel(portNumber, statusLabel);
+            await Task.Run(() =>
+            {
+                serverSetup.StopAppiumServer(portNumber);
+                isRunning = serverSetup.IsAppiumServerRunning(portNumber);
+            });
+            if (isRunning)
+            {
+                statusLabel.Text = "Running";
+            }
+            else
+            {
+                statusLabel.Text = "Not Running";
+            }
             commonProgress.Close();
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
 
 
-        private void StartButton1_Click(object sender, EventArgs e)
+        private async void StartButton1_Click(object sender, EventArgs e)
         {
-            StartServer(PortTextBox1, StatusLabel1, 1);
+            await StartServer(PortTextBox1, StatusLabel1, 1);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void StartButton2_Click(object sender, EventArgs e)
+        private async void StartButton2_Click(object sender, EventArgs e)
         {
-            StartServer(PortTextBox2, StatusLabel2, 2);
+            await StartServer(PortTextBox2, StatusLabel2, 2);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void StartButton3_Click(object sender, EventArgs e)
+        private async void StartButton3_Click(object sender, EventArgs e)
         {
-            StartServer(PortTextBox3, StatusLabel3, 3);
+            await StartServer(PortTextBox3, StatusLabel3, 3);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void StartButton4_Click(object sender, EventArgs e)
+        private async void StartButton4_Click(object sender, EventArgs e)
         {
-            StartServer(PortTextBox4, StatusLabel4, 4);
+            await StartServer(PortTextBox4, StatusLabel4, 4);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
-        private void StartButton5_Click(object sender, EventArgs e)
+        private async void StartButton5_Click(object sender, EventArgs e)
         {
-            StartServer(PortTextBox5, StatusLabel5, 5);
+            await StartServer(PortTextBox5, StatusLabel5, 5);
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
         //---------------------------------------------------------
 
-        private void StopButton1_Click(object sender, EventArgs e)
+        private async void StopButton1_Click(object sender, EventArgs e)
         {
-            StopServer(PortTextBox1, StatusLabel1);
+            await StopServer(PortTextBox1, StatusLabel1);
         }
 
-        private void StopButton2_Click(object sender, EventArgs e)
+        private async void StopButton2_Click(object sender, EventArgs e)
         {
-            StopServer(PortTextBox2, StatusLabel2);
+            await StopServer(PortTextBox2, StatusLabel2);
         }
 
-        private void StopButton3_Click(object sender, EventArgs e)
+        private async void StopButton3_Click(object sender, EventArgs e)
         {
-            StopServer(PortTextBox3, StatusLabel3);
+            await StopServer(PortTextBox3, StatusLabel3);
         }
 
-        private void StopButton4_Click(object sender, EventArgs e)
+        private async void StopButton4_Click(object sender, EventArgs e)
         {
-            StopServer(PortTextBox4, StatusLabel4);
+            await StopServer(PortTextBox4, StatusLabel4);
         }
 
-        private void StopButton5_Click(object sender, EventArgs e)
+        private async void StopButton5_Click(object sender, EventArgs e)
         {
-            StopServer(PortTextBox5, StatusLabel5);
+            await StopServer(PortTextBox5, StatusLabel5);
         }
 
         //---------------------------------------------------------
@@ -329,22 +387,21 @@ namespace Appium_Wizard
 
         //---------------------------------------------------------
 
-        private void CheckPortAndUpdateLabel(int port, Label statusLabel)
-        {
-            bool isRunning = serverSetup.IsAppiumServerRunning(port);
-            if (isRunning)
-            {
-                statusLabel.Text = "Running";
-            }
-            else
-            {
-                statusLabel.Text = "Not Running";
-            }
-        }
-
         private void ServerConfig_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+        }
+
+        private bool isValidPortNumber(int port)
+        {
+            if (port < 1024 | port > 65535)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

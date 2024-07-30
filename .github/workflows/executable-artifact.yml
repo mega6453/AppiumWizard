@@ -93,4 +93,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AppiumWizard
-        path: AppiumWizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.exe
+        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\win-x64\publish\output\AppiumWizard.exe

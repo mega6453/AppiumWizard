@@ -70,11 +70,11 @@ jobs:
       env:
         SCRIPT_PATH: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/ExcludeInInstaller/Installer Script.iss"  
 
-    - name: Zip the EXE file
-      run: |
-        $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.exe"
-        $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
-        Compress-Archive -Path $exePath -DestinationPath $zipPath
+    # - name: Zip the EXE file
+    #   run: |
+    #     $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.exe"
+    #     $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
+    #     Compress-Archive -Path $exePath -DestinationPath $zipPath
 
     - name: Get Version
       id: get_version
@@ -89,8 +89,8 @@ jobs:
         Solution_Name: Appium Wizard
         DOTNET_ROOT: C:\Program Files\dotnet
         
-    - name: Upload AppiumWizard.zip artifact
+    - name: Upload AppiumWizard.exe artifact
       uses: actions/upload-artifact@v3
       with:
         name: AppiumWizard
-        path: AppiumWizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.zip
+        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net6.0-windows\win-x64\publish\output\AppiumWizard.exe

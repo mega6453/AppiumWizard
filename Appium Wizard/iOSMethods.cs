@@ -19,9 +19,11 @@ namespace Appium_Wizard
     public class iOSMethods
     {
         private static iOSMethods? instance;
+        private static iOSMethods? instance17Plus;
         private static readonly object lockObject = new object();
+        private static readonly object lockObject17Plus = new object();
 
-        private string iOSServerFilePath = FilesPath.iOSServerFilePath;
+        private static string iOSServerFilePath;
         private string iOSFilesPath = FilesPath.iOSFilesPath;
         private string pListUtilFilePath = FilesPath.pListUtilFilePath;
         string ProfilesFilePath = FilesPath.ProfilesFilePath;
@@ -32,6 +34,7 @@ namespace Appium_Wizard
         public string deviceInfo = "";
         public enum iOSExecutable { go, py }
         public static bool isGo;
+        public static bool is17Plus;
         public List<string> GetListOfDevicesUDID(iOSExecutable executable = iOSExecutable.go)
         {
             List<string> list = new List<string>();
@@ -822,12 +825,12 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    KillAppUsingExecutable(bundleId, udid);
+                    KillAppUsingExecutable(udid, bundleId);
                 }
             }
             else
             {
-                KillAppUsingExecutable(bundleId, udid);
+                KillAppUsingExecutable(udid, bundleId);
             }
            
         }
@@ -849,6 +852,7 @@ namespace Appium_Wizard
         {
             try
             {
+                iOSAsyncMethods.GetInstance().CreateTunnelGo();
                 if (udid.Equals("any"))
                 {
                     iOSProcess.StartInfo.Arguments = arguments;
@@ -864,6 +868,7 @@ namespace Appium_Wizard
                 }
                 string output = iOSProcess.StandardOutput.ReadToEnd();
                 string error = iOSProcess.StandardError.ReadToEnd();
+                //iOSAsyncMethods.GetInstance().CloseTunnel();
                 if (output != "")
                 {
                     return output;
@@ -959,17 +964,37 @@ namespace Appium_Wizard
 
         public static iOSMethods GetInstance()
         {
-            if (instance == null)
+            if (is17Plus)
             {
-                lock (lockObject)
+                iOSServerFilePath = FilesPath.iOSServerFilePath;
+                if (instance17Plus == null)
                 {
-                    if (instance == null)
+                    lock (lockObject17Plus)
                     {
-                        instance = new iOSMethods();
+                        if (instance17Plus == null)
+                        {
+                            instance17Plus = new iOSMethods();
+                        }
                     }
                 }
+                return instance17Plus;
             }
-            return instance;
+            else
+            {
+                iOSServerFilePath = FilesPath.iOSServerOldFilePath;
+                if (instance == null)
+                {
+                    lock (lockObject)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new iOSMethods();
+                        }
+                    }
+                }
+                return instance;
+            }
+           
         }
 
         private void InitializeProcess()

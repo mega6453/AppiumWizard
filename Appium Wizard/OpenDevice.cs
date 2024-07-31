@@ -172,6 +172,13 @@
                                         return;
                                     }
                                 }
+                                if (output.Contains("Password Protected"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
                                 if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
                                 {
                                     commonProgress.Close();
@@ -256,6 +263,13 @@
                                     {
                                         MainScreen.udidScreenPort.Add(udid, screenServerPort);
                                     }
+                                }
+                                else if (iOSMethods.GetInstance().isPasswordProtected(udid))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
                                 }
                                 else
                                 {

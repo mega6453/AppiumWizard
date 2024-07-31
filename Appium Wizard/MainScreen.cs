@@ -297,13 +297,15 @@ namespace Appium_Wizard
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
+                        iOSMethods.is17Plus = true;
                         iOSAsyncMethods.is17Plus = true;
                     }
                     else // <17
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
-                        iOSAsyncMethods.is17Plus = true;
+                        iOSMethods.is17Plus = false;
+                        iOSAsyncMethods.is17Plus = false;
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))

@@ -832,7 +832,7 @@ namespace Appium_Wizard
            
         }
 
-        public void KillAppUsingExecutable(string udid, string bundleId)
+        public void KillAppUsingExecutable(string bundleId, string udid)
         {
             if (isGo)
             {
@@ -1536,7 +1536,7 @@ namespace Appium_Wizard
                     tunnelProcess.StartInfo.FileName = iOSServerFilePath;
                     tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
                     tunnelProcess.StartInfo.UseShellExecute = false;
-                    tunnelProcess.StartInfo.CreateNoWindow = false;
+                    tunnelProcess.StartInfo.CreateNoWindow = true;
                     tunnelProcess.Start();
                     Thread.Sleep(5000);
                     var processId = tunnelProcess.Id;

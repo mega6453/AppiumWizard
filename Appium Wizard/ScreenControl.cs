@@ -515,10 +515,6 @@ namespace Appium_Wizard
         {
             udidScreenControl.Remove(udid);
             webview2.Remove(udid);
-            if (ScreenWebView != null)
-            {
-                ScreenWebView.Dispose();
-            }
             //Hide();
             //try
             //{
@@ -627,12 +623,30 @@ namespace Appium_Wizard
 
         }
 
-        private void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
+        private async void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
         {
             //AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
             //OpenDevice.deviceSessionId.Remove(udid);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            if (ScreenWebView != null)
+            {
+                ScreenWebView.Dispose();
+            }
+            await Task.Run(() =>
+            {
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
+                    MainScreen.udidProxyPort.Remove(udid);
+                }
+                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                {
+                    Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
+                    MainScreen.udidScreenPort.Remove(udid);
+                }
+            });
+
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
@@ -687,7 +701,7 @@ namespace Appium_Wizard
                     await Task.Run(() =>
                     {
                         AndroidMethods.GetInstance().TakeScreenshot(udid, filePath);
-                    });                   
+                    });
                 }
                 catch (Exception)
                 {

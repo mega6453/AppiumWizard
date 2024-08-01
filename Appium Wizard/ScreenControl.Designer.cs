@@ -164,7 +164,6 @@
             Screenshot.ImageTransparentColor = Color.Magenta;
             Screenshot.Name = "Screenshot";
             Screenshot.Size = new Size(34, 28);
-            Screenshot.Text = "Screenshot";
             Screenshot.Click += Screenshot_Click;
             // 
             // toolStripDropDownButton1

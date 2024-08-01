@@ -1416,7 +1416,7 @@ namespace Appium_Wizard
                     {
                         if (iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
                         {
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, port, 8100);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, port, 8100);
                         }
                         commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nRetry " + count + "/6.");
                         Thread.Sleep(5000);

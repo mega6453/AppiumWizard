@@ -250,8 +250,8 @@ namespace Appium_Wizard
             int proxyPort = ScreenControl.devicePorts[udid].Item2;
             Common.KillProcessByPortNumber(proxyPort);
             Common.KillProcessByPortNumber(screenPort);
-            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenPort, 9100);
+            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
+            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenPort, 9100);
             bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
             if (!isRunning)
             {

@@ -2,6 +2,7 @@
 using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace Appium_Wizard
 {
@@ -83,7 +84,7 @@ namespace Appium_Wizard
                         }
                         catch (Exception)
                         {
-                        }                       
+                        }
                     }
                     Thread.Sleep(1000);
                 }
@@ -326,7 +327,7 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY,waitDuration);
+                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
                             GoogleAnalytics.SendEvent("Press_Hold_Screen", "iOS");
                         }
                     }
@@ -515,6 +516,10 @@ namespace Appium_Wizard
         {
             udidScreenControl.Remove(udid);
             webview2.Remove(udid);
+            if (ScreenWebView != null)
+            {
+                ScreenWebView.Dispose();
+            }
             //Hide();
             //try
             //{
@@ -666,6 +671,50 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
+            }
+        }
+
+        static bool isMessageDisplayed = false;
+        private async void Screenshot_Click(object sender, EventArgs e)
+        {
+            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string filePath = Path.Combine(downloadPath, $"{deviceName}_{timestamp}.png");
+            filePath = "\"" + filePath + "\"";
+            if (OSType.Equals("Android"))
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });                   
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                GoogleAnalytics.SendEvent("Android_TakeScreenshot_ScreenControl");
+            }
+            else
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        iOSMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                GoogleAnalytics.SendEvent("iOS_TakeScreenshot_ScreenControl");
+            }
+            if (!isMessageDisplayed)
+            {
+                isMessageDisplayed = true;
+                MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

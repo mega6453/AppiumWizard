@@ -917,8 +917,14 @@ namespace Appium_Wizard
             }
         }
 
+        bool isMessageDisplayed = false;
         private void MoreButton_Click(object sender, EventArgs e)
         {
+            if (selectedOS.Equals("iOS") && !isMessageDisplayed)
+            {
+                isMessageDisplayed = true;
+                MessageBox.Show("Make sure to open the iOS device before performing any operation from More section or some operations may not work.\n\nOpening device won't be required in future releases.\n\nThis is a one time message for an application lifecycle.", "More Operations", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             Point screenPoint = MoreButton.PointToScreen(new Point(0, MoreButton.Height));
             contextMenuStrip4.Show(screenPoint);
         }

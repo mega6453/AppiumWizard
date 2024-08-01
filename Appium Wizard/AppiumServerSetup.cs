@@ -146,7 +146,7 @@ namespace Appium_Wizard
                         if (platformName.ToLower().Contains("ios"))
                         {
                             Common.KillProcessByPortNumber(webDriverAgentProxyPort);
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             //iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
@@ -195,7 +195,7 @@ namespace Appium_Wizard
                         if (!proxiedUDID.Equals(currentUDID) && !currentUDID.Equals("none"))
                         {
                             Common.KillProcessByPortNumber(webDriverAgentProxyPort);
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -224,7 +224,7 @@ namespace Appium_Wizard
                                         UpdateScreenControl(currentUDID, "Switch Device " + name);
                                     }
                                     Common.KillProcessByPortNumber(webDriverAgentProxyPort);
-                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                                    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                                     proxiedUDID = currentUDID;
                                 }
                             }

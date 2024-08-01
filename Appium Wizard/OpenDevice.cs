@@ -103,8 +103,8 @@
                             proxyPort = Common.GetFreePort();
                             screenServerPort = Common.GetFreePort();
                             iOSAsyncMethods.GetInstance().CloseTunnel();
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
                             if (installedNow)
                             {
                                 isRunning = false;
@@ -288,7 +288,7 @@
                             {
                                 commonProgress.UpdateStepLabel(title, "Starting screen server...", 95);
                                 Common.KillProcessByPortNumber(screenServerPort);
-                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
                             }
                             if (WDAsessionId.Equals("nosession"))
                             {

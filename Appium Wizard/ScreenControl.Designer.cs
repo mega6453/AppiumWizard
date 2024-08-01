@@ -40,6 +40,7 @@
             toolStripButton1 = new ToolStripButton();
             BackButton = new ToolStripButton();
             controlCenter = new ToolStripButton();
+            Screenshot = new ToolStripButton();
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             unlockToolStripMenuItem = new ToolStripMenuItem();
             toolStrip2 = new ToolStrip();
@@ -69,7 +70,7 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { buttonAlwaysOnTop, toolStripSeparator4, toolStripSeparator3, ObjectSpy, toolStripSeparator2, toolStripSeparator1, toolStripButton1, BackButton, controlCenter, toolStripDropDownButton1 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { buttonAlwaysOnTop, toolStripSeparator4, toolStripSeparator3, ObjectSpy, toolStripSeparator2, toolStripSeparator1, toolStripButton1, BackButton, controlCenter, Screenshot, toolStripDropDownButton1 });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 595);
             toolStrip1.Name = "toolStrip1";
@@ -154,6 +155,17 @@
             controlCenter.Name = "controlCenter";
             controlCenter.Size = new Size(34, 28);
             controlCenter.Click += controlCenter_Click;
+            // 
+            // Screenshot
+            // 
+            Screenshot.Alignment = ToolStripItemAlignment.Right;
+            Screenshot.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            Screenshot.Image = Properties.Resources.screenshot;
+            Screenshot.ImageTransparentColor = Color.Magenta;
+            Screenshot.Name = "Screenshot";
+            Screenshot.Size = new Size(34, 28);
+            Screenshot.Text = "Screenshot";
+            Screenshot.Click += Screenshot_Click;
             // 
             // toolStripDropDownButton1
             // 
@@ -242,5 +254,6 @@
         private ToolStripButton BackButton;
         private ToolStripDropDownButton toolStripDropDownButton1;
         private ToolStripMenuItem unlockToolStripMenuItem;
+        private ToolStripButton Screenshot;
     }
 }

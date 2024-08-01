@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {

@@ -1,13 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Appium.Enums;
-using RestSharp;
 using System.Diagnostics;
-using System.Net;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using File = System.IO.File;
 
 namespace Appium_Wizard

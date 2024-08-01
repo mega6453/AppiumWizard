@@ -2,7 +2,6 @@
 using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Reflection;
-using System.Windows.Forms;
 
 namespace Appium_Wizard
 {

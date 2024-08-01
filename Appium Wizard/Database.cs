@@ -1,5 +1,4 @@
 ﻿using System.Data.SQLite;
-using System.Net;
 
 namespace Appium_Wizard
 {

@@ -1,15 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Remote;
 using RestSharp;
-using System;
-using System.Data.Common;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Net;
-using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;

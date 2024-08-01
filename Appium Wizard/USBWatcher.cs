@@ -1,7 +1,5 @@
-﻿using OpenQA.Selenium.Appium;
-using System.Management;
+﻿using System.Management;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Appium_Wizard
 {

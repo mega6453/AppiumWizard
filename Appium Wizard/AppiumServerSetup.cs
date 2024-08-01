@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RestSharp;
 
 namespace Appium_Wizard
 {

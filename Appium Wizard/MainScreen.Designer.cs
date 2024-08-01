@@ -433,7 +433,7 @@ namespace Appium_Wizard
             tabPage1.Controls.Add(richTextBox1);
             tabPage1.Location = new Point(4, 34);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3, 3, 3, 3);
+            tabPage1.Padding = new Padding(3);
             tabPage1.Size = new Size(1426, 1005);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
@@ -444,7 +444,7 @@ namespace Appium_Wizard
             tabPage2.Controls.Add(richTextBox2);
             tabPage2.Location = new Point(4, 34);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3, 3, 3, 3);
+            tabPage2.Padding = new Padding(3);
             tabPage2.Size = new Size(1426, 1005);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
@@ -464,7 +464,7 @@ namespace Appium_Wizard
             tabPage3.Controls.Add(richTextBox3);
             tabPage3.Location = new Point(4, 34);
             tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(3, 3, 3, 3);
+            tabPage3.Padding = new Padding(3);
             tabPage3.Size = new Size(1426, 1005);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
@@ -484,7 +484,7 @@ namespace Appium_Wizard
             tabPage4.Controls.Add(richTextBox4);
             tabPage4.Location = new Point(4, 34);
             tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(3, 3, 3, 3);
+            tabPage4.Padding = new Padding(3);
             tabPage4.Size = new Size(1426, 1005);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
@@ -504,7 +504,7 @@ namespace Appium_Wizard
             tabPage5.Controls.Add(richTextBox5);
             tabPage5.Location = new Point(4, 34);
             tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(3, 3, 3, 3);
+            tabPage5.Padding = new Padding(3);
             tabPage5.Size = new Size(1426, 1005);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";

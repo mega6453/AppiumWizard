@@ -83,7 +83,7 @@ namespace Appium_Wizard
                         }
                         catch (Exception)
                         {
-                        }                       
+                        }
                     }
                     Thread.Sleep(1000);
                 }
@@ -326,7 +326,7 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY,waitDuration);
+                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
                             GoogleAnalytics.SendEvent("Press_Hold_Screen", "iOS");
                         }
                     }
@@ -623,12 +623,30 @@ namespace Appium_Wizard
 
         }
 
-        private void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
+        private async void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
         {
             //AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
             //OpenDevice.deviceSessionId.Remove(udid);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, proxyPort);
             //AndroidMethods.GetInstance().StopAndroidProxyServer(udid, screenPort);
+            if (ScreenWebView != null)
+            {
+                ScreenWebView.Dispose();
+            }
+            await Task.Run(() =>
+            {
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
+                    MainScreen.udidProxyPort.Remove(udid);
+                }
+                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                {
+                    Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
+                    MainScreen.udidScreenPort.Remove(udid);
+                }
+            });
+
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 
@@ -666,6 +684,50 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
+            }
+        }
+
+        static bool isMessageDisplayed = false;
+        private async void Screenshot_Click(object sender, EventArgs e)
+        {
+            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string filePath = Path.Combine(downloadPath, $"{deviceName}_{timestamp}.png");
+            filePath = "\"" + filePath + "\"";
+            if (OSType.Equals("Android"))
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                GoogleAnalytics.SendEvent("Android_TakeScreenshot_ScreenControl");
+            }
+            else
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        iOSMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                GoogleAnalytics.SendEvent("iOS_TakeScreenshot_ScreenControl");
+            }
+            if (!isMessageDisplayed)
+            {
+                isMessageDisplayed = true;
+                MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

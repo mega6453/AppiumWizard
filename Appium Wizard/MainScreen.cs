@@ -1,13 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Appium.Enums;
-using RestSharp;
 using System.Diagnostics;
-using System.Net;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using File = System.IO.File;
 
 namespace Appium_Wizard
@@ -24,6 +17,7 @@ namespace Appium_Wizard
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
         public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
+        public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
 
         public MainScreen()
         {
@@ -292,15 +286,17 @@ namespace Appium_Wizard
                 {
                     Version deviceVersion = new Version(selectedDeviceVersion);
                     Version version17Plus = new Version("17.0.0");
-                    if (deviceVersion >= version17Plus) // >=17
+                    if (deviceVersion >= version17Plus) // >=17  -- Setting as true, as go-ios supports iOS 17+ now.
                     {
-                        iOSMethods.isGo = false;
-                        iOSAsyncMethods.isGo = false;
+                        iOSMethods.isGo = true;
+                        iOSAsyncMethods.isGo = true;
+                        iOSAsyncMethods.is17Plus = true;
                     }
                     else // <17
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
+                        iOSAsyncMethods.is17Plus = true;
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))
@@ -548,7 +544,7 @@ namespace Appium_Wizard
 
         private void DeleteDevice_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedDeviceName + " device?", "Delete Device", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            DialogResult result = MessageBox.Show("Deleting device will interrupt any running tests.\nAre you sure you want to delete " + selectedDeviceName + " device?", "Delete Device", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
                 bool valueExists = false;
@@ -574,6 +570,24 @@ namespace Appium_Wizard
                     if (selectedOS.Equals("Android"))
                     {
                         AndroidMethods.GetInstance().DisconnectAndroidWireless(selectedDeviceIP);
+                    }
+                    else
+                    {
+                        if (udidProxyPort.ContainsKey(selectedUDID))
+                        {
+                            Common.KillProcessByPortNumber(udidProxyPort[selectedUDID]);
+                            udidProxyPort.Remove(selectedUDID);
+                        }
+                        if (udidScreenPort.ContainsKey(selectedUDID))
+                        {
+                            Common.KillProcessByPortNumber(udidScreenPort[selectedUDID]);
+                            udidScreenPort.Remove(selectedUDID);
+                        }
+                    }
+                    if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
+                    {
+                        ScreenControl.udidScreenControl[selectedUDID].Close();
+                        ScreenControl.udidScreenControl.Remove(selectedUDID);
                     }
                     DeleteDevice.Enabled = false;
                     Open.Enabled = false;
@@ -833,7 +847,8 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 try
                 {
                     foreach (var item in runningProcessesPortNumbers)
@@ -895,8 +910,14 @@ namespace Appium_Wizard
             }
         }
 
+        bool isMessageDisplayed = false;
         private void MoreButton_Click(object sender, EventArgs e)
         {
+            if (selectedOS.Equals("iOS") && !isMessageDisplayed)
+            {
+                isMessageDisplayed = true;
+                MessageBox.Show("Make sure to open the iOS device before performing any operation from More section or some operations may not work.\n\nOpening device won't be required in future releases.\n\nThis is a one time message for an application lifecycle.", "More Operations", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             Point screenPoint = MoreButton.PointToScreen(new Point(0, MoreButton.Height));
             contextMenuStrip4.Show(screenPoint);
         }

@@ -102,8 +102,9 @@
                             commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
                             proxyPort = Common.GetFreePort();
                             screenServerPort = Common.GetFreePort();
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            iOSAsyncMethods.GetInstance().CloseTunnel();
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
                             if (installedNow)
                             {
                                 isRunning = false;
@@ -134,11 +135,31 @@
                                 {
                                     MainScreen.udidProxyPort.Add(udid, proxyPort);
                                 }
+                                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                                {
+                                    MainScreen.udidScreenPort[udid] = screenServerPort;
+                                }
+                                else
+                                {
+                                    MainScreen.udidScreenPort.Add(udid, screenServerPort);
+                                }
                             }
                             else
                             {
                                 Version deviceVersion = new Version(OSVersion);
                                 Version version17Plus = new Version("17.0.0");
+                                if (deviceVersion >= version17Plus)
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 35);
+                                    var isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
+                                    if (!isTunnelStarted)
+                                    {
+                                        commonProgress.Close();
+                                        isScreenServerStarted = false;
+                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
+                                }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 40);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
                                 if (deviceVersion >= version17Plus)
@@ -150,6 +171,13 @@
                                         MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
+                                }
+                                if (output.Contains("Password Protected"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
                                 }
                                 if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
                                 {
@@ -219,17 +247,10 @@
                                     keyValuePairs.Add("width", width);
                                     keyValuePairs.Add("height", height);
                                     deviceDetails.Add(udid, keyValuePairs);
-                                    if (MainScreen.udidProxyPort.ContainsKey(udid))
-                                    {
-                                        MainScreen.udidProxyPort[udid] = proxyPort;
-                                    }
-                                    else
-                                    {
-                                        MainScreen.udidProxyPort.Add(udid, proxyPort);
-                                    }
                                 }
                                 else
                                 {
+                                    iOSAsyncMethods.GetInstance().CloseTunnel();
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
                                     MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -245,14 +266,17 @@
                             height = (int)deviceDetails[udid]["height"];
                             WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
                             isScreenServerStarted = true;
+                            commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                             WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
-                            bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
-                            if (!isLoaded)
-                            {
-                                commonProgress.UpdateStepLabel(title, "Starting screen server...", 95);
-                                Common.KillProcessByPortNumber(screenServerPort);
-                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
-                            }
+                            //bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
+                            //if (!isLoaded)
+                            //{
+                            //    commonProgress.UpdateStepLabel(title, "Starting screen server...", 95);
+                            //    Common.KillProcessByPortNumber(screenServerPort);
+                            //    iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            //    //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
+                            //}
                             if (WDAsessionId.Equals("nosession"))
                             {
                                 commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...", 10);
@@ -309,6 +333,7 @@
                             }
                             else
                             {
+                                commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 80);
                                 proxyPort = (int)deviceDetails[udid]["proxyPort"];
                                 screenServerPort = (int)deviceDetails[udid]["screenPort"];
                                 width = (int)deviceDetails[udid]["width"];
@@ -330,6 +355,23 @@
                     commonProgress.Close();
                     MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
+                }
+
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                {
+                    MainScreen.udidProxyPort[udid] = proxyPort;
+                }
+                else
+                {
+                    MainScreen.udidProxyPort.Add(udid, proxyPort);
+                }
+                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                {
+                    MainScreen.udidScreenPort[udid] = screenServerPort;
+                }
+                else
+                {
+                    MainScreen.udidScreenPort.Add(udid, screenServerPort);
                 }
             });
         }

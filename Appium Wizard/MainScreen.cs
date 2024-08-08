@@ -1699,5 +1699,41 @@ namespace Appium_Wizard
             capabilityCopyButton.BackgroundImage = Properties.Resources.files; // Replace with your image resource
             timer1.Stop();
         }
+
+        private void serverSecurityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/security/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("serverSecurityToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("serverSecurityToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void cLIArgumentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/cli/args/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("cLIArgumentsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("cLIArgumentsToolStripMenuItem_Click", exception.Message);
+            }
+        }
     }
 }

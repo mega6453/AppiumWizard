@@ -146,7 +146,7 @@ namespace Appium_Wizard
             int portNumber = int.Parse(portTextbox.Text);
             if (!isValidPortNumber(portNumber))
             {
-                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1024 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1024 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             serverSetup = new AppiumServerSetup();
@@ -402,6 +402,11 @@ namespace Appium_Wizard
             {
                 return true;
             }
+        }
+
+        private void ConfigButton1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

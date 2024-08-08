@@ -899,7 +899,7 @@ namespace Appium_Wizard
             {
                 commonProgress.Close();
             }
-
+            e.Cancel = false;
             if (this.InvokeRequired)
             {
                 this.Invoke(new Action(() => this.Close()));
@@ -1626,7 +1626,7 @@ namespace Appium_Wizard
                     if (isUpdateAvailable)
                     {
                         commonProgress.Close();
-                        var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes: " + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes:\n" + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (result == DialogResult.Yes)
                         {
                             try

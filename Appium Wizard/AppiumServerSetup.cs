@@ -39,7 +39,8 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:newCommandTimeout\"":0}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
 
                     //working
@@ -92,6 +93,7 @@ namespace Appium_Wizard
         }
 
         string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
+        string currentPlatformName = "none";
         //int proxyPort = 0;
         int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
@@ -124,6 +126,10 @@ namespace Appium_Wizard
 
                 try
                 {
+                    //if (currentPlatformName.ToLower().Contains("ios") && !currentUDID.Equals("none") && !isPortReachable(webDriverAgentProxyPort))
+                    //{
+                    //    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                    //}
                     executionStatus.UpdateStatus(data);
 
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
@@ -134,6 +140,7 @@ namespace Appium_Wizard
                         if (platformMatch.Success)
                         {
                             platformName = platformMatch.Groups[1].Value;
+                            currentPlatformName = platformName;
                         }
                         //------------------------
                         string udidPattern = "\"appium:udid\":\"([^\"]+)\"";
@@ -147,7 +154,6 @@ namespace Appium_Wizard
                         {
                             Common.KillProcessByPortNumber(webDriverAgentProxyPort);
                             iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
-                            //iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -351,70 +357,6 @@ namespace Appium_Wizard
         }
 
 
-
-        public static async Task<bool> IsAppiumServerRunningAsync(string appiumUrl, int maxRetries = 10, int retryIntervalMilliseconds = 3000)
-        {
-            var statusUrl = appiumUrl.TrimEnd('/') + "/status";
-            int retryCount = 0;
-
-            while (retryCount < maxRetries)
-            {
-                try
-                {
-                    using (var httpClient = new HttpClient())
-                    {
-                        var response = await httpClient.GetAsync(statusUrl);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseBody = await response.Content.ReadAsStringAsync();
-                            if (responseBody.Contains("value"))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                catch (HttpRequestException)
-                {
-                    // Ignore and retry
-                }
-
-                retryCount++;
-                await Task.Delay(retryIntervalMilliseconds);
-            }
-
-            return false;
-        }
-
-
-        public string GetOnlyJson(string text)
-        {
-            Match match = Regex.Match(text, @"\{.*\}");
-            string output;
-            if (match.Success)
-            {
-                output = match.Value;
-            }
-            else
-            {
-                output = "No JSON found in the string";
-            }
-            return output;
-        }
-
-        public bool IsValidJson(string data)
-        {
-            try
-            {
-                JsonDocument.Parse(data);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
         public bool IsAppiumServerRunning(int port)
         {
             var options = new RestClientOptions("http://localhost:" + port)
@@ -566,6 +508,22 @@ namespace Appium_Wizard
             {
                 return null;
             }
+        }
+
+        public static bool isPortReachable(int port)
+        {
+            var options = new RestClientOptions("http://localhost:"+port)
+            {
+                Timeout = TimeSpan.FromSeconds(3),
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/", Method.Get);
+            RestResponse response = client.Execute(request);
+            if (response.StatusCode == 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

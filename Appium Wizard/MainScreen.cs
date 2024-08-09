@@ -357,18 +357,18 @@ namespace Appium_Wizard
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedUDID}""
                                 }}";
                 }
                 else
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedDeviceIP}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedDeviceIP}""
                                 }}";
                 }
             }
@@ -377,9 +377,9 @@ namespace Appium_Wizard
                 automationName = "XCUITest";
                 jsonString = $@"{{
                                 ""platformName"": ""{selectedOS}"",
+                                ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                 ""appium:automationName"": ""{automationName}"",
-                                ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                ""appium:udid"": ""{selectedUDID}""
                               }}";
             }
 
@@ -1681,17 +1681,10 @@ namespace Appium_Wizard
 
         private void capabilityCopyButton_Click(object sender, EventArgs e)
         {
-            if (selectedDeviceCapability.Contains("\"appium:webDriverAgentUrl\": \"\""))
-            {
-                MessageBox.Show("\"appium:webDriverAgentUrl\" capability is empty. Please open the device to get the updated capability and then copy again.", "Capability Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                Clipboard.SetText(selectedDeviceCapability);
-                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
-                timer1.Start();
-                GoogleAnalytics.SendEvent("Copy_Capability");
-            }
+            Clipboard.SetText(selectedDeviceCapability);
+            capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
+            timer1.Start();
+            GoogleAnalytics.SendEvent("Copy_Capability");
         }
 
         private void timer1_Tick(object sender, EventArgs e)

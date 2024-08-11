@@ -69,6 +69,7 @@
             PortTextBox1.Size = new Size(183, 31);
             PortTextBox1.TabIndex = 0;
             PortTextBox1.Text = "4723";
+            PortTextBox1.TextChanged += PortTextBox1_TextChanged;
             PortTextBox1.KeyPress += textBox1_KeyPress;
             // 
             // NumberLabel1
@@ -83,6 +84,7 @@
             // StartButton1
             // 
             StartButton1.AutoSize = true;
+            StartButton1.Enabled = false;
             StartButton1.Location = new Point(431, 20);
             StartButton1.Name = "StartButton1";
             StartButton1.Size = new Size(111, 42);
@@ -94,6 +96,7 @@
             // StartButton2
             // 
             StartButton2.AutoSize = true;
+            StartButton2.Enabled = false;
             StartButton2.Location = new Point(431, 102);
             StartButton2.Name = "StartButton2";
             StartButton2.Size = new Size(111, 42);
@@ -118,11 +121,13 @@
             PortTextBox2.PlaceholderText = "Appium Port Number";
             PortTextBox2.Size = new Size(183, 31);
             PortTextBox2.TabIndex = 3;
+            PortTextBox2.TextChanged += PortTextBox2_TextChanged;
             PortTextBox2.KeyPress += textBox2_KeyPress;
             // 
             // StartButton3
             // 
             StartButton3.AutoSize = true;
+            StartButton3.Enabled = false;
             StartButton3.Location = new Point(431, 183);
             StartButton3.Name = "StartButton3";
             StartButton3.Size = new Size(111, 42);
@@ -147,11 +152,13 @@
             PortTextBox3.PlaceholderText = "Appium Port Number";
             PortTextBox3.Size = new Size(183, 31);
             PortTextBox3.TabIndex = 6;
+            PortTextBox3.TextChanged += PortTextBox3_TextChanged;
             PortTextBox3.KeyPress += textBox3_KeyPress;
             // 
             // StartButton4
             // 
             StartButton4.AutoSize = true;
+            StartButton4.Enabled = false;
             StartButton4.Location = new Point(431, 268);
             StartButton4.Name = "StartButton4";
             StartButton4.Size = new Size(111, 42);
@@ -176,11 +183,13 @@
             PortTextBox4.PlaceholderText = "Appium Port Number";
             PortTextBox4.Size = new Size(183, 31);
             PortTextBox4.TabIndex = 9;
+            PortTextBox4.TextChanged += PortTextBox4_TextChanged;
             PortTextBox4.KeyPress += textBox4_KeyPress;
             // 
             // StartButton5
             // 
             StartButton5.AutoSize = true;
+            StartButton5.Enabled = false;
             StartButton5.Location = new Point(431, 353);
             StartButton5.Name = "StartButton5";
             StartButton5.Size = new Size(111, 42);
@@ -205,6 +214,7 @@
             PortTextBox5.PlaceholderText = "Appium Port Number";
             PortTextBox5.Size = new Size(183, 31);
             PortTextBox5.TabIndex = 12;
+            PortTextBox5.TextChanged += PortTextBox5_TextChanged;
             PortTextBox5.KeyPress += textBox5_KeyPress;
             // 
             // StopButton5
@@ -310,6 +320,7 @@
             // ConfigButton1
             // 
             ConfigButton1.AutoSize = true;
+            ConfigButton1.Enabled = false;
             ConfigButton1.Location = new Point(302, 21);
             ConfigButton1.Name = "ConfigButton1";
             ConfigButton1.Size = new Size(112, 41);
@@ -321,6 +332,7 @@
             // ConfigButton2
             // 
             ConfigButton2.AutoSize = true;
+            ConfigButton2.Enabled = false;
             ConfigButton2.Location = new Point(302, 100);
             ConfigButton2.Name = "ConfigButton2";
             ConfigButton2.Size = new Size(112, 44);
@@ -331,6 +343,7 @@
             // ConfigButton3
             // 
             ConfigButton3.AutoSize = true;
+            ConfigButton3.Enabled = false;
             ConfigButton3.Location = new Point(302, 179);
             ConfigButton3.Name = "ConfigButton3";
             ConfigButton3.Size = new Size(112, 46);
@@ -341,6 +354,7 @@
             // ConfigButton4
             // 
             ConfigButton4.AutoSize = true;
+            ConfigButton4.Enabled = false;
             ConfigButton4.Location = new Point(302, 266);
             ConfigButton4.Name = "ConfigButton4";
             ConfigButton4.Size = new Size(112, 44);
@@ -351,6 +365,7 @@
             // ConfigButton5
             // 
             ConfigButton5.AutoSize = true;
+            ConfigButton5.Enabled = false;
             ConfigButton5.Location = new Point(302, 353);
             ConfigButton5.Name = "ConfigButton5";
             ConfigButton5.Size = new Size(112, 42);

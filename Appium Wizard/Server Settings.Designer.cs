@@ -32,7 +32,6 @@
             label1 = new Label();
             ServerArgs = new RichTextBox();
             label2 = new Label();
-            finalCommandLabel = new Label();
             label3 = new Label();
             label4 = new Label();
             DefaultCapabilities = new RichTextBox();
@@ -40,6 +39,9 @@
             label6 = new Label();
             label7 = new Label();
             ServerArgsLink = new LinkLabel();
+            FinalCommandRichTextBox = new RichTextBox();
+            cancelButton = new Button();
+            applyButton = new Button();
             SuspendLayout();
             // 
             // label1
@@ -53,30 +55,22 @@
             // 
             // ServerArgs
             // 
-            ServerArgs.Location = new Point(12, 169);
+            ServerArgs.Location = new Point(12, 125);
             ServerArgs.Name = "ServerArgs";
             ServerArgs.Size = new Size(1025, 72);
             ServerArgs.TabIndex = 1;
             ServerArgs.Text = "";
+            ServerArgs.TextChanged += ServerArgs_TextChanged;
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(12, 419);
+            label2.Location = new Point(12, 327);
             label2.Name = "label2";
             label2.Size = new Size(153, 25);
             label2.TabIndex = 2;
             label2.Text = "Final Command :";
-            // 
-            // finalCommandLabel
-            // 
-            finalCommandLabel.AutoSize = true;
-            finalCommandLabel.Location = new Point(12, 444);
-            finalCommandLabel.Name = "finalCommandLabel";
-            finalCommandLabel.Size = new Size(991, 25);
-            finalCommandLabel.TabIndex = 3;
-            finalCommandLabel.Text = "appium --port {{portNumber}} --allow-cors --default-capabilities \"{\\\"appium:webDriverAgentUrl\\\":\\\"http://localhost:56254\\\"}";
             // 
             // label3
             // 
@@ -99,11 +93,12 @@
             // 
             // DefaultCapabilities
             // 
-            DefaultCapabilities.Location = new Point(12, 311);
+            DefaultCapabilities.Location = new Point(11, 238);
             DefaultCapabilities.Name = "DefaultCapabilities";
             DefaultCapabilities.Size = new Size(1026, 72);
             DefaultCapabilities.TabIndex = 6;
             DefaultCapabilities.Text = "";
+            DefaultCapabilities.TextChanged += DefaultCapabilities_TextChanged;
             // 
             // label5
             // 
@@ -119,7 +114,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(12, 141);
+            label6.Location = new Point(12, 97);
             label6.Name = "label6";
             label6.Size = new Size(103, 25);
             label6.TabIndex = 8;
@@ -128,11 +123,11 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(12, 283);
+            label7.Location = new Point(11, 210);
             label7.Name = "label7";
             label7.Size = new Size(160, 25);
             label7.TabIndex = 9;
-            label7.Text = "Deafult Capabilites";
+            label7.Text = "Default Capabilites";
             // 
             // ServerArgsLink
             // 
@@ -145,11 +140,45 @@
             ServerArgsLink.Text = "https://appium.io/docs/en/latest/cli/args/";
             ServerArgsLink.LinkClicked += ServerArgsLink_LinkClicked;
             // 
+            // FinalCommandRichTextBox
+            // 
+            FinalCommandRichTextBox.Enabled = false;
+            FinalCommandRichTextBox.Location = new Point(15, 355);
+            FinalCommandRichTextBox.Name = "FinalCommandRichTextBox";
+            FinalCommandRichTextBox.Size = new Size(1023, 84);
+            FinalCommandRichTextBox.TabIndex = 11;
+            FinalCommandRichTextBox.Text = "";
+            // 
+            // cancelButton
+            // 
+            cancelButton.AutoSize = true;
+            cancelButton.Location = new Point(344, 445);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(112, 35);
+            cancelButton.TabIndex = 12;
+            cancelButton.Text = "Cancel";
+            cancelButton.UseVisualStyleBackColor = true;
+            cancelButton.Click += cancelButton_Click;
+            // 
+            // applyButton
+            // 
+            applyButton.AutoSize = true;
+            applyButton.Location = new Point(507, 445);
+            applyButton.Name = "applyButton";
+            applyButton.Size = new Size(136, 35);
+            applyButton.TabIndex = 13;
+            applyButton.Text = "Apply && Close";
+            applyButton.UseVisualStyleBackColor = true;
+            applyButton.Click += applyButton_Click;
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1049, 637);
+            Controls.Add(applyButton);
+            Controls.Add(cancelButton);
+            Controls.Add(FinalCommandRichTextBox);
             Controls.Add(ServerArgsLink);
             Controls.Add(label7);
             Controls.Add(label6);
@@ -157,7 +186,6 @@
             Controls.Add(DefaultCapabilities);
             Controls.Add(label4);
             Controls.Add(label3);
-            Controls.Add(finalCommandLabel);
             Controls.Add(label2);
             Controls.Add(ServerArgs);
             Controls.Add(label1);
@@ -179,7 +207,6 @@
         private Label label1;
         private RichTextBox ServerArgs;
         private Label label2;
-        private Label finalCommandLabel;
         private Label label3;
         private Label label4;
         private RichTextBox DefaultCapabilities;
@@ -187,5 +214,8 @@
         private Label label6;
         private Label label7;
         private LinkLabel ServerArgsLink;
+        private RichTextBox FinalCommandRichTextBox;
+        private Button cancelButton;
+        private Button applyButton;
     }
 }

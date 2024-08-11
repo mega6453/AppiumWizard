@@ -152,7 +152,7 @@ namespace Appium_Wizard
         {
             await Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, 1);
+                serverSetup.StartAppiumServer(appiumPort, 1, "/C appium --allow-cors --port "+appiumPort);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 if (Common.IsNodeInstalled())
                 {

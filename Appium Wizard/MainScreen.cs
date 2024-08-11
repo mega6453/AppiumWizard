@@ -130,7 +130,7 @@ namespace Appium_Wizard
                 {
                     Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
                     AppiumServerSetup serverSetup = new AppiumServerSetup();
-                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
+                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1, "/C appium --allow-cors --port " + LoadingScreen.appiumPort);
                 }
                 else
                 {

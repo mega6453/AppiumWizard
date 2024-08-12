@@ -125,9 +125,9 @@
             label7.AutoSize = true;
             label7.Location = new Point(11, 210);
             label7.Name = "label7";
-            label7.Size = new Size(160, 25);
+            label7.Size = new Size(922, 25);
             label7.TabIndex = 9;
-            label7.Text = "Default Capabilites";
+            label7.Text = "Default Capabilites - Enter valid json string below. E.g. {\"appium:newCommandTimeout\": 0, \"appium:noReset\": true}";
             // 
             // ServerArgsLink
             // 

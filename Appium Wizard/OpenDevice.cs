@@ -80,6 +80,7 @@
                 if (!deviceList.Contains(udid))
                 {
                     MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
                 try
                 {
@@ -398,6 +399,7 @@
                 {
                     MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isScreenServerStarted = false;
+                    return;
                 }
                 try
                 {

@@ -7,17 +7,17 @@ namespace Appium_Wizard
     public partial class Server_Settings : Form
     {
         int portNumber;
-       
+
         public static string defaultCommand = string.Empty;
         public static string serverCLICommand = string.Empty;
-        public static string defaultCapabilities = string.Empty;
+        //public static string defaultCapabilities = string.Empty;
         public static string finalCommand = string.Empty;
         public Server_Settings(int portNumber)
         {
             this.portNumber = portNumber;
             InitializeComponent();
             defaultCommand = "appium --allow-cors --port " + portNumber;
-            defaultCapabilities = $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:webDriverAgentProxyPort\""}}""";
+            //defaultCapabilities = $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:webDriverAgentProxyPort\""}}""";
             finalCommand = defaultCommand;
             serverCLICommand = defaultCommand;
         }
@@ -54,7 +54,7 @@ namespace Appium_Wizard
 
         private void DefaultCapabilities_TextChanged(object sender, EventArgs e)
         {
-            UpdateFinalCommand();           
+            UpdateFinalCommand();
         }
 
         private void UpdateFinalCommand()
@@ -64,7 +64,7 @@ namespace Appium_Wizard
             serverCLICommand = defaultCommand + " " + serverArgsText;
             if (!string.IsNullOrEmpty(defaultCapabilitiesText))
             {
-                serverCLICommand += $@" -dc {defaultCapabilitiesText}";
+                serverCLICommand += $@" -dc ""{defaultCapabilitiesText.Replace("\"", "\\\"")}""";
             }
             FinalCommandRichTextBox.Text = serverCLICommand;
         }
@@ -78,7 +78,8 @@ namespace Appium_Wizard
         private void applyButton_Click(object sender, EventArgs e)
         {
             string currentText = FinalCommandRichTextBox.Text;
-            finalCommand = $@"/C {currentText.Replace("\"", "\\\"")}";
+            finalCommand = $@"/C {currentText}";
+            //finalCommand = $@"/C {currentText.Replace("\"", "\\\"")}";
             this.Close();
         }
 

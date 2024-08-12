@@ -152,7 +152,10 @@ namespace Appium_Wizard
                         //------------------------
                         if (platformName.ToLower().Contains("ios"))
                         {
-                            Common.KillProcessByPortNumber(webDriverAgentProxyPort);
+                            if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                            {
+                                Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                            }
                             iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
@@ -200,7 +203,10 @@ namespace Appium_Wizard
                         }
                         if (!proxiedUDID.Equals(currentUDID) && !currentUDID.Equals("none"))
                         {
-                            Common.KillProcessByPortNumber(webDriverAgentProxyPort);
+                            if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                            {
+                                Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                            }
                             iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
@@ -229,7 +235,10 @@ namespace Appium_Wizard
                                         string name = MainScreen.DeviceInfo[currentUDID].Item1;
                                         UpdateScreenControl(currentUDID, "Switch Device " + name);
                                     }
-                                    Common.KillProcessByPortNumber(webDriverAgentProxyPort);
+                                    if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                                    {
+                                        Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                                    }
                                     iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                                     proxiedUDID = currentUDID;
                                 }

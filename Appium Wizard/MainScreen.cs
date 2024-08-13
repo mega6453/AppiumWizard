@@ -847,9 +847,9 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
 
-            await Task.Run(() =>
+            try
             {
-                try
+                await Task.Run(() =>
                 {
                     foreach (var item in runningProcessesPortNumbers)
                     {
@@ -881,32 +881,33 @@ namespace Appium_Wizard
                             formToClose.Close();
                         }
                     }
-                }
-                catch (Exception)
+                });
+
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (commonProgress.InvokeRequired)
                 {
-                    // Handle exceptions if necessary
+                    commonProgress.Invoke(new Action(() => commonProgress.Close()));
                 }
-            });
+                else
+                {
+                    commonProgress.Close();
+                }
 
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
-
-            // Close the commonProgress form and the main form on the UI thread
-            if (commonProgress.InvokeRequired)
-            {
-                commonProgress.Invoke(new Action(() => commonProgress.Close()));
-            }
-            else
-            {
-                commonProgress.Close();
-            }
-            e.Cancel = false;
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(() => this.Close()));
-            }
-            else
-            {
-                this.Close();
+                e.Cancel = false;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() => this.Close()));
+                }
+                else
+                {
+                    this.Close();
+                }
             }
         }
 

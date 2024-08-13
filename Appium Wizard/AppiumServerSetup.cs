@@ -40,7 +40,7 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:newCommandTimeout\"":0}}""",
+                    Arguments = $@"/C appium --port {appiumPort} --allow-cors --allow-insecure=adb_shell --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:newCommandTimeout\"":0}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
 
                     //working
@@ -160,7 +160,7 @@ namespace Appium_Wizard
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                UpdateScreenControl(currentUDID, "Set Device " + name);
+                                UpdateScreenControl(currentUDID, "Set Device - " + name);
                             }
                             proxiedUDID = currentUDID;
                         }
@@ -211,7 +211,7 @@ namespace Appium_Wizard
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                UpdateScreenControl(currentUDID, "Switch Device " + name);
+                                UpdateScreenControl(currentUDID, "Switch Device - " + name);
                             }                           
                             proxiedUDID = currentUDID;
                         }
@@ -233,7 +233,7 @@ namespace Appium_Wizard
                                     if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                                     {
                                         string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                        UpdateScreenControl(currentUDID, "Switch Device " + name);
+                                        UpdateScreenControl(currentUDID, "Switch Device - " + name);
                                     }
                                     if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
                                     {
@@ -312,12 +312,12 @@ namespace Appium_Wizard
                         if (MainScreen.DeviceInfo.ContainsKey(deviceUDID))
                         {
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
-                            string text = "Set Device " + name;
+                            string text = "Set Device - " + name;
                             UpdateScreenControl(deviceUDID, text);
                         }
                         else
                         {
-                            string text = "Set Device " + deviceUDID;
+                            string text = "Set Device - " + deviceUDID;
                             UpdateScreenControl(deviceUDID, text);
                         }                                          
                     }

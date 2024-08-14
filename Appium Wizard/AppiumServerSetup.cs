@@ -130,8 +130,6 @@ namespace Appium_Wizard
                     //{
                     //    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                     //}
-                    executionStatus.UpdateStatus(data);
-
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
                     {
                         string platformName = "";
@@ -211,7 +209,7 @@ namespace Appium_Wizard
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                UpdateScreenControl(currentUDID, "Switch Device - " + name);
+                                UpdateScreenControl(currentUDID, "Set Device - " + name);
                             }                           
                             proxiedUDID = currentUDID;
                         }
@@ -233,7 +231,7 @@ namespace Appium_Wizard
                                     if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                                     {
                                         string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                        UpdateScreenControl(currentUDID, "Switch Device - " + name);
+                                        UpdateScreenControl(currentUDID, "Set Device - " + name);
                                     }
                                     if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
                                     {

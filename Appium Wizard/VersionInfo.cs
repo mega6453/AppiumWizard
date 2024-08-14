@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "3.0.1";
-        public const string ReleaseNotes = "Fixed issue - Unable to close the appium wizard";
+        public const string VersionNumber = "3.0.2";
+        public const string ReleaseNotes = "Fixed issue - Sometimes iOS session creation fails.";
     }
 }

@@ -80,6 +80,8 @@
                 if (!deviceList.Contains(udid))
                 {
                     MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    isScreenServerStarted = false;
+                    return;
                 }
                 try
                 {
@@ -346,6 +348,7 @@
                     else
                     {
                         commonProgress.Close();
+                        isScreenServerStarted = false;
                         MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
@@ -353,6 +356,7 @@
                 catch (Exception e)
                 {
                     commonProgress.Close();
+                    isScreenServerStarted = false;
                     MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -398,6 +402,7 @@
                 {
                     MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isScreenServerStarted = false;
+                    return;
                 }
                 try
                 {
@@ -489,6 +494,7 @@
                 }
                 catch (Exception e)
                 {
+                    isScreenServerStarted = false;
                     MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             });

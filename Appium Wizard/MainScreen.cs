@@ -357,18 +357,18 @@ namespace Appium_Wizard
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedUDID}""
                                 }}";
                 }
                 else
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedDeviceIP}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedDeviceIP}""
                                 }}";
                 }
             }
@@ -377,9 +377,9 @@ namespace Appium_Wizard
                 automationName = "XCUITest";
                 jsonString = $@"{{
                                 ""platformName"": ""{selectedOS}"",
+                                ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                 ""appium:automationName"": ""{automationName}"",
-                                ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                ""appium:udid"": ""{selectedUDID}""
                               }}";
             }
 
@@ -847,9 +847,9 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
 
-            await Task.Run(() =>
+            try
             {
-                try
+                await Task.Run(() =>
                 {
                     foreach (var item in runningProcessesPortNumbers)
                     {
@@ -881,32 +881,33 @@ namespace Appium_Wizard
                             formToClose.Close();
                         }
                     }
-                }
-                catch (Exception)
+                });
+
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (commonProgress.InvokeRequired)
                 {
-                    // Handle exceptions if necessary
+                    commonProgress.Invoke(new Action(() => commonProgress.Close()));
                 }
-            });
+                else
+                {
+                    commonProgress.Close();
+                }
 
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
-
-            // Close the commonProgress form and the main form on the UI thread
-            if (commonProgress.InvokeRequired)
-            {
-                commonProgress.Invoke(new Action(() => commonProgress.Close()));
-            }
-            else
-            {
-                commonProgress.Close();
-            }
-            e.Cancel = false;
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(() => this.Close()));
-            }
-            else
-            {
-                this.Close();
+                e.Cancel = false;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() => this.Close()));
+                }
+                else
+                {
+                    this.Close();
+                }
             }
         }
 
@@ -1681,17 +1682,10 @@ namespace Appium_Wizard
 
         private void capabilityCopyButton_Click(object sender, EventArgs e)
         {
-            if (selectedDeviceCapability.Contains("\"appium:webDriverAgentUrl\": \"\""))
-            {
-                MessageBox.Show("\"appium:webDriverAgentUrl\" capability is empty. Please open the device to get the updated capability and then copy again.", "Capability Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                Clipboard.SetText(selectedDeviceCapability);
-                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
-                timer1.Start();
-                GoogleAnalytics.SendEvent("Copy_Capability");
-            }
+            Clipboard.SetText(selectedDeviceCapability);
+            capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
+            timer1.Start();
+            GoogleAnalytics.SendEvent("Copy_Capability");
         }
 
         private void timer1_Tick(object sender, EventArgs e)

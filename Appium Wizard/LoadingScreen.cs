@@ -153,7 +153,6 @@ namespace Appium_Wizard
             await Task.Run(() =>
             {
                 serverSetup.StartAppiumServer(appiumPort, 1);
-                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 if (Common.IsNodeInstalled())
                 {
                     while (!serverSetup.serverStarted)

@@ -1059,7 +1059,7 @@ namespace Appium_Wizard
                     {
                         PortProcessId.Add(localPort, processId);
                     }
-                    MainScreen.runningProcessesPortNumbers.Add(localPort);
+                    MainScreen.runningProcesses.Add(processId);
                 }
                 catch (Exception ex)
                 {
@@ -1083,7 +1083,7 @@ namespace Appium_Wizard
                     {
                         PortProcessId.Add(localPort, processId);
                     }
-                    MainScreen.runningProcessesPortNumbers.Add(localPort);
+                    MainScreen.runningProcesses.Add(processId);
                 }
                 catch (Exception)
                 {
@@ -1113,7 +1113,7 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort, processId);
             }
-            MainScreen.runningProcessesPortNumbers.Add(localPort);
+            MainScreen.runningProcesses.Add(processId);
         }
 
         public void StartiProxyServer(string udid, int localPort1, int iOSPort1, int localPort2, int iOSPort2)
@@ -1136,7 +1136,7 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort1, processId);
             }
-            MainScreen.runningProcessesPortNumbers.Add(localPort1);
+            MainScreen.runningProcesses.Add(processId);
         }
 
         public void StartiProxyServer(int localPort, int iOSPort)
@@ -1159,7 +1159,7 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort, processId);
             }
-            MainScreen.runningProcessesPortNumbers.Add(localPort);
+            MainScreen.runningProcesses.Add(processId);
         }
 
         public void InstallApp(string udid, string path, iOSExecutable executable = iOSExecutable.go)

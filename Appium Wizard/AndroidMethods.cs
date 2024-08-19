@@ -39,7 +39,8 @@ namespace Appium_Wizard
 
             // Wait for the ADB server to start (you can adjust the sleep duration based on your needs)
             Thread.Sleep(2000);
-            MainScreen.runningProcessesPortNumbers.Add(AdbPort);
+            int processId = adbProcess.Id;
+            MainScreen.runningProcesses.Add(processId);
         }
 
         public void StopAdbServer(int AdbPort)
@@ -99,7 +100,6 @@ namespace Appium_Wizard
             {
                 ExecuteCommand("-s " + udid + " forward tcp:" + localPort + " tcp:" + AndroidPort);
             }
-            MainScreen.runningProcessesPortNumbers.Add(localPort);
             //var processId = adbProcess.Id;
             //PortProcessId.Add(localPort, processId);   // item already exception occurs if we delete and add device again.. need to check.
         }
@@ -423,6 +423,8 @@ namespace Appium_Wizard
                 }
                 string output = adbProcess.StandardOutput.ReadToEnd();
                 string error = adbProcess.StandardError.ReadToEnd();
+                int processId = adbProcess.Id;
+                MainScreen.runningProcesses.Add(processId);
                 return output + "\n" + error;
             }
             catch (Exception ex)

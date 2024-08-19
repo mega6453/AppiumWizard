@@ -10,7 +10,6 @@ namespace Appium_Wizard
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
-        public static List<int> runningProcessesPortNumbers = new List<int>();
         public static List<int> runningProcesses = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
@@ -851,10 +850,6 @@ namespace Appium_Wizard
             {
                 await Task.Run(() =>
                 {
-                    foreach (var item in runningProcessesPortNumbers)
-                    {
-                        Common.KillProcessByPortNumber(item);
-                    }
                     foreach (var item in runningProcesses)
                     {
                         Common.KillProcessById(item);

@@ -83,6 +83,8 @@ namespace Appium_Wizard
                 {
                     portServerNumberAndFilePath.Add(serverNumber, Tuple.Create(appiumPort, logFilePath));
                 }
+                int processId = appiumServerProcess.Id;
+                MainScreen.runningProcesses.Add(processId);
             }
             catch (Exception ex)
             {

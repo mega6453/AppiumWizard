@@ -158,7 +158,7 @@
                                     {
                                         commonProgress.Close();
                                         isScreenServerStarted = false;
-                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Sometimes this may fail if you are using VPN. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
                                 }

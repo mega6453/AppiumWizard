@@ -54,6 +54,7 @@ namespace Appium_Wizard
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
                 };
+                startInfo.EnvironmentVariables["ANDROID_HOME"] = FilesPath.executablesFolderPath;
                 Process appiumServerProcess = new Process();
                 appiumServerProcess.StartInfo = startInfo;
                 //appiumServerProcess.OutputDataReceived += AppiumServer_OutputDataReceived;

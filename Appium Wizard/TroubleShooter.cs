@@ -84,14 +84,14 @@ namespace Appium_Wizard
                     }
                 }
             }
-            commonProgress.Close();        
+            commonProgress.Close();
         }
 
         private async void FixNodeJSButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Install NodeJS","Installing NodeJS, This may take sometime, Please wait...");
+            commonProgress.UpdateStepLabel("Install NodeJS", "Installing NodeJS, This may take sometime, Please wait...");
             await Task.Run(() =>
             {
                 Common.InstallNodeJs();

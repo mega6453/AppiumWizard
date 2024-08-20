@@ -20,6 +20,7 @@ namespace Appium_Wizard
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "/C appium --allow-cors")
         {
             int webDriverAgentProxyPort = Common.GetFreePort();
+            string updatedCommand = command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
@@ -42,7 +43,7 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
                     //Arguments = command + $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    Arguments = command + $@" -dc {{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    Arguments = updatedCommand,
                     //working
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:skipServerInstallation\"": \""true\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",

@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Server_Settings));
-            label1 = new Label();
             ServerArgs = new RichTextBox();
             label2 = new Label();
             label3 = new Label();
@@ -42,20 +41,13 @@
             FinalCommandRichTextBox = new RichTextBox();
             cancelButton = new Button();
             applyButton = new Button();
+            defaultCapLinkLabel = new LinkLabel();
+            label8 = new Label();
             SuspendLayout();
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 9);
-            label1.Name = "label1";
-            label1.Size = new Size(423, 25);
-            label1.TabIndex = 0;
-            label1.Text = "Enter the required Server Command-Line Argument.\r\n";
             // 
             // ServerArgs
             // 
-            ServerArgs.Location = new Point(12, 125);
+            ServerArgs.Location = new Point(12, 95);
             ServerArgs.Name = "ServerArgs";
             ServerArgs.Size = new Size(1025, 72);
             ServerArgs.TabIndex = 1;
@@ -66,7 +58,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(12, 327);
+            label2.Location = new Point(15, 320);
             label2.Name = "label2";
             label2.Size = new Size(153, 25);
             label2.TabIndex = 2;
@@ -76,7 +68,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(12, 502);
+            label3.Location = new Point(12, 528);
             label3.Name = "label3";
             label3.Size = new Size(602, 25);
             label3.TabIndex = 4;
@@ -85,7 +77,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(12, 544);
+            label4.Location = new Point(12, 570);
             label4.Name = "label4";
             label4.Size = new Size(607, 75);
             label4.TabIndex = 5;
@@ -93,9 +85,9 @@
             // 
             // DefaultCapabilities
             // 
-            DefaultCapabilities.Location = new Point(11, 238);
+            DefaultCapabilities.Location = new Point(15, 208);
             DefaultCapabilities.Name = "DefaultCapabilities";
-            DefaultCapabilities.Size = new Size(1026, 72);
+            DefaultCapabilities.Size = new Size(1026, 109);
             DefaultCapabilities.TabIndex = 6;
             DefaultCapabilities.Text = "";
             DefaultCapabilities.TextChanged += DefaultCapabilities_TextChanged;
@@ -105,7 +97,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label5.ForeColor = Color.IndianRed;
-            label5.Location = new Point(12, 44);
+            label5.Location = new Point(12, 9);
             label5.Name = "label5";
             label5.Size = new Size(1026, 50);
             label5.TabIndex = 7;
@@ -114,45 +106,47 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(12, 97);
+            label6.Location = new Point(12, 67);
             label6.Name = "label6";
-            label6.Size = new Size(103, 25);
+            label6.Size = new Size(107, 25);
             label6.TabIndex = 8;
-            label6.Text = "Server Args";
+            label6.Text = "Server Args:";
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(11, 210);
+            label7.Location = new Point(11, 180);
             label7.Name = "label7";
-            label7.Size = new Size(922, 25);
+            label7.Size = new Size(164, 25);
             label7.TabIndex = 9;
-            label7.Text = "Default Capabilites - Enter valid json string below. E.g. {\"appium:newCommandTimeout\": 0, \"appium:noReset\": true}";
+            label7.Text = "Default Capabilites:";
             // 
             // ServerArgsLink
             // 
             ServerArgsLink.AutoSize = true;
-            ServerArgsLink.Location = new Point(486, 9);
+            ServerArgsLink.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            ServerArgsLink.Location = new Point(125, 67);
             ServerArgsLink.Name = "ServerArgsLink";
-            ServerArgsLink.Size = new Size(342, 25);
+            ServerArgsLink.Size = new Size(90, 25);
             ServerArgsLink.TabIndex = 10;
             ServerArgsLink.TabStop = true;
-            ServerArgsLink.Text = "https://appium.io/docs/en/latest/cli/args/";
+            ServerArgsLink.Text = "Refer here";
             ServerArgsLink.LinkClicked += ServerArgsLink_LinkClicked;
             // 
             // FinalCommandRichTextBox
             // 
-            FinalCommandRichTextBox.Enabled = false;
-            FinalCommandRichTextBox.Location = new Point(15, 355);
+            FinalCommandRichTextBox.DetectUrls = false;
+            FinalCommandRichTextBox.Location = new Point(15, 348);
             FinalCommandRichTextBox.Name = "FinalCommandRichTextBox";
-            FinalCommandRichTextBox.Size = new Size(1023, 84);
+            FinalCommandRichTextBox.ReadOnly = true;
+            FinalCommandRichTextBox.Size = new Size(1023, 123);
             FinalCommandRichTextBox.TabIndex = 11;
             FinalCommandRichTextBox.Text = "";
             // 
             // cancelButton
             // 
             cancelButton.AutoSize = true;
-            cancelButton.Location = new Point(344, 445);
+            cancelButton.Location = new Point(362, 477);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(112, 35);
             cancelButton.TabIndex = 12;
@@ -163,7 +157,7 @@
             // applyButton
             // 
             applyButton.AutoSize = true;
-            applyButton.Location = new Point(507, 445);
+            applyButton.Location = new Point(524, 477);
             applyButton.Name = "applyButton";
             applyButton.Size = new Size(136, 35);
             applyButton.TabIndex = 13;
@@ -171,12 +165,36 @@
             applyButton.UseVisualStyleBackColor = true;
             applyButton.Click += applyButton_Click;
             // 
+            // defaultCapLinkLabel
+            // 
+            defaultCapLinkLabel.AutoSize = true;
+            defaultCapLinkLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            defaultCapLinkLabel.Location = new Point(181, 180);
+            defaultCapLinkLabel.Name = "defaultCapLinkLabel";
+            defaultCapLinkLabel.Size = new Size(90, 25);
+            defaultCapLinkLabel.TabIndex = 14;
+            defaultCapLinkLabel.TabStop = true;
+            defaultCapLinkLabel.Text = "Refer here";
+            defaultCapLinkLabel.LinkClicked += defaultCapLinkLabel_LinkClicked;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.ForeColor = Color.Chocolate;
+            label8.Location = new Point(278, 180);
+            label8.Name = "label8";
+            label8.Size = new Size(757, 25);
+            label8.TabIndex = 15;
+            label8.Text = "Enter valid json string below. E.g. {\"appium:newCommandTimeout\": 0, \"appium:noReset\": true}";
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1049, 637);
+            ClientSize = new Size(1048, 656);
+            Controls.Add(label8);
+            Controls.Add(defaultCapLinkLabel);
             Controls.Add(applyButton);
             Controls.Add(cancelButton);
             Controls.Add(FinalCommandRichTextBox);
@@ -189,7 +207,6 @@
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(ServerArgs);
-            Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -204,8 +221,6 @@
         }
 
         #endregion
-
-        private Label label1;
         private RichTextBox ServerArgs;
         private Label label2;
         private Label label3;
@@ -218,5 +233,7 @@
         private RichTextBox FinalCommandRichTextBox;
         private Button cancelButton;
         private Button applyButton;
+        private LinkLabel defaultCapLinkLabel;
+        private Label label8;
     }
 }

@@ -7,21 +7,12 @@ namespace Appium_Wizard
     public partial class Server_Settings : Form
     {
         int portNumber;
-
-        public static string defaultCommand = string.Empty;
         public static string serverCLICommand = string.Empty;
-        //public static string defaultCapabilities = string.Empty;
         public static string finalCommand = string.Empty;
         public Server_Settings(int portNumber)
         {
             this.portNumber = portNumber;
             InitializeComponent();
-            //defaultCommand = "appium --allow-cors --port " + portNumber;
-            //string defaultCapabilities = $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:webDriverAgentProxyPort\""}}""";
-            //defaultCommand = $@"appium --allow-cors --port " + portNumber + " "+ defaultCapabilities;
-            
-            finalCommand = defaultCommand;
-            serverCLICommand = defaultCommand;
         }
 
         private void ServerArgsLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -45,10 +36,7 @@ namespace Appium_Wizard
         private void Server_Settings_Load(object sender, EventArgs e)
         {
             this.Text = "Server Settings - " + portNumber;
-            //FinalCommandRichTextBox.Text = "appium --allow-cors --port " + portNumber;
-
-
-            string updatedCapabilities = $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            string updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
             serverCLICommand = $@"appium --allow-cors --port {portNumber} {updatedCapabilities} ";
             FinalCommandRichTextBox.Text = serverCLICommand;
             finalCommand = FinalCommandRichTextBox.Text;
@@ -66,22 +54,26 @@ namespace Appium_Wizard
 
         private void UpdateFinalCommand()
         {
-            //string serverArgsText = ServerArgs.Text;
-            //string defaultCapabilitiesText = DefaultCapabilities.Text;
-            //serverCLICommand = defaultCommand + " " + serverArgsText;
-            //if (!string.IsNullOrEmpty(defaultCapabilitiesText))
-            //{
-            //    serverCLICommand += $@" -dc ""{defaultCapabilitiesText.Replace("\"", "\\\"")}""";
-            //}
-            //FinalCommandRichTextBox.Text = serverCLICommand;
-
-
             string serverArgsText = ServerArgs.Text;
             string defaultCapabilitiesText = DefaultCapabilities.Text;
-            //string updatedCapabilities = $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:webDriverAgentProxyPort\"",{defaultCapabilitiesText}}}""";
-            string updatedCapabilities = $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{defaultCapabilitiesText}}}""";
-            serverCLICommand = $@"appium --allow-cors --port {portNumber} {serverArgsText} {updatedCapabilities} ";
-            //serverCLICommand = $@"appium --allow-cors --port "+portNumber+serverArgsText +updatedCapabilities;
+            string updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            if (string.IsNullOrEmpty(defaultCapabilitiesText))
+            {
+                updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            }
+            else
+            {
+                if (defaultCapabilitiesText.StartsWith("{"))
+                {
+                    defaultCapabilitiesText = defaultCapabilitiesText.Substring(1);
+                }
+                if (defaultCapabilitiesText.EndsWith("}"))
+                {
+                    defaultCapabilitiesText = defaultCapabilitiesText.Substring(0, defaultCapabilitiesText.Length - 1);
+                }
+                updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{defaultCapabilitiesText}}}""";
+            }
+            serverCLICommand = $@"appium --allow-cors --port {portNumber} {serverArgsText} {updatedCapabilities}";
             FinalCommandRichTextBox.Text = serverCLICommand;
         }
 
@@ -94,11 +86,25 @@ namespace Appium_Wizard
         private void applyButton_Click(object sender, EventArgs e)
         {
             string currentText = FinalCommandRichTextBox.Text;
-            finalCommand = $@"/C {currentText}";
-            finalCommand = $@"/C {currentText.Replace("\"", "\"\"")}";
+            finalCommand = $@"{currentText.Replace("\"", "\"\"")}";
+            finalCommand = $@"/C {finalCommand.Replace("\"\"{", "\"{").Replace("}\"\"", "}\"")}";
             this.Close();
         }
 
-
+        private void defaultCapLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/caps/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+            }
+            catch (Exception)
+            {
+            }
+        }
     }
 }

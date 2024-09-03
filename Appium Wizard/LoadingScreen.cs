@@ -11,7 +11,7 @@ namespace Appium_Wizard
         public LoadingScreen()
         {
             InitializeComponent();
-            statusLabel.Text = "Initializing...";            
+            statusLabel.Text = "Initializing...";
             try
             {
                 Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
@@ -112,7 +112,7 @@ namespace Appium_Wizard
             }
             UpdateStepLabel("Starting Appium Server...");
             Database.UpdateDataIntoFirstTimeRunTable("No");
-            _ = ExecuteBackgroundMethod();
+            await ExecuteBackgroundMethod();
             UpdateStepLabel("Loading Modules...");
             int adbPort = 5037;
             AndroidMethods.GetInstance().StartAdbServer(adbPort);
@@ -152,7 +152,13 @@ namespace Appium_Wizard
         {
             await Task.Run(() =>
             {
-                serverSetup.StartAppiumServer(appiumPort, 1, "/C appium --allow-cors --port "+appiumPort);
+                string serverCommand = Database.QueryDataFromServerFinalCommandTable()["Server1"];
+                if (!serverCommand.Contains("--port"))
+                {
+                    serverCommand = "appium --port " + appiumPort + " --allow-cors --allow-insecure=adb_shell";
+                    Database.UpdateDataIntoServerFinalCommandTable("Server1",serverCommand);
+                }
+                serverSetup.StartAppiumServer(appiumPort, 1, serverCommand);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 if (Common.IsNodeInstalled())
                 {

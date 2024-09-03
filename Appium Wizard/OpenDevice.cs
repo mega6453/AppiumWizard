@@ -84,7 +84,9 @@
                 }
                 try
                 {
-                    bool wdaCheck = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                    commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
+                    bool wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
+                    commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign wda..", 15);
                     bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
                     if (wdaCheck | profileCheck)
                     {
@@ -93,8 +95,7 @@
                         {
                             bool installedNow = false;
                             bool isRunning = false;
-                            commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
-                            if (!iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid))
+                            if (!wdaCheck)
                             {
                                 commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 20);
                                 iOSMethods.GetInstance().InstallWDA(udid);
@@ -227,11 +228,11 @@
                                     MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
-                                else if (WDAsessionId.Equals("unhandled"))
+                                else if (string.IsNullOrEmpty(WDAsessionId) | WDAsessionId.Equals("unhandled"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    MessageBox.Show("Unhandled Exception - Try launching Webdriveragent manually and try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (!WDAsessionId.Equals("nosession"))

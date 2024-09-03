@@ -263,5 +263,149 @@ namespace Appium_Wizard
                 connection.Close();
             }
         }
+
+
+        public static Dictionary<string, string> QueryDataFromServerFinalCommandTable()
+        {
+            string defaultAppiumCOmmand = "appium --allow-cors";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM ServerFinalCommand", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var Server1 = reader.IsDBNull(0) ? defaultAppiumCOmmand : reader.GetString(0);
+                            var Server2 = reader.IsDBNull(1) ? defaultAppiumCOmmand : reader.GetString(1);
+                            var Server3 = reader.IsDBNull(2) ? defaultAppiumCOmmand : reader.GetString(2);
+                            var Server4 = reader.IsDBNull(3) ? defaultAppiumCOmmand : reader.GetString(3);
+                            var Server5 = reader.IsDBNull(4) ? defaultAppiumCOmmand : reader.GetString(4);
+
+                            result["Server1"] = Server1;
+                            result["Server2"] = Server2;
+                            result["Server3"] = Server3;
+                            result["Server4"] = Server4;
+                            result["Server5"] = Server5;
+                        }
+                    }
+                }
+                connection.Close();
+                return result;
+            }
+        }
+
+        public static void UpdateDataIntoServerFinalCommandTable(string serverNumber, string serverCommand)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE ServerFinalCommand SET ('" + serverNumber + "') = ('" + serverCommand + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+
+        public static Dictionary<string, string> QueryDataFromServerArgsTable()
+        {
+            string defaultAppiumCOmmand = "appium --allow-cors";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM ServerArgsCommand", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var Server1 = reader.IsDBNull(0) ? defaultAppiumCOmmand : reader.GetString(0);
+                            var Server2 = reader.IsDBNull(1) ? defaultAppiumCOmmand : reader.GetString(1);
+                            var Server3 = reader.IsDBNull(2) ? defaultAppiumCOmmand : reader.GetString(2);
+                            var Server4 = reader.IsDBNull(3) ? defaultAppiumCOmmand : reader.GetString(3);
+                            var Server5 = reader.IsDBNull(4) ? defaultAppiumCOmmand : reader.GetString(4);
+
+                            result["Server1"] = Server1;
+                            result["Server2"] = Server2;
+                            result["Server3"] = Server3;
+                            result["Server4"] = Server4;
+                            result["Server5"] = Server5;
+                        }
+                    }
+                }
+                connection.Close();
+                return result;
+            }
+        }
+
+        public static void UpdateDataIntoServerArgsTable(string serverNumber, string serverCommand)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE ServerArgsCommand SET ('" + serverNumber + "') = ('" + serverCommand + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+
+        public static Dictionary<string, string> QueryDataFromServerCapsTable()
+        {
+            string defaultAppiumCOmmand = "appium --allow-cors";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM ServerCapsCommand", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var Server1 = reader.IsDBNull(0) ? defaultAppiumCOmmand : reader.GetString(0);
+                            var Server2 = reader.IsDBNull(1) ? defaultAppiumCOmmand : reader.GetString(1);
+                            var Server3 = reader.IsDBNull(2) ? defaultAppiumCOmmand : reader.GetString(2);
+                            var Server4 = reader.IsDBNull(3) ? defaultAppiumCOmmand : reader.GetString(3);
+                            var Server5 = reader.IsDBNull(4) ? defaultAppiumCOmmand : reader.GetString(4);
+
+                            result["Server1"] = Server1;
+                            result["Server2"] = Server2;
+                            result["Server3"] = Server3;
+                            result["Server4"] = Server4;
+                            result["Server5"] = Server5;
+                        }
+                    }
+                }
+                connection.Close();
+                return result;
+            }
+        }
+
+        public static void UpdateDataIntoServerCapsTable(string serverNumber, string serverCommand)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE ServerCapsCommand SET ('" + serverNumber + "') = ('" + serverCommand + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
     }
 }

@@ -17,10 +17,18 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public void StartAppiumServer(int appiumPort, int serverNumber, string command = "/C appium --allow-cors")
+        public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+            if (!command.Contains("webDriverAgentProxyPort"))
+            {
+                command = command + $@" -dc ""{{""""appium:webDriverAgentUrl"""":""""http://localhost:webDriverAgentProxyPort""""}}""";
+            }
+            if (!command.Contains("--port"))
+            {
+                command = command + " --port " + appiumPort;
+            }
             int webDriverAgentProxyPort = Common.GetFreePort();
-            string updatedCommand = command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
+            string updatedCommand = "/C "+command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");

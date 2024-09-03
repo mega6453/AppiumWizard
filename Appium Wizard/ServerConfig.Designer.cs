@@ -339,6 +339,7 @@
             ConfigButton2.TabIndex = 26;
             ConfigButton2.Text = "Settings";
             ConfigButton2.UseVisualStyleBackColor = true;
+            ConfigButton2.Click += ConfigButton2_Click;
             // 
             // ConfigButton3
             // 
@@ -350,6 +351,7 @@
             ConfigButton3.TabIndex = 27;
             ConfigButton3.Text = "Settings";
             ConfigButton3.UseVisualStyleBackColor = true;
+            ConfigButton3.Click += ConfigButton3_Click;
             // 
             // ConfigButton4
             // 
@@ -361,6 +363,7 @@
             ConfigButton4.TabIndex = 28;
             ConfigButton4.Text = "Settings";
             ConfigButton4.UseVisualStyleBackColor = true;
+            ConfigButton4.Click += ConfigButton4_Click;
             // 
             // ConfigButton5
             // 
@@ -372,6 +375,7 @@
             ConfigButton5.TabIndex = 29;
             ConfigButton5.Text = "Settings";
             ConfigButton5.UseVisualStyleBackColor = true;
+            ConfigButton5.Click += ConfigButton5_Click;
             // 
             // ServerConfig
             // 

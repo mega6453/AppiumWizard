@@ -18,7 +18,7 @@
         {
             if (progressPercent >= 100)
             {
-                progressPercent = 100;
+                progressPercent = 95;
             }
             if (this.InvokeRequired)
             {

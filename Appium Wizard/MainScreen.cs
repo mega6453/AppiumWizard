@@ -130,7 +130,7 @@ namespace Appium_Wizard
                 {
                     Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
                     AppiumServerSetup serverSetup = new AppiumServerSetup();
-                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1, "/C appium --allow-cors --port " + LoadingScreen.appiumPort);
+                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1, "appium --port " + LoadingScreen.appiumPort + " --allow-cors --allow-insecure=adb_shell");
                 }
                 else
                 {
@@ -836,25 +836,18 @@ namespace Appium_Wizard
             }
         }
 
-
         private async void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            // Prevent the form from closing immediately
             e.Cancel = true;
-
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
 
-            await Task.Run(() =>
+            try
             {
-                try
+                await Task.Run(() =>
                 {
-                    foreach (var item in runningProcessesPortNumbers)
-                    {
-                        Common.KillProcessByPortNumber(item);
-                    }
                     foreach (var item in runningProcesses)
                     {
                         Common.KillProcessById(item);
@@ -881,32 +874,16 @@ namespace Appium_Wizard
                             formToClose.Close();
                         }
                     }
-                }
-                catch (Exception)
-                {
-                    // Handle exceptions if necessary
-                }
-            });
+                });
 
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
-
-            // Close the commonProgress form and the main form on the UI thread
-            if (commonProgress.InvokeRequired)
-            {
-                commonProgress.Invoke(new Action(() => commonProgress.Close()));
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
             }
-            else
+            catch (Exception)
             {
-                commonProgress.Close();
             }
-
-            if (this.InvokeRequired)
+            finally
             {
-                this.Invoke(new Action(() => this.Close()));
-            }
-            else
-            {
-                this.Close();
+                e.Cancel = false;
             }
         }
 

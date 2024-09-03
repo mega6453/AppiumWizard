@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Server_Settings));
-            ServerArgs = new RichTextBox();
+            ServerArgsRichTextBox = new RichTextBox();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
-            DefaultCapabilities = new RichTextBox();
+            DefaultCapabilitiesRichTextBox = new RichTextBox();
             label5 = new Label();
             label6 = new Label();
             label7 = new Label();
@@ -43,16 +43,17 @@
             applyButton = new Button();
             defaultCapLinkLabel = new LinkLabel();
             label8 = new Label();
+            resetButton = new Button();
             SuspendLayout();
             // 
-            // ServerArgs
+            // ServerArgsRichTextBox
             // 
-            ServerArgs.Location = new Point(12, 95);
-            ServerArgs.Name = "ServerArgs";
-            ServerArgs.Size = new Size(1025, 72);
-            ServerArgs.TabIndex = 1;
-            ServerArgs.Text = "";
-            ServerArgs.TextChanged += ServerArgs_TextChanged;
+            ServerArgsRichTextBox.Location = new Point(12, 95);
+            ServerArgsRichTextBox.Name = "ServerArgsRichTextBox";
+            ServerArgsRichTextBox.Size = new Size(1025, 72);
+            ServerArgsRichTextBox.TabIndex = 1;
+            ServerArgsRichTextBox.Text = "";
+            ServerArgsRichTextBox.TextChanged += ServerArgs_TextChanged;
             // 
             // label2
             // 
@@ -68,29 +69,29 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(12, 528);
+            label3.Location = new Point(12, 538);
             label3.Name = "label3";
-            label3.Size = new Size(602, 25);
+            label3.Size = new Size(411, 25);
             label3.TabIndex = 4;
-            label3.Text = "Following args will be added automatically while starting the server : ";
+            label3.Text = "Mandatory args (will be added automatically): ";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Location = new Point(12, 570);
             label4.Name = "label4";
-            label4.Size = new Size(607, 75);
+            label4.Size = new Size(607, 50);
             label4.TabIndex = 5;
-            label4.Text = resources.GetString("label4.Text");
+            label4.Text = "1. Appium Port number --> To start the server in the given port number.\r\n2. webDriverAgentUrl as default capability --> For iOS automation support.";
             // 
-            // DefaultCapabilities
+            // DefaultCapabilitiesRichTextBox
             // 
-            DefaultCapabilities.Location = new Point(15, 208);
-            DefaultCapabilities.Name = "DefaultCapabilities";
-            DefaultCapabilities.Size = new Size(1026, 109);
-            DefaultCapabilities.TabIndex = 6;
-            DefaultCapabilities.Text = "";
-            DefaultCapabilities.TextChanged += DefaultCapabilities_TextChanged;
+            DefaultCapabilitiesRichTextBox.Location = new Point(15, 208);
+            DefaultCapabilitiesRichTextBox.Name = "DefaultCapabilitiesRichTextBox";
+            DefaultCapabilitiesRichTextBox.Size = new Size(1026, 109);
+            DefaultCapabilitiesRichTextBox.TabIndex = 6;
+            DefaultCapabilitiesRichTextBox.Text = "";
+            DefaultCapabilitiesRichTextBox.TextChanged += DefaultCapabilities_TextChanged;
             // 
             // label5
             // 
@@ -101,7 +102,7 @@
             label5.Name = "label5";
             label5.Size = new Size(1026, 50);
             label5.TabIndex = 7;
-            label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN COMMAND, SO MAKE SURE YOU ARE ENTERING VALID ARGS.\r\nWHILE STARTING THE SERVER, IF IT FAILS THEN FIX THE ARGS.";
+            label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN COMMAND, SO MAKE SURE YOU ARE ENTERING VALID ARGS.\r\nWHILE STARTING THE SERVER, IF IT FAILS THEN FIX THE COMMAND.";
             // 
             // label6
             // 
@@ -146,7 +147,7 @@
             // cancelButton
             // 
             cancelButton.AutoSize = true;
-            cancelButton.Location = new Point(362, 477);
+            cancelButton.Location = new Point(417, 477);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(112, 35);
             cancelButton.TabIndex = 12;
@@ -157,7 +158,7 @@
             // applyButton
             // 
             applyButton.AutoSize = true;
-            applyButton.Location = new Point(524, 477);
+            applyButton.Location = new Point(566, 477);
             applyButton.Name = "applyButton";
             applyButton.Size = new Size(136, 35);
             applyButton.TabIndex = 13;
@@ -187,12 +188,23 @@
             label8.TabIndex = 15;
             label8.Text = "Enter valid json string below. E.g. {\"appium:newCommandTimeout\": 0, \"appium:noReset\": true}";
             // 
+            // resetButton
+            // 
+            resetButton.Location = new Point(232, 478);
+            resetButton.Name = "resetButton";
+            resetButton.Size = new Size(147, 34);
+            resetButton.TabIndex = 16;
+            resetButton.Text = "Reset to Default";
+            resetButton.UseVisualStyleBackColor = true;
+            resetButton.Click += resetButton_Click;
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1048, 656);
+            Controls.Add(resetButton);
             Controls.Add(label8);
             Controls.Add(defaultCapLinkLabel);
             Controls.Add(applyButton);
@@ -202,11 +214,11 @@
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(label5);
-            Controls.Add(DefaultCapabilities);
+            Controls.Add(DefaultCapabilitiesRichTextBox);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
-            Controls.Add(ServerArgs);
+            Controls.Add(ServerArgsRichTextBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -221,11 +233,11 @@
         }
 
         #endregion
-        private RichTextBox ServerArgs;
+        private RichTextBox ServerArgsRichTextBox;
         private Label label2;
         private Label label3;
         private Label label4;
-        private RichTextBox DefaultCapabilities;
+        private RichTextBox DefaultCapabilitiesRichTextBox;
         private Label label5;
         private Label label6;
         private Label label7;
@@ -235,5 +247,6 @@
         private Button applyButton;
         private LinkLabel defaultCapLinkLabel;
         private Label label8;
+        private Button resetButton;
     }
 }

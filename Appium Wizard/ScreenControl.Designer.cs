@@ -45,6 +45,7 @@
             unlockToolStripMenuItem = new ToolStripMenuItem();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
+            appsToolStripButton = new ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -70,7 +71,7 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { buttonAlwaysOnTop, toolStripSeparator4, toolStripSeparator3, ObjectSpy, toolStripSeparator2, toolStripSeparator1, toolStripButton1, BackButton, controlCenter, Screenshot, toolStripDropDownButton1 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { buttonAlwaysOnTop, toolStripSeparator4, toolStripSeparator3, ObjectSpy, toolStripSeparator2, toolStripSeparator1, toolStripButton1, BackButton, controlCenter, Screenshot, toolStripDropDownButton1, appsToolStripButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 595);
             toolStrip1.Name = "toolStrip1";
@@ -181,7 +182,7 @@
             // 
             unlockToolStripMenuItem.Image = Properties.Resources.Unlock;
             unlockToolStripMenuItem.Name = "unlockToolStripMenuItem";
-            unlockToolStripMenuItem.Size = new Size(168, 34);
+            unlockToolStripMenuItem.Size = new Size(270, 34);
             unlockToolStripMenuItem.Text = "Unlock";
             unlockToolStripMenuItem.Click += unlockToolStripMenuItem_Click;
             // 
@@ -208,6 +209,16 @@
             statusLabel.Overflow = ToolStripItemOverflow.Never;
             statusLabel.Size = new Size(0, 20);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // appsToolStripButton
+            // 
+            appsToolStripButton.Alignment = ToolStripItemAlignment.Right;
+            appsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            appsToolStripButton.Image = Properties.Resources.application;
+            appsToolStripButton.ImageTransparentColor = Color.Magenta;
+            appsToolStripButton.Name = "appsToolStripButton";
+            appsToolStripButton.Size = new Size(34, 28);
+            appsToolStripButton.Click += appsToolStripButton_Click;
             // 
             // ScreenControl
             // 
@@ -254,5 +265,6 @@
         private ToolStripDropDownButton toolStripDropDownButton1;
         private ToolStripMenuItem unlockToolStripMenuItem;
         private ToolStripButton Screenshot;
+        private ToolStripButton appsToolStripButton;
     }
 }

@@ -388,7 +388,7 @@ namespace Appium_Wizard
                     sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
                     if (sessionId.Equals("nosession"))
                     {
-                      
+
                         bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
                         if (!isRunning)
                         {
@@ -401,11 +401,11 @@ namespace Appium_Wizard
                             AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                             AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
                             sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                        }                       
+                        }
                         if (sessionId.Equals("nosession"))
                         {
                             sessionId = CreateSession();
-                        }                       
+                        }
                         return sessionId;
                     }
                     else
@@ -739,6 +739,13 @@ namespace Appium_Wizard
                 isMessageDisplayed = true;
                 MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private async void appsToolStripButton_Click(object sender, EventArgs e)
+        {
+            InstalledAppsList installedAppsList = new InstalledAppsList(OSType, udid, deviceName);
+            await installedAppsList.GetInstalledAppsList(this);
+            installedAppsList.ShowDialog();
         }
     }
 }

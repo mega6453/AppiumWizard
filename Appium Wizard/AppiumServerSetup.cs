@@ -49,6 +49,7 @@ namespace Appium_Wizard
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
+                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --allow-insecure=adb_shell --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:newCommandTimeout\"":0}}""",
                     //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
                     //Arguments = command + $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     Arguments = updatedCommand,
@@ -63,6 +64,7 @@ namespace Appium_Wizard
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
                 };
+                startInfo.EnvironmentVariables["ANDROID_HOME"] = FilesPath.executablesFolderPath;
                 Process appiumServerProcess = new Process();
                 appiumServerProcess.StartInfo = startInfo;
                 //appiumServerProcess.OutputDataReceived += AppiumServer_OutputDataReceived;
@@ -92,6 +94,9 @@ namespace Appium_Wizard
                 {
                     portServerNumberAndFilePath.Add(serverNumber, Tuple.Create(appiumPort, logFilePath));
                 }
+                int processId = appiumServerProcess.Id;
+                MainScreen.runningProcesses.Add(processId);
+                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
             }
             catch (Exception ex)
             {
@@ -102,6 +107,7 @@ namespace Appium_Wizard
         }
 
         string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
+        string currentPlatformName = "none";
         //int proxyPort = 0;
         int screenDensity = 0;
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
@@ -134,8 +140,10 @@ namespace Appium_Wizard
 
                 try
                 {
-                    executionStatus.UpdateStatus(data);
-
+                    //if (currentPlatformName.ToLower().Contains("ios") && !currentUDID.Equals("none") && !isPortReachable(webDriverAgentProxyPort))
+                    //{
+                    //    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                    //}
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
                     {
                         string platformName = "";
@@ -144,6 +152,7 @@ namespace Appium_Wizard
                         if (platformMatch.Success)
                         {
                             platformName = platformMatch.Groups[1].Value;
+                            currentPlatformName = platformName;
                         }
                         //------------------------
                         string udidPattern = "\"appium:udid\":\"([^\"]+)\"";
@@ -160,11 +169,10 @@ namespace Appium_Wizard
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
                             iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
-                            //iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                UpdateScreenControl(currentUDID, "Set Device " + name);
+                                UpdateScreenControl(currentUDID, "Set Device - " + name);
                             }
                             proxiedUDID = currentUDID;
                         }
@@ -215,7 +223,7 @@ namespace Appium_Wizard
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                UpdateScreenControl(currentUDID, "Switch Device " + name);
+                                UpdateScreenControl(currentUDID, "Set Device - " + name);
                             }                           
                             proxiedUDID = currentUDID;
                         }
@@ -237,7 +245,11 @@ namespace Appium_Wizard
                                     if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                                     {
                                         string name = MainScreen.DeviceInfo[currentUDID].Item1;
-                                        UpdateScreenControl(currentUDID, "Switch Device " + name);
+                                        UpdateScreenControl(currentUDID, "Set Device - " + name);
+                                    }
+                                    if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                                    {
+                                        Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                                     }
                                     if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
                                     {
@@ -316,12 +328,12 @@ namespace Appium_Wizard
                         if (MainScreen.DeviceInfo.ContainsKey(deviceUDID))
                         {
                             string name = MainScreen.DeviceInfo[deviceUDID].Item1;
-                            string text = "Set Device " + name;
+                            string text = "Set Device - " + name;
                             UpdateScreenControl(deviceUDID, text);
                         }
                         else
                         {
-                            string text = "Set Device " + deviceUDID;
+                            string text = "Set Device - " + deviceUDID;
                             UpdateScreenControl(deviceUDID, text);
                         }                                          
                     }
@@ -369,70 +381,6 @@ namespace Appium_Wizard
             }
         }
 
-
-
-        public static async Task<bool> IsAppiumServerRunningAsync(string appiumUrl, int maxRetries = 10, int retryIntervalMilliseconds = 3000)
-        {
-            var statusUrl = appiumUrl.TrimEnd('/') + "/status";
-            int retryCount = 0;
-
-            while (retryCount < maxRetries)
-            {
-                try
-                {
-                    using (var httpClient = new HttpClient())
-                    {
-                        var response = await httpClient.GetAsync(statusUrl);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseBody = await response.Content.ReadAsStringAsync();
-                            if (responseBody.Contains("value"))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                catch (HttpRequestException)
-                {
-                    // Ignore and retry
-                }
-
-                retryCount++;
-                await Task.Delay(retryIntervalMilliseconds);
-            }
-
-            return false;
-        }
-
-
-        public string GetOnlyJson(string text)
-        {
-            Match match = Regex.Match(text, @"\{.*\}");
-            string output;
-            if (match.Success)
-            {
-                output = match.Value;
-            }
-            else
-            {
-                output = "No JSON found in the string";
-            }
-            return output;
-        }
-
-        public bool IsValidJson(string data)
-        {
-            try
-            {
-                JsonDocument.Parse(data);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
 
         public bool IsAppiumServerRunning(int port)
         {
@@ -585,6 +533,22 @@ namespace Appium_Wizard
             {
                 return null;
             }
+        }
+
+        public static bool isPortReachable(int port)
+        {
+            var options = new RestClientOptions("http://localhost:"+port)
+            {
+                Timeout = TimeSpan.FromSeconds(3),
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/", Method.Get);
+            RestResponse response = client.Execute(request);
+            if (response.StatusCode == 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

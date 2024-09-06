@@ -10,8 +10,8 @@ namespace Appium_Wizard
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
-        public static List<int> runningProcessesPortNumbers = new List<int>();
         public static List<int> runningProcesses = new List<int>();
+        public static List<int> runningProcessesPortNumbers = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
@@ -357,18 +357,18 @@ namespace Appium_Wizard
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedUDID}""
                                 }}";
                 }
                 else
                 {
                     jsonString = $@"{{
                                     ""platformName"": ""{selectedOS}"",
+                                    ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                     ""appium:automationName"": ""{automationName}"",
-                                    ""appium:udid"": ""{selectedDeviceIP}"",
-                                    ""appium:newCommandTimeout"": 0
+                                    ""appium:udid"": ""{selectedDeviceIP}""
                                 }}";
                 }
             }
@@ -377,9 +377,9 @@ namespace Appium_Wizard
                 automationName = "XCUITest";
                 jsonString = $@"{{
                                 ""platformName"": ""{selectedOS}"",
+                                ""appium:platformVersion"": ""{selectedDeviceVersion}"",
                                 ""appium:automationName"": ""{automationName}"",
-                                ""appium:udid"": ""{selectedUDID}"",
-                                    ""appium:newCommandTimeout"": 0
+                                ""appium:udid"": ""{selectedUDID}""
                               }}";
             }
 
@@ -853,6 +853,11 @@ namespace Appium_Wizard
                         Common.KillProcessById(item);
                     }
 
+                    foreach (var item in runningProcessesPortNumbers)
+                    {
+                        Common.KillProcessByPortNumber(item);
+                    }
+
                     List<Form> childFormsToClose = new List<Form>();
                     foreach (Form form in Application.OpenForms)
                     {
@@ -880,6 +885,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
+                e.Cancel = false;
             }
             finally
             {
@@ -1603,7 +1609,7 @@ namespace Appium_Wizard
                     if (isUpdateAvailable)
                     {
                         commonProgress.Close();
-                        var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes: " + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes:\n" + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (result == DialogResult.Yes)
                         {
                             try
@@ -1658,17 +1664,10 @@ namespace Appium_Wizard
 
         private void capabilityCopyButton_Click(object sender, EventArgs e)
         {
-            if (selectedDeviceCapability.Contains("\"appium:webDriverAgentUrl\": \"\""))
-            {
-                MessageBox.Show("\"appium:webDriverAgentUrl\" capability is empty. Please open the device to get the updated capability and then copy again.", "Capability Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                Clipboard.SetText(selectedDeviceCapability);
-                capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
-                timer1.Start();
-                GoogleAnalytics.SendEvent("Copy_Capability");
-            }
+            Clipboard.SetText(selectedDeviceCapability);
+            capabilityCopyButton.BackgroundImage = Properties.Resources.tick;
+            timer1.Start();
+            GoogleAnalytics.SendEvent("Copy_Capability");
         }
 
         private void timer1_Tick(object sender, EventArgs e)

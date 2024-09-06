@@ -80,6 +80,7 @@
                 if (!deviceList.Contains(udid))
                 {
                     MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    isScreenServerStarted = false;
                     return;
                 }
                 try
@@ -158,7 +159,7 @@
                                     {
                                         commonProgress.Close();
                                         isScreenServerStarted = false;
-                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Sometimes this may fail if you are using VPN. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
                                 }
@@ -348,6 +349,7 @@
                     else
                     {
                         commonProgress.Close();
+                        isScreenServerStarted = false;
                         MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
@@ -355,6 +357,7 @@
                 catch (Exception e)
                 {
                     commonProgress.Close();
+                    isScreenServerStarted = false;
                     MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -492,6 +495,7 @@
                 }
                 catch (Exception e)
                 {
+                    isScreenServerStarted = false;
                     MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             });

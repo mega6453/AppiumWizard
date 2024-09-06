@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "3.0.0";
-        public const string ReleaseNotes = "Fixed UI Not responding issue.\nFixed UI issues for different screen sizes.\nOther bug fixes and improvements.";
+        public const string VersionNumber = "4.0.0";
+        public const string ReleaseNotes = "User can add now Server args and default capabilities to customize the server as needed in the Server Settings.";
     }
 }

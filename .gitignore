@@ -61,3 +61,6 @@
 /Appium Wizard/Resources/iOS/AppiumWizardDistro.vhdx
 *.cache
 /Appium Wizard/ExcludeInInstaller/Installer Script.iss
+/t string ReleaseNotes = User can add now Server args and default capabilities to customize the server as needed in the Server Settings.
+/.gitignore
+/.gitignore

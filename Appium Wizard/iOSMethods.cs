@@ -1059,6 +1059,7 @@ namespace Appium_Wizard
                     {
                         PortProcessId.Add(localPort, processId);
                     }
+                    MainScreen.runningProcesses.Add(processId);
                     MainScreen.runningProcessesPortNumbers.Add(localPort);
                 }
                 catch (Exception ex)
@@ -1083,6 +1084,7 @@ namespace Appium_Wizard
                     {
                         PortProcessId.Add(localPort, processId);
                     }
+                    MainScreen.runningProcesses.Add(processId);
                     MainScreen.runningProcessesPortNumbers.Add(localPort);
                 }
                 catch (Exception)
@@ -1113,6 +1115,7 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort, processId);
             }
+            MainScreen.runningProcesses.Add(processId);
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
@@ -1136,7 +1139,9 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort1, processId);
             }
+            MainScreen.runningProcesses.Add(processId);
             MainScreen.runningProcessesPortNumbers.Add(localPort1);
+            MainScreen.runningProcessesPortNumbers.Add(localPort2);
         }
 
         public void StartiProxyServer(int localPort, int iOSPort)
@@ -1159,6 +1164,7 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort, processId);
             }
+            MainScreen.runningProcesses.Add(processId);
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
 
@@ -1521,6 +1527,7 @@ namespace Appium_Wizard
 
         public bool CreateTunnelGo()
         {
+            int count = 0;
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
             if (!isTunnelRunning)
             {
@@ -1532,10 +1539,21 @@ namespace Appium_Wizard
                     tunnelProcess.StartInfo.UseShellExecute = false;
                     tunnelProcess.StartInfo.CreateNoWindow = true;
                     tunnelProcess.Start();
-                    Thread.Sleep(5000);
-                    var processId = tunnelProcess.Id;
-                    MainScreen.runningProcesses.Add(processId);
-                    return true;
+                    do
+                    {
+                        Thread.Sleep(1000);
+                        isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+                        count++;
+                    }
+                    while (count <= 5 && !isTunnelRunning);                             
+                    
+                    if (isTunnelRunning)
+                    {
+                        var processId = tunnelProcess.Id;
+                        MainScreen.runningProcesses.Add(processId);
+                        return true;
+                    }
+                    return false;
                 }
                 catch (Exception)
                 {

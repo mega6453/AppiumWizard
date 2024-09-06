@@ -159,7 +159,6 @@ namespace Appium_Wizard
                     Database.UpdateDataIntoServerFinalCommandTable("Server1",serverCommand);
                 }
                 serverSetup.StartAppiumServer(appiumPort, 1, serverCommand);
-                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
                 if (Common.IsNodeInstalled())
                 {
                     while (!serverSetup.serverStarted)

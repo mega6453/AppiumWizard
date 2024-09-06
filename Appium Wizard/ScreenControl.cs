@@ -126,7 +126,7 @@ namespace Appium_Wizard
             InitializeWebView();
             if (OSType.Equals("iOS"))
             {
-                BackButton.Visible = false;
+                BackToolStripButton.Visible = false;
             }
             toolStrip1.Refresh();
             toolStrip2.Refresh();
@@ -198,6 +198,11 @@ namespace Appium_Wizard
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            AppsToolStripButton.Enabled = true;
+            BackToolStripButton.Enabled = true;
+            ControlCenterToolStripButton.Enabled = true;
+            HomeToolStripButton.Enabled = true;
+            ScreenshotToolStripButton.Enabled = true;
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -244,6 +249,11 @@ namespace Appium_Wizard
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            AppsToolStripButton.Enabled = false;
+            BackToolStripButton.Enabled = false;
+            ControlCenterToolStripButton.Enabled = false;
+            HomeToolStripButton.Enabled = false;
+            ScreenshotToolStripButton.Enabled = false;
         }
 
         private async void InitializeWebView()
@@ -461,7 +471,7 @@ namespace Appium_Wizard
         {
             this.TopMost = !this.TopMost;
             //buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
-            buttonAlwaysOnTop.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
+            AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
         }
 

@@ -836,61 +836,45 @@ namespace Appium_Wizard
             }
         }
 
-        private async void onFormClosing(object sender, FormClosingEventArgs e)
+        private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-
-            try
+            List<Form> childFormsToClose = new List<Form>();
+            foreach (Form form in Application.OpenForms)
             {
-                await Task.Run(() =>
+                if (form != this)
                 {
-                    foreach (var item in runningProcesses)
-                    {
-                        Common.KillProcessById(item);
-                    }
-
-                    foreach (var item in runningProcessesPortNumbers)
-                    {
-                        Common.KillProcessByPortNumber(item);
-                    }
-
-                    List<Form> childFormsToClose = new List<Form>();
-                    foreach (Form form in Application.OpenForms)
-                    {
-                        if (form != this)
-                        {
-                            childFormsToClose.Add(form);
-                        }
-                    }
-
-                    // Close child forms on the UI thread
-                    foreach (Form formToClose in childFormsToClose)
-                    {
-                        if (formToClose.InvokeRequired)
-                        {
-                            formToClose.Invoke(new Action(() => formToClose.Close()));
-                        }
-                        else
-                        {
-                            formToClose.Close();
-                        }
-                    }
-                });
-
-                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                    childFormsToClose.Add(form);
+                }
             }
-            catch (Exception)
+            foreach (Form formToClose in childFormsToClose)
             {
-                e.Cancel = false;
+                formToClose.Close();
             }
-            finally
+            foreach (var item in ScreenControl.webview2)
             {
-                e.Cancel = false;
+                item.Value.Dispose();
             }
+            foreach (var item in runningProcesses)
+            {
+                Common.KillProcessById(item);
+            }
+            foreach (var item in runningProcessesPortNumbers)
+            {
+                Common.KillProcessByPortNumber(item);
+            }
+            foreach (var item in udidProxyPort)
+            {
+                Common.KillProcessByPortNumber(item.Value);
+            }
+            foreach (var item in udidScreenPort)
+            {
+                Common.KillProcessByPortNumber(item.Value);
+            }
+            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         bool isMessageDisplayed = false;

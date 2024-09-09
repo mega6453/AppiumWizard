@@ -43,10 +43,9 @@
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
             listView1.HeaderStyle = ColumnHeaderStyle.None;
-            listView1.Location = new Point(0, 24);
-            listView1.Margin = new Padding(2, 2, 2, 2);
+            listView1.Location = new Point(0, 40);
             listView1.Name = "listView1";
-            listView1.Size = new Size(355, 201);
+            listView1.Size = new Size(505, 332);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -61,10 +60,9 @@
             // 
             LaunchButton.AutoSize = true;
             LaunchButton.Enabled = false;
-            LaunchButton.Location = new Point(26, 228);
-            LaunchButton.Margin = new Padding(2, 2, 2, 2);
+            LaunchButton.Location = new Point(37, 380);
             LaunchButton.Name = "LaunchButton";
-            LaunchButton.Size = new Size(88, 25);
+            LaunchButton.Size = new Size(126, 42);
             LaunchButton.TabIndex = 1;
             LaunchButton.Text = "Launch App";
             LaunchButton.UseVisualStyleBackColor = true;
@@ -74,10 +72,9 @@
             // 
             UninstallButton.AutoSize = true;
             UninstallButton.Enabled = false;
-            UninstallButton.Location = new Point(228, 228);
-            UninstallButton.Margin = new Padding(2, 2, 2, 2);
+            UninstallButton.Location = new Point(326, 380);
             UninstallButton.Name = "UninstallButton";
-            UninstallButton.Size = new Size(97, 25);
+            UninstallButton.Size = new Size(139, 42);
             UninstallButton.TabIndex = 2;
             UninstallButton.Text = "Uninstall App";
             UninstallButton.UseVisualStyleBackColor = true;
@@ -85,11 +82,10 @@
             // 
             // textBoxSearch
             // 
-            textBoxSearch.Location = new Point(0, 5);
-            textBoxSearch.Margin = new Padding(2, 2, 2, 2);
+            textBoxSearch.Location = new Point(0, 8);
             textBoxSearch.Name = "textBoxSearch";
             textBoxSearch.PlaceholderText = "Search Package Name";
-            textBoxSearch.Size = new Size(355, 23);
+            textBoxSearch.Size = new Size(505, 31);
             textBoxSearch.TabIndex = 3;
             textBoxSearch.TextChanged += textBox1_TextChanged;
             // 
@@ -97,10 +93,9 @@
             // 
             KillAppButton.AutoSize = true;
             KillAppButton.Enabled = false;
-            KillAppButton.Location = new Point(133, 228);
-            KillAppButton.Margin = new Padding(2, 2, 2, 2);
+            KillAppButton.Location = new Point(190, 380);
             KillAppButton.Name = "KillAppButton";
-            KillAppButton.Size = new Size(78, 25);
+            KillAppButton.Size = new Size(111, 42);
             KillAppButton.TabIndex = 4;
             KillAppButton.Text = "Kill App";
             KillAppButton.UseVisualStyleBackColor = true;
@@ -108,9 +103,9 @@
             // 
             // InstalledAppsList
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(356, 260);
+            ClientSize = new Size(509, 433);
             Controls.Add(KillAppButton);
             Controls.Add(textBoxSearch);
             Controls.Add(UninstallButton);
@@ -118,13 +113,13 @@
             Controls.Add(listView1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2, 2, 2, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "InstalledAppsList";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Installed Apps List";
+            Load += InstalledAppsList_Load;
             Shown += InstalledAppsList_Shown;
             ResumeLayout(false);
             PerformLayout();

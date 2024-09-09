@@ -11,6 +11,7 @@ namespace Appium_Wizard
         public static MainScreen main;
         string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
         public static List<int> runningProcesses = new List<int>();
+        public static List<int> runningProcessesPortNumbers = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
         string latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
@@ -129,7 +130,7 @@ namespace Appium_Wizard
                 {
                     Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
                     AppiumServerSetup serverSetup = new AppiumServerSetup();
-                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1);
+                    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1, "appium --port " + LoadingScreen.appiumPort + " --allow-cors --allow-insecure=adb_shell");
                 }
                 else
                 {
@@ -835,75 +836,45 @@ namespace Appium_Wizard
             }
         }
 
-
-        private async void onFormClosing(object sender, FormClosingEventArgs e)
+        private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            // Prevent the form from closing immediately
-            e.Cancel = true;
-
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-
-            try
+            List<Form> childFormsToClose = new List<Form>();
+            foreach (Form form in Application.OpenForms)
             {
-                await Task.Run(() =>
+                if (form != this)
                 {
-                    foreach (var item in runningProcesses)
-                    {
-                        Common.KillProcessById(item);
-                    }
-
-                    List<Form> childFormsToClose = new List<Form>();
-                    foreach (Form form in Application.OpenForms)
-                    {
-                        if (form != this)
-                        {
-                            childFormsToClose.Add(form);
-                        }
-                    }
-
-                    // Close child forms on the UI thread
-                    foreach (Form formToClose in childFormsToClose)
-                    {
-                        if (formToClose.InvokeRequired)
-                        {
-                            formToClose.Invoke(new Action(() => formToClose.Close()));
-                        }
-                        else
-                        {
-                            formToClose.Close();
-                        }
-                    }
-                });
-
-                GoogleAnalytics.SendEvent("App_Closed", "Closed");
-            }
-            catch (Exception)
-            {
-            }
-            finally
-            {
-                if (commonProgress.InvokeRequired)
-                {
-                    commonProgress.Invoke(new Action(() => commonProgress.Close()));
-                }
-                else
-                {
-                    commonProgress.Close();
-                }
-
-                e.Cancel = false;
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new Action(() => this.Close()));
-                }
-                else
-                {
-                    this.Close();
+                    childFormsToClose.Add(form);
                 }
             }
+            foreach (Form formToClose in childFormsToClose)
+            {
+                formToClose.Close();
+            }
+            foreach (var item in ScreenControl.webview2)
+            {
+                item.Value.Dispose();
+            }
+            foreach (var item in runningProcesses)
+            {
+                Common.KillProcessById(item);
+            }
+            foreach (var item in runningProcessesPortNumbers)
+            {
+                Common.KillProcessByPortNumber(item);
+            }
+            foreach (var item in udidProxyPort)
+            {
+                Common.KillProcessByPortNumber(item.Value);
+            }
+            foreach (var item in udidScreenPort)
+            {
+                Common.KillProcessByPortNumber(item.Value);
+            }
+            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         bool isMessageDisplayed = false;
@@ -1687,6 +1658,42 @@ namespace Appium_Wizard
         {
             capabilityCopyButton.BackgroundImage = Properties.Resources.files; // Replace with your image resource
             timer1.Stop();
+        }
+
+        private void serverSecurityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/security/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("serverSecurityToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("serverSecurityToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void cLIArgumentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/cli/args/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("cLIArgumentsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("cLIArgumentsToolStripMenuItem_Click", exception.Message);
+            }
         }
     }
 }

@@ -7,21 +7,28 @@ namespace Appium_Wizard
         string os, udid, deviceName;
         List<string> packageNames = new List<string>();
         string selectedPackageName;
+        Form ownerForm;
         public InstalledAppsList(string os, string udid, string deviceName)
         {
             this.os = os;
             this.udid = udid;
             this.deviceName = deviceName;
             InitializeComponent();
+            this.Text = "Installed Apps List - " + deviceName;
         }
 
-        public async Task GetInstalledAppsList(MainScreen main)
+        public async Task GetInstalledAppsList(object obj)
         {
             CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = main;
+            if (obj is Form form)
+            {
+                ownerForm = form;
+                commonProgress.Owner = form;
+            }
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Installed Apps List", "Please wait while fetching list of installed apps...");
-            await Task.Run(() => {
+            commonProgress.UpdateStepLabel("Installed Apps List - " + deviceName, "Please wait while fetching list of installed apps...");
+            await Task.Run(() =>
+            {
                 GetListOfAppsAndUpdateListView();
             });
             commonProgress.Close();
@@ -84,7 +91,8 @@ namespace Appium_Wizard
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Launch App", "Please wait while launching app : " + selectedPackageName);
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (os.Equals("Android"))
                 {
                     string activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
@@ -111,9 +119,10 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
                         AndroidMethods.GetInstance().UnInstallApp(udid, selectedPackageName);
-                    });                    
+                    });
                     GoogleAnalytics.SendEvent("Android_App_Uninstalled");
                 }
             }
@@ -124,7 +133,8 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Uninstall App", "Please wait while uninstalling app : " + selectedPackageName);
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
                         iOSMethods.GetInstance().UninstallApp(udid, selectedPackageName);
                     });
                     GoogleAnalytics.SendEvent("iOS_App_Uninstalled");
@@ -149,7 +159,8 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
                         AndroidMethods.GetInstance().KillApp(udid, selectedPackageName);
                     });
                     GoogleAnalytics.SendEvent("Android_App_Killed");
@@ -162,7 +173,8 @@ namespace Appium_Wizard
                 {
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Kill App", "Please wait while killing app : " + selectedPackageName);
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
                         iOSMethods.GetInstance().KillApp(udid, selectedPackageName);
                     });
                     GoogleAnalytics.SendEvent("iOS_App_Killed");
@@ -174,6 +186,11 @@ namespace Appium_Wizard
         private void InstalledAppsList_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("InstalledAppsList_Shown");
+        }
+
+        private void InstalledAppsList_Load(object sender, EventArgs e)
+        {
+            this.Owner = ownerForm;
         }
     }
 }

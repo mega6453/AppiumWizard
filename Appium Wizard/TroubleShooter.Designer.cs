@@ -54,9 +54,9 @@
             FixNodeJSButton.Anchor = AnchorStyles.None;
             FixNodeJSButton.AutoSize = true;
             FixNodeJSButton.Enabled = false;
-            FixNodeJSButton.Location = new Point(559, 52);
+            FixNodeJSButton.Location = new Point(559, 58);
             FixNodeJSButton.Name = "FixNodeJSButton";
-            FixNodeJSButton.Size = new Size(154, 57);
+            FixNodeJSButton.Size = new Size(154, 45);
             FixNodeJSButton.TabIndex = 0;
             FixNodeJSButton.Text = "Fix NodeJS";
             FixNodeJSButton.UseVisualStyleBackColor = true;
@@ -67,9 +67,9 @@
             FixAppiumButton.Anchor = AnchorStyles.None;
             FixAppiumButton.AutoSize = true;
             FixAppiumButton.Enabled = false;
-            FixAppiumButton.Location = new Point(556, 118);
+            FixAppiumButton.Location = new Point(556, 126);
             FixAppiumButton.Name = "FixAppiumButton";
-            FixAppiumButton.Size = new Size(160, 58);
+            FixAppiumButton.Size = new Size(160, 42);
             FixAppiumButton.TabIndex = 2;
             FixAppiumButton.Text = "Fix Appium";
             FixAppiumButton.UseVisualStyleBackColor = true;
@@ -80,9 +80,9 @@
             FixXCUITestButton.Anchor = AnchorStyles.None;
             FixXCUITestButton.AutoSize = true;
             FixXCUITestButton.Enabled = false;
-            FixXCUITestButton.Location = new Point(553, 187);
+            FixXCUITestButton.Location = new Point(553, 195);
             FixXCUITestButton.Name = "FixXCUITestButton";
-            FixXCUITestButton.Size = new Size(167, 58);
+            FixXCUITestButton.Size = new Size(167, 41);
             FixXCUITestButton.TabIndex = 3;
             FixXCUITestButton.Text = "Fix XCUITest";
             FixXCUITestButton.UseVisualStyleBackColor = true;
@@ -93,9 +93,9 @@
             FixUIAutomatorButton.Anchor = AnchorStyles.None;
             FixUIAutomatorButton.AutoSize = true;
             FixUIAutomatorButton.Enabled = false;
-            FixUIAutomatorButton.Location = new Point(528, 260);
+            FixUIAutomatorButton.Location = new Point(551, 266);
             FixUIAutomatorButton.Name = "FixUIAutomatorButton";
-            FixUIAutomatorButton.Size = new Size(217, 58);
+            FixUIAutomatorButton.Size = new Size(171, 46);
             FixUIAutomatorButton.TabIndex = 4;
             FixUIAutomatorButton.Text = "Fix UIAutomator";
             FixUIAutomatorButton.UseVisualStyleBackColor = true;

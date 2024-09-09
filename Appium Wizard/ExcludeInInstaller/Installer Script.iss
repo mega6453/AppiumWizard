@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Appium Wizard"
-#define MyAppVersion "3.2.0"
+#define MyAppVersion "4.0.0"
 #define MyAppPublisher "Meganathan C"
 #define MyAppExeName "Appium Wizard.exe"
 
@@ -54,7 +54,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 ;Filename: {app}\Resources\Server\Backup\7za.exe; Parameters: "x ""{app}\Resources\Executables\iOSServerPy.zip"" -o""{app}\Resources\Executables"" * -r -aoa"; Flags: runhidden runascurrentuser; StatusMsg: "Extracting iOS Server... This may take sometime, Please wait..."
 Filename: {app}\Resources\Server\Backup\7za.exe; Parameters: "x ""{app}\Resources\Server\Backup\node.zip"" -o""{app}\Resources\Server"" * -r -aoa"; Flags: runhidden runascurrentuser; StatusMsg: "Extracting NodeJS... This may take sometime, Please wait..."
-Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && cd {app}\Resources\Server && npm i -g appium"; Flags: runhidden runascurrentuser; StatusMsg: "Installing appium server... This may take sometime, Please wait..."
+Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && cd {app}\Resources\Server && npm list -g appium || npm install -g appium"; Flags: runhidden runascurrentuser; StatusMsg: "Installing appium server... This may take sometime, Please wait..."
 Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && appium driver install xcuitest"; Flags: runhidden runascurrentuser;  StatusMsg: "Installing XCUITest driver... This may take sometime, Please wait..."
 Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && appium driver install uiautomator2"; Flags: runhidden runascurrentuser; StatusMsg: "Installing UIAutomator2 driver... This may take sometime, Please wait..."
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

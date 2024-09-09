@@ -26,6 +26,33 @@ namespace Appium_Wizard
             PortTextBox3.Text = port3 == 0 ? string.Empty : port3.ToString();
             PortTextBox4.Text = port4 == 0 ? string.Empty : port4.ToString();
             PortTextBox5.Text = port5 == 0 ? string.Empty : port5.ToString();
+            PortTextBox1_TextChanged(this, EventArgs.Empty);
+            PortTextBox2_TextChanged(this, EventArgs.Empty);
+            PortTextBox3_TextChanged(this, EventArgs.Empty);
+            PortTextBox4_TextChanged(this, EventArgs.Empty);
+            PortTextBox5_TextChanged(this, EventArgs.Empty);
+
+            if (StatusLabel1.Text.Equals("Running"))
+            {
+                StartButton1.Enabled = false;
+            }
+            if (StatusLabel2.Text.Equals("Running"))
+            {
+                StartButton2.Enabled = false;
+            }
+            if (StatusLabel3.Text.Equals("Running"))
+            {
+                StartButton3.Enabled = false;
+            }
+            if (StatusLabel4.Text.Equals("Running"))
+            {
+                StartButton4.Enabled = false;
+            }
+            if (StatusLabel5.Text.Equals("Running"))
+            {
+                StartButton5.Enabled = false;
+            }
+
 
             Task.Run(() =>
             {
@@ -146,7 +173,7 @@ namespace Appium_Wizard
             int portNumber = int.Parse(portTextbox.Text);
             if (!isValidPortNumber(portNumber))
             {
-                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1024 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             serverSetup = new AppiumServerSetup();
@@ -171,7 +198,8 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
                 await Task.Run(() =>
                 {
-                    serverSetup.StartAppiumServer(portNumber, serverNumber);
+                    string command = Database.QueryDataFromServerFinalCommandTable()["Server" + serverNumber];
+                    serverSetup.StartAppiumServer(portNumber, serverNumber, command);
                 });
                 int count = 1;
 
@@ -187,7 +215,7 @@ namespace Appium_Wizard
                         }
                         else if (count == 15)
                         {
-                            MessageBox.Show("Timed out after 45 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Timed out after 45 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                             break;
                         }
@@ -199,7 +227,7 @@ namespace Appium_Wizard
                     count++;
                     if (count == 15)
                     {
-                        MessageBox.Show("Timed out after 45 seconds", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Timed out after 45 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                         break;
                     }
@@ -225,7 +253,6 @@ namespace Appium_Wizard
             await Task.Run(() =>
             {
                 serverSetup.StopAppiumServer(portNumber);
-                isRunning = serverSetup.IsAppiumServerRunning(portNumber);
             });
             if (isRunning)
             {
@@ -393,7 +420,7 @@ namespace Appium_Wizard
 
         private bool isValidPortNumber(int port)
         {
-            if (port < 1024 | port > 65535)
+            if (port < 1 | port > 65535)
             {
                 return false;
             }
@@ -401,6 +428,96 @@ namespace Appium_Wizard
             {
                 return true;
             }
+        }
+
+        private void ConfigButton1_Click(object sender, EventArgs e)
+        {
+            int portNumber = int.Parse(PortTextBox1.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Server_Settings server_Settings = new Server_Settings("Server1", portNumber);
+            server_Settings.ShowDialog();
+        }
+
+        private void ConfigButton2_Click(object sender, EventArgs e)
+        {
+            int portNumber = int.Parse(PortTextBox2.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Server_Settings server_Settings = new Server_Settings("Server2", portNumber);
+            server_Settings.ShowDialog();
+        }
+
+        private void ConfigButton3_Click(object sender, EventArgs e)
+        {
+            int portNumber = int.Parse(PortTextBox3.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Server_Settings server_Settings = new Server_Settings("Server3", portNumber);
+            server_Settings.ShowDialog();
+        }
+
+        private void ConfigButton4_Click(object sender, EventArgs e)
+        {
+            int portNumber = int.Parse(PortTextBox4.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Server_Settings server_Settings = new Server_Settings("Server4", portNumber);
+            server_Settings.ShowDialog();
+        }
+
+        private void ConfigButton5_Click(object sender, EventArgs e)
+        {
+            int portNumber = int.Parse(PortTextBox5.Text);
+            if (!isValidPortNumber(portNumber))
+            {
+                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Server_Settings server_Settings = new Server_Settings("Server5", portNumber);
+            server_Settings.ShowDialog();
+        }
+
+        private void PortTextBox1_TextChanged(object sender, EventArgs e)
+        {
+            ConfigButton1.Enabled = !string.IsNullOrWhiteSpace(PortTextBox1.Text);
+            StartButton1.Enabled = !string.IsNullOrWhiteSpace(PortTextBox1.Text);
+        }
+
+        private void PortTextBox2_TextChanged(object sender, EventArgs e)
+        {
+            ConfigButton2.Enabled = !string.IsNullOrWhiteSpace(PortTextBox2.Text);
+            StartButton2.Enabled = !string.IsNullOrWhiteSpace(PortTextBox2.Text);
+        }
+
+        private void PortTextBox3_TextChanged(object sender, EventArgs e)
+        {
+            ConfigButton3.Enabled = !string.IsNullOrWhiteSpace(PortTextBox3.Text);
+            StartButton3.Enabled = !string.IsNullOrWhiteSpace(PortTextBox3.Text);
+        }
+
+        private void PortTextBox4_TextChanged(object sender, EventArgs e)
+        {
+            ConfigButton4.Enabled = !string.IsNullOrWhiteSpace(PortTextBox4.Text);
+            StartButton4.Enabled = !string.IsNullOrWhiteSpace(PortTextBox4.Text);
+        }
+
+        private void PortTextBox5_TextChanged(object sender, EventArgs e)
+        {
+            ConfigButton5.Enabled = !string.IsNullOrWhiteSpace(PortTextBox5.Text);
+            StartButton5.Enabled = !string.IsNullOrWhiteSpace(PortTextBox5.Text);
         }
     }
 }

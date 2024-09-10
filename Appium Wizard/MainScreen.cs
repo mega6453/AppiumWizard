@@ -850,10 +850,6 @@ namespace Appium_Wizard
                     childFormsToClose.Add(form);
                 }
             }
-            foreach (Form formToClose in childFormsToClose)
-            {
-                formToClose.Close();
-            }
             foreach (var item in ScreenControl.webview2)
             {
                 item.Value.Dispose();
@@ -873,6 +869,10 @@ namespace Appium_Wizard
             foreach (var item in udidScreenPort)
             {
                 Common.KillProcessByPortNumber(item.Value);
+            }
+            foreach (Form formToClose in childFormsToClose)
+            {
+                formToClose.Close();
             }
             GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
@@ -1071,24 +1071,6 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent("InspectorToolStripMenuItem_Click", exception.Message);
-            }
-        }
-
-        private void capabilitiesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo
-                {
-                    FileName = "https://appium.io/docs/en/latest/guides/caps/",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
-                GoogleAnalytics.SendEvent("CapabilitiesToolStripMenuItem_Click");
-            }
-            catch (Exception exception)
-            {
-                GoogleAnalytics.SendEvent("CapabilitiesToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -1693,6 +1675,114 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent("cLIArgumentsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void sessionCapsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/caps/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("sessionCapsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("sessionCapsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void xCUITestCapsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.github.io/appium-xcuitest-driver/latest/reference/capabilities/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("xCUITestCapsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("xCUITestCapsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void uIAutomator2CapsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/appium/appium-uiautomator2-driver?tab=readme-ov-file#capabilities",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("uIAutomator2CapsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("uIAutomator2CapsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void sessionSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/settings/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("sessionSettingsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("sessionSettingsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void xCUITestSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.github.io/appium-xcuitest-driver/latest/reference/settings/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("xCUITestSettingsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("xCUITestSettingsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void uIAutomator2SettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/appium/appium-uiautomator2-driver?tab=readme-ov-file#settings-api",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("uIAutomator2SettingsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("uIAutomator2SettingsToolStripMenuItem_Click", exception.Message);
             }
         }
     }

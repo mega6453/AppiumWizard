@@ -145,5 +145,65 @@ namespace Appium_Wizard
             DefaultCapabilitiesRichTextBox.Text = "";
             FinalCommandRichTextBox.Text = $@"appium --port {portNumber} {ServerArgsRichTextBox.Text}" + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
         }
+
+        private void sessionCapabilityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/guides/caps/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("sessionCapabilityToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("sessionCapabilityToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void xCUITestCapabilityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.github.io/appium-xcuitest-driver/latest/reference/capabilities/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("xCUITestCapabilityToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("xCUITestCapabilityToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void uIAutomator2CapabilityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/appium/appium-uiautomator2-driver?tab=readme-ov-file#capabilities",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("uIAutomator2CapabilityToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("uIAutomator2CapabilityToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void DefaultCapsLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Point screenPoint = DefaultCapsLinkLabel.PointToScreen(new Point(0, DefaultCapsLinkLabel.Height));
+            contextMenuStrip1.Show(screenPoint);
+        }
     }
 }

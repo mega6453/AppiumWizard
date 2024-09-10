@@ -28,22 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Server_Settings));
             ServerArgsRichTextBox = new RichTextBox();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
             DefaultCapabilitiesRichTextBox = new RichTextBox();
-            label5 = new Label();
             label6 = new Label();
             label7 = new Label();
             ServerArgsLink = new LinkLabel();
             FinalCommandRichTextBox = new RichTextBox();
             cancelButton = new Button();
             applyButton = new Button();
-            defaultCapLinkLabel = new LinkLabel();
             label8 = new Label();
             resetButton = new Button();
+            label5 = new Label();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            sessionCapabilityToolStripMenuItem = new ToolStripMenuItem();
+            xCUITestCapabilityToolStripMenuItem = new ToolStripMenuItem();
+            uIAutomator2CapabilityToolStripMenuItem = new ToolStripMenuItem();
+            DefaultCapsLinkLabel = new LinkLabel();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // ServerArgsRichTextBox
@@ -92,17 +98,6 @@
             DefaultCapabilitiesRichTextBox.TabIndex = 6;
             DefaultCapabilitiesRichTextBox.Text = "";
             DefaultCapabilitiesRichTextBox.TextChanged += DefaultCapabilities_TextChanged;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.ForeColor = Color.IndianRed;
-            label5.Location = new Point(12, 9);
-            label5.Name = "label5";
-            label5.Size = new Size(1026, 50);
-            label5.TabIndex = 7;
-            label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN COMMAND, SO MAKE SURE YOU ARE ENTERING VALID ARGS.\r\nWHILE STARTING THE SERVER, IF IT FAILS THEN FIX THE COMMAND.";
             // 
             // label6
             // 
@@ -166,18 +161,6 @@
             applyButton.UseVisualStyleBackColor = true;
             applyButton.Click += applyButton_Click;
             // 
-            // defaultCapLinkLabel
-            // 
-            defaultCapLinkLabel.AutoSize = true;
-            defaultCapLinkLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
-            defaultCapLinkLabel.Location = new Point(181, 180);
-            defaultCapLinkLabel.Name = "defaultCapLinkLabel";
-            defaultCapLinkLabel.Size = new Size(90, 25);
-            defaultCapLinkLabel.TabIndex = 14;
-            defaultCapLinkLabel.TabStop = true;
-            defaultCapLinkLabel.Text = "Refer here";
-            defaultCapLinkLabel.LinkClicked += defaultCapLinkLabel_LinkClicked;
-            // 
             // label8
             // 
             label8.AutoSize = true;
@@ -198,15 +181,69 @@
             resetButton.UseVisualStyleBackColor = true;
             resetButton.Click += resetButton_Click;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.ForeColor = Color.IndianRed;
+            label5.Location = new Point(12, 9);
+            label5.Name = "label5";
+            label5.Size = new Size(1026, 50);
+            label5.TabIndex = 7;
+            label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN COMMAND, SO MAKE SURE YOU ARE ENTERING VALID ARGS.\r\nWHILE STARTING THE SERVER, IF IT FAILS THEN FIX THE COMMAND.";
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.ImageScalingSize = new Size(24, 24);
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { sessionCapabilityToolStripMenuItem, xCUITestCapabilityToolStripMenuItem, uIAutomator2CapabilityToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(290, 100);
+            // 
+            // sessionCapabilityToolStripMenuItem
+            // 
+            sessionCapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            sessionCapabilityToolStripMenuItem.Name = "sessionCapabilityToolStripMenuItem";
+            sessionCapabilityToolStripMenuItem.Size = new Size(289, 32);
+            sessionCapabilityToolStripMenuItem.Text = "Session Capability";
+            sessionCapabilityToolStripMenuItem.Click += sessionCapabilityToolStripMenuItem_Click;
+            // 
+            // xCUITestCapabilityToolStripMenuItem
+            // 
+            xCUITestCapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestCapabilityToolStripMenuItem.Name = "xCUITestCapabilityToolStripMenuItem";
+            xCUITestCapabilityToolStripMenuItem.Size = new Size(289, 32);
+            xCUITestCapabilityToolStripMenuItem.Text = "XCUITest Capability";
+            xCUITestCapabilityToolStripMenuItem.Click += xCUITestCapabilityToolStripMenuItem_Click;
+            // 
+            // uIAutomator2CapabilityToolStripMenuItem
+            // 
+            uIAutomator2CapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2CapabilityToolStripMenuItem.Name = "uIAutomator2CapabilityToolStripMenuItem";
+            uIAutomator2CapabilityToolStripMenuItem.Size = new Size(289, 32);
+            uIAutomator2CapabilityToolStripMenuItem.Text = "UIAutomator2 Capability";
+            uIAutomator2CapabilityToolStripMenuItem.Click += uIAutomator2CapabilityToolStripMenuItem_Click;
+            // 
+            // DefaultCapsLinkLabel
+            // 
+            DefaultCapsLinkLabel.AutoSize = true;
+            DefaultCapsLinkLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            DefaultCapsLinkLabel.Location = new Point(181, 180);
+            DefaultCapsLinkLabel.Name = "DefaultCapsLinkLabel";
+            DefaultCapsLinkLabel.Size = new Size(90, 25);
+            DefaultCapsLinkLabel.TabIndex = 18;
+            DefaultCapsLinkLabel.TabStop = true;
+            DefaultCapsLinkLabel.Text = "Refer here";
+            DefaultCapsLinkLabel.LinkClicked += DefaultCapsLinkLabel_LinkClicked;
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1048, 656);
+            Controls.Add(DefaultCapsLinkLabel);
             Controls.Add(resetButton);
             Controls.Add(label8);
-            Controls.Add(defaultCapLinkLabel);
             Controls.Add(applyButton);
             Controls.Add(cancelButton);
             Controls.Add(FinalCommandRichTextBox);
@@ -228,6 +265,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Server Settings";
             Load += Server_Settings_Load;
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -238,15 +276,19 @@
         private Label label3;
         private Label label4;
         private RichTextBox DefaultCapabilitiesRichTextBox;
-        private Label label5;
         private Label label6;
         private Label label7;
         private LinkLabel ServerArgsLink;
         private RichTextBox FinalCommandRichTextBox;
         private Button cancelButton;
         private Button applyButton;
-        private LinkLabel defaultCapLinkLabel;
         private Label label8;
         private Button resetButton;
+        private Label label5;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem sessionCapabilityToolStripMenuItem;
+        private ToolStripMenuItem xCUITestCapabilityToolStripMenuItem;
+        private ToolStripMenuItem uIAutomator2CapabilityToolStripMenuItem;
+        private LinkLabel DefaultCapsLinkLabel;
     }
 }

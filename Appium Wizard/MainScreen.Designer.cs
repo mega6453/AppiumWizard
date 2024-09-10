@@ -65,14 +65,14 @@ namespace Appium_Wizard
             sessionCapsToolStripMenuItem = new ToolStripMenuItem();
             xCUITestCapsToolStripMenuItem = new ToolStripMenuItem();
             uIAutomator2CapsToolStripMenuItem = new ToolStripMenuItem();
-            xCUITestToolStripMenuItem = new ToolStripMenuItem();
-            uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
-            serverSecurityToolStripMenuItem = new ToolStripMenuItem();
-            cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
             settingsAPIToolStripMenuItem = new ToolStripMenuItem();
             sessionSettingsToolStripMenuItem = new ToolStripMenuItem();
             xCUITestSettingsToolStripMenuItem = new ToolStripMenuItem();
             uIAutomator2SettingsToolStripMenuItem = new ToolStripMenuItem();
+            xCUITestToolStripMenuItem = new ToolStripMenuItem();
+            uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
+            serverSecurityToolStripMenuItem = new ToolStripMenuItem();
+            cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
             reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
             startADiscussionToolStripMenuItem = new ToolStripMenuItem();
@@ -392,38 +392,6 @@ namespace Appium_Wizard
             uIAutomator2CapsToolStripMenuItem.Text = "UIAutomator2 Caps";
             uIAutomator2CapsToolStripMenuItem.Click += uIAutomator2CapsToolStripMenuItem_Click;
             // 
-            // xCUITestToolStripMenuItem
-            // 
-            xCUITestToolStripMenuItem.Image = Properties.Resources.link;
-            xCUITestToolStripMenuItem.Name = "xCUITestToolStripMenuItem";
-            xCUITestToolStripMenuItem.Size = new Size(285, 34);
-            xCUITestToolStripMenuItem.Text = "XCUITest";
-            xCUITestToolStripMenuItem.Click += xCUITestToolStripMenuItem_Click;
-            // 
-            // uIAutomatorToolStripMenuItem
-            // 
-            uIAutomatorToolStripMenuItem.Image = Properties.Resources.link;
-            uIAutomatorToolStripMenuItem.Name = "uIAutomatorToolStripMenuItem";
-            uIAutomatorToolStripMenuItem.Size = new Size(285, 34);
-            uIAutomatorToolStripMenuItem.Text = "UIAutomator";
-            uIAutomatorToolStripMenuItem.Click += uIAutomatorToolStripMenuItem_Click;
-            // 
-            // serverSecurityToolStripMenuItem
-            // 
-            serverSecurityToolStripMenuItem.Image = Properties.Resources.link;
-            serverSecurityToolStripMenuItem.Name = "serverSecurityToolStripMenuItem";
-            serverSecurityToolStripMenuItem.Size = new Size(285, 34);
-            serverSecurityToolStripMenuItem.Text = "Server Security";
-            serverSecurityToolStripMenuItem.Click += serverSecurityToolStripMenuItem_Click;
-            // 
-            // cLIArgumentsToolStripMenuItem
-            // 
-            cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
-            cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
-            cLIArgumentsToolStripMenuItem.Size = new Size(285, 34);
-            cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
-            cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
-            // 
             // settingsAPIToolStripMenuItem
             // 
             settingsAPIToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionSettingsToolStripMenuItem, xCUITestSettingsToolStripMenuItem, uIAutomator2SettingsToolStripMenuItem });
@@ -455,6 +423,38 @@ namespace Appium_Wizard
             uIAutomator2SettingsToolStripMenuItem.Size = new Size(297, 34);
             uIAutomator2SettingsToolStripMenuItem.Text = "UIAutomator2 Settings";
             uIAutomator2SettingsToolStripMenuItem.Click += uIAutomator2SettingsToolStripMenuItem_Click;
+            // 
+            // xCUITestToolStripMenuItem
+            // 
+            xCUITestToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestToolStripMenuItem.Name = "xCUITestToolStripMenuItem";
+            xCUITestToolStripMenuItem.Size = new Size(285, 34);
+            xCUITestToolStripMenuItem.Text = "XCUITest";
+            xCUITestToolStripMenuItem.Click += xCUITestToolStripMenuItem_Click;
+            // 
+            // uIAutomatorToolStripMenuItem
+            // 
+            uIAutomatorToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomatorToolStripMenuItem.Name = "uIAutomatorToolStripMenuItem";
+            uIAutomatorToolStripMenuItem.Size = new Size(285, 34);
+            uIAutomatorToolStripMenuItem.Text = "UIAutomator";
+            uIAutomatorToolStripMenuItem.Click += uIAutomatorToolStripMenuItem_Click;
+            // 
+            // serverSecurityToolStripMenuItem
+            // 
+            serverSecurityToolStripMenuItem.Image = Properties.Resources.link;
+            serverSecurityToolStripMenuItem.Name = "serverSecurityToolStripMenuItem";
+            serverSecurityToolStripMenuItem.Size = new Size(285, 34);
+            serverSecurityToolStripMenuItem.Text = "Server Security";
+            serverSecurityToolStripMenuItem.Click += serverSecurityToolStripMenuItem_Click;
+            // 
+            // cLIArgumentsToolStripMenuItem
+            // 
+            cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
+            cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
+            cLIArgumentsToolStripMenuItem.Size = new Size(285, 34);
+            cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
+            cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
             // 
             // troubleshootToolStripMenuItem
             // 

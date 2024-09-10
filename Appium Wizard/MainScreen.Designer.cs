@@ -62,9 +62,17 @@ namespace Appium_Wizard
             helpToolStripMenuItem = new ToolStripMenuItem();
             appiumDocsToolStripMenuItem = new ToolStripMenuItem();
             capabilitiesToolStripMenuItem = new ToolStripMenuItem();
+            sessionCapsToolStripMenuItem = new ToolStripMenuItem();
+            xCUITestCapsToolStripMenuItem = new ToolStripMenuItem();
+            uIAutomator2CapsToolStripMenuItem = new ToolStripMenuItem();
             xCUITestToolStripMenuItem = new ToolStripMenuItem();
             uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
             serverSecurityToolStripMenuItem = new ToolStripMenuItem();
+            cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
+            settingsAPIToolStripMenuItem = new ToolStripMenuItem();
+            sessionSettingsToolStripMenuItem = new ToolStripMenuItem();
+            xCUITestSettingsToolStripMenuItem = new ToolStripMenuItem();
+            uIAutomator2SettingsToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
             reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
             startADiscussionToolStripMenuItem = new ToolStripMenuItem();
@@ -98,7 +106,6 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             label4 = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
-            cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -347,7 +354,7 @@ namespace Appium_Wizard
             // 
             // appiumDocsToolStripMenuItem
             // 
-            appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
+            appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
             appiumDocsToolStripMenuItem.Size = new Size(376, 34);
@@ -355,11 +362,35 @@ namespace Appium_Wizard
             // 
             // capabilitiesToolStripMenuItem
             // 
+            capabilitiesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionCapsToolStripMenuItem, xCUITestCapsToolStripMenuItem, uIAutomator2CapsToolStripMenuItem });
             capabilitiesToolStripMenuItem.Image = Properties.Resources.link;
             capabilitiesToolStripMenuItem.Name = "capabilitiesToolStripMenuItem";
             capabilitiesToolStripMenuItem.Size = new Size(285, 34);
             capabilitiesToolStripMenuItem.Text = "Capabilities";
-            capabilitiesToolStripMenuItem.Click += capabilitiesToolStripMenuItem_Click;
+            // 
+            // sessionCapsToolStripMenuItem
+            // 
+            sessionCapsToolStripMenuItem.Image = Properties.Resources.link;
+            sessionCapsToolStripMenuItem.Name = "sessionCapsToolStripMenuItem";
+            sessionCapsToolStripMenuItem.Size = new Size(272, 34);
+            sessionCapsToolStripMenuItem.Text = "Session Caps";
+            sessionCapsToolStripMenuItem.Click += sessionCapsToolStripMenuItem_Click;
+            // 
+            // xCUITestCapsToolStripMenuItem
+            // 
+            xCUITestCapsToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestCapsToolStripMenuItem.Name = "xCUITestCapsToolStripMenuItem";
+            xCUITestCapsToolStripMenuItem.Size = new Size(272, 34);
+            xCUITestCapsToolStripMenuItem.Text = "XCUITest Caps";
+            xCUITestCapsToolStripMenuItem.Click += xCUITestCapsToolStripMenuItem_Click;
+            // 
+            // uIAutomator2CapsToolStripMenuItem
+            // 
+            uIAutomator2CapsToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2CapsToolStripMenuItem.Name = "uIAutomator2CapsToolStripMenuItem";
+            uIAutomator2CapsToolStripMenuItem.Size = new Size(272, 34);
+            uIAutomator2CapsToolStripMenuItem.Text = "UIAutomator2 Caps";
+            uIAutomator2CapsToolStripMenuItem.Click += uIAutomator2CapsToolStripMenuItem_Click;
             // 
             // xCUITestToolStripMenuItem
             // 
@@ -384,6 +415,46 @@ namespace Appium_Wizard
             serverSecurityToolStripMenuItem.Size = new Size(285, 34);
             serverSecurityToolStripMenuItem.Text = "Server Security";
             serverSecurityToolStripMenuItem.Click += serverSecurityToolStripMenuItem_Click;
+            // 
+            // cLIArgumentsToolStripMenuItem
+            // 
+            cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
+            cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
+            cLIArgumentsToolStripMenuItem.Size = new Size(285, 34);
+            cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
+            cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
+            // 
+            // settingsAPIToolStripMenuItem
+            // 
+            settingsAPIToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionSettingsToolStripMenuItem, xCUITestSettingsToolStripMenuItem, uIAutomator2SettingsToolStripMenuItem });
+            settingsAPIToolStripMenuItem.Image = Properties.Resources.link;
+            settingsAPIToolStripMenuItem.Name = "settingsAPIToolStripMenuItem";
+            settingsAPIToolStripMenuItem.Size = new Size(285, 34);
+            settingsAPIToolStripMenuItem.Text = "Settings API";
+            // 
+            // sessionSettingsToolStripMenuItem
+            // 
+            sessionSettingsToolStripMenuItem.Image = Properties.Resources.link;
+            sessionSettingsToolStripMenuItem.Name = "sessionSettingsToolStripMenuItem";
+            sessionSettingsToolStripMenuItem.Size = new Size(297, 34);
+            sessionSettingsToolStripMenuItem.Text = "Session Settings";
+            sessionSettingsToolStripMenuItem.Click += sessionSettingsToolStripMenuItem_Click;
+            // 
+            // xCUITestSettingsToolStripMenuItem
+            // 
+            xCUITestSettingsToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestSettingsToolStripMenuItem.Name = "xCUITestSettingsToolStripMenuItem";
+            xCUITestSettingsToolStripMenuItem.Size = new Size(297, 34);
+            xCUITestSettingsToolStripMenuItem.Text = "XCUITest Settings";
+            xCUITestSettingsToolStripMenuItem.Click += xCUITestSettingsToolStripMenuItem_Click;
+            // 
+            // uIAutomator2SettingsToolStripMenuItem
+            // 
+            uIAutomator2SettingsToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2SettingsToolStripMenuItem.Name = "uIAutomator2SettingsToolStripMenuItem";
+            uIAutomator2SettingsToolStripMenuItem.Size = new Size(297, 34);
+            uIAutomator2SettingsToolStripMenuItem.Text = "UIAutomator2 Settings";
+            uIAutomator2SettingsToolStripMenuItem.Click += uIAutomator2SettingsToolStripMenuItem_Click;
             // 
             // troubleshootToolStripMenuItem
             // 
@@ -687,14 +758,6 @@ namespace Appium_Wizard
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
             // 
-            // cLIArgumentsToolStripMenuItem
-            // 
-            cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
-            cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
-            cLIArgumentsToolStripMenuItem.Size = new Size(285, 34);
-            cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
-            cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
-            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -809,5 +872,12 @@ namespace Appium_Wizard
         private RichTextBox richTextBox6;
         private ToolStripMenuItem serverSecurityToolStripMenuItem;
         private ToolStripMenuItem cLIArgumentsToolStripMenuItem;
+        private ToolStripMenuItem settingsAPIToolStripMenuItem;
+        private ToolStripMenuItem sessionCapsToolStripMenuItem;
+        private ToolStripMenuItem xCUITestCapsToolStripMenuItem;
+        private ToolStripMenuItem uIAutomator2CapsToolStripMenuItem;
+        private ToolStripMenuItem sessionSettingsToolStripMenuItem;
+        private ToolStripMenuItem xCUITestSettingsToolStripMenuItem;
+        private ToolStripMenuItem uIAutomator2SettingsToolStripMenuItem;
     }
 }

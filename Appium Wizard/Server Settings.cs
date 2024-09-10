@@ -146,12 +146,6 @@ namespace Appium_Wizard
             FinalCommandRichTextBox.Text = $@"appium --port {portNumber} {ServerArgsRichTextBox.Text}" + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
         }
 
-        private void CapabilityReferHereButton_Click(object sender, EventArgs e)
-        {
-            Point screenPoint = CapabilityReferHereButton.PointToScreen(new Point(0, CapabilityReferHereButton.Height));
-            contextMenuStrip1.Show(screenPoint);
-        }
-
         private void sessionCapabilityToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try

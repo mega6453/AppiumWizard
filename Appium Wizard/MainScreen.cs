@@ -850,10 +850,6 @@ namespace Appium_Wizard
                     childFormsToClose.Add(form);
                 }
             }
-            foreach (Form formToClose in childFormsToClose)
-            {
-                formToClose.Close();
-            }
             foreach (var item in ScreenControl.webview2)
             {
                 item.Value.Dispose();
@@ -873,6 +869,10 @@ namespace Appium_Wizard
             foreach (var item in udidScreenPort)
             {
                 Common.KillProcessByPortNumber(item.Value);
+            }
+            foreach (Form formToClose in childFormsToClose)
+            {
+                formToClose.Close();
             }
             GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }

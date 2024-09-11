@@ -838,43 +838,53 @@ namespace Appium_Wizard
 
         private void onFormClosing(object sender, FormClosingEventArgs e)
         {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = this;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-            List<Form> childFormsToClose = new List<Form>();
-            foreach (Form form in Application.OpenForms)
+            try
             {
-                if (form != this)
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
+
+                List<Form> childFormsToClose = new List<Form>();
+                foreach (Form form in Application.OpenForms)
                 {
-                    childFormsToClose.Add(form);
+                    if (form != this && form != commonProgress)
+                    {
+                        childFormsToClose.Add(form);
+                    }
                 }
+                foreach (Form formToClose in childFormsToClose)
+                {
+                    formToClose.Close();
+                }
+
+                foreach (var item in runningProcesses)
+                {
+                    Common.KillProcessById(item);
+                }
+                foreach (var item in runningProcessesPortNumbers)
+                {
+                    Common.KillProcessByPortNumber(item);
+                }
+                foreach (var item in udidProxyPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+                foreach (var item in udidScreenPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+                foreach (var item in ScreenControl.webview2)
+                {
+                    item.Value.Dispose();
+                }
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                commonProgress.Close();
             }
-            foreach (var item in ScreenControl.webview2)
+            catch (Exception ex)
             {
-                item.Value.Dispose();
+                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
             }
-            foreach (var item in runningProcesses)
-            {
-                Common.KillProcessById(item);
-            }
-            foreach (var item in runningProcessesPortNumbers)
-            {
-                Common.KillProcessByPortNumber(item);
-            }
-            foreach (var item in udidProxyPort)
-            {
-                Common.KillProcessByPortNumber(item.Value);
-            }
-            foreach (var item in udidScreenPort)
-            {
-                Common.KillProcessByPortNumber(item.Value);
-            }
-            foreach (Form formToClose in childFormsToClose)
-            {
-                formToClose.Close();
-            }
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         bool isMessageDisplayed = false;

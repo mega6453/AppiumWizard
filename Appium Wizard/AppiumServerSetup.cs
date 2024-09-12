@@ -436,7 +436,7 @@ namespace Appium_Wizard
                     {
                         JObject responseObj = JObject.Parse(response.Content);
                         string sessionId = responseObj["value"][0]["id"].ToString();
-                        string androidId = GetAndroidIdFromAppiumServer(4723, sessionId);
+                        string androidId = GetAndroidIdFromAppiumServer(port, sessionId);
                         if (androidId.Equals(data))
                         {
                             return true;
@@ -458,7 +458,7 @@ namespace Appium_Wizard
         }
         public static string GetAndroidId(int port, string sessionId)
         {
-            var options = new RestClientOptions("http://127.0.0.1:"+port)
+            var options = new RestClientOptions("http://127.0.0.1:" + port)
             {
                 MaxTimeout = -1,
             };
@@ -488,7 +488,7 @@ namespace Appium_Wizard
                 Console.WriteLine(response.Content);
                 JObject responseObj = JObject.Parse(response.Content);
                 string androidId = "noId";
-                if (responseObj.ContainsKey("androidId"))
+                if (responseObj["value"]?["androidId"] != null)
                 {
                     androidId = responseObj["value"]["androidId"].ToString();
                 }                
@@ -501,7 +501,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static Dictionary<string,int> ElementInfo(string url, string elementId)
+        public static Dictionary<string, int> ElementInfo(string url, string elementId)
         {
             try
             {
@@ -537,7 +537,7 @@ namespace Appium_Wizard
 
         public static bool isPortReachable(int port)
         {
-            var options = new RestClientOptions("http://localhost:"+port)
+            var options = new RestClientOptions("http://localhost:" + port)
             {
                 Timeout = TimeSpan.FromSeconds(3),
             };

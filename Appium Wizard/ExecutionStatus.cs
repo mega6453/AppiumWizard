@@ -188,6 +188,49 @@ namespace Appium_Wizard
                         screenControl.UpdateStatusLabel(screenControl, statusText);
                     }
 
+                    //Drag Gesture - Android
+                    else if (data.Contains(" POST /session/") && data.Contains("dragGesture"))
+                    {
+                        string jsonString = GetOnlyJson(data);
+                        var jsonDocument = JsonDocument.Parse(jsonString);
+                        var root = jsonDocument.RootElement;
+
+                        var argsElement = root.GetProperty("args")[0];
+                        var argsDictionary = new Dictionary<string, object>();
+
+                        foreach (var property in argsElement.EnumerateObject())
+                        {
+                            argsDictionary[property.Name] = property.Value.ToString();
+                        }
+                        int startX = (int)(Convert.ToInt32(argsDictionary["startX"]) / (screenDensity / 160f));
+                        int startY = (int)(Convert.ToInt32(argsDictionary["startY"]) / (screenDensity / 160f));
+                        int endX = (int)(Convert.ToInt32(argsDictionary["endX"]) / (screenDensity / 160f));
+                        int endY = (int)(Convert.ToInt32(argsDictionary["endY"]) / (screenDensity / 160f));
+                        screenControl.DrawArrow(screenControl,startX,startY,endX,endY);
+                    }
+
+                    //Drag Gesture - iOS
+                    else if (data.Contains(" POST /session/") && data.Contains("dragFromToForDuration"))
+                    {
+                        string jsonString = GetOnlyJson(data);
+                        var jsonDocument = JsonDocument.Parse(jsonString);
+                        var root = jsonDocument.RootElement;
+
+                        var argsElement = root.GetProperty("args")[0];
+                        var argsDictionary = new Dictionary<string, object>();
+
+                        foreach (var property in argsElement.EnumerateObject())
+                        {
+                            argsDictionary[property.Name] = property.Value.ToString();
+                        }
+                        int startX = Convert.ToInt32(argsDictionary["fromX"]);
+                        int startY = Convert.ToInt32(argsDictionary["fromY"]);
+                        int endX = Convert.ToInt32(argsDictionary["toX"]);
+                        int endY = Convert.ToInt32(argsDictionary["toY"]);
+                        screenControl.DrawArrow(screenControl, startX, startY, endX, endY);
+                    }
+
+
                     // Handling Responses
                     else if (data.Contains("Got response with status"))
                     {

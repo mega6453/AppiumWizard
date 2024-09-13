@@ -613,7 +613,8 @@ namespace Appium_Wizard
             Dictionary<string, object> deviceInfo = new Dictionary<string, object>();
             try
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
                 });
                
@@ -660,7 +661,8 @@ namespace Appium_Wizard
                             if (!isDeviceAlreadyAdded(deviceList[i]))
                             {
                                 DeviceInformation deviceInformation = new DeviceInformation(main);
-                                await Task.Run(() => {
+                                await Task.Run(() =>
+                                {
                                     deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
                                 });
                                 commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 70);
@@ -668,7 +670,8 @@ namespace Appium_Wizard
                                 {
                                     try
                                     {
-                                        await Task.Run(() => {
+                                        await Task.Run(() =>
+                                        {
                                         Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
                                         });
                                     }
@@ -749,7 +752,8 @@ namespace Appium_Wizard
             Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
             try
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     deviceList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
                 });
                 int count = deviceList.Count;
@@ -766,7 +770,8 @@ namespace Appium_Wizard
                         if (!isDeviceAlreadyAdded(deviceList[i]))
                         {
                             DeviceInformation deviceInformation = new DeviceInformation(main);
-                            await Task.Run(() => {
+                            await Task.Run(() =>
+                            {
                                 deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
                             });
                             if (deviceInfo.Count > 0)
@@ -1817,6 +1822,83 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendEvent("uIAutomator2SettingsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+
+        private void onFormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
+                List<Form> childFormsToClose = new List<Form>();
+                foreach (Form form in Application.OpenForms)
+                {
+                    if (form != this && form != commonProgress)
+                    {
+                        childFormsToClose.Add(form);
+                    }
+                }
+                foreach (Form formToClose in childFormsToClose)
+                {
+                    formToClose.Close();
+                }
+
+                //foreach (var item in runningProcesses)
+                //{
+                //    Common.KillProcessById(item);
+                //}
+                //foreach (var item in runningProcessesPortNumbers)
+                //{
+                //    Common.KillProcessByPortNumber(item);
+                //}
+                //foreach (var item in udidProxyPort)
+                //{
+                //    Common.KillProcessByPortNumber(item.Value);
+                //}
+                //foreach (var item in udidScreenPort)
+                //{
+                //    Common.KillProcessByPortNumber(item.Value);
+                //}
+                //foreach (var item in ScreenControl.webview2)
+                //{
+                //    item.Value.Dispose();
+                //}
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                commonProgress.Close();
+            }
+            catch (Exception ex)
+            {
+                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
+            }
+        }
+        private void MainScreen_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try
+            {
+                foreach (var item in runningProcesses)
+                {
+                    Common.KillProcessById(item);
+                }
+                foreach (var item in runningProcessesPortNumbers)
+                {
+                    Common.KillProcessByPortNumber(item);
+                }
+                foreach (var item in udidProxyPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+                foreach (var item in udidScreenPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
     }

@@ -691,6 +691,21 @@ namespace Appium_Wizard
             }
         }
 
+
+        public void DrawArrow(ScreenControl screenControl, int startX, int startY, int endX, int endY)
+        {
+            try
+            {
+                BeginInvoke(new Action(() =>
+                {
+                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawArrow({startX}, {startY}, {endX}, {endY}, 10, '{color}', true)");
+                }));
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public void DrawDot(ScreenControl screenControl, int x, int y)
         {
             try

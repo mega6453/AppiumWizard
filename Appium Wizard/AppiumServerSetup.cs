@@ -417,7 +417,10 @@ namespace Appium_Wizard
                 {
                     continue;
                 }
-
+                if (port == 0)
+                {
+                    continue;
+                }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
                     MaxTimeout = -1,

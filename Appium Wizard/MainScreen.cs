@@ -437,7 +437,14 @@ namespace Appium_Wizard
             if (DeviceName != null | DeviceName != string.Empty)
             {
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
-                listView1.Items.Add(new ListViewItem(item1));
+                if (listView1.InvokeRequired)
+                {
+                    listView1.Invoke(new Action(() => listView1.Items.Add(new ListViewItem(item1))));
+                }
+                else
+                {
+                    listView1.Items.Add(new ListViewItem(item1));
+                }
                 if (string.IsNullOrEmpty(IPAddress))
                 {
                     if (!DeviceInfo.ContainsKey(udid))
@@ -711,7 +718,6 @@ namespace Appium_Wizard
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
                                     commonProgress.Close();
                                     deviceInformation.ShowDialog();
-                                    deviceLookUp.Close();
                                     GoogleAnalytics.SendEvent("DeviceInformation_iOS");
                                     break;
                                 }
@@ -722,7 +728,6 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     MessageBox.Show("No New iOS Device available. Please check device connectivity.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    deviceLookUp.Close();
                                     GoogleAnalytics.SendEvent("No_iOS_Device_Available");
                                 }
                             }
@@ -862,57 +867,6 @@ namespace Appium_Wizard
                 commonProgress.Close();
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendExceptionEvent("AddDevice_Android_Clicked", ex.Message);
-            }
-        }
-
-        private void onFormClosing(object sender, FormClosingEventArgs e)
-        {
-            try
-            {
-                CommonProgress commonProgress = new CommonProgress();
-                commonProgress.Owner = this;
-                commonProgress.Show();
-                commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-
-                List<Form> childFormsToClose = new List<Form>();
-                foreach (Form form in Application.OpenForms)
-                {
-                    if (form != this && form != commonProgress)
-                    {
-                        childFormsToClose.Add(form);
-                    }
-                }
-                foreach (Form formToClose in childFormsToClose)
-                {
-                    formToClose.Close();
-                }
-
-                foreach (var item in runningProcesses)
-                {
-                    Common.KillProcessById(item);
-                }
-                foreach (var item in runningProcessesPortNumbers)
-                {
-                    Common.KillProcessByPortNumber(item);
-                }
-                foreach (var item in udidProxyPort)
-                {
-                    Common.KillProcessByPortNumber(item.Value);
-                }
-                foreach (var item in udidScreenPort)
-                {
-                    Common.KillProcessByPortNumber(item.Value);
-                }
-                foreach (var item in ScreenControl.webview2)
-                {
-                    item.Value.Dispose();
-                }
-                GoogleAnalytics.SendEvent("App_Closed", "Closed");
-                commonProgress.Close();
-            }
-            catch (Exception ex)
-            {
-                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
             }
         }
 
@@ -1835,50 +1789,6 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
                 List<Form> childFormsToClose = new List<Form>();
-                foreach (Form form in Application.OpenForms)
-                {
-                    if (form != this && form != commonProgress)
-                    {
-                        childFormsToClose.Add(form);
-                    }
-                }
-                foreach (Form formToClose in childFormsToClose)
-                {
-                    formToClose.Close();
-                }
-
-                //foreach (var item in runningProcesses)
-                //{
-                //    Common.KillProcessById(item);
-                //}
-                //foreach (var item in runningProcessesPortNumbers)
-                //{
-                //    Common.KillProcessByPortNumber(item);
-                //}
-                //foreach (var item in udidProxyPort)
-                //{
-                //    Common.KillProcessByPortNumber(item.Value);
-                //}
-                //foreach (var item in udidScreenPort)
-                //{
-                //    Common.KillProcessByPortNumber(item.Value);
-                //}
-                //foreach (var item in ScreenControl.webview2)
-                //{
-                //    item.Value.Dispose();
-                //}
-                GoogleAnalytics.SendEvent("App_Closed", "Closed");
-                commonProgress.Close();
-            }
-            catch (Exception ex)
-            {
-                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
-            }
-        }
-        private void MainScreen_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            try
-            {
                 foreach (var item in runningProcesses)
                 {
                     Common.KillProcessById(item);
@@ -1895,10 +1805,23 @@ namespace Appium_Wizard
                 {
                     Common.KillProcessByPortNumber(item.Value);
                 }
+                foreach (Form form in Application.OpenForms)
+                {
+                    if (form != this && form != commonProgress)
+                    {
+                        childFormsToClose.Add(form);
+                    }
+                }
+                foreach (Form formToClose in childFormsToClose)
+                {
+                    formToClose.Close();
+                }
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                commonProgress.Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
             }
         }
     }

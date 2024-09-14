@@ -19,9 +19,6 @@
     <Compile Update="DeviceInformation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="DeviceLookUp.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="ImportProfile.cs">
       <SubType>Form</SubType>
     </Compile>

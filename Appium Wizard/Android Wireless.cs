@@ -22,18 +22,25 @@
             FindDevices();
         }
 
-        private void FindDevices()
+        private async void FindDevices()
         {
             int retryCount = 0;
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for Android devices over Wi-Fi...");
-            deviceLookUp.Show();
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...",10);
             listOfDevices.Clear();
-            listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+            await Task.Run(() => {
+                listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+            });
+            commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...",30);
             while (listOfDevices.Count == 0 && retryCount <= 5)
             {
-                listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
-                Thread.Sleep(1000);
+                await Task.Run(() => {
+                    listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+                });
+                await Task.Delay(1000);                
                 retryCount++;
+                commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...", 30+(retryCount*10));
             }
             listView1.Items.Clear();
             foreach (var pair in listOfDevices)
@@ -54,7 +61,7 @@
                     listView1.Items.Add(item);
                 }
             }
-            deviceLookUp.Close();
+            commonProgress.Close();
             if (listOfDevices.Count == 0)
             {
                 var result = MessageBox.Show("No device found. Do you want to try adding the device manually?", "Add Android Device Over Wi-Fi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
@@ -66,21 +73,24 @@
             }
         }
 
-        private void PairButton_Click(object sender, EventArgs e)
+        private async void PairButton_Click(object sender, EventArgs e)
         {
             string pairingAddress = listOfDevices[selectedDevice].Item1;
             string connectAddress = listOfDevices[selectedDevice].Item2;
             if (string.IsNullOrEmpty(connectAddress))
             {
                 listOfDevices.Clear();
-                listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+                await Task.Run(() => {
+                    listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
+                });
                 connectAddress = listOfDevices[selectedDevice].Item2;
             }
             if (string.IsNullOrEmpty(pairingAddress) & !string.IsNullOrEmpty(connectAddress))
             {
-                DeviceLookUp deviceLookUp = new DeviceLookUp("Connecting to Android device over Wi-Fi...");
-                deviceLookUp.Show();
-                GetDeviceInformation(deviceLookUp, this, connectAddress);
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...");
+                await GetDeviceInformation(commonProgress, this, connectAddress);
             }
             if (!string.IsNullOrEmpty(pairingAddress) & !string.IsNullOrEmpty(connectAddress))
             {
@@ -92,8 +102,16 @@
 
         public void RemoveFromList()
         {
-            listView1.Items.Remove(selectedItem);
-            listView1.Refresh();
+            if (listView1.InvokeRequired)
+            {
+                listView1.Invoke(new Action(() => listView1.Items.Remove(selectedItem)));
+                listView1.Invoke(new Action(() => listView1.Refresh()));
+            }
+            else
+            {
+                listView1.Items.Remove(selectedItem);
+                listView1.Refresh();
+            }
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -111,17 +129,25 @@
             }
         }
 
-        public void GetDeviceInformation(DeviceLookUp deviceLookUp, AndroidWireless androidWireless, string connectIPAddress)
+        public async Task GetDeviceInformation(CommonProgress commonProgress, AndroidWireless androidWireless, string connectIPAddress)
         {
-            var output = AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPAddress);
-            if (output.Contains("failed to connect"))
+            string connectOutput = string.Empty;
+            await Task.Run(() => {
+                connectOutput = AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPAddress);
+            });
+            commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 50);
+            if (connectOutput.Contains("failed to connect"))
             {
-                deviceLookUp.Close();
+                commonProgress.Close();
                 MessageBox.Show("1.In the phone, Go to Developer options > Wireless debugging > Pair device with pairing code.\n2.Here, Click Find Devices again> Select the pairing IP > Pair.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
+                Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
+                await Task.Run(() => {
+                    deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
+                });
+                commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 75);
                 DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
                 if (deviceInfo.ContainsKey("ro.serialno"))
                 {
@@ -194,10 +220,9 @@
                             deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
                             deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
                             deviceInformation.infoListView.Items.Add(new ListViewItem(IPAddress));
-                            deviceLookUp.Hide();
+                            commonProgress.Close();
                             deviceInformation.ShowDialog();
                             GoogleAnalytics.SendEvent("DeviceInformation_Android_Wireless");
-                            deviceLookUp.Close();
                             if (MainScreen.isDeviceAlreadyAdded(udid))
                             {
                                 RemoveFromList();
@@ -211,13 +236,13 @@
                     }
                     else
                     {
-                        deviceLookUp.Close();
+                        commonProgress.Close();
                         MessageBox.Show(DeviceName.Replace("\n", "") + " already exist in the Devices list.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
                 {
-                    deviceLookUp.Close();
+                    commonProgress.Close();
                     MessageBox.Show("No Android Device available.\nPlease check if the device is on the same network as this PC.\nGo to Developer options > Wireless debugging > Pair device with pairing code > Find Devices again.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }

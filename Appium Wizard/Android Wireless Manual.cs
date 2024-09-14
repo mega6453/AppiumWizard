@@ -20,12 +20,16 @@
             Close();
         }
 
-        private void PairButton_Click(object sender, EventArgs e)
+        private async void PairButton_Click(object sender, EventArgs e)
         {
             string pairingIPPort = PairingIPTextBox.Text + ":" + PairPortNumberTextbox.Text;
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Pairing Android device over Wi-Fi...");
-            deviceLookUp.Show();
-            var pairOutput = AndroidMethods.GetInstance().PairAndroidWirelessly(pairingIPPort, PairingCodeTextbox.Text);
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Android Wireless device", "Pairing Android device over Wi-Fi...", 10);
+            string pairOutput = string.Empty;
+            await Task.Run(() => {
+                pairOutput = AndroidMethods.GetInstance().PairAndroidWirelessly(pairingIPPort, PairingCodeTextbox.Text);
+            });            
             if (pairOutput.Contains("Successfully paired"))
             {
                 //Disable Pair section
@@ -47,18 +51,19 @@
                 ConnectPortNumber.Enabled = true;
                 CancelButton2.Enabled = true;
                 ConnectButton.Enabled = true;
+                commonProgress.UpdateStepLabel("Android Wireless device", "Pairing Android device over Wi-Fi...", 90);
             }
             else if (pairOutput.Contains("Wrong password or connection was dropped"))
             {
-                deviceLookUp.Close();
+                commonProgress.Close();
                 MessageBox.Show("Wrong pairing code or connection was dropped.\n1.Please enter correct pairing code.\n2.Make sure device is connected to same network.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                deviceLookUp.Close();
+                commonProgress.Close();
                 MessageBox.Show("Unable to Pair the device. Please try the following steps:\n1.Restart Wireless debugging\n2.Restart Mobile Wi-Fi\n3.Restart device", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            deviceLookUp.Close();
+            commonProgress.Close();
         }
 
         private void CancelButton2_Click(object sender, EventArgs e)
@@ -66,23 +71,29 @@
             Close();
         }
 
-        private void ConnectButton_Click(object sender, EventArgs e)
+        private async void ConnectButton_Click(object sender, EventArgs e)
         {
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Connecting to Android device over Wi-Fi...");
-            deviceLookUp.Show();
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 10);
             string connectIPPort = ConnectIPTextBox.Text + ":" + ConnectPortNumber.Text;
-            var connectOutput = AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPPort);
+            string connectOutput = string.Empty;
+            await Task.Run(() => {
+                connectOutput = AndroidMethods.GetInstance().ConnectToAndroidWirelessly(connectIPPort);
+            });
             if (connectOutput.Contains("connected to"))
             {
-                androidWireless.GetDeviceInformation(deviceLookUp, androidWireless, connectIPPort);
+                commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 60);
+                await androidWireless.GetDeviceInformation(commonProgress, androidWireless, connectIPPort);
+                commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 90);
                 Close();
             }
             else
             {
-                deviceLookUp.Close();
+                commonProgress.Close();
                 MessageBox.Show("Please verify entered IP details and Make sure device is connected to same network.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            deviceLookUp.Close();
+            commonProgress.Close();
         }
 
         bool isValidPairingIP = false;

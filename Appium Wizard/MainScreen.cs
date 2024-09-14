@@ -437,7 +437,14 @@ namespace Appium_Wizard
             if (DeviceName != null | DeviceName != string.Empty)
             {
                 string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
-                listView1.Items.Add(new ListViewItem(item1));
+                if (listView1.InvokeRequired)
+                {
+                    listView1.Invoke(new Action(() => listView1.Items.Add(new ListViewItem(item1))));
+                }
+                else
+                {
+                    listView1.Items.Add(new ListViewItem(item1));
+                }
                 if (string.IsNullOrEmpty(IPAddress))
                 {
                     if (!DeviceInfo.ContainsKey(udid))
@@ -603,16 +610,24 @@ namespace Appium_Wizard
         }
 
 
-        private void iOSToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void iOSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for iOS device...");
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Detect iOS Device", "Looking for iOS device......", 10);
+            List<string> deviceList = new List<string>();
+            Dictionary<string, object> deviceInfo = new Dictionary<string, object>();
             try
             {
-                deviceLookUp.Show();
-                List<string> deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                await Task.Run(() =>
+                {
+                    deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                });
+               
                 if (deviceList.Contains("ITunes not installed"))
                 {
-                    deviceLookUp.Close();
+                    commonProgress.Close();
                     var result = MessageBox.Show("Apple Mobile Device Service required for iOS automation. Please Install ITunes and try again.\n\nDo you want to download now?", "Add iOS Device", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                     GoogleAnalytics.SendEvent("iTunes_Not_Installed_Error");
                     if (result == DialogResult.Yes)
@@ -642,27 +657,36 @@ namespace Appium_Wizard
                     int count = deviceList.Count;
                     if (count == 0)
                     {
-                        deviceLookUp.Hide();
+                        commonProgress.Close();
                         MessageBox.Show("No iOS Device available. Please check device connectivity.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
+                        commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 50);
                         for (int i = 0; i < count; i++)
                         {
                             if (!isDeviceAlreadyAdded(deviceList[i]))
                             {
                                 DeviceInformation deviceInformation = new DeviceInformation(main);
-                                Dictionary<string, object> deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
+                                await Task.Run(() =>
+                                {
+                                    deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
+                                });
+                                commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 70);
                                 if (deviceInfo.Count > 0)
                                 {
                                     try
                                     {
+                                        await Task.Run(() =>
+                                        {
                                         Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
+                                        });
                                     }
                                     catch (Exception)
                                     {
                                         Model = deviceInfo["ProductType"]?.ToString() ?? "";
                                     }
+                                    commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 90);
                                     DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™", "'") ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
@@ -692,9 +716,8 @@ namespace Appium_Wizard
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(UniqueDeviceID));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
-                                    deviceLookUp.Hide();
+                                    commonProgress.Close();
                                     deviceInformation.ShowDialog();
-                                    deviceLookUp.Close();
                                     GoogleAnalytics.SendEvent("DeviceInformation_iOS");
                                     break;
                                 }
@@ -703,9 +726,8 @@ namespace Appium_Wizard
                             {
                                 if (i == count - 1)
                                 {
-                                    deviceLookUp.Hide();
+                                    commonProgress.Close();
                                     MessageBox.Show("No New iOS Device available. Please check device connectivity.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    deviceLookUp.Close();
                                     GoogleAnalytics.SendEvent("No_iOS_Device_Available");
                                 }
                             }
@@ -717,7 +739,7 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                deviceLookUp.Hide();
+                commonProgress.Close();
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendExceptionEvent("AddDevice_iOS_Clicked", ex.Message);
             }
@@ -725,29 +747,41 @@ namespace Appium_Wizard
 
 
 
-        private void androidToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void androidToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DeviceLookUp deviceLookUp = new DeviceLookUp("Looking for Android device...");
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Detect Android Device", "Looking for Android device......", 10);
+            List<string> deviceList = new List<string>();
+            Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
             try
             {
-                deviceLookUp.Show();
-                List<string> deviceList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
+                await Task.Run(() =>
+                {
+                    deviceList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
+                });
                 int count = deviceList.Count;
                 if (count == 0)
                 {
-                    deviceLookUp.Hide();
+                    commonProgress.Close();
                     MessageBox.Show("No Android Device available. Please check device connectivity.\nMake sure USB debugging option enabled in your phone's Developer options.", "Add Android Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
+                    commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information......", 50);
                     for (int i = 0; i < count; i++)
                     {
                         if (!isDeviceAlreadyAdded(deviceList[i]))
                         {
                             DeviceInformation deviceInformation = new DeviceInformation(main);
-                            Dictionary<string, string> deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
+                            await Task.Run(() =>
+                            {
+                                deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
+                            });
                             if (deviceInfo.Count > 0)
                             {
+                                commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information......", 75);
                                 udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
                                 OSType = "Android";
                                 screenWidth = deviceInfo["Width"];
@@ -808,7 +842,7 @@ namespace Appium_Wizard
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenWidth));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(ScreenHeight));
                                 deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
-                                deviceLookUp.Hide();
+                                commonProgress.Close();
                                 deviceInformation.ShowDialog();
                                 GoogleAnalytics.SendEvent("DeviceInformation_Android");
                                 break;
@@ -818,7 +852,7 @@ namespace Appium_Wizard
                         {
                             if (i == count - 1)
                             {
-                                deviceLookUp.Hide();
+                                commonProgress.Close();
                                 MessageBox.Show("No New Android Device available. Please check device connectivity.", "Add Android Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 GoogleAnalytics.SendEvent("No_Android_Device_Available");
                             }
@@ -830,51 +864,10 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                deviceLookUp.Hide();
+                commonProgress.Close();
                 MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendExceptionEvent("AddDevice_Android_Clicked", ex.Message);
             }
-        }
-
-        private void onFormClosing(object sender, FormClosingEventArgs e)
-        {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = this;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
-            List<Form> childFormsToClose = new List<Form>();
-            foreach (Form form in Application.OpenForms)
-            {
-                if (form != this)
-                {
-                    childFormsToClose.Add(form);
-                }
-            }
-            foreach (var item in ScreenControl.webview2)
-            {
-                item.Value.Dispose();
-            }
-            foreach (var item in runningProcesses)
-            {
-                Common.KillProcessById(item);
-            }
-            foreach (var item in runningProcessesPortNumbers)
-            {
-                Common.KillProcessByPortNumber(item);
-            }
-            foreach (var item in udidProxyPort)
-            {
-                Common.KillProcessByPortNumber(item.Value);
-            }
-            foreach (var item in udidScreenPort)
-            {
-                Common.KillProcessByPortNumber(item.Value);
-            }
-            foreach (Form formToClose in childFormsToClose)
-            {
-                formToClose.Close();
-            }
-            GoogleAnalytics.SendEvent("App_Closed", "Closed");
         }
 
         bool isMessageDisplayed = false;
@@ -1783,6 +1776,52 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendEvent("uIAutomator2SettingsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+
+        private void onFormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
+                List<Form> childFormsToClose = new List<Form>();
+                foreach (var item in runningProcesses)
+                {
+                    Common.KillProcessById(item);
+                }
+                foreach (var item in runningProcessesPortNumbers)
+                {
+                    Common.KillProcessByPortNumber(item);
+                }
+                foreach (var item in udidProxyPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+                foreach (var item in udidScreenPort)
+                {
+                    Common.KillProcessByPortNumber(item.Value);
+                }
+                foreach (Form form in Application.OpenForms)
+                {
+                    if (form != this && form != commonProgress)
+                    {
+                        childFormsToClose.Add(form);
+                    }
+                }
+                foreach (Form formToClose in childFormsToClose)
+                {
+                    formToClose.Close();
+                }
+                GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                commonProgress.Close();
+            }
+            catch (Exception ex)
+            {
+                GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
             }
         }
     }

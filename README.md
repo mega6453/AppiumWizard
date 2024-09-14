@@ -49,6 +49,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Features Available
 
 * Upto 5 Parallel Appium servers
+* Server Settings - Set server arguments and default capabilities separately for each server **(New)**
 * Update Appium Server and drivers
 * iOS Automation Execution **(including iOS version 17.x)**
 * iOS Screen Reflection and Screen Control

@@ -232,7 +232,7 @@ namespace Appium_Wizard
 
         public void UpdateDeviceStatus()
         {
-            listView1.Invoke((MethodInvoker)delegate
+            listView1.Invoke((System.Windows.Forms.MethodInvoker)delegate
             {
                 foreach (ListViewItem item in listView1.Items)
                 {

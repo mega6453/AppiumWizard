@@ -34,7 +34,7 @@ namespace Appium_Wizard
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
             if (!Common.IsNodeInstalled())
             {
-                File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Please install and restart Appium Wizard to start the appium server----------------\n\n");
+                File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n");
             }
             try
             {

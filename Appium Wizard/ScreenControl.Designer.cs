@@ -44,6 +44,7 @@
             toolStripDropDownButton1 = new ToolStripDropDownButton();
             unlockToolStripMenuItem = new ToolStripMenuItem();
             AppsToolStripButton = new ToolStripButton();
+            SettingsToolStripButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -58,8 +59,9 @@
             ScreenWebView.DefaultBackgroundColor = Color.White;
             ScreenWebView.Dock = DockStyle.Fill;
             ScreenWebView.Location = new Point(0, 0);
+            ScreenWebView.Margin = new Padding(2);
             ScreenWebView.Name = "ScreenWebView";
-            ScreenWebView.Size = new Size(380, 595);
+            ScreenWebView.Size = new Size(327, 346);
             ScreenWebView.TabIndex = 0;
             ScreenWebView.ZoomFactor = 1D;
             ScreenWebView.KeyPress += SendKeys;
@@ -71,12 +73,12 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, ScreenshotToolStripButton, toolStripDropDownButton1, AppsToolStripButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, ScreenshotToolStripButton, toolStripDropDownButton1, AppsToolStripButton, SettingsToolStripButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            toolStrip1.Location = new Point(0, 595);
+            toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.RenderMode = ToolStripRenderMode.System;
-            toolStrip1.Size = new Size(380, 33);
+            toolStrip1.Size = new Size(327, 31);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -87,20 +89,20 @@
             AlwaysOnTopToolStripButton.Image = Properties.Resources.pin;
             AlwaysOnTopToolStripButton.ImageTransparentColor = Color.Magenta;
             AlwaysOnTopToolStripButton.Name = "AlwaysOnTopToolStripButton";
-            AlwaysOnTopToolStripButton.Size = new Size(34, 28);
+            AlwaysOnTopToolStripButton.Size = new Size(28, 28);
             AlwaysOnTopToolStripButton.Click += AlwaysOnTop_Click;
             // 
             // toolStripSeparator4
             // 
             toolStripSeparator4.Alignment = ToolStripItemAlignment.Right;
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(6, 33);
+            toolStripSeparator4.Size = new Size(6, 31);
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Alignment = ToolStripItemAlignment.Right;
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(6, 33);
+            toolStripSeparator3.Size = new Size(6, 31);
             // 
             // ObjectSpyToolStripButton
             // 
@@ -109,20 +111,20 @@
             ObjectSpyToolStripButton.Image = Properties.Resources.inspector;
             ObjectSpyToolStripButton.ImageTransparentColor = Color.Magenta;
             ObjectSpyToolStripButton.Name = "ObjectSpyToolStripButton";
-            ObjectSpyToolStripButton.Size = new Size(34, 28);
+            ObjectSpyToolStripButton.Size = new Size(28, 28);
             ObjectSpyToolStripButton.Click += ObjectSpy_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Alignment = ToolStripItemAlignment.Right;
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(6, 33);
+            toolStripSeparator2.Size = new Size(6, 31);
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Alignment = ToolStripItemAlignment.Right;
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 33);
+            toolStripSeparator1.Size = new Size(6, 31);
             // 
             // HomeToolStripButton
             // 
@@ -132,7 +134,7 @@
             HomeToolStripButton.Image = Properties.Resources.home;
             HomeToolStripButton.ImageTransparentColor = Color.Magenta;
             HomeToolStripButton.Name = "HomeToolStripButton";
-            HomeToolStripButton.Size = new Size(34, 28);
+            HomeToolStripButton.Size = new Size(28, 28);
             HomeToolStripButton.Click += HomeButton_Click;
             // 
             // BackToolStripButton
@@ -142,7 +144,7 @@
             BackToolStripButton.Image = Properties.Resources.left_arrow;
             BackToolStripButton.ImageTransparentColor = Color.Magenta;
             BackToolStripButton.Name = "BackToolStripButton";
-            BackToolStripButton.Size = new Size(34, 28);
+            BackToolStripButton.Size = new Size(28, 28);
             BackToolStripButton.Click += BackButton_Click;
             // 
             // ControlCenterToolStripButton
@@ -154,7 +156,7 @@
             ControlCenterToolStripButton.Image = Properties.Resources.toggle_button;
             ControlCenterToolStripButton.ImageTransparentColor = Color.Magenta;
             ControlCenterToolStripButton.Name = "ControlCenterToolStripButton";
-            ControlCenterToolStripButton.Size = new Size(34, 28);
+            ControlCenterToolStripButton.Size = new Size(28, 28);
             ControlCenterToolStripButton.Click += controlCenter_Click;
             // 
             // ScreenshotToolStripButton
@@ -164,7 +166,7 @@
             ScreenshotToolStripButton.Image = Properties.Resources.screenshot;
             ScreenshotToolStripButton.ImageTransparentColor = Color.Magenta;
             ScreenshotToolStripButton.Name = "ScreenshotToolStripButton";
-            ScreenshotToolStripButton.Size = new Size(34, 28);
+            ScreenshotToolStripButton.Size = new Size(28, 28);
             ScreenshotToolStripButton.Click += Screenshot_Click;
             // 
             // toolStripDropDownButton1
@@ -174,7 +176,7 @@
             toolStripDropDownButton1.Image = (Image)resources.GetObject("toolStripDropDownButton1.Image");
             toolStripDropDownButton1.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            toolStripDropDownButton1.Size = new Size(42, 28);
+            toolStripDropDownButton1.Size = new Size(37, 28);
             toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             toolStripDropDownButton1.Visible = false;
             // 
@@ -182,7 +184,7 @@
             // 
             unlockToolStripMenuItem.Image = Properties.Resources.Unlock;
             unlockToolStripMenuItem.Name = "unlockToolStripMenuItem";
-            unlockToolStripMenuItem.Size = new Size(168, 34);
+            unlockToolStripMenuItem.Size = new Size(111, 22);
             unlockToolStripMenuItem.Text = "Unlock";
             unlockToolStripMenuItem.Click += unlockToolStripMenuItem_Click;
             // 
@@ -193,8 +195,18 @@
             AppsToolStripButton.Image = Properties.Resources.application;
             AppsToolStripButton.ImageTransparentColor = Color.Magenta;
             AppsToolStripButton.Name = "AppsToolStripButton";
-            AppsToolStripButton.Size = new Size(34, 28);
+            AppsToolStripButton.Size = new Size(28, 28);
             AppsToolStripButton.Click += appsToolStripButton_Click;
+            // 
+            // SettingsToolStripButton
+            // 
+            SettingsToolStripButton.Alignment = ToolStripItemAlignment.Right;
+            SettingsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            SettingsToolStripButton.Image = Properties.Resources.settings;
+            SettingsToolStripButton.ImageTransparentColor = Color.Magenta;
+            SettingsToolStripButton.Name = "SettingsToolStripButton";
+            SettingsToolStripButton.Size = new Size(28, 28);
+            SettingsToolStripButton.Click += SettingsToolStripButton_Click;
             // 
             // toolStrip2
             // 
@@ -202,10 +214,10 @@
             toolStrip2.GripStyle = ToolStripGripStyle.Hidden;
             toolStrip2.ImageScalingSize = new Size(24, 24);
             toolStrip2.Items.AddRange(new ToolStripItem[] { statusLabel });
-            toolStrip2.Location = new Point(0, 570);
+            toolStrip2.Location = new Point(0, 321);
             toolStrip2.Name = "toolStrip2";
             toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(380, 25);
+            toolStrip2.Size = new Size(327, 25);
             toolStrip2.TabIndex = 2;
             toolStrip2.TabStop = true;
             toolStrip2.Text = "toolStrip2";
@@ -214,22 +226,23 @@
             // 
             statusLabel.BackgroundImageLayout = ImageLayout.None;
             statusLabel.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            statusLabel.Font = new Font("Arial Narrow", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            statusLabel.Font = new Font("Arial Narrow", 9F);
             statusLabel.Name = "statusLabel";
             statusLabel.Overflow = ToolStripItemOverflow.Never;
-            statusLabel.Size = new Size(0, 20);
+            statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // ScreenControl
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(380, 628);
+            ClientSize = new Size(327, 377);
             Controls.Add(toolStrip2);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(2);
             MaximizeBox = false;
             Name = "ScreenControl";
             StartPosition = FormStartPosition.WindowsDefaultBounds;
@@ -266,5 +279,6 @@
         private ToolStripMenuItem unlockToolStripMenuItem;
         private ToolStripButton ScreenshotToolStripButton;
         private ToolStripButton AppsToolStripButton;
+        private ToolStripButton SettingsToolStripButton;
     }
 }

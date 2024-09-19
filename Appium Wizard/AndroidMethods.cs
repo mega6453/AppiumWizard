@@ -205,6 +205,11 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell input keyevent KEYCODE_BACK");
         }
 
+        public void LaunchSettings(string udid)
+        {
+            ExecuteCommand("-s " + udid + " shell am start -a android.settings.SETTINGS");
+        }
+
         public bool InstallApp(string udid, string path)
         {
             var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");

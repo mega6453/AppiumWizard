@@ -104,7 +104,7 @@ namespace Appium_Wizard
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             capabilityLabel = new Label();
-            label4 = new Label();
+            mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -622,7 +622,7 @@ namespace Appium_Wizard
             panel1.Controls.Add(richTextBox6);
             panel1.Location = new Point(30, 448);
             panel1.Name = "panel1";
-            panel1.Size = new Size(583, 187);
+            panel1.Size = new Size(583, 163);
             panel1.TabIndex = 13;
             panel1.Visible = false;
             // 
@@ -742,16 +742,17 @@ namespace Appium_Wizard
             capabilityLabel.Text = "Capability";
             capabilityLabel.Visible = false;
             // 
-            // label4
+            // mandatorymsglabel
             // 
-            label4.AutoSize = true;
-            label4.BackColor = SystemColors.ControlLightLight;
-            label4.ForeColor = Color.IndianRed;
-            label4.Location = new Point(30, 345);
-            label4.Name = "label4";
-            label4.Size = new Size(556, 25);
-            label4.TabIndex = 18;
-            label4.Text = "Note : It's mandatory to open the device before starting automation.";
+            mandatorymsglabel.AutoSize = true;
+            mandatorymsglabel.BackColor = SystemColors.ControlLightLight;
+            mandatorymsglabel.ForeColor = Color.IndianRed;
+            mandatorymsglabel.Location = new Point(30, 345);
+            mandatorymsglabel.Name = "mandatorymsglabel";
+            mandatorymsglabel.Size = new Size(556, 25);
+            mandatorymsglabel.TabIndex = 18;
+            mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.";
+            mandatorymsglabel.Visible = false;
             // 
             // timer1
             // 
@@ -765,7 +766,7 @@ namespace Appium_Wizard
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1924, 1050);
             Controls.Add(checkBox1);
-            Controls.Add(label4);
+            Controls.Add(mandatorymsglabel);
             Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(label1);
@@ -866,7 +867,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem updaterToolStripMenuItem;
         private Label capabilityLabel;
         private Button capabilityCopyButton;
-        private Label label4;
+        private Label mandatorymsglabel;
         private Label label5;
         private System.Windows.Forms.Timer timer1;
         private RichTextBox richTextBox6;

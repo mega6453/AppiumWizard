@@ -220,7 +220,7 @@ namespace Appium_Wizard
                             break;
                         }
                     }
-                    commonProgress.Invoke((MethodInvoker)(() =>
+                    commonProgress.Invoke((System.Windows.Forms.MethodInvoker)(() =>
                     {
                         commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 15 * count);
                     }));

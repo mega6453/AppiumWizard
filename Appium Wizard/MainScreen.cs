@@ -232,7 +232,7 @@ namespace Appium_Wizard
 
         public void UpdateDeviceStatus()
         {
-            listView1.Invoke((MethodInvoker)delegate
+            listView1.Invoke((System.Windows.Forms.MethodInvoker)delegate
             {
                 foreach (ListViewItem item in listView1.Items)
                 {
@@ -303,13 +303,14 @@ namespace Appium_Wizard
                 {
                     ShowCapability();
                 }
+                mandatorymsglabel.Visible = true;
                 if (selectedDeviceConnection.Equals("Wi-Fi"))
                 {
-                    label4.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
+                    mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
                 }
                 else
                 {
-                    label4.Text = "Note : It's mandatory to open the device before starting automation.";
+                    mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.";
                 }
                 if (selectedDeviceStatus.Equals("Offline"))
                 {
@@ -321,6 +322,7 @@ namespace Appium_Wizard
                     contextMenuStrip4.Items[2].Enabled = true; // Refresh
                     contextMenuStrip4.Items[3].Enabled = false;
                     contextMenuStrip4.Items[4].Enabled = false;
+                    mandatorymsglabel.Visible = false;
                 }
                 else
                 {
@@ -341,6 +343,7 @@ namespace Appium_Wizard
                 Open.Enabled = false;
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
+                mandatorymsglabel.Visible = false;
             }
         }
 
@@ -624,7 +627,7 @@ namespace Appium_Wizard
                 {
                     deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
                 });
-               
+
                 if (deviceList.Contains("ITunes not installed"))
                 {
                     commonProgress.Close();
@@ -679,7 +682,7 @@ namespace Appium_Wizard
                                     {
                                         await Task.Run(() =>
                                         {
-                                        Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
+                                            Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
                                         });
                                     }
                                     catch (Exception)

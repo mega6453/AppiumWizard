@@ -772,5 +772,20 @@ namespace Appium_Wizard
             await installedAppsList.GetInstalledAppsList(this);
             installedAppsList.ShowDialog();
         }
+
+        private void SettingsToolStripButton_Click(object sender, EventArgs e)
+        {
+            if (OSType.Equals("Android"))
+            {
+                AndroidMethods.GetInstance().LaunchSettings(udid);
+                GoogleAnalytics.SendEvent("Android_SettingsToolStripButton_Click");
+            }
+            else
+            {
+                string url = "http://localhost:" + proxyPort;               
+                iOSAPIMethods.LaunchApp(url,sessionId, "com.apple.Preferences");
+                GoogleAnalytics.SendEvent("iOS_SettingsToolStripButton_Click");
+            }
+        }
     }
 }

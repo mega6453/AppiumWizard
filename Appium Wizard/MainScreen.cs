@@ -1827,5 +1827,23 @@ namespace Appium_Wizard
                 GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
             }
         }
+
+        private void iOSNativeAppsBundleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://support.apple.com/en-in/guide/deployment/depece748c41/web",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("iOSNativeAppsBundleToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("iOSNativeAppsBundleToolStripMenuItem_Click", exception.Message);
+            }
+        }
     }
 }

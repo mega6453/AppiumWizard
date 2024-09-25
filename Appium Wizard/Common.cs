@@ -48,12 +48,12 @@ namespace Appium_Wizard
 
         public static void SetEnvironmentVariable(string path)
         {
-            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
             if (!currentPath.Contains(path))
             {
                 string newPath = currentPath + ";" + path;
                 Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.User);
-                string updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User);
+                string updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
                 Console.WriteLine("Updated PATH: " + updatedPath);
             }
         }
@@ -183,31 +183,27 @@ namespace Appium_Wizard
             }
         }
 
-        public static bool IsLocalhostLoaded(string URL)
+        public static async Task<bool> IsLocalhostLoaded(string URL)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(URL);
-            request.Timeout = 5000;
-            HttpWebResponse response = null;
-            try
+            using (HttpClient client = new HttpClient())
             {
-                response = (HttpWebResponse)request.GetResponse();
-                if (response.StatusCode == HttpStatusCode.OK)
+                client.Timeout = TimeSpan.FromMilliseconds(5000);
+                try
                 {
-                    Console.WriteLine("Web page loaded successfully.");
-                    return true;
+                    HttpResponseMessage response = await client.GetAsync(URL);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Web page loaded successfully.");
+                        return true;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error while loading web page: " + ex.Message);
-            }
-            finally
-            {
-                response?.Close();
+                catch (Exception)
+                {
+                    return false;
+                }
             }
             return false;
         }
-
 
         public static string ExtractInfoPlistFromIPA(string ipaFilePath, string outputFolderPath)
         {
@@ -240,21 +236,24 @@ namespace Appium_Wizard
         public static Dictionary<string, string> GetValueFromXml(string xmlString)
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-            string value = "";
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlString);
             XmlNodeList keyNodes = xmlDoc.SelectNodes("//key");
-            foreach (XmlNode keyNode in keyNodes)
+            if (keyNodes != null)
             {
-                XmlNode valueNode = keyNode.NextSibling;
-                if (valueNode != null && valueNode.Name == "string")
+                foreach (XmlNode keyNode in keyNodes)
                 {
-                    if (!keyValuePairs.ContainsKey(keyNode.InnerText))
+                    XmlNode valueNode = keyNode.NextSibling;
+                    if (valueNode != null && valueNode.Name == "string")
                     {
-                        keyValuePairs.Add(keyNode.InnerText, valueNode.InnerText);
+                        if (!keyValuePairs.ContainsKey(keyNode.InnerText))
+                        {
+                            keyValuePairs.Add(keyNode.InnerText, valueNode.InnerText);
+                        }
                     }
                 }
             }
+          
             return keyValuePairs;
         }
 

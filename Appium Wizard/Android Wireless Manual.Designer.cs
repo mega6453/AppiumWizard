@@ -39,7 +39,7 @@
             label7 = new Label();
             label8 = new Label();
             PairButton = new Button();
-            CancelButton = new Button();
+            CancelButton1 = new Button();
             PairPortNumberTextbox = new TextBox();
             ConnectPortNumber = new TextBox();
             label2 = new Label();
@@ -128,7 +128,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Underline, GraphicsUnit.Point);
+            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Underline);
             label7.Location = new Point(29, 90);
             label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
@@ -140,7 +140,7 @@
             // 
             label8.AutoSize = true;
             label8.Enabled = false;
-            label8.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Underline, GraphicsUnit.Point);
+            label8.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Underline);
             label8.Location = new Point(24, 283);
             label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
@@ -161,17 +161,17 @@
             PairButton.UseVisualStyleBackColor = true;
             PairButton.Click += PairButton_Click;
             // 
-            // CancelButton
+            // CancelButton1
             // 
-            CancelButton.AutoSize = true;
-            CancelButton.Location = new Point(176, 165);
-            CancelButton.Margin = new Padding(2);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(78, 25);
-            CancelButton.TabIndex = 14;
-            CancelButton.Text = "Cancel";
-            CancelButton.UseVisualStyleBackColor = true;
-            CancelButton.Click += CancelButton_Click;
+            CancelButton1.AutoSize = true;
+            CancelButton1.Location = new Point(176, 165);
+            CancelButton1.Margin = new Padding(2);
+            CancelButton1.Name = "CancelButton1";
+            CancelButton1.Size = new Size(78, 25);
+            CancelButton1.TabIndex = 14;
+            CancelButton1.Text = "Cancel";
+            CancelButton1.UseVisualStyleBackColor = true;
+            CancelButton1.Click += CancelButton_Click;
             // 
             // PairPortNumberTextbox
             // 
@@ -197,7 +197,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label2.Location = new Point(236, 95);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
@@ -209,7 +209,7 @@
             // 
             label6.AutoSize = true;
             label6.Enabled = false;
-            label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label6.Location = new Point(234, 309);
             label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
@@ -256,7 +256,7 @@
             // label10
             // 
             label10.AutoSize = true;
-            label10.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label10.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label10.Location = new Point(29, 5);
             label10.Margin = new Padding(2, 0, 2, 0);
             label10.Name = "label10";
@@ -289,7 +289,7 @@
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(CancelButton);
+            panel2.Controls.Add(CancelButton1);
             panel2.Controls.Add(PairButton);
             panel2.Controls.Add(PairPortNumberTextbox);
             panel2.Controls.Add(label2);
@@ -350,7 +350,7 @@
         private Label label7;
         private Label label8;
         private Button PairButton;
-        private Button CancelButton;
+        private Button CancelButton1;
         private TextBox PairPortNumberTextbox;
         private TextBox ConnectPortNumber;
         private Label label2;

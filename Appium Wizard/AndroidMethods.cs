@@ -14,7 +14,7 @@ namespace Appium_Wizard
         private string aaptFilePath = FilesPath.aaptFilePath;
         private string serverAPKFilePath = FilesPath.serverAPKFilePath;
         private string settingsAPKFilePath = FilesPath.settingsAPKFilePath;
-        private Process adbProcess;
+        private Process adbProcess = new Process();
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
 
         public void StartAdbServer(int AdbPort)
@@ -489,7 +489,7 @@ namespace Appium_Wizard
 
                 while (!process.StandardOutput.EndOfStream)
                 {
-                    string line = process.StandardOutput.ReadLine();
+                    string line = process.StandardOutput.ReadLine() ?? string.Empty;
 
                     if (line.StartsWith("application-label:", StringComparison.OrdinalIgnoreCase))
                     {
@@ -552,7 +552,7 @@ namespace Appium_Wizard
 
                 using (var process = Process.Start(processStartInfo))
                 {
-                    string output = process.StandardOutput.ReadToEnd();
+                    string output = process?.StandardOutput.ReadToEnd() ?? string.Empty;
                     string[] lines = output.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
                     foreach (string line in lines)
@@ -570,7 +570,7 @@ namespace Appium_Wizard
                             }
                         }
                     }
-                    process.Close();
+                    process?.Close();
                     return -1;
                 }
             }
@@ -624,7 +624,7 @@ namespace Appium_Wizard
         private static AndroidAsyncMethods? instance;
         private static readonly object lockObject = new object();
         private string adbFilePath = FilesPath.adbFilePath;
-        private Process adbAsyncProcess;
+        private Process adbAsyncProcess = new Process();
         public void StartUIAutomatorServer(string udid, bool stop)
         {
             // if fails, then only need to uninstall.. need to add a condition here..
@@ -796,7 +796,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5),
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -828,7 +828,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + proxyPort)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
@@ -856,14 +856,18 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + proxyPort)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/sessions", Method.Get);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
-                JObject obj = JObject.Parse(response.Content);
-                string sessionId = (string)obj["value"][0]["id"];
+                string sessionId = "nosession";
+                if (response.Content != null)
+                {
+                    JObject obj = JObject.Parse(response.Content);
+                    sessionId = (string?)obj["value"]?[0]?["id"] ?? string.Empty;
+                }
                 if (sessionId == null)
                 {
                     sessionId = "nosession";
@@ -882,7 +886,7 @@ namespace Appium_Wizard
             //string sessionId = GetSessionID(proxyPort);
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5),
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId, Method.Delete);
@@ -897,7 +901,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + proxyPort)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId, Method.Delete);

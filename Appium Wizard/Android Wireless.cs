@@ -5,7 +5,7 @@
         MainScreen mainScreen;
         string selectedDevice = string.Empty;
         string selectedAddress = string.Empty;
-        ListViewItem selectedItem;
+        ListViewItem selectedItem = new ListViewItem();
         Dictionary<string, Tuple<string, string>> listOfDevices = new Dictionary<string, Tuple<string, string>>();
         public AndroidWireless(MainScreen mainScreen)
         {

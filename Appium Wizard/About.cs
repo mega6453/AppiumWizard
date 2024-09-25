@@ -50,7 +50,7 @@ namespace Appium_Wizard
 
         private void About_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("About_Shown");
         }
     }
 
@@ -66,7 +66,7 @@ namespace Appium_Wizard
 
                 var response = await client.GetStringAsync(url);
                 var json = JObject.Parse(response);
-                string contentBase64 = json["content"].ToString();
+                string contentBase64 = json["content"]?.ToString() ?? string.Empty;
                 byte[] data = Convert.FromBase64String(contentBase64);
                 string decodedString = System.Text.Encoding.UTF8.GetString(data);
                 return decodedString;
@@ -120,7 +120,7 @@ namespace Appium_Wizard
                     string responseBody = await response.Content.ReadAsStringAsync();
                     return responseBody;
                 }
-                catch (HttpRequestException e)
+                catch (HttpRequestException)
                 {
                     return url;
                 }

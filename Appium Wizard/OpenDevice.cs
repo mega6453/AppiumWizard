@@ -7,7 +7,7 @@
         public string WDAsessionId = "", UIAutomatorSessionId = "", URL;
         int width, height, proxyPort, screenServerPort;
         public string IPAddress = "localhost";
-        string deviceName, udid, OSType, OSVersion;
+        string deviceName, udid, OSType, OSVersion, connectionType;
         bool isScreenServerStarted = false;
         string title;
         public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress)
@@ -16,6 +16,7 @@
             this.deviceName = selectedDeviceName;
             this.OSType = selectedOS;
             this.OSVersion = selectedVersion;
+            this.connectionType = connectionType;
             var screeSize = getDeviceScreenSize(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
@@ -106,7 +107,16 @@
                             proxyPort = Common.GetFreePort();
                             screenServerPort = Common.GetFreePort();
                             iOSAsyncMethods.GetInstance().CloseTunnel();
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            if (connectionType.Equals("Wi-Fi"))
+                            {
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            }
+                            else
+                            {
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            }
+                            //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
                             if (installedNow)
                             {
@@ -293,7 +303,15 @@
                             WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
                             isScreenServerStarted = true;
                             commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            if (connectionType.Equals("Wi-Fi"))
+                            {
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid,proxyPort,8100);
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid,screenServerPort,9100);
+                            }
+                            else
+                            {
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            }
                             WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
                             //bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
                             //if (!isLoaded)

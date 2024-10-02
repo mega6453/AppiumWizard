@@ -1,4 +1,5 @@
-﻿using System.Management;
+﻿using System.Data.Entity.Core.Metadata.Edm;
+using System.Management;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -70,7 +71,7 @@ namespace Appium_Wizard
                             {
                                 if (OS.Equals("iOS"))
                                 {
-                                    isiOSScreenLoaded(udid);
+                                    isiOSScreenLoaded(udid,"USB");
                                     int screenPort = ScreenControl.devicePorts[udid].Item1;
                                     var control = ScreenControl.udidScreenControl[udid];
                                     control.LoadScreen(udid,screenPort);
@@ -176,7 +177,7 @@ namespace Appium_Wizard
                                     item.SubItems[5].Text = "Wi-Fi";
                                     Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
 
-                                    bool isLoaded = isiOSScreenLoaded(udid);
+                                    bool isLoaded = isiOSScreenLoaded(udid, "Wi-Fi");
                                     if (isLoaded)
                                     {
                                         var control = ScreenControl.udidScreenControl[udid];
@@ -242,7 +243,7 @@ namespace Appium_Wizard
             }
         }
 
-        private bool isiOSScreenLoaded(string udid)
+        private bool isiOSScreenLoaded(string udid, string connectionType)
         {
             int screenPort = ScreenControl.devicePorts[udid].Item1;
             int proxyPort = ScreenControl.devicePorts[udid].Item2;
@@ -250,7 +251,16 @@ namespace Appium_Wizard
             Common.KillProcessByPortNumber(screenPort);
             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenPort, 9100);
-            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
+            if (connectionType.Equals("Wi-Fi"))
+            {
+                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenPort, 9100);
+            }
+            else
+            {
+                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
+            }
+            //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
             bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
             if (!isRunning)
             {

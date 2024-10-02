@@ -286,17 +286,19 @@ namespace Appium_Wizard
                 {
                     Version deviceVersion = new Version(selectedDeviceVersion);
                     Version version17Plus = new Version("17.0.0");
-                    if (deviceVersion >= version17Plus) // >=17  -- Setting as true, as go-ios supports iOS 17+ now.
+                    if (deviceVersion >= version17Plus) // >17
                     {
-                        iOSMethods.isGo = true;
-                        iOSAsyncMethods.isGo = true;
+                        iOSMethods.isGo = false;
+                        iOSAsyncMethods.isGo = false;
+
                         iOSAsyncMethods.is17Plus = true;
                     }
                     else // <17
                     {
                         iOSMethods.isGo = true;
                         iOSAsyncMethods.isGo = true;
-                        iOSAsyncMethods.is17Plus = true;
+
+                        iOSAsyncMethods.is17Plus = false;
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))
@@ -618,7 +620,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Detect iOS Device", "Looking for iOS device......", 10);
+            commonProgress.UpdateStepLabel("Detect iOS Device", "Looking for iOS device...", 10);
             List<string> deviceList = new List<string>();
             Dictionary<string, object> deviceInfo = new Dictionary<string, object>();
             try
@@ -665,7 +667,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 50);
+                        commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information...", 50);
                         for (int i = 0; i < count; i++)
                         {
                             if (!isDeviceAlreadyAdded(deviceList[i]))
@@ -675,7 +677,7 @@ namespace Appium_Wizard
                                 {
                                     deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
                                 });
-                                commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 70);
+                                commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information...", 70);
                                 if (deviceInfo.Count > 0)
                                 {
                                     try
@@ -689,7 +691,7 @@ namespace Appium_Wizard
                                     {
                                         Model = deviceInfo["ProductType"]?.ToString() ?? "";
                                     }
-                                    commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information......", 90);
+                                    commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information...", 90);
                                     DeviceName = deviceInfo["DeviceName"]?.ToString().Replace("â€™", "'") ?? "";
                                     OSVersion = deviceInfo["ProductVersion"]?.ToString() ?? "";
                                     udid = deviceInfo["UniqueDeviceID"]?.ToString() ?? "";
@@ -879,7 +881,7 @@ namespace Appium_Wizard
             if (selectedOS.Equals("iOS") && !isMessageDisplayed)
             {
                 isMessageDisplayed = true;
-                MessageBox.Show("Make sure to open the iOS device before performing any operation from More section or some operations may not work.\n\nOpening device won't be required in future releases.\n\nThis is a one time message for an application lifecycle.", "More Operations", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Make sure to open the iOS device before performing any operation from More section or some operations may not work or may need admin privilege.\n\nThis is a one time message for an application lifecycle.", "More Operations", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             Point screenPoint = MoreButton.PointToScreen(new Point(0, MoreButton.Height));
             contextMenuStrip4.Show(screenPoint);

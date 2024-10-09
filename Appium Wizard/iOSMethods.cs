@@ -625,23 +625,6 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetLinuxPathFromInput(string WindowsPath)
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = $"/C wsl wslpath -u \"{WindowsPath}\"";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd().Trim();
-            process.WaitForExit();
-            return "\"" + output + "\"";
-
-        }
-
-
         public string RunWebDriverAgentQuick(string udid)
         {
             if (isGo)
@@ -906,7 +889,7 @@ namespace Appium_Wizard
             }
         }
 
-        public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false)
+        public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
             bool isTunnelRunning = false;
             if (command.Contains("developer"))
@@ -932,10 +915,24 @@ namespace Appium_Wizard
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.Start();
+            bool processExited = false;
             string error = process.StandardError.ReadToEnd();
             string output = process.StandardOutput.ReadToEnd();
             string result = output + error;
-            process.WaitForExit();
+            if (timeout == 0)
+            {
+                process.WaitForExit();
+            }
+            else
+            {
+                processExited = iOSProcess.WaitForExit(timeout);
+            }
+            if (timeout != 0 && !processExited)
+            {
+                process.Kill(); // Kill the process if it did not exit within the timeout
+                MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return "Process did not complete within the allotted time.";
+            }
             result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
             process.Close();
             if (closeTunnel)
@@ -1492,7 +1489,7 @@ namespace Appium_Wizard
                 var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nNOTE : You might get Unknown publisher security warning from windows, Just Run.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
-                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\n\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
+                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
                     try
                     {
                         tunnelProcess = new Process();

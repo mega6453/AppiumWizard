@@ -22,17 +22,16 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0-windows"
+          "net8.0-windows7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "C:\\Users\\mc\\source\\repos\\Appcenter\\AppCenterDownloadAppGetAppInfoCode\\AppCenterDownloadAppGetAppInfo\\bin\\Release": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net6.0-windows7.0": {
-            "targetAlias": "net6.0-windows",
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows7.0",
             "projectReferences": {}
           }
         },
@@ -40,15 +39,20 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
-        "net6.0-windows7.0": {
-          "targetAlias": "net6.0-windows",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows7.0",
           "dependencies": {
             "Microsoft.Web.WebView2": {
               "target": "Package",
-              "version": "[1.0.2592.51, )"
+              "version": "[1.0.2739.15, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -56,7 +60,7 @@
             },
             "RestSharp": {
               "target": "Package",
-              "version": "[111.4.1, )"
+              "version": "[112.0.0, )"
             },
             "SharpZipLib": {
               "target": "Package",
@@ -85,19 +89,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[6.0.18, 6.0.18]"
+              "version": "[8.0.8, 8.0.8]"
             },
             {
               "name": "Microsoft.NETCore.App.Crossgen2.win-x64",
-              "version": "[6.0.18, 6.0.18]"
+              "version": "[8.0.8, 8.0.8]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[6.0.18, 6.0.18]"
+              "version": "[8.0.8, 8.0.8]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[6.0.18, 6.0.18]"
+              "version": "[8.0.8, 8.0.8]"
             }
           ],
           "frameworkReferences": {
@@ -108,7 +112,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

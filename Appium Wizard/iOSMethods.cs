@@ -1536,6 +1536,7 @@ namespace Appium_Wizard
                 else
                 {
                     commonProgress.Close();
+                    MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try
                     //{

@@ -284,21 +284,29 @@ namespace Appium_Wizard
                 DeleteDevice.Enabled = true;
                 if (selectedOS.Equals("iOS"))
                 {
-                    Version deviceVersion = new Version(selectedDeviceVersion);
-                    Version version17Plus = new Version("17.0.0");
-                    if (deviceVersion >= version17Plus) // >17
+                    if (iOS_Executor.selectediOSExecutor.Equals("auto"))
                     {
-                        iOSMethods.isGo = false;
-                        iOSAsyncMethods.isGo = false;
-
-                        iOSAsyncMethods.is17Plus = true;
+                        Version deviceVersion = new Version(selectedDeviceVersion);
+                        Version version17Plus = new Version("17.0.0");
+                        if (deviceVersion >= version17Plus) // >17
+                        {
+                            //SetiOSTool(false);
+                            SetiOSTool(true);
+                            iOSAsyncMethods.is17Plus = true;
+                        }
+                        else // <17
+                        {
+                            SetiOSTool(true);
+                            iOSAsyncMethods.is17Plus = false;
+                        }
                     }
-                    else // <17
+                    else if (iOS_Executor.selectediOSExecutor.Equals("go"))
                     {
-                        iOSMethods.isGo = true;
-                        iOSAsyncMethods.isGo = true;
-
-                        iOSAsyncMethods.is17Plus = false;
+                        SetiOSTool(true); // use go
+                    }
+                    else
+                    {
+                        SetiOSTool(false); // use py
                     }
                 }
                 if (selectedDeviceStatus.Equals("Online"))
@@ -346,6 +354,20 @@ namespace Appium_Wizard
                 DeleteDevice.Enabled = false;
                 MoreButton.Enabled = false;
                 mandatorymsglabel.Visible = false;
+            }
+        }
+
+        public void SetiOSTool(bool useGoiOS)
+        {
+            if (useGoiOS) //go-iOS
+            {
+                iOSMethods.isGo = true;
+                iOSAsyncMethods.isGo = true;
+            }
+            else //pymobiledevice3
+            {
+                iOSMethods.isGo = false;
+                iOSAsyncMethods.isGo = false;
             }
         }
 
@@ -1827,6 +1849,22 @@ namespace Appium_Wizard
             catch (Exception ex)
             {
                 GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
+            }
+        }
+
+        private void iOSExecutorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            iOS_Executor iOS_Executor = new iOS_Executor(listView1);
+            iOS_Executor.ShowDialog();
+        }
+
+        private void MainScreen_Activated(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                selectedItem.Selected = false;
+                selectedItem.Selected = true;
             }
         }
     }

@@ -124,6 +124,9 @@
   <data name="doc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\doc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="execute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\execute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="android" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\android.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -214,7 +217,7 @@
   <data name="information" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\information.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="execute" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\execute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="execute1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\execute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

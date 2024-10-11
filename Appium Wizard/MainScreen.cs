@@ -123,6 +123,14 @@ namespace Appium_Wizard
         DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
+            try
+            {
+                iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
+            }
+            catch (Exception)
+            {
+                iOS_Executor.selectediOSExecutor = "auto";
+            }
             if (!LoadingScreen.isServerStarted)
             {
                 var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);

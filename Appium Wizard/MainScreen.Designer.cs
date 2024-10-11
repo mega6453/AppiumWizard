@@ -355,7 +355,7 @@ namespace Appium_Wizard
             // 
             // iOSExecutorToolStripMenuItem
             // 
-            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
+            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute1;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
             iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";

@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
 
 namespace Appium_Wizard
 {
@@ -401,6 +402,43 @@ namespace Appium_Wizard
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
                     command.CommandText = "UPDATE ServerCapsCommand SET ('" + serverNumber + "') = ('" + serverCommand + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+
+        public static string QueryDataFromiOSExecutorTable()
+        {
+            string output = string.Empty;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM iOSExecutor", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            output = reader.GetString(0);
+                        }
+                    }
+                }
+                connection.Close();
+                return output;
+            }
+        }
+
+        public static void UpdateDataIntoiOSExecutorTable(string executionMethod)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE iOSExecutor SET ('Executor') = ('" + executionMethod + "')";
                     int rowsAffected = command.ExecuteNonQuery();
                     Console.WriteLine($"Rows affected: {rowsAffected}");
                 }

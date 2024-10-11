@@ -29,14 +29,17 @@ namespace Appium_Wizard
         {
             if (AutomaticRadioButton.Checked)
             {
+                Database.UpdateDataIntoiOSExecutorTable("auto");
                 selectediOSExecutor = "auto";
             }
             else if (goRadioButton.Checked)
             {
+                Database.UpdateDataIntoiOSExecutorTable("go");
                 selectediOSExecutor = "go";
             }
             else
             {
+                Database.UpdateDataIntoiOSExecutorTable("py");
                 selectediOSExecutor = "py";
             }
             if (listView1.SelectedItems.Count > 0)
@@ -50,7 +53,19 @@ namespace Appium_Wizard
 
         private void iOS_Executor_Load(object sender, EventArgs e)
         {
-            AutomaticRadioButton.Checked = true;
+            var output = Database.QueryDataFromiOSExecutorTable();
+            if (output.Contains("auto"))
+            {
+                AutomaticRadioButton.Checked = true;
+            }
+            else if (output.Contains("go"))
+            {
+                goRadioButton.Checked = true;
+            }
+            else
+            {
+                pyRadioButton.Checked = true; 
+            }            
         }
     }
 }

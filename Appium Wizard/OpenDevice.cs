@@ -232,7 +232,7 @@
                                     commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 50);
                                     iOSMethods.GetInstance().InstallWDA(udid);
                                 }
-                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 70);
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...", 70);
                                 WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {

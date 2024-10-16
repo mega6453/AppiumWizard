@@ -299,6 +299,8 @@ namespace Appium_Wizard
                         if (deviceVersion >= version17Plus) // >17
                         {
                             //SetiOSTool(false);
+                            //iOSAsyncMethods.is17Plus = true;
+
                             SetiOSTool(true);
                             iOSAsyncMethods.is17Plus = true;
                         }

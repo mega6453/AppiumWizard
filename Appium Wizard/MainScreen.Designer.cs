@@ -59,6 +59,7 @@ namespace Appium_Wizard
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
             signIPAToolStripMenuItem = new ToolStripMenuItem();
+            iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             appiumDocsToolStripMenuItem = new ToolStripMenuItem();
             capabilitiesToolStripMenuItem = new ToolStripMenuItem();
@@ -124,9 +125,10 @@ namespace Appium_Wizard
             // 
             Open.AutoSize = true;
             Open.Enabled = false;
-            Open.Location = new Point(339, 83);
+            Open.Location = new Point(237, 50);
+            Open.Margin = new Padding(2);
             Open.Name = "Open";
-            Open.Size = new Size(130, 43);
+            Open.Size = new Size(91, 26);
             Open.TabIndex = 0;
             Open.Text = "Open Device";
             Open.UseVisualStyleBackColor = true;
@@ -137,9 +139,10 @@ namespace Appium_Wizard
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
-            listView1.Location = new Point(30, 133);
+            listView1.Location = new Point(21, 80);
+            listView1.Margin = new Padding(2);
             listView1.Name = "listView1";
-            listView1.Size = new Size(581, 207);
+            listView1.Size = new Size(408, 126);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -187,13 +190,13 @@ namespace Appium_Wizard
             contextMenuStrip1.ImageScalingSize = new Size(24, 24);
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { iOSToolStripMenuItem, androidToolStripMenuItem, androidWiFiToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(204, 100);
+            contextMenuStrip1.Size = new Size(157, 94);
             // 
             // iOSToolStripMenuItem
             // 
             iOSToolStripMenuItem.Image = Properties.Resources.apple;
             iOSToolStripMenuItem.Name = "iOSToolStripMenuItem";
-            iOSToolStripMenuItem.Size = new Size(203, 32);
+            iOSToolStripMenuItem.Size = new Size(156, 30);
             iOSToolStripMenuItem.Text = "iOS";
             iOSToolStripMenuItem.Click += iOSToolStripMenuItem_Click;
             // 
@@ -201,7 +204,7 @@ namespace Appium_Wizard
             // 
             androidToolStripMenuItem.Image = Properties.Resources.android;
             androidToolStripMenuItem.Name = "androidToolStripMenuItem";
-            androidToolStripMenuItem.Size = new Size(203, 32);
+            androidToolStripMenuItem.Size = new Size(156, 30);
             androidToolStripMenuItem.Text = "Android";
             androidToolStripMenuItem.Click += androidToolStripMenuItem_Click;
             // 
@@ -209,16 +212,17 @@ namespace Appium_Wizard
             // 
             androidWiFiToolStripMenuItem.Image = (Image)resources.GetObject("androidWiFiToolStripMenuItem.Image");
             androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
-            androidWiFiToolStripMenuItem.Size = new Size(203, 32);
+            androidWiFiToolStripMenuItem.Size = new Size(156, 30);
             androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
             androidWiFiToolStripMenuItem.Click += androidWiFiToolStripMenuItem_Click;
             // 
             // AddDevice
             // 
             AddDevice.AutoSize = true;
-            AddDevice.Location = new Point(30, 83);
+            AddDevice.Location = new Point(21, 50);
+            AddDevice.Margin = new Padding(2);
             AddDevice.Name = "AddDevice";
-            AddDevice.Size = new Size(120, 43);
+            AddDevice.Size = new Size(84, 26);
             AddDevice.TabIndex = 4;
             AddDevice.Text = "Add Device";
             AddDevice.UseVisualStyleBackColor = true;
@@ -228,9 +232,10 @@ namespace Appium_Wizard
             // 
             DeleteDevice.AutoSize = true;
             DeleteDevice.Enabled = false;
-            DeleteDevice.Location = new Point(173, 83);
+            DeleteDevice.Location = new Point(121, 50);
+            DeleteDevice.Margin = new Padding(2);
             DeleteDevice.Name = "DeleteDevice";
-            DeleteDevice.Size = new Size(140, 43);
+            DeleteDevice.Size = new Size(98, 26);
             DeleteDevice.TabIndex = 5;
             DeleteDevice.Text = "Delete Device";
             DeleteDevice.UseVisualStyleBackColor = true;
@@ -239,8 +244,9 @@ namespace Appium_Wizard
             // richTextBox1
             // 
             richTextBox1.Location = new Point(0, 0);
+            richTextBox1.Margin = new Padding(2);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(1427, 1001);
+            richTextBox1.Size = new Size(1000, 602);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
             richTextBox1.TextChanged += richTextBox1_TextChanged;
@@ -250,9 +256,10 @@ namespace Appium_Wizard
             checkBox1.AutoSize = true;
             checkBox1.Checked = true;
             checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(1933, 95);
+            checkBox1.Location = new Point(1353, 57);
+            checkBox1.Margin = new Padding(2);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(125, 29);
+            checkBox1.Size = new Size(84, 19);
             checkBox1.TabIndex = 7;
             checkBox1.Text = "Auto Scroll";
             checkBox1.UseVisualStyleBackColor = true;
@@ -262,9 +269,10 @@ namespace Appium_Wizard
             // 
             MoreButton.AutoSize = true;
             MoreButton.Enabled = false;
-            MoreButton.Location = new Point(501, 83);
+            MoreButton.Location = new Point(351, 50);
+            MoreButton.Margin = new Padding(2);
             MoreButton.Name = "MoreButton";
-            MoreButton.Size = new Size(111, 43);
+            MoreButton.Size = new Size(78, 26);
             MoreButton.TabIndex = 9;
             MoreButton.Text = "More...";
             MoreButton.UseVisualStyleBackColor = true;
@@ -278,8 +286,8 @@ namespace Appium_Wizard
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(3, 3, 0, 3);
-            menuStrip1.Size = new Size(1924, 35);
+            menuStrip1.Padding = new Padding(2, 2, 0, 2);
+            menuStrip1.Size = new Size(899, 24);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -287,14 +295,14 @@ namespace Appium_Wizard
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(77, 29);
+            fileToolStripMenuItem.Size = new Size(51, 20);
             fileToolStripMenuItem.Text = "Server";
             // 
             // serverSetupToolStripMenuItem
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(233, 34);
+            serverSetupToolStripMenuItem.Size = new Size(153, 22);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -302,7 +310,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(233, 34);
+            fixInstallationToolStripMenuItem.Size = new Size(153, 22);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -310,22 +318,22 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(233, 34);
+            updaterToolStripMenuItem.Size = new Size(153, 22);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, iOSExecutorToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            toolsToolStripMenuItem.Size = new Size(69, 29);
+            toolsToolStripMenuItem.Size = new Size(46, 20);
             toolsToolStripMenuItem.Text = "Tools";
             // 
             // inspectorToolStripMenuItem1
             // 
             inspectorToolStripMenuItem1.Image = Properties.Resources.inspector;
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
-            inspectorToolStripMenuItem1.Size = new Size(307, 34);
+            inspectorToolStripMenuItem1.Size = new Size(203, 22);
             inspectorToolStripMenuItem1.Text = "Inspector";
             inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem_Click;
             // 
@@ -333,7 +341,7 @@ namespace Appium_Wizard
             // 
             iOSProfileManagementToolStripMenuItem.Image = Properties.Resources.management;
             iOSProfileManagementToolStripMenuItem.Name = "iOSProfileManagementToolStripMenuItem";
-            iOSProfileManagementToolStripMenuItem.Size = new Size(307, 34);
+            iOSProfileManagementToolStripMenuItem.Size = new Size(203, 22);
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
@@ -341,15 +349,23 @@ namespace Appium_Wizard
             // 
             signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
             signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
-            signIPAToolStripMenuItem.Size = new Size(307, 34);
+            signIPAToolStripMenuItem.Size = new Size(203, 22);
             signIPAToolStripMenuItem.Text = "Sign IPA";
             signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
+            // 
+            // iOSExecutorToolStripMenuItem
+            // 
+            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute1;
+            iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
+            iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
+            iOSExecutorToolStripMenuItem.Text = "iOS Executor";
+            iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
             helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(65, 29);
+            helpToolStripMenuItem.Size = new Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
             // 
             // appiumDocsToolStripMenuItem
@@ -357,7 +373,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(376, 34);
+            appiumDocsToolStripMenuItem.Size = new Size(247, 22);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -365,14 +381,14 @@ namespace Appium_Wizard
             capabilitiesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionCapsToolStripMenuItem, xCUITestCapsToolStripMenuItem, uIAutomator2CapsToolStripMenuItem });
             capabilitiesToolStripMenuItem.Image = Properties.Resources.link;
             capabilitiesToolStripMenuItem.Name = "capabilitiesToolStripMenuItem";
-            capabilitiesToolStripMenuItem.Size = new Size(285, 34);
+            capabilitiesToolStripMenuItem.Size = new Size(188, 22);
             capabilitiesToolStripMenuItem.Text = "Capabilities";
             // 
             // sessionCapsToolStripMenuItem
             // 
             sessionCapsToolStripMenuItem.Image = Properties.Resources.link;
             sessionCapsToolStripMenuItem.Name = "sessionCapsToolStripMenuItem";
-            sessionCapsToolStripMenuItem.Size = new Size(272, 34);
+            sessionCapsToolStripMenuItem.Size = new Size(178, 22);
             sessionCapsToolStripMenuItem.Text = "Session Caps";
             sessionCapsToolStripMenuItem.Click += sessionCapsToolStripMenuItem_Click;
             // 
@@ -380,7 +396,7 @@ namespace Appium_Wizard
             // 
             xCUITestCapsToolStripMenuItem.Image = Properties.Resources.link;
             xCUITestCapsToolStripMenuItem.Name = "xCUITestCapsToolStripMenuItem";
-            xCUITestCapsToolStripMenuItem.Size = new Size(272, 34);
+            xCUITestCapsToolStripMenuItem.Size = new Size(178, 22);
             xCUITestCapsToolStripMenuItem.Text = "XCUITest Caps";
             xCUITestCapsToolStripMenuItem.Click += xCUITestCapsToolStripMenuItem_Click;
             // 
@@ -388,7 +404,7 @@ namespace Appium_Wizard
             // 
             uIAutomator2CapsToolStripMenuItem.Image = Properties.Resources.link;
             uIAutomator2CapsToolStripMenuItem.Name = "uIAutomator2CapsToolStripMenuItem";
-            uIAutomator2CapsToolStripMenuItem.Size = new Size(272, 34);
+            uIAutomator2CapsToolStripMenuItem.Size = new Size(178, 22);
             uIAutomator2CapsToolStripMenuItem.Text = "UIAutomator2 Caps";
             uIAutomator2CapsToolStripMenuItem.Click += uIAutomator2CapsToolStripMenuItem_Click;
             // 
@@ -397,14 +413,14 @@ namespace Appium_Wizard
             settingsAPIToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionSettingsToolStripMenuItem, xCUITestSettingsToolStripMenuItem, uIAutomator2SettingsToolStripMenuItem });
             settingsAPIToolStripMenuItem.Image = Properties.Resources.link;
             settingsAPIToolStripMenuItem.Name = "settingsAPIToolStripMenuItem";
-            settingsAPIToolStripMenuItem.Size = new Size(285, 34);
+            settingsAPIToolStripMenuItem.Size = new Size(188, 22);
             settingsAPIToolStripMenuItem.Text = "Settings API";
             // 
             // sessionSettingsToolStripMenuItem
             // 
             sessionSettingsToolStripMenuItem.Image = Properties.Resources.link;
             sessionSettingsToolStripMenuItem.Name = "sessionSettingsToolStripMenuItem";
-            sessionSettingsToolStripMenuItem.Size = new Size(297, 34);
+            sessionSettingsToolStripMenuItem.Size = new Size(194, 22);
             sessionSettingsToolStripMenuItem.Text = "Session Settings";
             sessionSettingsToolStripMenuItem.Click += sessionSettingsToolStripMenuItem_Click;
             // 
@@ -412,7 +428,7 @@ namespace Appium_Wizard
             // 
             xCUITestSettingsToolStripMenuItem.Image = Properties.Resources.link;
             xCUITestSettingsToolStripMenuItem.Name = "xCUITestSettingsToolStripMenuItem";
-            xCUITestSettingsToolStripMenuItem.Size = new Size(297, 34);
+            xCUITestSettingsToolStripMenuItem.Size = new Size(194, 22);
             xCUITestSettingsToolStripMenuItem.Text = "XCUITest Settings";
             xCUITestSettingsToolStripMenuItem.Click += xCUITestSettingsToolStripMenuItem_Click;
             // 
@@ -420,7 +436,7 @@ namespace Appium_Wizard
             // 
             uIAutomator2SettingsToolStripMenuItem.Image = Properties.Resources.link;
             uIAutomator2SettingsToolStripMenuItem.Name = "uIAutomator2SettingsToolStripMenuItem";
-            uIAutomator2SettingsToolStripMenuItem.Size = new Size(297, 34);
+            uIAutomator2SettingsToolStripMenuItem.Size = new Size(194, 22);
             uIAutomator2SettingsToolStripMenuItem.Text = "UIAutomator2 Settings";
             uIAutomator2SettingsToolStripMenuItem.Click += uIAutomator2SettingsToolStripMenuItem_Click;
             // 
@@ -428,7 +444,7 @@ namespace Appium_Wizard
             // 
             xCUITestToolStripMenuItem.Image = Properties.Resources.link;
             xCUITestToolStripMenuItem.Name = "xCUITestToolStripMenuItem";
-            xCUITestToolStripMenuItem.Size = new Size(285, 34);
+            xCUITestToolStripMenuItem.Size = new Size(188, 22);
             xCUITestToolStripMenuItem.Text = "XCUITest";
             xCUITestToolStripMenuItem.Click += xCUITestToolStripMenuItem_Click;
             // 
@@ -436,7 +452,7 @@ namespace Appium_Wizard
             // 
             uIAutomatorToolStripMenuItem.Image = Properties.Resources.link;
             uIAutomatorToolStripMenuItem.Name = "uIAutomatorToolStripMenuItem";
-            uIAutomatorToolStripMenuItem.Size = new Size(285, 34);
+            uIAutomatorToolStripMenuItem.Size = new Size(188, 22);
             uIAutomatorToolStripMenuItem.Text = "UIAutomator";
             uIAutomatorToolStripMenuItem.Click += uIAutomatorToolStripMenuItem_Click;
             // 
@@ -444,7 +460,7 @@ namespace Appium_Wizard
             // 
             serverSecurityToolStripMenuItem.Image = Properties.Resources.link;
             serverSecurityToolStripMenuItem.Name = "serverSecurityToolStripMenuItem";
-            serverSecurityToolStripMenuItem.Size = new Size(285, 34);
+            serverSecurityToolStripMenuItem.Size = new Size(188, 22);
             serverSecurityToolStripMenuItem.Text = "Server Security";
             serverSecurityToolStripMenuItem.Click += serverSecurityToolStripMenuItem_Click;
             // 
@@ -452,7 +468,7 @@ namespace Appium_Wizard
             // 
             cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
             cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
-            cLIArgumentsToolStripMenuItem.Size = new Size(285, 34);
+            cLIArgumentsToolStripMenuItem.Size = new Size(188, 22);
             cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
             cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
             // 
@@ -460,7 +476,7 @@ namespace Appium_Wizard
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(376, 34);
+            troubleshootToolStripMenuItem.Size = new Size(247, 22);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
             // 
@@ -468,7 +484,7 @@ namespace Appium_Wizard
             // 
             reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
-            reportAnIssueToolStripMenuItem.Size = new Size(376, 34);
+            reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
@@ -476,7 +492,7 @@ namespace Appium_Wizard
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
-            startADiscussionToolStripMenuItem.Size = new Size(376, 34);
+            startADiscussionToolStripMenuItem.Size = new Size(247, 22);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
@@ -484,7 +500,7 @@ namespace Appium_Wizard
             // 
             checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            checkForUpdatesToolStripMenuItem.Size = new Size(376, 34);
+            checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
             checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
             // 
@@ -492,7 +508,7 @@ namespace Appium_Wizard
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(376, 34);
+            aboutToolStripMenuItem.Size = new Size(247, 22);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -503,19 +519,21 @@ namespace Appium_Wizard
             tabControl1.Controls.Add(tabPage3);
             tabControl1.Controls.Add(tabPage4);
             tabControl1.Controls.Add(tabPage5);
-            tabControl1.Location = new Point(620, 90);
+            tabControl1.Location = new Point(434, 54);
+            tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1434, 1043);
+            tabControl1.Size = new Size(1004, 626);
             tabControl1.TabIndex = 11;
             // 
             // tabPage1
             // 
             tabPage1.Controls.Add(richTextBox1);
-            tabPage1.Location = new Point(4, 34);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Margin = new Padding(2);
             tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1426, 1005);
+            tabPage1.Padding = new Padding(2);
+            tabPage1.Size = new Size(996, 598);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
             tabPage1.UseVisualStyleBackColor = true;
@@ -523,10 +541,11 @@ namespace Appium_Wizard
             // tabPage2
             // 
             tabPage2.Controls.Add(richTextBox2);
-            tabPage2.Location = new Point(4, 34);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Margin = new Padding(2);
             tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1426, 1005);
+            tabPage2.Padding = new Padding(2);
+            tabPage2.Size = new Size(996, 598);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
             tabPage2.UseVisualStyleBackColor = true;
@@ -534,8 +553,9 @@ namespace Appium_Wizard
             // richTextBox2
             // 
             richTextBox2.Location = new Point(0, 0);
+            richTextBox2.Margin = new Padding(2);
             richTextBox2.Name = "richTextBox2";
-            richTextBox2.Size = new Size(747, 459);
+            richTextBox2.Size = new Size(524, 277);
             richTextBox2.TabIndex = 0;
             richTextBox2.Text = resources.GetString("richTextBox2.Text");
             richTextBox2.TextChanged += richTextBox2_TextChanged;
@@ -543,10 +563,11 @@ namespace Appium_Wizard
             // tabPage3
             // 
             tabPage3.Controls.Add(richTextBox3);
-            tabPage3.Location = new Point(4, 34);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Margin = new Padding(2);
             tabPage3.Name = "tabPage3";
-            tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(1426, 1005);
+            tabPage3.Padding = new Padding(2);
+            tabPage3.Size = new Size(996, 598);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
             tabPage3.UseVisualStyleBackColor = true;
@@ -554,8 +575,9 @@ namespace Appium_Wizard
             // richTextBox3
             // 
             richTextBox3.Location = new Point(0, 0);
+            richTextBox3.Margin = new Padding(2);
             richTextBox3.Name = "richTextBox3";
-            richTextBox3.Size = new Size(747, 457);
+            richTextBox3.Size = new Size(524, 276);
             richTextBox3.TabIndex = 0;
             richTextBox3.Text = resources.GetString("richTextBox3.Text");
             richTextBox3.TextChanged += richTextBox3_TextChanged;
@@ -563,10 +585,11 @@ namespace Appium_Wizard
             // tabPage4
             // 
             tabPage4.Controls.Add(richTextBox4);
-            tabPage4.Location = new Point(4, 34);
+            tabPage4.Location = new Point(4, 24);
+            tabPage4.Margin = new Padding(2);
             tabPage4.Name = "tabPage4";
-            tabPage4.Padding = new Padding(3);
-            tabPage4.Size = new Size(1426, 1005);
+            tabPage4.Padding = new Padding(2);
+            tabPage4.Size = new Size(996, 598);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
             tabPage4.UseVisualStyleBackColor = true;
@@ -574,8 +597,9 @@ namespace Appium_Wizard
             // richTextBox4
             // 
             richTextBox4.Location = new Point(0, 0);
+            richTextBox4.Margin = new Padding(2);
             richTextBox4.Name = "richTextBox4";
-            richTextBox4.Size = new Size(747, 457);
+            richTextBox4.Size = new Size(524, 276);
             richTextBox4.TabIndex = 0;
             richTextBox4.Text = resources.GetString("richTextBox4.Text");
             richTextBox4.TextChanged += richTextBox4_TextChanged;
@@ -583,10 +607,11 @@ namespace Appium_Wizard
             // tabPage5
             // 
             tabPage5.Controls.Add(richTextBox5);
-            tabPage5.Location = new Point(4, 34);
+            tabPage5.Location = new Point(4, 24);
+            tabPage5.Margin = new Padding(2);
             tabPage5.Name = "tabPage5";
-            tabPage5.Padding = new Padding(3);
-            tabPage5.Size = new Size(1426, 1005);
+            tabPage5.Padding = new Padding(2);
+            tabPage5.Size = new Size(996, 598);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";
             tabPage5.UseVisualStyleBackColor = true;
@@ -594,8 +619,9 @@ namespace Appium_Wizard
             // richTextBox5
             // 
             richTextBox5.Location = new Point(0, 0);
+            richTextBox5.Margin = new Padding(2);
             richTextBox5.Name = "richTextBox5";
-            richTextBox5.Size = new Size(747, 459);
+            richTextBox5.Size = new Size(524, 277);
             richTextBox5.TabIndex = 0;
             richTextBox5.Text = resources.GetString("richTextBox5.Text");
             richTextBox5.TextChanged += richTextBox5_TextChanged;
@@ -605,13 +631,13 @@ namespace Appium_Wizard
             contextMenuStrip2.ImageScalingSize = new Size(24, 24);
             contextMenuStrip2.Items.AddRange(new ToolStripItem[] { copyUDIDToolStripMenuItem });
             contextMenuStrip2.Name = "contextMenuStrip2";
-            contextMenuStrip2.Size = new Size(183, 36);
+            contextMenuStrip2.Size = new Size(141, 34);
             // 
             // copyUDIDToolStripMenuItem
             // 
             copyUDIDToolStripMenuItem.Image = Properties.Resources.files;
             copyUDIDToolStripMenuItem.Name = "copyUDIDToolStripMenuItem";
-            copyUDIDToolStripMenuItem.Size = new Size(182, 32);
+            copyUDIDToolStripMenuItem.Size = new Size(140, 30);
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
@@ -620,9 +646,10 @@ namespace Appium_Wizard
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(capabilityCopyButton);
             panel1.Controls.Add(richTextBox6);
-            panel1.Location = new Point(30, 448);
+            panel1.Location = new Point(21, 269);
+            panel1.Margin = new Padding(2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(583, 163);
+            panel1.Size = new Size(409, 99);
             panel1.TabIndex = 13;
             panel1.Visible = false;
             // 
@@ -631,19 +658,21 @@ namespace Appium_Wizard
             capabilityCopyButton.BackColor = SystemColors.ControlLightLight;
             capabilityCopyButton.BackgroundImage = Properties.Resources.files;
             capabilityCopyButton.BackgroundImageLayout = ImageLayout.Stretch;
-            capabilityCopyButton.Location = new Point(526, -3);
+            capabilityCopyButton.Location = new Point(368, -2);
+            capabilityCopyButton.Margin = new Padding(2);
             capabilityCopyButton.Name = "capabilityCopyButton";
-            capabilityCopyButton.Size = new Size(57, 53);
+            capabilityCopyButton.Size = new Size(40, 32);
             capabilityCopyButton.TabIndex = 18;
             capabilityCopyButton.UseVisualStyleBackColor = false;
             capabilityCopyButton.Click += capabilityCopyButton_Click;
             // 
             // richTextBox6
             // 
-            richTextBox6.Location = new Point(-1, -2);
+            richTextBox6.Location = new Point(-1, -1);
+            richTextBox6.Margin = new Padding(2);
             richTextBox6.Name = "richTextBox6";
             richTextBox6.ReadOnly = true;
-            richTextBox6.Size = new Size(583, 187);
+            richTextBox6.Size = new Size(409, 114);
             richTextBox6.TabIndex = 20;
             richTextBox6.Text = "";
             // 
@@ -652,13 +681,13 @@ namespace Appium_Wizard
             contextMenuStrip3.ImageScalingSize = new Size(24, 24);
             contextMenuStrip3.Items.AddRange(new ToolStripItem[] { copyIPAddressToolStripMenuItem });
             contextMenuStrip3.Name = "contextMenuStrip3";
-            contextMenuStrip3.Size = new Size(225, 36);
+            contextMenuStrip3.Size = new Size(169, 34);
             // 
             // copyIPAddressToolStripMenuItem
             // 
             copyIPAddressToolStripMenuItem.Image = Properties.Resources.files;
             copyIPAddressToolStripMenuItem.Name = "copyIPAddressToolStripMenuItem";
-            copyIPAddressToolStripMenuItem.Size = new Size(224, 32);
+            copyIPAddressToolStripMenuItem.Size = new Size(168, 30);
             copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
             // 
             // contextMenuStrip4
@@ -666,13 +695,13 @@ namespace Appium_Wizard
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
             contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(324, 164);
+            contextMenuStrip4.Size = new Size(240, 154);
             // 
             // installAppToolStripMenuItem
             // 
             installAppToolStripMenuItem.Image = Properties.Resources.Install;
             installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
-            installAppToolStripMenuItem.Size = new Size(323, 32);
+            installAppToolStripMenuItem.Size = new Size(239, 30);
             installAppToolStripMenuItem.Text = "Install App";
             installAppToolStripMenuItem.Click += installAppToolStripMenuItem_Click;
             // 
@@ -680,7 +709,7 @@ namespace Appium_Wizard
             // 
             launchAppToolStripMenuItem.Image = Properties.Resources.application;
             launchAppToolStripMenuItem.Name = "launchAppToolStripMenuItem";
-            launchAppToolStripMenuItem.Size = new Size(323, 32);
+            launchAppToolStripMenuItem.Size = new Size(239, 30);
             launchAppToolStripMenuItem.Text = "Apps - Launch | Kill | Uninstall";
             launchAppToolStripMenuItem.Click += launchAppToolStripMenuItem_Click;
             // 
@@ -688,7 +717,7 @@ namespace Appium_Wizard
             // 
             refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
             refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
-            refreshStatusToolStripMenuItem.Size = new Size(323, 32);
+            refreshStatusToolStripMenuItem.Size = new Size(239, 30);
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
             refreshStatusToolStripMenuItem.Click += refreshStatusToolStripMenuItem_Click;
             // 
@@ -696,7 +725,7 @@ namespace Appium_Wizard
             // 
             takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
             takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
-            takeScreenshotToolStripMenuItem.Size = new Size(323, 32);
+            takeScreenshotToolStripMenuItem.Size = new Size(239, 30);
             takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
             takeScreenshotToolStripMenuItem.Click += takeScreenshotToolStripMenuItem_Click;
             // 
@@ -704,7 +733,7 @@ namespace Appium_Wizard
             // 
             rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
             rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
-            rebootDeviceToolStripMenuItem.Size = new Size(323, 32);
+            rebootDeviceToolStripMenuItem.Size = new Size(239, 30);
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
             rebootDeviceToolStripMenuItem.Click += rebootDeviceToolStripMenuItem_Click;
             // 
@@ -712,9 +741,10 @@ namespace Appium_Wizard
             // 
             label1.AutoSize = true;
             label1.Dock = DockStyle.Fill;
-            label1.Location = new Point(0, 35);
+            label1.Location = new Point(0, 24);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(0, 25);
+            label1.Size = new Size(0, 15);
             label1.TabIndex = 15;
             // 
             // tableLayoutPanel1
@@ -723,21 +753,23 @@ namespace Appium_Wizard
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 97.26736F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2.732644F));
-            tableLayoutPanel1.Location = new Point(33, 37);
+            tableLayoutPanel1.Location = new Point(23, 22);
+            tableLayoutPanel1.Margin = new Padding(2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(2019, 47);
+            tableLayoutPanel1.Size = new Size(1413, 28);
             tableLayoutPanel1.TabIndex = 16;
             tableLayoutPanel1.Visible = false;
             // 
             // capabilityLabel
             // 
             capabilityLabel.AutoSize = true;
-            capabilityLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            capabilityLabel.Location = new Point(30, 423);
+            capabilityLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            capabilityLabel.Location = new Point(21, 254);
+            capabilityLabel.Margin = new Padding(2, 0, 2, 0);
             capabilityLabel.Name = "capabilityLabel";
-            capabilityLabel.Size = new Size(97, 25);
+            capabilityLabel.Size = new Size(60, 15);
             capabilityLabel.TabIndex = 17;
             capabilityLabel.Text = "Capability";
             capabilityLabel.Visible = false;
@@ -747,9 +779,10 @@ namespace Appium_Wizard
             mandatorymsglabel.AutoSize = true;
             mandatorymsglabel.BackColor = SystemColors.ControlLightLight;
             mandatorymsglabel.ForeColor = Color.IndianRed;
-            mandatorymsglabel.Location = new Point(30, 345);
+            mandatorymsglabel.Location = new Point(21, 207);
+            mandatorymsglabel.Margin = new Padding(2, 0, 2, 0);
             mandatorymsglabel.Name = "mandatorymsglabel";
-            mandatorymsglabel.Size = new Size(556, 25);
+            mandatorymsglabel.Size = new Size(367, 15);
             mandatorymsglabel.TabIndex = 18;
             mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.";
             mandatorymsglabel.Visible = false;
@@ -761,10 +794,10 @@ namespace Appium_Wizard
             // 
             // MainScreen
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1924, 1050);
+            ClientSize = new Size(899, 421);
             Controls.Add(checkBox1);
             Controls.Add(mandatorymsglabel);
             Controls.Add(capabilityLabel);
@@ -780,6 +813,7 @@ namespace Appium_Wizard
             Controls.Add(tabControl1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
+            Margin = new Padding(2);
             Name = "MainScreen";
             Text = "Appium Wizard";
             WindowState = FormWindowState.Maximized;
@@ -880,5 +914,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem sessionSettingsToolStripMenuItem;
         private ToolStripMenuItem xCUITestSettingsToolStripMenuItem;
         private ToolStripMenuItem uIAutomator2SettingsToolStripMenuItem;
+        private ToolStripMenuItem iOSExecutorToolStripMenuItem;
     }
 }

@@ -31,22 +31,29 @@ namespace Appium_Wizard
             List<string> list = new List<string>();
             if (executable == iOSExecutable.go)
             {
-                string deviceListString = ExecuteCommand("list");
-                if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+                string deviceListString = ExecuteCommand("list","any",true,10000);
+                if (deviceListString.Contains("Process did not complete within the allotted time"))
                 {
-                    list.Add("ITunes not installed");
+                    return GetListOfDevicesUDID(iOSExecutable.py);
                 }
                 else
                 {
-                    JObject json = JObject.Parse(deviceListString);
-                    JArray deviceList = (JArray)json["deviceList"];
-                    foreach (JToken device in deviceList)
+                    if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
                     {
-                        string udid = device.ToString();
-                        list.Add(udid);
+                        list.Add("ITunes not installed");
                     }
+                    else
+                    {
+                        JObject json = JObject.Parse(deviceListString);
+                        JArray deviceList = (JArray)json["deviceList"];
+                        foreach (JToken device in deviceList)
+                        {
+                            string udid = device.ToString();
+                            list.Add(udid);
+                        }
+                    }
+                    return list;
                 }
-                return list;
             }
             else
             {
@@ -64,9 +71,16 @@ namespace Appium_Wizard
         {
             if (executable == iOSExecutable.go)
             {
-                string output = ExecuteCommand("info", udid);
-                Dictionary<string, object> deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
-                return deviceValues;
+                string output = ExecuteCommand("info", udid, true, 10000);
+                if (output.Contains("Process did not complete within the allotted time"))
+                {
+                    return GetDeviceInformation(udid, iOSExecutable.py);
+                }
+                else
+                {
+                    Dictionary<string, object> deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
+                    return deviceValues;
+                }
             }
             else
             {
@@ -192,11 +206,16 @@ namespace Appium_Wizard
             return isProtected;
         }
 
-        public bool isDeveloperModeDisabled(string udid)
+        public bool isDeveloperModeDisabled(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            if (isGo)
+            bool isDevModeDisabled = false;
+            if (executable == iOSExecutable.go)
             {
-                bool isDevModeDisabled = ExecuteCommand("devicestate list", udid).Contains("Could not start service:com.apple.instruments.remoteserver.DVTSecureSocketProxy with reason:'InvalidService'");
+                string output = ExecuteCommand("devmode get", udid);
+                if (output.Contains("Developer mode enabled: true"))
+                {
+                    return true;
+                }
                 return isDevModeDisabled;
             }
             else
@@ -606,23 +625,6 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetLinuxPathFromInput(string WindowsPath)
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = $"/C wsl wslpath -u \"{WindowsPath}\"";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd().Trim();
-            process.WaitForExit();
-            return "\"" + output + "\"";
-
-        }
-
-
         public string RunWebDriverAgentQuick(string udid)
         {
             if (isGo)
@@ -839,7 +841,7 @@ namespace Appium_Wizard
         }
 
 
-        public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true)
+        public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true, int timeout = 0)
         {
             try
             {
@@ -852,13 +854,26 @@ namespace Appium_Wizard
                     iOSProcess.StartInfo.Arguments = arguments + " --udid=" + udid;
                 }
                 iOSProcess.Start();
+                bool processExited = false;
                 if (waitForExit)
                 {
-                    iOSProcess.WaitForExit();
+                    if (timeout == 0)
+                    {
+                        iOSProcess.WaitForExit();
+                    }
+                    else
+                    {
+                        processExited = iOSProcess.WaitForExit(timeout);
+                    }                   
+                }
+                if (timeout != 0 && !processExited)
+                {
+                    iOSProcess.Kill(); // Kill the process if it did not exit within the timeout
+                    return "Process did not complete within the allotted time.";
                 }
                 string output = iOSProcess.StandardOutput.ReadToEnd();
                 string error = iOSProcess.StandardError.ReadToEnd();
-                if (output != "")
+                if (!string.IsNullOrEmpty(output))
                 {
                     return output;
                 }
@@ -874,48 +889,64 @@ namespace Appium_Wizard
             }
         }
 
-        public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false)
+        public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
-            bool isClickedOK = iOSAsyncMethods.GetInstance().CreateTunnel();
-            if (isClickedOK)
+            bool isTunnelRunning = false;
+            if (command.Contains("developer"))
             {
-                Process process = new Process();
-                process.StartInfo.FileName = FilesPath.pymd3FilePath;
-                if (udid == "")
+                isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
+                if (!isTunnelRunning)
                 {
-                    process.StartInfo.Arguments = command;
+                    return "tunnel not created";
                 }
-                else
-                {
-                    process.StartInfo.Arguments = command + " --udid " + udid;
-                }
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-                string error = process.StandardError.ReadToEnd();
-                string output = process.StandardOutput.ReadToEnd();
-                string result = output + error;
-                process.WaitForExit();
-                result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
-                process.Close();
-                if (closeTunnel)
-                {
-                    try
-                    {
-                        iOSAsyncMethods.GetInstance().CloseTunnel();
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
-                return result;
+            }
+            Process process = new Process();
+            process.StartInfo.FileName = FilesPath.pymd3FilePath;
+            if (udid == "")
+            {
+                process.StartInfo.Arguments = command;
             }
             else
             {
-                return "tunnel not created";
+                process.StartInfo.Arguments = command + " --udid " + udid;
             }
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            bool processExited = false;
+            string error = process.StandardError.ReadToEnd();
+            string output = process.StandardOutput.ReadToEnd();
+            string result = output + error;
+            if (timeout == 0)
+            {
+                process.WaitForExit();
+            }
+            else
+            {
+                processExited = iOSProcess.WaitForExit(timeout);
+            }
+            if (timeout != 0 && !processExited)
+            {
+                process.Kill(); // Kill the process if it did not exit within the timeout
+                MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return "Process did not complete within the allotted time.";
+            }
+            result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+            process.Close();
+            if (closeTunnel)
+            {
+                try
+                {
+                    iOSAsyncMethods.GetInstance().CloseTunnel();
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return result;
+
         }
 
         public string GetDeviceModel(string input)
@@ -1443,16 +1474,22 @@ namespace Appium_Wizard
         public bool CreateTunnel()
         {
             CommonProgress commonProgress = new CommonProgress();
-            bool clickedOK = false; int counter = 1;
-            bool isProcessRunning = iOSAPIMethods.isTunnelRunning();           
-            if (!isProcessRunning)
+            int counter = 1;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...",10);
+            bool isTunnelRunning = iOSAPIMethods.isTunnelRunning();
+            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
+            if (isTunnelRunning)
             {
-                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                commonProgress.Close();
+                return true;
+            }
+            else
+            {
+                var result = MessageBox.Show("----->THIS WORKS ONLY WITH iOS VERSION >=17.4<-----\n\nStarting at iOS 17.0, Apple introduced a new CoreDevice framework to work with iOS devices.\n\nIn order to communicate with the developer services you'll be required to first create trusted tunnel using a command.\n\nThis command must be run with high privileges since it creates a new TUN/TAP device which is a high privilege operation.\n\nSo click OK to grant permission to create the tunnel as an admin[It may not prompt if you logged in as admin or it will ask admin credentials on clicking OK]\n\nNOTE : You might get Unknown publisher security warning from windows, Just Run.", "Admin Privilege Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                 {
-                    commonProgress.Show();
-                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\n\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
-                    clickedOK = true;
+                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\nNote : Tunnel will be created only once for a application lifecycle.\nIt won't ask permission again until you re-launch the Appium Wizard.");
                     try
                     {
                         tunnelProcess = new Process();
@@ -1499,7 +1536,7 @@ namespace Appium_Wizard
                 else
                 {
                     commonProgress.Close();
-                    clickedOK = false;
+                    MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try
                     //{
@@ -1517,12 +1554,8 @@ namespace Appium_Wizard
                     //}
                 }
             }
-            else
-            {
-                clickedOK = true;
-            }
             commonProgress.Close();
-            return clickedOK;
+            return iOSAPIMethods.isTunnelRunning();
         }
 
         public bool CreateTunnelGo()

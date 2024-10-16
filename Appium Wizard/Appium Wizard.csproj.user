@@ -28,6 +28,9 @@
     <Compile Update="InstalliOSApp.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="iOS Executor.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="iOSProfileManagement.cs">
       <SubType>Form</SubType>
     </Compile>

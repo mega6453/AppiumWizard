@@ -203,6 +203,7 @@ namespace Appium_Wizard
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
             ScreenshotToolStripButton.Enabled = true;
+            SettingsToolStripButton.Enabled = true;
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -254,6 +255,7 @@ namespace Appium_Wizard
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
             ScreenshotToolStripButton.Enabled = false;
+            SettingsToolStripButton.Enabled = false;
         }
 
         private async void InitializeWebView()

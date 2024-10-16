@@ -101,7 +101,12 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    iOSMethods.GetInstance().LaunchApp(udid, selectedPackageName);
+                    var output = iOSMethods.GetInstance().LaunchApp(udid, selectedPackageName);
+                    if (output.Contains("profile has not been explicitly trusted by the user"))
+                    {
+                        MessageBox.Show("Unable to launch " + selectedPackageName + " because it has an invalid code signature, inadequate entitlements or its profile has not been explicitly trusted by the user.\n\nTo trust a profile on the device, go to Settings-> General-> VPN & Device Management-> Select Profile-> Trust.", "Launch Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        GoogleAnalytics.SendEvent("Launch_iOS_App_Profile_Not_Trusted");
+                    }
                     GoogleAnalytics.SendEvent("iOS_App_Launched");
                 }
             });

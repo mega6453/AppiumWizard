@@ -7,7 +7,7 @@
         public string WDAsessionId = "", UIAutomatorSessionId = "", URL;
         int width, height, proxyPort, screenServerPort;
         public string IPAddress = "localhost";
-        string deviceName, udid, OSType, OSVersion;
+        string deviceName, udid, OSType, OSVersion, connectionType;
         bool isScreenServerStarted = false;
         string title;
         public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress)
@@ -16,6 +16,7 @@
             this.deviceName = selectedDeviceName;
             this.OSType = selectedOS;
             this.OSVersion = selectedVersion;
+            this.connectionType = connectionType;
             var screeSize = getDeviceScreenSize(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
@@ -106,7 +107,16 @@
                             proxyPort = Common.GetFreePort();
                             screenServerPort = Common.GetFreePort();
                             iOSAsyncMethods.GetInstance().CloseTunnel();
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            if (connectionType.Equals("Wi-Fi"))
+                            {
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
+                            }
+                            else
+                            {
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            }
+                            //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenServerPort, 9100);
                             if (installedNow)
                             {
@@ -154,13 +164,36 @@
                                 if (deviceVersion >= version17Plus)
                                 {
                                     commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 35);
-                                    var isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
-                                    if (!isTunnelStarted)
+                                    bool isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
+                                    if (isTunnelStarted)
                                     {
-                                        commonProgress.Close();
-                                        isScreenServerStarted = false;
-                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Sometimes this may fail if you are using VPN. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        return;
+                                        iOSMethods.isGo = true;
+                                        iOSAsyncMethods.isGo = true;
+                                    }
+                                    else
+                                    {
+                                        var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                                        if (result == DialogResult.Yes)
+                                        {
+                                            isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnel();
+                                            if (isTunnelStarted)
+                                            {
+                                                iOSMethods.isGo = false;
+                                                iOSAsyncMethods.isGo = false;
+                                            }
+                                            else
+                                            {
+                                                commonProgress.Close();
+                                                isScreenServerStarted = false;
+                                                MessageBox.Show("Tunnel creation failed.\n\nIf Admin permission not given, Please provide admin permission when system prompts.\n\nIf Admin permission given, Please try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            isScreenServerStarted = false;
+                                            return;
+                                        }
                                     }
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 40);
@@ -199,7 +232,7 @@
                                     commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 50);
                                     iOSMethods.GetInstance().InstallWDA(udid);
                                 }
-                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone if it asks...", 70);
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...", 70);
                                 WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
@@ -270,7 +303,15 @@
                             WDAsessionId = deviceDetails[udid]["sessionId"].ToString();
                             isScreenServerStarted = true;
                             commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            if (connectionType.Equals("Wi-Fi"))
+                            {
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid,proxyPort,8100);
+                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid,screenServerPort,9100);
+                            }
+                            else
+                            {
+                                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
+                            }
                             WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
                             //bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenServerPort);
                             //if (!isLoaded)
@@ -429,17 +470,17 @@
                         screenServerPort = Common.GetFreePort();
                         AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                     }
-                    commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...",70);
+                    commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...", 70);
                     bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
                     if (!IsUIAutomatorRunning)
                     {
-                        commonProgress.UpdateStepLabel(title, "Starting UIAutomator...",75);
+                        commonProgress.UpdateStepLabel(title, "Starting UIAutomator...", 75);
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
                         sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
                     }
                     else
                     {
-                        commonProgress.UpdateStepLabel(title, "Checking for existing session...",75);
+                        commonProgress.UpdateStepLabel(title, "Checking for existing session...", 75);
                         bool isSessionCreated = false, isItValidSession = false;
                         if (deviceSessionId.ContainsKey(udid))
                         {

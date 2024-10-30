@@ -50,7 +50,7 @@ jobs:
       run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:ReadyToRun=true   
 
     - name: Archive artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: app
         path: "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish"

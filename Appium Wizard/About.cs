@@ -28,7 +28,8 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-MIT";
+                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-MIT\n" +
+                                          "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-GPL";
                 ThanksToRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
             }
         }

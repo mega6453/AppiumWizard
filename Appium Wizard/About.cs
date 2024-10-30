@@ -18,13 +18,17 @@ namespace Appium_Wizard
            
             try
             {
-                LicenseRichTextBox.Text = await AboutText.GetLicenseText();
+                string MITLicense = await AboutText.GetLicenseText("MIT");
+                string GPLLicense = await AboutText.GetLicenseText("GPL");
+                string linebreak = "\n\n--------------------------------------------------------------------------\n\n";
+                string finalLicense = MITLicense + linebreak + GPLLicense;
+                LicenseRichTextBox.Text = finalLicense;
                 var thanksTo = await AboutText.ExtractSections();
                 ThanksToRichTextBox.Text = thanksTo;
             }
             catch (Exception)
             {
-                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE";
+                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-MIT";
                 ThanksToRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
             }
         }
@@ -108,9 +112,9 @@ namespace Appium_Wizard
             }
         }
 
-        public static async Task<string> GetLicenseText()
+        public static async Task<string> GetLicenseText(string licenseType)
         {
-            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/LICENSE";
+            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/LICENSE-"+licenseType;
             using (HttpClient client = new HttpClient())
             {
                 try

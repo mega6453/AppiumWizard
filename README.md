@@ -91,7 +91,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Innosetup
 
 ## Thanks To
-* [danielpaulus](https://github.com/danielpaulus) - For the excellent go-ios cli tool which provides "operating system independent implementation of iOS device features".
+* [danielpaulus](https://github.com/danielpaulus) - For iOS device features in windows.
+* [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS device features in windows. 
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
 * [Dadoum](https://github.com/Dadoum/zsign-Windows) - For providing zsign windows executable.

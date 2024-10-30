@@ -107,6 +107,8 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
+            otherDocsToolStripMenuItem = new ToolStripMenuItem();
+            iOSNativeAppsBundleToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -363,7 +365,7 @@ namespace Appium_Wizard
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, otherDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
@@ -792,6 +794,22 @@ namespace Appium_Wizard
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
             // 
+            // otherDocsToolStripMenuItem
+            // 
+            otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
+            otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
+            otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
+            otherDocsToolStripMenuItem.Size = new Size(255, 30);
+            otherDocsToolStripMenuItem.Text = "Other Docs";
+            // 
+            // iOSNativeAppsBundleToolStripMenuItem
+            // 
+            iOSNativeAppsBundleToolStripMenuItem.Image = Properties.Resources.link;
+            iOSNativeAppsBundleToolStripMenuItem.Name = "iOSNativeAppsBundleToolStripMenuItem";
+            iOSNativeAppsBundleToolStripMenuItem.Size = new Size(226, 30);
+            iOSNativeAppsBundleToolStripMenuItem.Text = "iOS Native Apps Bundle IDs";
+            iOSNativeAppsBundleToolStripMenuItem.Click += iOSNativeAppsBundleToolStripMenuItem_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -915,5 +933,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem xCUITestSettingsToolStripMenuItem;
         private ToolStripMenuItem uIAutomator2SettingsToolStripMenuItem;
         private ToolStripMenuItem iOSExecutorToolStripMenuItem;
+        private ToolStripMenuItem otherDocsToolStripMenuItem;
+        private ToolStripMenuItem iOSNativeAppsBundleToolStripMenuItem;
     }
 }

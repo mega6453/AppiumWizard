@@ -40,7 +40,7 @@
                 PairingIPTextBox.Enabled = false;
                 PairPortNumberTextbox.Enabled = false;
                 PairingCodeTextbox.Enabled = false;
-                CancelButton.Enabled = false;
+                CancelButton1.Enabled = false;
                 PairButton.Enabled = false;
                 //Enable Connect section
                 ConnectIPTextBox.Text = PairingIPTextBox.Text;

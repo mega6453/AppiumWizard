@@ -224,15 +224,21 @@ namespace Appium_Wizard
             }
         }
 
-        public void RebootDevice(string udid, iOSExecutable executable = iOSExecutable.go)
+        public bool RebootDevice(string udid, iOSExecutable executable = iOSExecutable.go)
         {
             if (executable.Equals(iOSExecutable.go))
             {
-                ExecuteCommand("reboot", udid);
+                var output = ExecuteCommand("reboot", udid);
+                if (output.Contains("\"msg\":\"ok\""))
+                {
+                    return true;
+                }
+                return false;
             }
             else
             {
                 ExecuteCommandPy("diagnostics restart", udid);
+                return true; //Need to verify and fix
             }
         }
 
@@ -275,6 +281,7 @@ namespace Appium_Wizard
         {
             if (isGo)
             {
+                iOSAsyncMethods.GetInstance().CreateTunnelGo();
                 ExecuteCommand("screenshot --output=" + path, udid);
             }
             else
@@ -661,7 +668,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
@@ -723,6 +730,16 @@ namespace Appium_Wizard
             {
                 return ExecuteCommandPy("mounter auto-mount", udid, false);
             }
+        }
+
+        public bool isImageMounted(string udid)
+        {
+            var output = ExecuteCommand("image list", udid);
+            if (output.Contains("\"msg\":\"none\""))
+            {
+                return false;
+            }
+            return true;
         }
 
         public Dictionary<string, string> GetIPAInformation(string ipaFilePath)
@@ -796,6 +813,7 @@ namespace Appium_Wizard
         {
             if (isGo)
             {
+                iOSAsyncMethods.GetInstance().CreateTunnelGo();
                 return ExecuteCommand("launch " + bundleId, udid);
             }
             else
@@ -832,12 +850,18 @@ namespace Appium_Wizard
         {
             if (isGo)
             {
+                iOSAsyncMethods.GetInstance().CreateTunnelGo();
                 ExecuteCommand("kill " + bundleId, udid);
             }
             else
             {
                 ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
             }
+        }
+
+        public void GoToHomeScreen(string udid)
+        {
+            LaunchApp(udid, "com.apple.springboard");
         }
 
 
@@ -879,7 +903,11 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    return error;
+                    if (error.Contains("PasswordProtected") | error.Contains("runtime error: invalid memory address or nil pointer dereference"))
+                    {
+                        MessageBox.Show("Failed to execute the operation. Please Unlock the device/Trust the computer and execute again.", "Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    }
+                    return "Error:"+error;
                 }
             }
             catch (Exception ex)
@@ -1295,138 +1323,156 @@ namespace Appium_Wizard
         string runwdaOutput = "", runwdaError = "";
         public async Task<string> RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
-            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            try
             {
-                int port1 = MainScreen.udidProxyPort[udid];
-                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                if (!sessionId.Equals("nosession"))
+                if (MainScreen.udidProxyPort.ContainsKey(udid))
                 {
-                    return sessionId;
-                }
-            }
-            
-            if (isGo && !is17Plus)
-            {
-                // Create a new process
-                Process process = new Process();
-
-                // Configure the process
-                process.StartInfo.FileName = iOSServerFilePath;
-                process.StartInfo.Arguments = "runwda --udid=" + udid;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.EnableRaisingEvents = true;
-
-                // Register event handlers for error and output data received
-                process.ErrorDataReceived += Process_ErrorDataReceived;
-                process.OutputDataReceived += Process_OutputDataReceived;
-
-                // Start the process
-                process.Start();
-                var processId = process.Id;
-                MainScreen.runningProcesses.Add(processId);
-                //Thread.Sleep(2000);
-                await Task.Delay(2000);
-                // Begin asynchronous reading of the output/error streams
-                process.BeginErrorReadLine();
-                process.BeginOutputReadLine();
-
-                // Wait for the process to exit
-                //process.WaitForExit();
-
-                // Clean up resources
-                //process.Close();
-                bool isPasscodeRequired = false;
-                int count = 1;
-                string sessionId = string.Empty;
-                bool isWDARanAtleaseOnce = false;
-                while (!process.HasExited)
-                {
-                    if (!string.IsNullOrEmpty(runwdaError))
+                    int port1 = MainScreen.udidProxyPort[udid];
+                    string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
                     {
-                        if (runwdaError.Contains("Process started successfully"))
+                        return sessionId;
+                    }
+                }
+
+                if (isGo && !is17Plus)
+                {
+                    // Create a new process
+                    Process process = new Process();
+
+                    // Configure the process
+                    process.StartInfo.FileName = iOSServerFilePath;
+                    process.StartInfo.Arguments = "runwda --udid=" + udid;
+                    process.StartInfo.UseShellExecute = false;
+                    //process.StartInfo.CreateNoWindow = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.EnableRaisingEvents = true;
+
+                    // Register event handlers for error and output data received
+                    //process.ErrorDataReceived += Process_ErrorDataReceived;
+                    //process.OutputDataReceived += Process_OutputDataReceived;
+                    process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, port);
+                    process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, port);
+
+                    // Start the process
+                    process.Start();
+                    var processId = process.Id;
+                    MainScreen.runningProcesses.Add(processId);
+                    //Thread.Sleep(2000);
+                    await Task.Delay(2000);
+                    // Begin asynchronous reading of the output/error streams
+                    process.BeginErrorReadLine();
+                    process.BeginOutputReadLine();
+
+                    // Wait for the process to exit
+                    //process.WaitForExit();
+
+                    // Clean up resources
+                    //process.Close();
+                    bool isPasscodeRequired = false;
+                    int count = 1;
+                    string sessionId = string.Empty;
+                    bool isWDARanAtleaseOnce = false;
+                    while (!process.HasExited)
+                    {
+                        if (!string.IsNullOrEmpty(runwdaError))
                         {
-                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                            while (sessionId.Equals("nosession") && count <= 6)
+                            if (runwdaError.Contains("Process started successfully"))
                             {
-                                await Task.Run(async () => {
-                                    //Thread.Sleep(5000);
-                                    await Task.Delay(5000);
-                                    sessionId = iOSAPIMethods.CreateWDASession(port);
-                                    bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
-                                    if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
-                                    {
-                                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                        isPasscodeRequired = true;
-                                        isWDARanAtleaseOnce = true;
-                                    }
-                                    else if (!IsWDARunningInAppsList)
-                                    {
-                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                        if (isWDARanAtleaseOnce)
-                                        {
-                                            commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                        }                                        
-                                        isPasscodeRequired = true;
-                                    }
-                                    count++;
-                                });
-                            }
-                            if (sessionId.Equals("nosession") & isPasscodeRequired)
-                            {
-                                process.Close();
-                                return "nosession passcode required";
-                            }
-                            else
-                            {
-                                process.Close();
                                 sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                                return sessionId;
+                                while (sessionId.Equals("nosession") && count <= 6)
+                                {
+                                    await Task.Run(async () => {
+                                        //Thread.Sleep(5000);
+                                        await Task.Delay(5000);
+                                        sessionId = iOSAPIMethods.CreateWDASession(port);
+                                        bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
+                                        if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
+                                        {
+                                            commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                            isPasscodeRequired = true;
+                                            isWDARanAtleaseOnce = true;
+                                        }
+                                        else if (!IsWDARunningInAppsList)
+                                        {
+                                            iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                            if (isWDARanAtleaseOnce)
+                                            {
+                                                commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                            }
+                                            isPasscodeRequired = true;
+                                        }
+                                        count++;
+                                    });
+                                }
+                                if (sessionId.Equals("nosession") & isPasscodeRequired)
+                                {
+                                    process.Close();
+                                    return "nosession passcode required";
+                                }
+                                else
+                                {
+                                    process.Close();
+                                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                                    return sessionId;
+                                }
                             }
                         }
                     }
+                    if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+                    {
+                        return "Enable Developer Mode";
+                    }
+                    if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
+                    {
+                        return "Password Protected";
+                    }
+                    if (runwdaError.Contains("Timed out while enabling automation mode"))
+                    {
+                        return "Timed out";
+                    }
+                    //if (runwdaError.Contains("WDA process ended unexpectedly"))
+                    //{
+                    //    return RunWebDriverAgentQuick(commonProgress,udid,port);
+                    //}
+                    return "unhandled";
                 }
-                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
+                else
                 {
-                    return "Enable Developer Mode";
+                    return RunWebDriverAgentQuick(commonProgress, udid, port);
                 }
-                if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-                {
-                    return "Password Protected";
-                }
-                if (runwdaError.Contains("Timed out while enabling automation mode"))
-                {
-                    return "Timed out";
-                }
-                //if (runwdaError.Contains("WDA process ended unexpectedly"))
-                //{
-                //    return RunWebDriverAgentQuick(commonProgress,udid,port);
-                //}
-                return "unhandled";
+
             }
-            else
+            catch (Exception)
             {
                 return RunWebDriverAgentQuick(commonProgress, udid, port);
             }
         }
-        public void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        public void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e, int port)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 Console.WriteLine("Error: " + e.Data);
                 runwdaError += e.Data;
+                if (e.Data.Contains("\"authorized\":true,\"level\":\"info\",\"msg\":\"authorized\""))
+                {
+                    iOSAPIMethods.GoToHome(port);
+                }
             }
         }
 
         // Event handler for output data received
-        public void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        public void Process_OutputDataReceived(object sender, DataReceivedEventArgs e, int port)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
                 Console.WriteLine("Output: " + e.Data);
                 runwdaOutput += e.Data;
+                if (e.Data.Contains("\"authorized\":true,\"level\":\"info\",\"msg\":\"authorized\""))
+                {
+                    iOSAPIMethods.GoToHome(port);
+                }
             }
         }
 
@@ -1438,21 +1484,21 @@ namespace Appium_Wizard
             string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
             if (output.Contains("Process launched"))
             {
-                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                while (sessionId.Equals("nosession") && count <= 6)
+                Thread.Sleep(2000);
+                sessionId = iOSAPIMethods.CreateWDASession(port);
+                while (sessionId.Equals("nosession") && count <= 5)
                 {
-                    Thread.Sleep(5000);
+                    Thread.Sleep(7000);
+                    iOSMethods.GetInstance().GoToHomeScreen(udid);
+                    Thread.Sleep(2000);
                     sessionId = iOSAPIMethods.CreateWDASession(port);
-                    if (sessionId.Equals("nosession"))
+                    if (!sessionId.Equals("nosession"))
                     {
-                        if (iOSMethods.GetInstance().IsWDARunningInAppsList(udid))
-                        {
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, port, 8100);
-                        }
-                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nRetry " + count + "/6.");
-                        Thread.Sleep(5000);
-                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                        break;
                     }
+                    commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
+                    iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");
                     count++;
                 }
             }
@@ -1464,6 +1510,7 @@ namespace Appium_Wizard
             //{
             //    return "Enable Developer Mode";
             //}
+            iOSMethods.GetInstance().GoToHomeScreen(udid);
             return sessionId;
 
         }
@@ -1473,6 +1520,7 @@ namespace Appium_Wizard
         Process tunnelProcess;
         public bool CreateTunnel()
         {
+            string errorMessage = "As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission or try setting Method 1 in Tools->iOS Executor.";
             CommonProgress commonProgress = new CommonProgress();
             int counter = 1;
             commonProgress.Show();
@@ -1500,6 +1548,7 @@ namespace Appium_Wizard
                         tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
+                        
                         try
                         {
                             var id = tunnelProcess.Id; // just to check if there's exception.
@@ -1507,7 +1556,7 @@ namespace Appium_Wizard
                         catch (InvalidOperationException)
                         {
                             commonProgress.Close();
-                            MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return false;
                         }
                         Thread.Sleep(10000);
@@ -1516,7 +1565,7 @@ namespace Appium_Wizard
                             if (tunnelProcess.HasExited)
                             {
                                 commonProgress.Close();
-                                MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return false;
                             }
                             Thread.Sleep(5000);
@@ -1529,14 +1578,14 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                         commonProgress.Close();
-                        MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
                 }
                 else
                 {
                     commonProgress.Close();
-                    MessageBox.Show("As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission.", "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try
                     //{
@@ -1558,12 +1607,20 @@ namespace Appium_Wizard
             return iOSAPIMethods.isTunnelRunning();
         }
 
-        public bool CreateTunnelGo()
+        public bool CreateTunnelGo(bool showProgress = true)
         {
+            CommonProgress commonProgress = new CommonProgress();
             int count = 0;
+            if (showProgress)
+            {
+                commonProgress.Show();
+            }
+            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (!isTunnelRunning)
             {
+                commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\nNote : Tunnel will be created only once for a application lifecycle.");
                 try
                 {
                     tunnelProcess = new Process();
@@ -1584,15 +1641,19 @@ namespace Appium_Wizard
                     {
                         var processId = tunnelProcess.Id;
                         MainScreen.runningProcesses.Add(processId);
+                        commonProgress.Close();
                         return true;
                     }
+                    commonProgress.Close();
                     return false;
                 }
                 catch (Exception)
                 {
+                    commonProgress.Close();
                     return false;
                 }
             }
+            commonProgress.Close();
             return isTunnelRunning;
         }
 
@@ -1719,11 +1780,11 @@ namespace Appium_Wizard
             Console.WriteLine(response.Content);
         }
 
-        public static void GoToHome(string URL)
+        public static void GoToHome(int proxyPort)
         {
-            var options = new RestClientOptions(URL)
+            var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                MaxTimeout = -1,
+               Timeout = TimeSpan.FromSeconds(2)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/homescreen", Method.Post);
@@ -1798,7 +1859,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://127.0.0.1:49151")
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/hello", Method.Get);
@@ -1815,7 +1876,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://127.0.0.1:60105")
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/", Method.Get);

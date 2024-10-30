@@ -386,13 +386,13 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + port)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5),
             };
             var client = new RestClient(options);
             var request = new RestRequest("/status", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
             {
                 return response.Content.Contains("server is ready to accept");
             }
@@ -423,13 +423,13 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/sessions", Method.Get);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
                 {
                     if (response.Content.Equals("{\"value\":[]}"))
                     {
@@ -438,7 +438,7 @@ namespace Appium_Wizard
                     else
                     {
                         JObject responseObj = JObject.Parse(response.Content);
-                        string sessionId = responseObj["value"][0]["id"].ToString();
+                        string sessionId = responseObj["value"]?[0]?["id"]?.ToString() ?? string.Empty;
                         string androidId = GetAndroidIdFromAppiumServer(port, sessionId);
                         if (androidId.Equals(data))
                         {
@@ -463,14 +463,18 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://127.0.0.1:" + port)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromSeconds(5),
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/appium/device/info", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
-            JObject responseObj = JObject.Parse(response.Content);
-            string androidId = responseObj["value"]["androidId"].ToString();
+            string androidId = "noId";
+            if (response.Content != null)
+            {
+                JObject responseObj = JObject.Parse(response.Content);
+                androidId = responseObj?["value"]?["androidId"]?.ToString() ?? "noId";
+            }
             return androidId;
         }
 
@@ -480,7 +484,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + appiumPort)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + appiumSessionId + "/execute", Method.Post);
@@ -489,12 +493,15 @@ namespace Appium_Wizard
                 request.AddStringBody(body, DataFormat.Json);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
-                JObject responseObj = JObject.Parse(response.Content);
                 string androidId = "noId";
-                if (responseObj["value"]?["androidId"] != null)
+                if (response.Content != null)
                 {
-                    androidId = responseObj["value"]["androidId"].ToString();
-                }                
+                    JObject responseObj = JObject.Parse(response.Content);
+                    if (responseObj["value"]?["androidId"] != null)
+                    {
+                        androidId = responseObj?["value"]?["androidId"]?.ToString() ?? string.Empty;
+                    }
+                }
                 return androidId;
 
             }
@@ -506,35 +513,38 @@ namespace Appium_Wizard
 
         public static Dictionary<string, int> ElementInfo(string url, string elementId)
         {
+            Dictionary<string, int> rectangleDict = new Dictionary<string, int>();
             try
             {
                 var options = new RestClientOptions(url)
                 {
-                    MaxTimeout = 3000,
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest(elementId + "/rect", Method.Get);
                 request.AddHeader("Content-Type", "application/json");
                 RestResponse response = client.Execute(request);
-                var jsonObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
-                int x = jsonObject.value.x;
-                int y = jsonObject.value.y;
-                int width = jsonObject.value.width;
-                int height = jsonObject.value.height;
+                if (response.Content != null)
+                {
+                    var jsonObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                    int x = jsonObject?.value.x;
+                    int y = jsonObject?.value.y;
+                    int width = jsonObject?.value.width;
+                    int height = jsonObject?.value.height;
 
-                Dictionary<string, int> rectangleDict = new Dictionary<string, int>
+                    rectangleDict = new Dictionary<string, int>
                     {
                         { "x", x },
                         { "y", y },
                         { "width", width },
                         { "height", height }
                     };
-
+                }             
                 return rectangleDict;
             }
             catch (Exception)
             {
-                return null;
+                return rectangleDict;
             }
         }
 

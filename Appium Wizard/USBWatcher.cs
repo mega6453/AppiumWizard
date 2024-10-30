@@ -1,5 +1,4 @@
-﻿using System.Data.Entity.Core.Metadata.Edm;
-using System.Management;
+﻿using System.Management;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -53,7 +52,7 @@ namespace Appium_Wizard
             Console.WriteLine("USB device connected: " + deviceId);
             if (!deviceId.Contains('&'))
             {
-                listView1.Invoke((MethodInvoker)delegate
+                listView1.Invoke((MethodInvoker)async delegate
                 {
                     foreach (ListViewItem item in listView1.Items)
                     {
@@ -71,7 +70,7 @@ namespace Appium_Wizard
                             {
                                 if (OS.Equals("iOS"))
                                 {
-                                    isiOSScreenLoaded(udid,"USB");
+                                    await isiOSScreenLoaded(udid);
                                     int screenPort = ScreenControl.devicePorts[udid].Item1;
                                     var control = ScreenControl.udidScreenControl[udid];
                                     control.LoadScreen(udid,screenPort);
@@ -156,7 +155,7 @@ namespace Appium_Wizard
             Console.WriteLine("USB device disconnected: " + deviceId);
             if (!deviceId.Contains('&'))
             {
-                listView1.Invoke((MethodInvoker)delegate
+                listView1.Invoke((MethodInvoker)async delegate
                 {
                     foreach (ListViewItem item in listView1.Items)
                     {
@@ -177,15 +176,26 @@ namespace Appium_Wizard
                                     item.SubItems[5].Text = "Wi-Fi";
                                     Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
 
-                                    bool isLoaded = isiOSScreenLoaded(udid, "Wi-Fi");
-                                    if (isLoaded)
+                                    if (ScreenControl.udidScreenControl.ContainsKey(udid))
                                     {
-                                        var control = ScreenControl.udidScreenControl[udid];
-                                        int screenPort = ScreenControl.devicePorts[udid].Item1;
-                                        control.LoadScreen(udid, screenPort);
-                                        GoogleAnalytics.SendEvent("iOSConnectedOverWiFi", OSVersion);
-                                        return;
-                                    }                                   
+                                        bool isLoaded = false;
+                                        try
+                                        {
+                                            isLoaded = await isiOSScreenLoaded(udid);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            isLoaded = false;
+                                        }                                       
+                                        if (isLoaded)
+                                        {
+                                            var control = ScreenControl.udidScreenControl[udid];
+                                            int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                            control.LoadScreen(udid, screenPort);
+                                            GoogleAnalytics.SendEvent("iOSConnectedOverWiFi", OSVersion);
+                                            return;
+                                        }
+                                    }                                                             
                                 }
                                 else
                                 {
@@ -243,7 +253,7 @@ namespace Appium_Wizard
             }
         }
 
-        private bool isiOSScreenLoaded(string udid, string connectionType)
+        private async Task<bool> isiOSScreenLoaded(string udid)
         {
             int screenPort = ScreenControl.devicePorts[udid].Item1;
             int proxyPort = ScreenControl.devicePorts[udid].Item2;
@@ -251,26 +261,17 @@ namespace Appium_Wizard
             Common.KillProcessByPortNumber(screenPort);
             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100);
             //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, screenPort, 9100);
-            if (connectionType.Equals("Wi-Fi"))
-            {
-                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
-                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenPort, 9100);
-            }
-            else
-            {
-                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
-            }
-            //iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
+            iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenPort, 9100);
             bool isRunning = !iOSMethods.GetInstance().IsWDARunning(proxyPort).Contains("nosession");
             if (!isRunning)
             {
                 iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
             }
-            bool isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+            bool isLoaded = await Common.IsLocalhostLoaded("http://localhost:" + screenPort);
             int count = 0;
             while (!isLoaded && count == 5)
             {
-                isLoaded = Common.IsLocalhostLoaded("http://localhost:" + screenPort);
+                isLoaded = await Common.IsLocalhostLoaded("http://localhost:" + screenPort);
                 if (!isLoaded)
                 {
                     Thread.Sleep(2000);

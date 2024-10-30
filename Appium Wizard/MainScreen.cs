@@ -294,9 +294,7 @@ namespace Appium_Wizard
                 {
                     if (iOS_Executor.selectediOSExecutor.Equals("auto"))
                     {
-                        Version deviceVersion = new Version(selectedDeviceVersion);
-                        Version version17Plus = new Version("17.0.0");
-                        if (deviceVersion >= version17Plus) // >17
+                        if (IsIt17PlusVersion(selectedDeviceVersion)) // >17
                         {
                             //SetiOSTool(false);
                             //iOSAsyncMethods.is17Plus = true;
@@ -379,6 +377,17 @@ namespace Appium_Wizard
                 iOSMethods.isGo = false;
                 iOSAsyncMethods.isGo = false;
             }
+        }
+
+        public bool IsIt17PlusVersion(string version)
+        {
+            Version deviceVersion = new Version(version);
+            Version version17Plus = new Version("17.0.0");
+            if (deviceVersion >= version17Plus)
+            {
+                return true;
+            }
+            return false;
         }
 
         private void ShowCapability()
@@ -467,9 +476,18 @@ namespace Appium_Wizard
 
         public void addToList(string DeviceName, string OSVersion, string udid, string OS, string Model, string status, string connection, string IPAddress)
         {
-            if (OS.Equals("iPhone OS", StringComparison.InvariantCultureIgnoreCase))
+            if (OS.Equals("iOS", StringComparison.InvariantCultureIgnoreCase) | OS.Equals("iPhone OS", StringComparison.InvariantCultureIgnoreCase))
             {
                 OS = "iOS";
+                if (IsIt17PlusVersion(OSVersion))
+                {
+                    Task.Run(() => {
+                        iOSAsyncMethods.GetInstance().CreateTunnelGo(false);                       
+                    });
+                }
+                Task.Run(() => {
+                    iOSMethods.GetInstance().MountImage(udid);
+                });
             }
             if (DeviceName != null | DeviceName != string.Empty)
             {
@@ -695,7 +713,7 @@ namespace Appium_Wizard
                     if (count == 0)
                     {
                         commonProgress.Close();
-                        MessageBox.Show("No iOS Device available. Please check device connectivity.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("No iOS Device available. Please check device connectivity and make sure device is unlocked.", "Add iOS Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
@@ -1302,15 +1320,19 @@ namespace Appium_Wizard
                 {
                     if (selectedOS.Equals("iOS"))
                     {
-                        iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                        bool isRebooted = iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                        if (isRebooted)
+                        {
+                            MessageBox.Show("Reboot Initiated for " + selectedDeviceName + ".", "Reboot Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                         GoogleAnalytics.SendExceptionEvent("Reboot_iOS");
                     }
                     else
                     {
                         AndroidMethods.GetInstance().RebootDevice(selectedUDID);
+                        MessageBox.Show("Reboot Initiated for " + selectedDeviceName + ".", "Reboot Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         GoogleAnalytics.SendExceptionEvent("Reboot_Android");
                     }
-                    MessageBox.Show("Reboot Initiated for " + selectedDeviceName + ".", "Reboot Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -1875,6 +1897,24 @@ namespace Appium_Wizard
                 ListViewItem selectedItem = listView1.SelectedItems[0];
                 selectedItem.Selected = false;
                 selectedItem.Selected = true;
+            }
+        }
+
+        private void iOSNativeAppsBundleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://support.apple.com/en-in/guide/deployment/depece748c41/web",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("iOSNativeAppsBundleToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("iOSNativeAppsBundleToolStripMenuItem_Click", exception.Message);
             }
         }
     }

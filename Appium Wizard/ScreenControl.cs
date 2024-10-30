@@ -455,7 +455,7 @@ namespace Appium_Wizard
         {
             if (OSType.Equals("iOS"))
             {
-                iOSAPIMethods.GoToHome(URL);
+                iOSAPIMethods.GoToHome(proxyPort);
                 GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
             }
             else

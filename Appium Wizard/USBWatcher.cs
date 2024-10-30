@@ -176,15 +176,26 @@ namespace Appium_Wizard
                                     item.SubItems[5].Text = "Wi-Fi";
                                     Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
 
-                                    bool isLoaded = await isiOSScreenLoaded(udid);
-                                    if (isLoaded)
+                                    if (ScreenControl.udidScreenControl.ContainsKey(udid))
                                     {
-                                        var control = ScreenControl.udidScreenControl[udid];
-                                        int screenPort = ScreenControl.devicePorts[udid].Item1;
-                                        control.LoadScreen(udid, screenPort);
-                                        GoogleAnalytics.SendEvent("iOSConnectedOverWiFi", OSVersion);
-                                        return;
-                                    }                                   
+                                        bool isLoaded = false;
+                                        try
+                                        {
+                                            isLoaded = await isiOSScreenLoaded(udid);
+                                        }
+                                        catch (Exception)
+                                        {
+                                            isLoaded = false;
+                                        }                                       
+                                        if (isLoaded)
+                                        {
+                                            var control = ScreenControl.udidScreenControl[udid];
+                                            int screenPort = ScreenControl.devicePorts[udid].Item1;
+                                            control.LoadScreen(udid, screenPort);
+                                            GoogleAnalytics.SendEvent("iOSConnectedOverWiFi", OSVersion);
+                                            return;
+                                        }
+                                    }                                                             
                                 }
                                 else
                                 {

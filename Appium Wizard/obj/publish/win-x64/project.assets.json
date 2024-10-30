@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net6.0-windows7.0": {
+    "net8.0-windows7.0": {
       "EntityFramework/6.4.4": {
         "type": "package",
         "dependencies": {
@@ -50,30 +50,8 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.Web.WebView2/1.0.2592.51": {
+      "Microsoft.Web.WebView2/1.0.2739.15": {
         "type": "package",
-        "compile": {
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {
-            "related": ".xml"
-          }
-        },
         "build": {
           "build/Microsoft.Web.WebView2.targets": {}
         },
@@ -154,15 +132,15 @@
           }
         }
       },
-      "RestSharp/111.4.1": {
+      "RestSharp/112.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/RestSharp.dll": {
+          "lib/net8.0/RestSharp.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/RestSharp.dll": {
+          "lib/net8.0/RestSharp.dll": {
             "related": ".xml"
           }
         }
@@ -249,12 +227,12 @@
       "System.CodeDom/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.CodeDom.dll": {
+          "lib/net8.0/System.CodeDom.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/System.CodeDom.dll": {
+          "lib/net8.0/System.CodeDom.dll": {
             "related": ".xml"
           }
         },
@@ -376,12 +354,12 @@
           "System.CodeDom": "8.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Management.dll": {
+          "lib/net8.0/System.Management.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/System.Management.dll": {
+          "lib/net8.0/System.Management.dll": {
             "related": ".xml"
           }
         },
@@ -389,7 +367,7 @@
           "buildTransitive/net6.0/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/net6.0/System.Management.dll": {
+          "runtimes/win/lib/net8.0/System.Management.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -500,7 +478,7 @@
         }
       }
     },
-    "net6.0-windows7.0/win-x64": {
+    "net8.0-windows7.0/win-x64": {
       "EntityFramework/6.4.4": {
         "type": "package",
         "dependencies": {
@@ -549,30 +527,8 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.Web.WebView2/1.0.2592.51": {
+      "Microsoft.Web.WebView2/1.0.2739.15": {
         "type": "package",
-        "compile": {
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll": {
-            "related": ".xml"
-          },
-          "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll": {
-            "related": ".xml"
-          }
-        },
         "native": {
           "runtimes/win-x64/native/WebView2Loader.dll": {}
         },
@@ -626,15 +582,15 @@
           }
         }
       },
-      "RestSharp/111.4.1": {
+      "RestSharp/112.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/RestSharp.dll": {
+          "lib/net8.0/RestSharp.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/RestSharp.dll": {
+          "lib/net8.0/RestSharp.dll": {
             "related": ".xml"
           }
         }
@@ -691,12 +647,12 @@
       "System.CodeDom/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/System.CodeDom.dll": {
+          "lib/net8.0/System.CodeDom.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/System.CodeDom.dll": {
+          "lib/net8.0/System.CodeDom.dll": {
             "related": ".xml"
           }
         },
@@ -800,12 +756,12 @@
           "System.CodeDom": "8.0.0"
         },
         "compile": {
-          "lib/net6.0/System.Management.dll": {
+          "lib/net8.0/System.Management.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "runtimes/win/lib/net6.0/System.Management.dll": {
+          "runtimes/win/lib/net8.0/System.Management.dll": {
             "related": ".xml"
           }
         },
@@ -1035,10 +991,10 @@
         "version.txt"
       ]
     },
-    "Microsoft.Web.WebView2/1.0.2592.51": {
-      "sha512": "AC9aWCthS2JvddYA1jl4dFpLBW3GsLRInhp5dkcBzaFXsRehfoUN9olIUsrH41eNaNYd7z9NRvmy81aUA5aD1g==",
+    "Microsoft.Web.WebView2/1.0.2739.15": {
+      "sha512": "hZg7vHWBg4RIiK3rhkNqX3hcBqqoVXVrrO2BVrVOiSmEgfLa7lY64G1tWh2VY84MfHIFLCAQNwn3Rwvu+ICHyw==",
       "type": "package",
-      "path": "microsoft.web.webview2/1.0.2592.51",
+      "path": "microsoft.web.webview2/1.0.2739.15",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -1073,13 +1029,14 @@
         "lib/net462/Microsoft.Web.WebView2.WinForms.xml",
         "lib/net462/Microsoft.Web.WebView2.Wpf.dll",
         "lib/net462/Microsoft.Web.WebView2.Wpf.xml",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Core.xml",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.xml",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll",
-        "lib/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.xml",
-        "microsoft.web.webview2.1.0.2592.51.nupkg.sha512",
+        "lib_manual/net6.0-windows10.0.17763.0/Microsoft.Web.WebView2.Core.Projection.dll",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Core.xml",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.dll",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.WinForms.xml",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.dll",
+        "lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Wpf.xml",
+        "microsoft.web.webview2.1.0.2739.15.nupkg.sha512",
         "microsoft.web.webview2.nuspec",
         "runtimes/win-arm64/native/WebView2Loader.dll",
         "runtimes/win-arm64/native_uap/Microsoft.Web.WebView2.Core.dll",
@@ -1233,10 +1190,10 @@
         "packageIcon.png"
       ]
     },
-    "RestSharp/111.4.1": {
-      "sha512": "MhrBdwqYd+ezd3xD+c6eaAVcLJoWI+2TBH7rqX149nbYRkPJJfK/UbrgJVfKN9ZMehOFzo2PmKIZjS1ATnxEAQ==",
+    "RestSharp/112.0.0": {
+      "sha512": "vezxJ6DLk0eDx+rmXwVHQvJ3elZCJfnLd8neRrkA+IvTs9falf2CEAolsjI1YKkkHTOvG13xWTnHK7gU0zgaaw==",
       "type": "package",
-      "path": "restsharp/111.4.1",
+      "path": "restsharp/112.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1253,7 +1210,7 @@
         "lib/net8.0/RestSharp.xml",
         "lib/netstandard2.0/RestSharp.dll",
         "lib/netstandard2.0/RestSharp.xml",
-        "restsharp.111.4.1.nupkg.sha512",
+        "restsharp.112.0.0.nupkg.sha512",
         "restsharp.nuspec",
         "restsharp.png"
       ]
@@ -1916,10 +1873,10 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net6.0-windows7.0": [
-      "Microsoft.Web.WebView2 >= 1.0.2592.51",
+    "net8.0-windows7.0": [
+      "Microsoft.Web.WebView2 >= 1.0.2739.15",
       "Newtonsoft.Json >= 13.0.3",
-      "RestSharp >= 111.4.1",
+      "RestSharp >= 112.0.0",
       "SharpZipLib >= 1.4.2",
       "System.Data.SQLite >= 1.0.118",
       "System.Management >= 8.0.0"
@@ -1947,17 +1904,16 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0-windows"
+        "net8.0-windows7.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "C:\\Users\\mc\\source\\repos\\Appcenter\\AppCenterDownloadAppGetAppInfoCode\\AppCenterDownloadAppGetAppInfo\\bin\\Release": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net6.0-windows7.0": {
-          "targetAlias": "net6.0-windows",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows7.0",
           "projectReferences": {}
         }
       },
@@ -1965,15 +1921,20 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
-      "net6.0-windows7.0": {
-        "targetAlias": "net6.0-windows",
+      "net8.0-windows7.0": {
+        "targetAlias": "net8.0-windows7.0",
         "dependencies": {
           "Microsoft.Web.WebView2": {
             "target": "Package",
-            "version": "[1.0.2592.51, )"
+            "version": "[1.0.2739.15, )"
           },
           "Newtonsoft.Json": {
             "target": "Package",
@@ -1981,7 +1942,7 @@
           },
           "RestSharp": {
             "target": "Package",
-            "version": "[111.4.1, )"
+            "version": "[112.0.0, )"
           },
           "SharpZipLib": {
             "target": "Package",
@@ -2010,19 +1971,19 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-            "version": "[6.0.18, 6.0.18]"
+            "version": "[8.0.8, 8.0.8]"
           },
           {
             "name": "Microsoft.NETCore.App.Crossgen2.win-x64",
-            "version": "[6.0.18, 6.0.18]"
+            "version": "[8.0.8, 8.0.8]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.win-x64",
-            "version": "[6.0.18, 6.0.18]"
+            "version": "[8.0.8, 8.0.8]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-            "version": "[6.0.18, 6.0.18]"
+            "version": "[8.0.8, 8.0.8]"
           }
         ],
         "frameworkReferences": {
@@ -2033,7 +1994,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

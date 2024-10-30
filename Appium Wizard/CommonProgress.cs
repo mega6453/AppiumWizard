@@ -16,6 +16,10 @@
 
         public void UpdateStepLabel(string title, string stepText, int progressPercent = 50)
         {
+            if (!this.Visible)
+            {
+                return;
+            }
             if (progressPercent >= 100)
             {
                 progressPercent = 95;

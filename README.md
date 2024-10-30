@@ -49,7 +49,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Features Available
 
 * Upto 5 Parallel Appium servers
-* Server Settings - Set server arguments and default capabilities separately for each server **(New)**
+* Server Settings - Set server arguments and default capabilities separately for each server 
 * Update Appium Server and drivers
 * iOS Automation Execution **(including iOS version 17.x)**
 * iOS Screen Reflection and Screen Control
@@ -70,7 +70,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 ## Features/Improvements in Queue
 * Add cancel button for progress window
 * Status bar for Element interaction (WaitForElement, Swipe, etc.)
-* Handle resources on Application exit
 * Unlock Mobile using Screen Control
 * Performance and Reliability Improvements
 * Error handling
@@ -129,6 +128,13 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/settings" title="settings icons">Settings icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/execute" title="execute icons">Execute icons created by surang - Flaticon</a>
 
+## License
+
+This project is dual-licensed under the MIT and GPL 3.0 licenses.
+
+- [MIT License](./LICENSE-MIT)
+- [GPL 3.0 License](./LICENSE-GPL)
+  
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)
 

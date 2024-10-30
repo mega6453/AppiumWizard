@@ -467,14 +467,14 @@ namespace Appium_Wizard
         private void BackButton_Click(object sender, EventArgs e)
         {
             AndroidMethods.GetInstance().Back(udid);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("BackButton_Click");
         }
         private void AlwaysOnTop_Click(object sender, EventArgs e)
         {
             this.TopMost = !this.TopMost;
             //buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
             AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("AlwaysOnTop_Click");
         }
 
         bool isControlCenterOpen = false;
@@ -494,23 +494,23 @@ namespace Appium_Wizard
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
+                GoogleAnalytics.SendEvent("controlCenter_Click", "iOS");
             }
             else
             {
                 if (isControlCenterOpen == false)
                 {
-                    AndroidMethods.GetInstance().Swipe(udid, 0, 0, 0, 300, 100);
+                    AndroidMethods.GetInstance().OpenNotification(udid);
                     //controlCenter.Text = "Close Control Center";
                     isControlCenterOpen = true;
                 }
                 else
                 {
-                    AndroidMethods.GetInstance().Swipe(udid, 0, 300, 0, 0, 100);
+                    AndroidMethods.GetInstance().CloseNotification(udid);
                     //controlCenter.Text = "Open Control Center";
                     isControlCenterOpen = false;
                 }
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
+                GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
             }
         }
 
@@ -524,12 +524,12 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+                GoogleAnalytics.SendEvent("ObjectSpy_Click");
             }
             catch (Exception exception)
             {
                 Console.WriteLine("Exception" + exception);
-                GoogleAnalytics.SendExceptionEvent(MethodBase.GetCurrentMethod().Name, exception.Message);
+                GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
         }
 

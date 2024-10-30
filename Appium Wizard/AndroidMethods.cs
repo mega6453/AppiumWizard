@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -393,9 +394,18 @@ namespace Appium_Wizard
             ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > " + path);
         }
 
+        public void OpenNotification(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell cmd statusbar expand-notifications");
+        }
+        public void CloseNotification(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell cmd statusbar collapse");
+        }
+
         public List<string> GetListOfInstalledApps(string udid)
         {
-            var output = ExecuteCommand("-s " + udid + " shell pm list packages -3");
+            var output = ExecuteCommand("-s " + udid + " shell pm list packages -3 --user 0");
             List<string> packageNames = new List<string>();
             string[] lines = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 

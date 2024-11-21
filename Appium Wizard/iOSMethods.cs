@@ -31,7 +31,7 @@ namespace Appium_Wizard
             List<string> list = new List<string>();
             if (executable == iOSExecutable.go)
             {
-                string deviceListString = ExecuteCommand("list","any",true,10000);
+                string deviceListString = ExecuteCommand("list", "any", true, 10000);
                 if (deviceListString.Contains("Process did not complete within the allotted time"))
                 {
                     return GetListOfDevicesUDID(iOSExecutable.py);
@@ -273,7 +273,7 @@ namespace Appium_Wizard
             }
             else
             {
-                TakeScreenshotUsingExecutable(udid,path);
+                TakeScreenshotUsingExecutable(udid, path);
             }
         }
 
@@ -485,7 +485,7 @@ namespace Appium_Wizard
                 tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 Directory.CreateDirectory(tempFolder);
                 string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress,message);
+                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress, message);
             }
             else
             {
@@ -501,7 +501,7 @@ namespace Appium_Wizard
                 bool isProfileAvailable = isProfileHasUDID(profilePath, udid);
                 if (isProfileAvailable)
                 {
-                    return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
+                    return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message);
                 }
                 else
                 {
@@ -510,7 +510,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress,message);
+                return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message);
             }
         }
 
@@ -762,7 +762,7 @@ namespace Appium_Wizard
             //return output["CFBundleShortVersionString"];
             return "8.7.3";
         }
-        
+
         public string ExecutePlistUtil(string plistFilePath)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
@@ -803,9 +803,9 @@ namespace Appium_Wizard
                     return LaunchAppUsingExecutable(bundleId, udid);
                 }
             }
-            else 
+            else
             {
-                return LaunchAppUsingExecutable(bundleId,udid);
+                return LaunchAppUsingExecutable(bundleId, udid);
             }
         }
 
@@ -843,7 +843,35 @@ namespace Appium_Wizard
             {
                 KillAppUsingExecutable(bundleId, udid);
             }
-           
+        }
+
+        public void UnlockScreen(string udid, string password)
+        {
+            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            {
+
+                int port = MainScreen.udidProxyPort[udid];
+                iOSAPIMethods.GoToHome(port);
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    string url = "http://localhost:" + port;
+                    var screenSize = iOSAPIMethods.GetScreenSize(port);
+                    int width = screenSize.Item1;
+                    int height = screenSize.Item2;
+                    int pressX = width / 2;
+                    int pressY = height - 1;
+                    int moveToX = width / 2;
+                    int moveToY = 0;
+                    iOSAPIMethods.Swipe(url, sessionId, pressX, pressY, moveToX, moveToY, 500);
+                    Thread.Sleep(3000);
+                    iOSAPIMethods.SendText(url, sessionId, password);
+                }
+                else
+                {
+                    MessageBox.Show("WebDriverAgentRunner is not running iPhone. So, screen unlock failed.");
+                }
+            }
         }
 
         public void KillAppUsingExecutable(string bundleId, string udid)
@@ -888,7 +916,7 @@ namespace Appium_Wizard
                     else
                     {
                         processExited = iOSProcess.WaitForExit(timeout);
-                    }                   
+                    }
                 }
                 if (timeout != 0 && !processExited)
                 {
@@ -905,9 +933,9 @@ namespace Appium_Wizard
                 {
                     if (error.Contains("PasswordProtected") | error.Contains("runtime error: invalid memory address or nil pointer dereference"))
                     {
-                        MessageBox.Show("Failed to execute the operation. Please Unlock the device/Trust the computer and execute again.", "Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        MessageBox.Show("Failed to execute the operation. Please Unlock the device/Trust the computer and execute again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    return "Error:"+error;
+                    return "Error:" + error;
                 }
             }
             catch (Exception ex)
@@ -1132,7 +1160,7 @@ namespace Appium_Wizard
                 {
                     pyAsyncProcess = new Process();
                     pyAsyncProcess.StartInfo.FileName = FilesPath.pymd3FilePath;
-                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward "+ localPort + " " + iOSPort + " --serial " +udid;
+                    pyAsyncProcess.StartInfo.Arguments = $"usbmux forward " + localPort + " " + iOSPort + " --serial " + udid;
                     pyAsyncProcess.StartInfo.RedirectStandardError = true;
                     pyAsyncProcess.StartInfo.RedirectStandardOutput = true;
                     pyAsyncProcess.StartInfo.UseShellExecute = false;
@@ -1383,7 +1411,8 @@ namespace Appium_Wizard
                                 sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                                 while (sessionId.Equals("nosession") && count <= 6)
                                 {
-                                    await Task.Run(async () => {
+                                    await Task.Run(async () =>
+                                    {
                                         //Thread.Sleep(5000);
                                         await Task.Delay(5000);
                                         sessionId = iOSAPIMethods.CreateWDASession(port);
@@ -1524,7 +1553,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             int counter = 1;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...",10);
+            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunning();
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (isTunnelRunning)
@@ -1548,7 +1577,7 @@ namespace Appium_Wizard
                         tunnelProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         tunnelProcess.StartInfo.Verb = "runas";
                         tunnelProcess.Start();
-                        
+
                         try
                         {
                             var id = tunnelProcess.Id; // just to check if there's exception.
@@ -1560,7 +1589,7 @@ namespace Appium_Wizard
                             return false;
                         }
                         Thread.Sleep(10000);
-                        while (!iOSAPIMethods.isTunnelRunning() && counter <= 10) 
+                        while (!iOSAPIMethods.isTunnelRunning() && counter <= 10)
                         {
                             if (tunnelProcess.HasExited)
                             {
@@ -1635,8 +1664,8 @@ namespace Appium_Wizard
                         isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
                         count++;
                     }
-                    while (count <= 5 && !isTunnelRunning);                             
-                    
+                    while (count <= 5 && !isTunnelRunning);
+
                     if (isTunnelRunning)
                     {
                         var processId = tunnelProcess.Id;
@@ -1784,7 +1813,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-               Timeout = TimeSpan.FromSeconds(2)
+                Timeout = TimeSpan.FromSeconds(2)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/homescreen", Method.Post);
@@ -1801,7 +1830,7 @@ namespace Appium_Wizard
             int fromY = 50;
             int endX = fromX;
             int endY = screenHeight;
-            Swipe(URL,sessionId,fromX,fromY,endX,endY,waitDuration);
+            Swipe(URL, sessionId, fromX, fromY, endX, endY, waitDuration);
         }
 
         public static void CloseControlCenter(string URL, string sessionId, int screenWidth)
@@ -1869,7 +1898,7 @@ namespace Appium_Wizard
             {
                 return response.Content.Contains("Hello, I'm alive");
             }
-            else { return false; }  
+            else { return false; }
         }
 
         public static bool isTunnelRunningGo()

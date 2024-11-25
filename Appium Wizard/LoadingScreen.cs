@@ -78,6 +78,7 @@ namespace Appium_Wizard
                 firstTimeRunLabel.Refresh();
                 await Task.Run(() =>
                 {
+                    UpdateStepLabel("Checking for Node Installation, Please wait...");
                     bool isNodeInstalled = Common.IsNodeInstalled();
                     if (!isNodeInstalled)
                     {
@@ -85,6 +86,7 @@ namespace Appium_Wizard
                         Common.InstallNodeJs();
                         GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "NodeJS not installed");
                     }
+                    UpdateStepLabel("Checking for Appium Installation, Please wait...");
                     bool iSAppiumInstalled = Common.IsAppiumInstalled();
                     if (!iSAppiumInstalled)
                     {
@@ -92,6 +94,7 @@ namespace Appium_Wizard
                         Common.InstallAppiumGlobally();
                         GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "Appium not installed");
                     }
+                    UpdateStepLabel("Checking for XCUITest, UIAutomator2 driver Installation, Please wait...");
                     string InstalledDriverList = Common.AppiumInstalledDriverList();
                     bool IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
                     bool IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
@@ -107,6 +110,8 @@ namespace Appium_Wizard
                         Common.InstallUIAutomatorDriver();
                         GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, "UIAutomator2 not installed");
                     }
+                    UpdateStepLabel("Getting compatible WebDriverAgentRunner, This may take sometime, Please wait...");
+                    Common.GetWebDriverAgentIPAFile();
                 });
                 firstTimeRunLabel.Text = "";
             }

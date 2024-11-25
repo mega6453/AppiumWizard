@@ -858,47 +858,16 @@ namespace Appium_Wizard
             }
         }
 
-        public static void GetWebDriverAgentIPAFile(string version)
+        public static void GetWebDriverAgentIPAFile()
         {
-            try
+            string version = GetRequiredWebDriverAgentVersion();
+            if (version != "versionNotFound")
             {
-                string url = "https://github.com/appium/WebDriverAgent/releases/download/v" + version + "/WebDriverAgentRunner-Runner.zip";
-                string tempFolder = Path.GetTempPath();
-                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                 try
                 {
-                    Directory.Delete(tempFolder, true);
-                }
-                catch (Exception)
-                {
-                }
-                Directory.CreateDirectory(tempFolder);
-                string downloadedZip = tempFolder + "\\wdadownloaded.zip";
-                using (var client = new HttpClient())
-                {
-                    using (var s = client.GetStreamAsync(url))
-                    {
-                        using (var fs = new FileStream(downloadedZip, FileMode.OpenOrCreate))
-                        {
-                            s.Result.CopyTo(fs);
-                        }
-                    }
-                }
-
-
-                //--------------------
-                string extractFolder = tempFolder + "\\Extracted";
-                string PayloadFolder = tempFolder + "\\Extracted\\Payload";
-                string finalIPAFile = tempFolder + "\\wda.ipa";
-                System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
-                System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
-                //--------------------
-                string destinationFilePath = FilesPath.iOSFilesPath + "wda.ipa";
-                File.Delete(destinationFilePath);
-                File.Move(finalIPAFile, destinationFilePath, true);
-                //--------------------
-                Task.Run(() =>
-                {
+                    string url = "https://github.com/appium/WebDriverAgent/releases/download/v" + version + "/WebDriverAgentRunner-Runner.zip";
+                    string tempFolder = Path.GetTempPath();
+                    tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
                     try
                     {
                         Directory.Delete(tempFolder, true);
@@ -906,10 +875,45 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                     }
-                });
-            }
-            catch (Exception)
-            {
+                    Directory.CreateDirectory(tempFolder);
+                    string downloadedZip = tempFolder + "\\wdadownloaded.zip";
+                    using (var client = new HttpClient())
+                    {
+                        using (var s = client.GetStreamAsync(url))
+                        {
+                            using (var fs = new FileStream(downloadedZip, FileMode.OpenOrCreate))
+                            {
+                                s.Result.CopyTo(fs);
+                            }
+                        }
+                    }
+
+
+                    //--------------------
+                    string extractFolder = tempFolder + "\\Extracted";
+                    string PayloadFolder = tempFolder + "\\Extracted\\Payload";
+                    string finalIPAFile = tempFolder + "\\wda.ipa";
+                    System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
+                    System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
+                    //--------------------
+                    string destinationFilePath = FilesPath.iOSFilesPath + "wda.ipa";
+                    File.Delete(destinationFilePath);
+                    File.Move(finalIPAFile, destinationFilePath, true);
+                    //--------------------
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            Directory.Delete(tempFolder, true);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    });
+                }
+                catch (Exception)
+                {
+                }
             }
         }
     }

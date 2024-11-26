@@ -771,7 +771,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void UnlockButton_Click(object sender, EventArgs e)
+        private void UnlockScreen_Click(object sender, EventArgs e)
         {
             EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
             enterPassword.ShowDialog();

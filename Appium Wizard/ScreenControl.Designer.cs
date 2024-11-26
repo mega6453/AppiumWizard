@@ -43,7 +43,8 @@
             ScreenshotToolStripButton = new ToolStripButton();
             AppsToolStripButton = new ToolStripButton();
             SettingsToolStripButton = new ToolStripButton();
-            UnlockButton = new ToolStripButton();
+            toolStripDropDownButton2 = new ToolStripDropDownButton();
+            UnlockScreen = new ToolStripMenuItem();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -60,7 +61,7 @@
             ScreenWebView.Location = new Point(0, 0);
             ScreenWebView.Margin = new Padding(2);
             ScreenWebView.Name = "ScreenWebView";
-            ScreenWebView.Size = new Size(324, 346);
+            ScreenWebView.Size = new Size(398, 346);
             ScreenWebView.TabIndex = 0;
             ScreenWebView.ZoomFactor = 1D;
             ScreenWebView.KeyPress += SendKeys;
@@ -72,12 +73,12 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, ScreenshotToolStripButton, AppsToolStripButton, SettingsToolStripButton, UnlockButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, ScreenshotToolStripButton, AppsToolStripButton, SettingsToolStripButton, toolStripDropDownButton2 });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.RenderMode = ToolStripRenderMode.System;
-            toolStrip1.Size = new Size(324, 31);
+            toolStrip1.Size = new Size(398, 31);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -188,14 +189,22 @@
             SettingsToolStripButton.Size = new Size(28, 28);
             SettingsToolStripButton.Click += SettingsToolStripButton_Click;
             // 
-            // UnlockButton
+            // toolStripDropDownButton2
             // 
-            UnlockButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            UnlockButton.Image = Properties.Resources.Unlock;
-            UnlockButton.ImageTransparentColor = Color.Magenta;
-            UnlockButton.Name = "UnlockButton";
-            UnlockButton.Size = new Size(28, 28);
-            UnlockButton.Click += UnlockButton_Click;
+            toolStripDropDownButton2.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolStripDropDownButton2.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen });
+            toolStripDropDownButton2.Image = Properties.Resources.ellipsis;
+            toolStripDropDownButton2.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            toolStripDropDownButton2.Size = new Size(37, 28);
+            // 
+            // UnlockScreen
+            // 
+            UnlockScreen.Image = Properties.Resources.Unlock;
+            UnlockScreen.Name = "UnlockScreen";
+            UnlockScreen.Size = new Size(188, 30);
+            UnlockScreen.Text = "Unlock Screen";
+            UnlockScreen.Click += UnlockScreen_Click;
             // 
             // toolStrip2
             // 
@@ -206,7 +215,7 @@
             toolStrip2.Location = new Point(0, 321);
             toolStrip2.Name = "toolStrip2";
             toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(324, 25);
+            toolStrip2.Size = new Size(398, 25);
             toolStrip2.TabIndex = 2;
             toolStrip2.TabStop = true;
             toolStrip2.Text = "toolStrip2";
@@ -225,7 +234,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(324, 377);
+            ClientSize = new Size(398, 377);
             Controls.Add(toolStrip2);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
@@ -269,6 +278,7 @@
         private ToolStripButton ScreenshotToolStripButton;
         private ToolStripButton AppsToolStripButton;
         private ToolStripButton SettingsToolStripButton;
-        private ToolStripButton UnlockButton;
+        private ToolStripDropDownButton toolStripDropDownButton2;
+        private ToolStripMenuItem UnlockScreen;
     }
 }

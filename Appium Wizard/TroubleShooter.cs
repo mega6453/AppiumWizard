@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Appium_Wizard
 {
@@ -14,6 +15,7 @@ namespace Appium_Wizard
             bool IsAppiumInstalled = false;
             bool IsXCUITestDriverInstalled = false;
             bool IsUIAutomatorDriverInstalled = false;
+            bool IsCompatibleWDAAvailable = false;
             CommonProgress commonProgress = new CommonProgress();
             if (mainScreen == null)
             {
@@ -34,6 +36,24 @@ namespace Appium_Wizard
                 string InstalledDriverList = Common.AppiumInstalledDriverList();
                 IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
                 IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
+                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for WebDriverAgent compatibility...", 90);
+                if (IsXCUITestDriverInstalled)
+                {
+                    string requiredVersion = Common.GetRequiredWebDriverAgentVersion();
+                    if (requiredVersion != "versionNotFound" & requiredVersion != "fileNotFound")
+                    {
+                        string IPAVersion = iOSMethods.GetInstance().GetWDAIPAVersion();
+                        Version expectedVersion = new Version(requiredVersion);
+                        Version actualVersion = new Version(IPAVersion);
+                        bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
+                        (expectedVersion.Minor == actualVersion.Minor);
+                        if (areEqual)
+                        {
+                            IsCompatibleWDAAvailable = true;
+                        }
+                    }
+                       
+                }                
             });
             if (!IsNodeInstalled)
             {
@@ -74,6 +94,16 @@ namespace Appium_Wizard
                         XCUITestStatusLabel.Text = "OK";
                         FixXCUITestButton.Enabled = false;
                         FixWDAButton.Enabled = true;
+                        if (IsCompatibleWDAAvailable)
+                        {
+                            WDAStatusLabel.Text = "OK";
+                            FixWDAButton.Enabled = false;
+                        }
+                        else
+                        {
+                            WDAStatusLabel.Text = "Not OK";
+                            FixWDAButton.Enabled = true;
+                        }
                     }
                     if (!IsUIAutomatorDriverInstalled)
                     {

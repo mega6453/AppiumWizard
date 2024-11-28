@@ -884,7 +884,7 @@ namespace Appium_Wizard
         public static void GetWebDriverAgentIPAFile()
         {
             string version = GetRequiredWebDriverAgentVersion();
-            if (version != "versionNotFound")
+            if (version != "versionNotFound" & version != "fileNotFound")
             {
                 try
                 {

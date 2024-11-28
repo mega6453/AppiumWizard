@@ -745,7 +745,9 @@ namespace Appium_Wizard
         public Dictionary<string, string> GetIPAInformation(string ipaFilePath)
         {
             Dictionary<string, string> output = new Dictionary<string, string>();
-            var tempFolder = Path.GetTempPath();
+            string tempFolder = Path.GetTempPath();
+            tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+            Directory.CreateDirectory(tempFolder);
             var plistFilePath = Common.ExtractInfoPlistFromIPA(ipaFilePath, tempFolder);
             if (!string.IsNullOrEmpty(plistFilePath))
             {
@@ -757,8 +759,16 @@ namespace Appium_Wizard
 
         public string GetWDAIPAVersion()
         {
-            string WDAPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\wda.ipa";
-            var output = GetIPAInformation(WDAPath);
+            Dictionary<string, string> output = new Dictionary<string, string>();
+            string tempFolder = Path.GetTempPath();
+            tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+            Directory.CreateDirectory(tempFolder);
+            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(tempFolder);
+            if (!string.IsNullOrEmpty(plistFilePath))
+            {
+                string xmlString = ExecutePlistUtil(plistFilePath);
+                output = Common.GetValueFromXml(xmlString);
+            }
             if (output.ContainsKey("CFBundleShortVersionString"))
             {
                 return output["CFBundleShortVersionString"];

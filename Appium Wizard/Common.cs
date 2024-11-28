@@ -14,6 +14,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.IO;
+using System.IO.Compression;
 
 namespace Appium_Wizard
 {
@@ -212,7 +213,7 @@ namespace Appium_Wizard
         public static string ExtractInfoPlistFromIPA(string ipaFilePath, string outputFolderPath)
         {
             string appName = ""; int count = 1; string outputPath = "";
-            using (ZipFile zipFile = new ZipFile(ipaFilePath))
+            using (ICSharpCode.SharpZipLib.Zip.ZipFile zipFile = new ICSharpCode.SharpZipLib.Zip.ZipFile(ipaFilePath))
             {
                 foreach (ZipEntry entry in zipFile)
                 {
@@ -234,6 +235,28 @@ namespace Appium_Wizard
                 }
             }
             return outputPath;
+        }
+
+        public static string ExtractInfoPlistFromWDAIPA(string outputFolderPath)
+        {
+            string wdaPath = FilesPath.WDAFilePath;
+            string destinationPath = "";
+            string fileNameToExtract = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist";
+            using (ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(wdaPath))
+            {
+                ZipArchiveEntry entry = archive.GetEntry(fileNameToExtract);
+
+                if (entry != null)
+                {
+                    destinationPath = Path.Combine(outputFolderPath, Path.GetFileName(fileNameToExtract));
+                    entry.ExtractToFile(destinationPath, overwrite: true);
+                }
+                else
+                {
+                    Console.WriteLine($"File '{fileNameToExtract}' not found in the ZIP archive.");
+                }
+            }
+            return destinationPath;
         }
 
 

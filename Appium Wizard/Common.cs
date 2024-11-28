@@ -1,15 +1,20 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System;
 using System.Diagnostics;
 using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.IO;
+using System.IO.Compression;
 
 namespace Appium_Wizard
 {
@@ -208,7 +213,7 @@ namespace Appium_Wizard
         public static string ExtractInfoPlistFromIPA(string ipaFilePath, string outputFolderPath)
         {
             string appName = ""; int count = 1; string outputPath = "";
-            using (ZipFile zipFile = new ZipFile(ipaFilePath))
+            using (ICSharpCode.SharpZipLib.Zip.ZipFile zipFile = new ICSharpCode.SharpZipLib.Zip.ZipFile(ipaFilePath))
             {
                 foreach (ZipEntry entry in zipFile)
                 {
@@ -232,6 +237,28 @@ namespace Appium_Wizard
             return outputPath;
         }
 
+        public static string ExtractInfoPlistFromWDAIPA(string outputFolderPath)
+        {
+            string wdaPath = FilesPath.WDAFilePath;
+            string destinationPath = "";
+            string fileNameToExtract = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist";
+            using (ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(wdaPath))
+            {
+                ZipArchiveEntry entry = archive.GetEntry(fileNameToExtract);
+
+                if (entry != null)
+                {
+                    destinationPath = Path.Combine(outputFolderPath, Path.GetFileName(fileNameToExtract));
+                    entry.ExtractToFile(destinationPath, overwrite: true);
+                }
+                else
+                {
+                    Console.WriteLine($"File '{fileNameToExtract}' not found in the ZIP archive.");
+                }
+            }
+            return destinationPath;
+        }
+
 
         public static Dictionary<string, string> GetValueFromXml(string xmlString)
         {
@@ -253,7 +280,7 @@ namespace Appium_Wizard
                     }
                 }
             }
-          
+
             return keyValuePairs;
         }
 
@@ -415,9 +442,9 @@ namespace Appium_Wizard
             }
         }
 
-        public static Dictionary<string,string> InstalledDriverVersion()
+        public static Dictionary<string, string> InstalledDriverVersion()
         {
-            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();    
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
             var output = AppiumInstalledDriverList();
             string pattern = @"- (\w+)@(\d+(\.\d+){0,2})";
             Regex regex = new Regex(pattern);
@@ -426,7 +453,7 @@ namespace Appium_Wizard
             {
                 string driverName = match.Groups[1].Value;
                 string version = match.Groups[2].Value;
-                keyValuePairs.Add(driverName,version);
+                keyValuePairs.Add(driverName, version);
             }
             return keyValuePairs;
         }
@@ -732,7 +759,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                return "NotValid";  
+                return "NotValid";
             }
         }
 
@@ -827,6 +854,90 @@ namespace Appium_Wizard
                 }
             }
             return -1; // Not found
+        }
+
+        public static string GetRequiredWebDriverAgentVersion()
+        {
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".appium\node_modules\appium-xcuitest-driver\node_modules\appium-webdriveragent\package.json");
+            if (!File.Exists(filePath))
+            {
+                return "fileNotFound";
+            }
+
+            string jsonContent = File.ReadAllText(filePath);
+
+            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+            {
+                JsonElement root = doc.RootElement;
+
+                if (root.TryGetProperty("version", out JsonElement versionElement))
+                {
+                    return versionElement.GetString();
+                }
+                else
+                {
+                    return "versionNotFound";
+                }
+            }
+        }
+
+        public static void GetWebDriverAgentIPAFile()
+        {
+            string version = GetRequiredWebDriverAgentVersion();
+            if (version != "versionNotFound" & version != "fileNotFound")
+            {
+                try
+                {
+                    string url = "https://github.com/appium/WebDriverAgent/releases/download/v" + version + "/WebDriverAgentRunner-Runner.zip";
+                    string tempFolder = Path.GetTempPath();
+                    tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                    try
+                    {
+                        Directory.Delete(tempFolder, true);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    Directory.CreateDirectory(tempFolder);
+                    string downloadedZip = tempFolder + "\\wdadownloaded.zip";
+                    using (var client = new HttpClient())
+                    {
+                        using (var s = client.GetStreamAsync(url))
+                        {
+                            using (var fs = new FileStream(downloadedZip, FileMode.OpenOrCreate))
+                            {
+                                s.Result.CopyTo(fs);
+                            }
+                        }
+                    }
+
+
+                    //--------------------
+                    string extractFolder = tempFolder + "\\Extracted";
+                    string PayloadFolder = tempFolder + "\\Extracted\\Payload";
+                    string finalIPAFile = tempFolder + "\\wda.ipa";
+                    System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
+                    System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
+                    //--------------------
+                    string destinationFilePath = FilesPath.iOSFilesPath + "wda.ipa";
+                    File.Delete(destinationFilePath);
+                    File.Move(finalIPAFile, destinationFilePath, true);
+                    //--------------------
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            Directory.Delete(tempFolder, true);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    });
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
     }
 }

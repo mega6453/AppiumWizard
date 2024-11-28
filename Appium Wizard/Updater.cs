@@ -141,6 +141,11 @@
                 GoogleAnalytics.SendEvent("Update_XCUITest");
                 isUpdated = true;
             });
+            commonProgress.UpdateStepLabel("Update WebDriverAgentRunner", "Please wait while updating the compatible WebDriverAgentRunner for the updated XCUITest driver...",75);
+            await Task.Run(() => 
+            {
+                Common.GetWebDriverAgentIPAFile();
+            });
             commonProgress.Close();
             await GetVersionInformation();
         }

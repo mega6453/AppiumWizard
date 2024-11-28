@@ -626,25 +626,6 @@ namespace Appium_Wizard
             //}
         }
 
-
-        private void UnlockButton_Click(object sender, EventArgs e)
-        {
-
-            //if (OSType.Equals("iOS"))
-            //{
-            //    iOSAPIMethods.SendText(URL, sessionId, "");
-            //}
-            //else
-            //{
-            //    //AndroidMethods.GetInstance().SendText(udid, text);
-            //}
-        }
-
-        private void unlockToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private async void ScreenControl_FormClosed(object sender, FormClosedEventArgs e)
         {
             //AndroidAPIMethods.DeleteSession(proxyPort, OpenDevice.deviceSessionId[udid]);
@@ -784,10 +765,16 @@ namespace Appium_Wizard
             }
             else
             {
-                string url = "http://localhost:" + proxyPort;               
-                iOSAPIMethods.LaunchApp(url,sessionId, "com.apple.Preferences");
+                string url = "http://localhost:" + proxyPort;
+                iOSAPIMethods.LaunchApp(url, sessionId, "com.apple.Preferences");
                 GoogleAnalytics.SendEvent("iOS_SettingsToolStripButton_Click");
             }
+        }
+
+        private void UnlockScreen_Click(object sender, EventArgs e)
+        {
+            EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+            enterPassword.ShowDialog();
         }
     }
 }

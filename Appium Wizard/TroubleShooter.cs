@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Appium_Wizard
 {
@@ -14,6 +15,7 @@ namespace Appium_Wizard
             bool IsAppiumInstalled = false;
             bool IsXCUITestDriverInstalled = false;
             bool IsUIAutomatorDriverInstalled = false;
+            bool IsCompatibleWDAAvailable = false;
             CommonProgress commonProgress = new CommonProgress();
             if (mainScreen == null)
             {
@@ -34,6 +36,24 @@ namespace Appium_Wizard
                 string InstalledDriverList = Common.AppiumInstalledDriverList();
                 IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
                 IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
+                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for WebDriverAgent compatibility...", 90);
+                if (IsXCUITestDriverInstalled)
+                {
+                    string requiredVersion = Common.GetRequiredWebDriverAgentVersion();
+                    if (requiredVersion != "versionNotFound" & requiredVersion != "fileNotFound")
+                    {
+                        string IPAVersion = iOSMethods.GetInstance().GetWDAIPAVersion();
+                        Version expectedVersion = new Version(requiredVersion);
+                        Version actualVersion = new Version(IPAVersion);
+                        bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
+                        (expectedVersion.Minor == actualVersion.Minor);
+                        if (areEqual)
+                        {
+                            IsCompatibleWDAAvailable = true;
+                        }
+                    }
+                       
+                }                
             });
             if (!IsNodeInstalled)
             {
@@ -41,6 +61,7 @@ namespace Appium_Wizard
                 AppiumStatusLabel.Text = "NodeJS Required";
                 XCUITestStatusLabel.Text = "Appium Required";
                 UIAutomatorStatusLabel.Text = "Appium Required";
+                WDAStatusLabel.Text = "XUITest Driver Required";
                 FixNodeJSButton.Enabled = true;
                 GoogleAnalytics.SendEvent("Trouble_NodeJS_Not_Installed");
             }
@@ -53,6 +74,7 @@ namespace Appium_Wizard
                     AppiumStatusLabel.Text = "Not OK";
                     XCUITestStatusLabel.Text = "Appium Required";
                     UIAutomatorStatusLabel.Text = "Appium Required";
+                    WDAStatusLabel.Text = "XUITest Driver Required";
                     FixAppiumButton.Enabled = true;
                     GoogleAnalytics.SendEvent("Trouble_Appium_Not_Installed");
                 }
@@ -63,6 +85,7 @@ namespace Appium_Wizard
                     if (!IsXCUITestDriverInstalled)
                     {
                         XCUITestStatusLabel.Text = "Not OK";
+                        WDAStatusLabel.Text = "XUITest Driver Required";
                         FixXCUITestButton.Enabled = true;
                         GoogleAnalytics.SendEvent("Trouble_XCUITest_Not_Installed");
                     }
@@ -70,6 +93,17 @@ namespace Appium_Wizard
                     {
                         XCUITestStatusLabel.Text = "OK";
                         FixXCUITestButton.Enabled = false;
+                        FixWDAButton.Enabled = true;
+                        if (IsCompatibleWDAAvailable)
+                        {
+                            WDAStatusLabel.Text = "OK";
+                            FixWDAButton.Enabled = false;
+                        }
+                        else
+                        {
+                            WDAStatusLabel.Text = "Not OK";
+                            FixWDAButton.Enabled = true;
+                        }
                     }
                     if (!IsUIAutomatorDriverInstalled)
                     {
@@ -153,7 +187,21 @@ namespace Appium_Wizard
 
         private void TroubleShooter_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("TroubleShooter_Shown");
+        }
+
+        private async void FixWDAButton_Click(object sender, EventArgs e)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Get WebDriverAgent", "Getting compatible WebDriverAgent based on installed XCUITest driver version, This may take sometime, Please wait...");
+            await Task.Run(() =>
+            {
+                Common.GetWebDriverAgentIPAFile();
+            });
+            commonProgress.Close();
+            MessageBox.Show("Downloaded compatible version of WDA.\nDelete the already installed WDA from your iPhone and Open the device again to fix any issues.", "Re-Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent("FixWDAButton_Click");
         }
     }
 }

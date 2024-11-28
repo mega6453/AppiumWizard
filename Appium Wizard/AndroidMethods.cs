@@ -403,6 +403,22 @@ namespace Appium_Wizard
             ExecuteCommandWithCmd("-s " + udid + " shell cmd statusbar collapse");
         }
 
+        public void UnlockScreen(string udid, string password)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82");
+            SendText(udid, password);
+        }
+
+        public bool ClearAppData(string udid, string packageName)
+        {
+            var output = ExecuteCommandWithCmd("-s " + udid + " shell pm clear "+packageName);
+            if (output.Contains("Success"))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public List<string> GetListOfInstalledApps(string udid)
         {
             var output = ExecuteCommand("-s " + udid + " shell pm list packages -3 --user 0");

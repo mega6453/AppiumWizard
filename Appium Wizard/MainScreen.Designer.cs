@@ -74,6 +74,8 @@ namespace Appium_Wizard
             uIAutomatorToolStripMenuItem = new ToolStripMenuItem();
             serverSecurityToolStripMenuItem = new ToolStripMenuItem();
             cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
+            otherDocsToolStripMenuItem = new ToolStripMenuItem();
+            iOSNativeAppsBundleToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
             reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
             startADiscussionToolStripMenuItem = new ToolStripMenuItem();
@@ -107,8 +109,6 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
-            otherDocsToolStripMenuItem = new ToolStripMenuItem();
-            iOSNativeAppsBundleToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -357,7 +357,7 @@ namespace Appium_Wizard
             // 
             // iOSExecutorToolStripMenuItem
             // 
-            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute1;
+            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
             iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
@@ -473,6 +473,22 @@ namespace Appium_Wizard
             cLIArgumentsToolStripMenuItem.Size = new Size(188, 22);
             cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
             cLIArgumentsToolStripMenuItem.Click += cLIArgumentsToolStripMenuItem_Click;
+            // 
+            // otherDocsToolStripMenuItem
+            // 
+            otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
+            otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
+            otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
+            otherDocsToolStripMenuItem.Size = new Size(247, 22);
+            otherDocsToolStripMenuItem.Text = "Other Docs";
+            // 
+            // iOSNativeAppsBundleToolStripMenuItem
+            // 
+            iOSNativeAppsBundleToolStripMenuItem.Image = Properties.Resources.link;
+            iOSNativeAppsBundleToolStripMenuItem.Name = "iOSNativeAppsBundleToolStripMenuItem";
+            iOSNativeAppsBundleToolStripMenuItem.Size = new Size(218, 22);
+            iOSNativeAppsBundleToolStripMenuItem.Text = "iOS Native Apps Bundle IDs";
+            iOSNativeAppsBundleToolStripMenuItem.Click += iOSNativeAppsBundleToolStripMenuItem_Click;
             // 
             // troubleshootToolStripMenuItem
             // 
@@ -793,22 +809,6 @@ namespace Appium_Wizard
             // 
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
-            // 
-            // otherDocsToolStripMenuItem
-            // 
-            otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
-            otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
-            otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
-            otherDocsToolStripMenuItem.Size = new Size(255, 30);
-            otherDocsToolStripMenuItem.Text = "Other Docs";
-            // 
-            // iOSNativeAppsBundleToolStripMenuItem
-            // 
-            iOSNativeAppsBundleToolStripMenuItem.Image = Properties.Resources.link;
-            iOSNativeAppsBundleToolStripMenuItem.Name = "iOSNativeAppsBundleToolStripMenuItem";
-            iOSNativeAppsBundleToolStripMenuItem.Size = new Size(226, 30);
-            iOSNativeAppsBundleToolStripMenuItem.Text = "iOS Native Apps Bundle IDs";
-            iOSNativeAppsBundleToolStripMenuItem.Click += iOSNativeAppsBundleToolStripMenuItem_Click;
             // 
             // MainScreen
             // 

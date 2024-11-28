@@ -16,7 +16,6 @@ namespace Appium_Wizard
             InitializeComponent();
             this.Text = "Installed Apps List - " + deviceName;
         }
-
         public async Task GetInstalledAppsList(object obj)
         {
             CommonProgress commonProgress = new CommonProgress();
@@ -60,12 +59,14 @@ namespace Appium_Wizard
                 UninstallButton.Enabled = true;
                 LaunchButton.Enabled = true;
                 KillAppButton.Enabled = true;
+                DropDownButton.Enabled = true;
             }
             else
             {
                 UninstallButton.Enabled = false;
                 LaunchButton.Enabled = false;
                 KillAppButton.Enabled = false;
+                DropDownButton.Enabled = false;
             }
         }
 
@@ -196,6 +197,22 @@ namespace Appium_Wizard
         private void InstalledAppsList_Load(object sender, EventArgs e)
         {
             this.Owner = ownerForm;
+        }
+
+        private void DropDownButton_Click(object sender, EventArgs e)
+        {
+            Point screenPoint = DropDownButton.PointToScreen(new Point(0, DropDownButton.Height));
+            contextMenuStrip1.Show(screenPoint);
+        }
+
+        private void clearAppDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to clear data for " + selectedPackageName + " from " + deviceName + "?", "Clear App Data", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                AndroidMethods.GetInstance().ClearAppData(udid, selectedPackageName);
+                GoogleAnalytics.SendEvent("Android_Clear_App_Data");
+            }
         }
     }
 }

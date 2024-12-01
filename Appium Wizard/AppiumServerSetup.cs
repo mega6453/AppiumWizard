@@ -144,6 +144,15 @@ namespace Appium_Wizard
                     //{
                     //    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                     //}
+
+                    if (data.Contains("XCUITestDriver") && data.Contains("Could not proxy command to the remote server"))
+                    {
+                        if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                        {
+                            Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                        }
+                        iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                    }                   
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
                     {
                         string platformName = "";

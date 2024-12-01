@@ -18,10 +18,11 @@ namespace Appium_Wizard
            
             try
             {
+                string dual = "This project is dual-licensed under the MIT and GPL 3.0 licenses.";
                 string MITLicense = await AboutText.GetLicenseText("MIT");
                 string GPLLicense = await AboutText.GetLicenseText("GPL");
                 string linebreak = "\n\n--------------------------------------------------------------------------\n\n";
-                string finalLicense = MITLicense + linebreak + GPLLicense;
+                string finalLicense = dual + linebreak + MITLicense + linebreak + GPLLicense;
                 LicenseRichTextBox.Text = finalLicense;
                 var thanksTo = await AboutText.ExtractSections();
                 ThanksToRichTextBox.Text = thanksTo;

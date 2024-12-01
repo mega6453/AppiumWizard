@@ -60,6 +60,7 @@ namespace Appium_Wizard
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
             signIPAToolStripMenuItem = new ToolStripMenuItem();
             iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
+            iOSProxyToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             appiumDocsToolStripMenuItem = new ToolStripMenuItem();
             capabilitiesToolStripMenuItem = new ToolStripMenuItem();
@@ -326,7 +327,7 @@ namespace Appium_Wizard
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, iOSExecutorToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, iOSExecutorToolStripMenuItem, iOSProxyToolStripMenuItem, signIPAToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(46, 20);
             toolsToolStripMenuItem.Text = "Tools";
@@ -335,7 +336,7 @@ namespace Appium_Wizard
             // 
             inspectorToolStripMenuItem1.Image = Properties.Resources.inspector;
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
-            inspectorToolStripMenuItem1.Size = new Size(203, 22);
+            inspectorToolStripMenuItem1.Size = new Size(211, 30);
             inspectorToolStripMenuItem1.Text = "Inspector";
             inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem_Click;
             // 
@@ -343,7 +344,7 @@ namespace Appium_Wizard
             // 
             iOSProfileManagementToolStripMenuItem.Image = Properties.Resources.management;
             iOSProfileManagementToolStripMenuItem.Name = "iOSProfileManagementToolStripMenuItem";
-            iOSProfileManagementToolStripMenuItem.Size = new Size(203, 22);
+            iOSProfileManagementToolStripMenuItem.Size = new Size(211, 30);
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
@@ -351,7 +352,7 @@ namespace Appium_Wizard
             // 
             signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
             signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
-            signIPAToolStripMenuItem.Size = new Size(203, 22);
+            signIPAToolStripMenuItem.Size = new Size(211, 30);
             signIPAToolStripMenuItem.Text = "Sign IPA";
             signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
             // 
@@ -359,9 +360,17 @@ namespace Appium_Wizard
             // 
             iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
+            iOSExecutorToolStripMenuItem.Size = new Size(211, 30);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
+            // 
+            // iOSProxyToolStripMenuItem
+            // 
+            iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
+            iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
+            iOSProxyToolStripMenuItem.Size = new Size(211, 30);
+            iOSProxyToolStripMenuItem.Text = "iOS Proxy";
+            iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
@@ -935,5 +944,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem iOSExecutorToolStripMenuItem;
         private ToolStripMenuItem otherDocsToolStripMenuItem;
         private ToolStripMenuItem iOSNativeAppsBundleToolStripMenuItem;
+        private ToolStripMenuItem iOSProxyToolStripMenuItem;
     }
 }

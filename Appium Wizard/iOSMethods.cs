@@ -72,7 +72,8 @@ namespace Appium_Wizard
             if (executable == iOSExecutable.go)
             {
                 string output = ExecuteCommand("info", udid, true, 10000);
-                if (output.Contains("Process did not complete within the allotted time"))
+                if (output.Contains("Process did not complete within the allotted time")
+                    | output.Contains("failed getting info"))
                 {
                     return GetDeviceInformation(udid, iOSExecutable.py);
                 }

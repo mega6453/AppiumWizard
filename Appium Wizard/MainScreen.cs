@@ -481,11 +481,13 @@ namespace Appium_Wizard
                 OS = "iOS";
                 if (IsIt17PlusVersion(OSVersion))
                 {
-                    Task.Run(() => {
-                        iOSAsyncMethods.GetInstance().CreateTunnelGo(false);                       
+                    Task.Run(() =>
+                    {
+                        iOSAsyncMethods.GetInstance().CreateTunnelGo(false);
                     });
                 }
-                Task.Run(() => {
+                Task.Run(() =>
+                {
                     iOSMethods.GetInstance().MountImage(udid);
                 });
             }
@@ -1915,6 +1917,28 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendEvent("iOSNativeAppsBundleToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void iOSProxyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var devicesList = Database.QueryDataFromDevicesTable();
+            bool isiOSDeviceAvailable = false;
+            foreach (var item in devicesList)
+            {
+                if (item["OS"].Equals("iOS"))
+                {
+                    isiOSDeviceAvailable = true;
+                }                
+            }
+            if (isiOSDeviceAvailable)
+            {
+                iOS_Proxy proxy = new iOS_Proxy();
+                proxy.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Please add an iOS device in the device list and then try again.","No iOS Device available",MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
         }
     }

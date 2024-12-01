@@ -35,12 +35,13 @@
             deviceListComboBox = new ComboBox();
             label2 = new Label();
             label3 = new Label();
+            label4 = new Label();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(10, 81);
+            label1.Location = new Point(58, 130);
             label1.Name = "label1";
             label1.Size = new Size(106, 15);
             label1.TabIndex = 0;
@@ -48,7 +49,7 @@
             // 
             // portTextBox
             // 
-            portTextBox.Location = new Point(122, 77);
+            portTextBox.Location = new Point(170, 126);
             portTextBox.Name = "portTextBox";
             portTextBox.Size = new Size(100, 23);
             portTextBox.TabIndex = 1;
@@ -56,7 +57,7 @@
             // startProxyButton
             // 
             startProxyButton.AutoSize = true;
-            startProxyButton.Location = new Point(228, 76);
+            startProxyButton.Location = new Point(276, 125);
             startProxyButton.Name = "startProxyButton";
             startProxyButton.Size = new Size(75, 25);
             startProxyButton.TabIndex = 2;
@@ -67,7 +68,7 @@
             // deviceListComboBox
             // 
             deviceListComboBox.FormattingEnabled = true;
-            deviceListComboBox.Location = new Point(122, 12);
+            deviceListComboBox.Location = new Point(170, 73);
             deviceListComboBox.Name = "deviceListComboBox";
             deviceListComboBox.Size = new Size(179, 23);
             deviceListComboBox.TabIndex = 3;
@@ -75,7 +76,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 15);
+            label2.Location = new Point(60, 76);
             label2.Name = "label2";
             label2.Size = new Size(76, 15);
             label2.TabIndex = 4;
@@ -84,18 +85,30 @@
             // label3
             // 
             label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             label3.ForeColor = Color.IndianRed;
-            label3.Location = new Point(12, 121);
+            label3.Location = new Point(60, 170);
             label3.Name = "label3";
-            label3.Size = new Size(330, 30);
+            label3.Size = new Size(323, 30);
             label3.TabIndex = 5;
-            label3.Text = "Note: Enter the port number for 'appium:webDriverAgentUrl' \r\nas displayed in the Appium server logs at startup.";
+            label3.Text = "Note: Enter the port number of 'appium:webDriverAgentUrl' \r\nas displayed in the Appium server logs at startup.";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
+            label4.Location = new Point(12, 7);
+            label4.Name = "label4";
+            label4.Size = new Size(424, 45);
+            label4.TabIndex = 6;
+            label4.Text = "Use this feature if you encounter communication issues with your iPhone during\r\nautomation execution,such as a 'Could not proxy command to the remote server'\r\nerror in the Appium server logs.\"";
             // 
             // iOS_Proxy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(373, 166);
+            ClientSize = new Size(468, 224);
+            Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(deviceListComboBox);
@@ -121,5 +134,6 @@
         private ComboBox deviceListComboBox;
         private Label label2;
         private Label label3;
+        private Label label4;
     }
 }

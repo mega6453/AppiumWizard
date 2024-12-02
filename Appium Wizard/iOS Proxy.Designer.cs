@@ -107,6 +107,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(468, 224);
             Controls.Add(label4);
             Controls.Add(label3);
@@ -119,6 +120,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "iOS_Proxy";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "iOS Proxy";
             Load += iOS_Proxy_Load;

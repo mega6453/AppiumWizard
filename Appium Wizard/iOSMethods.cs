@@ -2021,5 +2021,30 @@ namespace Appium_Wizard
                 return false;
             }
         }
+
+        public static string isDeviceLocked(int port)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/wda/locked", Method.Get);
+                RestResponse response = client.Execute(request);
+                JObject jsonObject = JObject.Parse(response.Content);
+                bool isLocked = jsonObject["value"].Value<bool>();
+                if (isLocked)
+                {
+                    return "Yes";
+                }
+                return "No";
+            }
+            catch (Exception)
+            {
+                return "Error";   
+            }
+        }
     }
 }

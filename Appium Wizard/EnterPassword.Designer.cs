@@ -80,9 +80,9 @@
             NoteForiOSLabel.ForeColor = Color.IndianRed;
             NoteForiOSLabel.Location = new Point(4, 135);
             NoteForiOSLabel.Name = "NoteForiOSLabel";
-            NoteForiOSLabel.Size = new Size(289, 40);
+            NoteForiOSLabel.Size = new Size(303, 36);
             NoteForiOSLabel.TabIndex = 5;
-            NoteForiOSLabel.Text = "Note : This works only if WebDriverAgent is already \r\nrunning in the iPhone.";
+            NoteForiOSLabel.Text = "Note : This works only if the WebDriverAgent is already running in the iPhone.";
             NoteForiOSLabel.Visible = false;
             // 
             // EnterPassword
@@ -90,7 +90,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(321, 184);
+            ClientSize = new Size(312, 184);
             Controls.Add(NoteForiOSLabel);
             Controls.Add(Unlock);
             Controls.Add(label2);

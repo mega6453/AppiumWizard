@@ -30,9 +30,16 @@ namespace Appium_Wizard
             DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedProfileName + " profile?", "Delete Profile", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
-                Directory.Delete(selectedProfilePath, true);
-                MessageBox.Show(selectedProfileName + " removed successfully.", "Delete Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                listView1.Items.Remove(selectedItem);
+                try
+                {
+                    Directory.Delete(selectedProfilePath, true);
+                    MessageBox.Show(selectedProfileName + " removed successfully.", "Delete Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    listView1.Items.Remove(selectedItem);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Exception - " + ex, "Failed to Delete", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             GoogleAnalytics.SendEvent("iOSProfileManage_DeleteProfile_Clicked");
         }

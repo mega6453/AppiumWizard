@@ -408,7 +408,7 @@ namespace Appium_Wizard
             try
             {
                 string certificatPath = "";
-                List<string> deviceList; int expirationDays;
+                List<string> deviceList;
                 bool flag = false;
                 string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
                 foreach (string profileFolder in profileFolders)
@@ -418,10 +418,14 @@ namespace Appium_Wizard
                     {
                         foreach (string provisioningFile in provisioningFiles)
                         {
+                            string directoryPath = Path.GetDirectoryName(provisioningFile);
+                            string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
+                            int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
+
                             var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
                             deviceList = (List<string>)provisionDetails["DevicesList"];
-                            expirationDays = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                            if (deviceList.Contains(udid) && expirationDays > 0)
+                            int expirationDaysFromProvision = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                            if (deviceList.Contains(udid) && expirationDaysFromProvision > 0 && expirationDaysFromPem > 0)
                             {
                                 flag = true;
                                 certificatPath = profileFolder;

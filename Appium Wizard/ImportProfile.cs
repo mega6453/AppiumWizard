@@ -182,7 +182,7 @@ namespace Appium_Wizard
             }
         }
 
-        public string GetExpirationDateFromPemFile(string certificatePath)
+        public static string GetExpirationDateFromPemFile(string certificatePath)
         {
             string arguments = $"x509 -in \"{certificatePath}\" -noout -enddate";
             string output = ExecuteCommand(opensslFilePath, arguments, false);

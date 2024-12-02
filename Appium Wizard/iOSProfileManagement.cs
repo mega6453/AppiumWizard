@@ -66,13 +66,6 @@ namespace Appium_Wizard
             {
                 Directory.CreateDirectory(ProfilesFilePath);
             }
-            //List<string> UDIDFromProfile = new List<string>();
-            //List<string> UDIDFromDB = new List<string>();
-            //var devicesFromDB = Database.QueryDataFromDevicesTable();
-            //foreach (var device in devicesFromDB)
-            //{
-            //    UDIDFromDB.Add(device["UDID"]);
-            //}
             string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
             foreach (string profileFolder in profileFolders)
             {
@@ -82,21 +75,34 @@ namespace Appium_Wizard
                 {
                     foreach (string provisioningFile in provisioningFiles)
                     {
+                        string directoryPath = Path.GetDirectoryName(provisioningFile);
+                        string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
+                        int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
+
                         var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
-                        //UDIDFromProfile = (List<string>)provisionDetails["DevicesList"];
                         string profileName = provisionDetails["Name"].ToString();
-                        int expirationDays = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                        int expirationDaysFromProvisionFile = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
                         string appId = provisionDetails["application-identifier"].ToString();
                         string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
-                        string updatedExpirationDays = expirationDays.ToString() + " days";
+                        string updatedExpirationDays = string.Empty;
                         try
                         {
-                            if (expirationDays <= 0)
+                            if (expirationDaysFromProvisionFile <= 0 | expirationDaysFromPem <= 0)
                             {
                                 updatedExpirationDays = "Expired";
                             }
+                            else
+                            {
+                                if (expirationDaysFromPem < expirationDaysFromProvisionFile)
+                                {
+                                    updatedExpirationDays = expirationDaysFromPem.ToString() + " days";
+                                }
+                                else
+                                {
+                                    updatedExpirationDays = expirationDaysFromProvisionFile.ToString() + " days";
+                                }
+                            }
                             string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
-                            // listView1.Items.Add(new ListViewItem(item1));
                             profilesList.Add(item1);
                         }
                         catch (Exception)

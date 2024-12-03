@@ -154,15 +154,22 @@ namespace Appium_Wizard
 
         public string GetInstalledAppVersion(string udid, string bundleId)
         {
-            string output = ExecuteCommand("apps --list", udid);
-            string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
-            var match = Regex.Match(output, pattern);
-
-            if (match.Success)
+            try
             {
-                return match.Groups[1].Value;
+                string output = ExecuteCommand("apps --list", udid, true, 10000);
+                string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
+                var match = Regex.Match(output, pattern);
+
+                if (match.Success)
+                {
+                    return match.Groups[1].Value;
+                }
+                return "failedToGetVersion";
             }
-            return "failedToGetVersion";
+            catch (Exception)
+            {
+                return "failedToGetVersion";
+            }
         }
 
         public string GetInstalledWDAVersion(string udid)
@@ -182,10 +189,9 @@ namespace Appium_Wizard
                 else
                 {
                     string ipaWDAVersion = GetWDAIPAVersion();
-
                     Version installed = new Version(installedWDAVersion);
                     Version ipa = new Version(ipaWDAVersion);
-                    return installed.Equals(ipa);
+                    return installed >= ipa;
                 }
 
             }
@@ -764,11 +770,27 @@ namespace Appium_Wizard
 
         public string GetWDAIPAVersion()
         {
+            string infoPlistPathFromRoot = @"Payload/WebDriverAgentRunner-Runner.app/Info.plist"; // Version is always 1.0 in this plistfile - But while downloading WDA updating the correct version in iPA.
+            string infoPlistPathFromXCTest = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist"; // Correct version given in this file.
+
+            string rootInfoVersion = "1.0";
+            rootInfoVersion = GetWDAIPAVersion(infoPlistPathFromRoot);
+            if (rootInfoVersion.Equals("1.0"))
+            {
+                string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
+                return xcTestInfoVersion;
+            }
+            return rootInfoVersion; 
+        }
+
+        private string GetWDAIPAVersion(string infoPlistPath)
+        {
             Dictionary<string, string> output = new Dictionary<string, string>();
             string tempFolder = Path.GetTempPath();
             tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
             Directory.CreateDirectory(tempFolder);
-            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(tempFolder);
+            
+            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
             if (!string.IsNullOrEmpty(plistFilePath))
             {
                 string xmlString = ExecutePlistUtil(plistFilePath);
@@ -778,7 +800,7 @@ namespace Appium_Wizard
             {
                 return output["CFBundleShortVersionString"];
             }
-            return "8.7.3";
+            return "1.0"; // Return Default version if no key found.
         }
 
         public string ExecutePlistUtil(string plistFilePath)

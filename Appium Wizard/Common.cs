@@ -237,23 +237,18 @@ namespace Appium_Wizard
             return outputPath;
         }
 
-        public static string ExtractInfoPlistFromWDAIPA(string outputFolderPath)
+        public static string ExtractInfoPlistFromWDAIPA(string infoPlistPath, string outputFolderPath)
         {
             string wdaPath = FilesPath.WDAFilePath;
             string destinationPath = "";
-            string fileNameToExtract = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist";
             using (ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(wdaPath))
             {
-                ZipArchiveEntry entry = archive.GetEntry(fileNameToExtract);
+                ZipArchiveEntry entry = archive.GetEntry(infoPlistPath);
 
                 if (entry != null)
                 {
-                    destinationPath = Path.Combine(outputFolderPath, Path.GetFileName(fileNameToExtract));
+                    destinationPath = Path.Combine(outputFolderPath, Path.GetFileName(infoPlistPath));
                     entry.ExtractToFile(destinationPath, overwrite: true);
-                }
-                else
-                {
-                    Console.WriteLine($"File '{fileNameToExtract}' not found in the ZIP archive.");
                 }
             }
             return destinationPath;
@@ -917,6 +912,7 @@ namespace Appium_Wizard
                     string PayloadFolder = tempFolder + "\\Extracted\\Payload";
                     string finalIPAFile = tempFolder + "\\wda.ipa";
                     System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
+                    UpdateVersionInPlistFile(PayloadFolder+ "\\WebDriverAgentRunner-Runner.app\\Info.plist", version);
                     System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
                     //--------------------
                     string destinationFilePath = FilesPath.iOSFilesPath + "wda.ipa";
@@ -938,6 +934,13 @@ namespace Appium_Wizard
                 {
                 }
             }
+        }
+
+        public static void UpdateVersionInPlistFile(string filePath, string version)
+        {
+            string plistContent = File.ReadAllText(filePath);
+            string updatedPlistContent = plistContent.Replace("<string>1.0</string>", "<string>"+version+"</string>");
+            File.WriteAllText(filePath, updatedPlistContent);
         }
     }
 }

@@ -62,15 +62,17 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Troubleshooter
 * Status bar for Element interaction (Find element, Click and Send text as of now)
 * Highlight element accessed by Appium in Screen Reflection during execution
-* Manage Apps - Install / Launch / Kill / Uninstall
+* Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data for Android
 * Take Device Screenshot
 * Reboot Device
+* Unlock Mobile using Screen Control (**New**)
+* Start iOS proxy manually (**New**)
+* iOS Executor - 2 ways to execute iOS actions (**New**)
 * etc.
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window
 * Status bar for Element interaction (WaitForElement, Swipe, etc.)
-* Unlock Mobile using Screen Control
 * Performance and Reliability Improvements
 * Error handling
 

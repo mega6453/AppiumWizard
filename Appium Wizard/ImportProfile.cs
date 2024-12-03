@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using ListView = System.Windows.Forms.ListView;
 
@@ -53,7 +55,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 10);
+            commonProgress.UpdateStepLabel("Import Profile", "Please wait while checking profile...", 10);
             try
             {
                 string password = maskedTextBox1.Text;
@@ -63,7 +65,7 @@ namespace Appium_Wizard
                 {
                     output = ExecuteCommand(opensslFilePath, command, true);
                 });
-                commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 30);
+                commonProgress.UpdateStepLabel("Import Profile", "Please wait while checking profile...", 30);
                 if (output.Contains("invalid password"))
                 {
                     commonProgress.Close();
@@ -77,9 +79,9 @@ namespace Appium_Wizard
                     await Task.Run(() =>
                     {
                         certificate = GetCertificateFromP12File(p12InputFilePath, password).Replace("\n", "");
-                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 50);
+                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while checking profile...", 50);
                         provisionDetails = GetDetailsFromProvisionFile(mobileProvisionFilePath);
-                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 70);
+                        commonProgress.UpdateStepLabel("Import Profile", "Please wait while checking profile...", 70);
                     });
                     string certificates = provisionDetails["DeveloperCertificates"].ToString();
                     if (!certificates.Contains(certificate))
@@ -105,35 +107,64 @@ namespace Appium_Wizard
                         File.Copy(mobileProvisionFilePath, mobileProvisionDestinationPath, true);
 
                         command = $"pkcs12 -in \"{p12InputFilePath}\" -out \"{folderPath + "certificate.pem"}\" -nodes -password pass:\"{password}\"";
-                        await Task.Run(() => {
+                        await Task.Run(() =>
+                        {
                             ExecuteCommand(opensslFilePath, command, true);
-                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 80);
-                        });                        
+                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while checking profile...", 80);
+                        });
+                        string expiryDateFromPem = GetExpirationDateFromPemFile(folderPath + "certificate.pem");
+                        int expirationDaysFromPem = ExpirationDays(expiryDateFromPem);
                         string profileName = provisionDetails["Name"].ToString();
-                        int expirationDays = ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                        string expiryDateFromProvision = provisionDetails["ExpirationDate"].ToString();
+                        DateTimeOffset dateTimeOffset = DateTimeOffset.Parse(expiryDateFromProvision);
+                        DateTime dateTimeInUtc = dateTimeOffset.UtcDateTime;
+                        string expiryDateFromProvisionInGMT = dateTimeInUtc.ToString("MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+
+                        int expirationDaysFromProvisionFile = ExpirationDays(expiryDateFromProvision);
                         string appId = provisionDetails["application-identifier"].ToString();
                         string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
-                        string updatedExpirationDays = expirationDays.ToString() + " days";
-                        try
+
+                        if (expirationDaysFromPem <= 0 & expirationDaysFromProvisionFile <= 0)
                         {
-                            if (expirationDays <= 0)
+                            MessageBox.Show("Import Failed - P12 and Mobile Provision files both are Expired.\n\nP12 File Expiry Date - " + expiryDateFromPem + "\nMobile Provision File Expiry Date - " + expiryDateFromProvisionInGMT, "Profiles Expired", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else if (expirationDaysFromPem <= 0)
+                        {
+                            MessageBox.Show("Import Failed - P12 File Expired.\n\nP12 File Expiry Date - " + expiryDateFromPem + "\nMobile Provision File Expiry Date - " + expiryDateFromProvisionInGMT, "Profiles Expired", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else if (expirationDaysFromProvisionFile <= 0)
+                        {
+                            MessageBox.Show("Import Failed - Mobile Provision file Expired.\n\nP12 File Expiry Date - " + expiryDateFromPem + "\nMobile Provision File Expiry Date - " + expiryDateFromProvisionInGMT, "Profiles Expired", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 90);
+                            string updatedExpirationDays = string.Empty;
+                            if (expirationDaysFromPem < expirationDaysFromProvisionFile)
                             {
-                                updatedExpirationDays = "Expired";
+                                updatedExpirationDays = expirationDaysFromPem.ToString() + " days";
                             }
-                            string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
-                            listView1.Items.Add(new ListViewItem(item1));
-                            commonProgress.UpdateStepLabel("Import Profile", "Please wait while importing profile...", 100);
-                            commonProgress.Close();
-                            Close();
-                            MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            listView1.Refresh();
-                            GoogleAnalytics.SendEvent("iOS_Profile_Added_Successfully");
+                            else
+                            {
+                                updatedExpirationDays = expirationDaysFromProvisionFile.ToString() + " days";
+                            }
+                            try
+                            {
+                                string[] item1 = { profileName, updatedExpirationDays, appId, teamId, folderPath };
+                                listView1.Items.Add(new ListViewItem(item1));
+                                commonProgress.Close();
+                                Close();
+                                MessageBox.Show(profileName + " Profile added successfully.", "Import Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                listView1.Refresh();
+                                GoogleAnalytics.SendEvent("iOS_Profile_Added_Successfully");
+                            }
+                            catch (Exception ex)
+                            {
+                                commonProgress.Close();
+                                MessageBox.Show("Unhandled exception : \n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            commonProgress.Close();
-                            MessageBox.Show("Unhandled exception : \n" + ex, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                        commonProgress.Close();
                     }
                 }
                 else
@@ -145,9 +176,28 @@ namespace Appium_Wizard
             }
             catch (Exception exception)
             {
+                MessageBox.Show("Unhandled exception : \n" + exception, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 commonProgress.Close();
                 GoogleAnalytics.SendExceptionEvent("ImportProfileButton_Clicked", exception.Message);
             }
+        }
+
+        public static string GetExpirationDateFromPemFile(string certificatePath)
+        {
+            string arguments = $"x509 -in \"{certificatePath}\" -noout -enddate";
+            string output = ExecuteCommand(opensslFilePath, arguments, false);
+
+            string pattern = @"notAfter=(\w{3} \d{1,2} \d{2}:\d{2}:\d{2} \d{4}) GMT";
+            Match match = Regex.Match(output, pattern);
+
+            if (match.Success)
+            {
+                string dateString = match.Groups[1].Value;
+                DateTime date = DateTime.ParseExact(dateString, "MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+                string formattedDate = date.ToString("MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+                return formattedDate;
+            }
+            return "error";
         }
 
         private void LoadCounter()
@@ -297,20 +347,35 @@ namespace Appium_Wizard
         {
             DateTime expirationDate;
             int daysRemaining = 0;
-            if (DateTime.TryParseExact(expirationDateString, "yyyy-MM-dd'T'HH:mm:ss'Z'",
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.AssumeUniversal, out expirationDate))
+
+            // List of possible date formats
+            string[] dateFormats = new[]
             {
-                DateTime currentDate = DateTime.Now;
+            "yyyy-MM-dd'T'HH:mm:ss'Z'", // ISO 8601 format
+            "MMM dd HH:mm:ss yyyy",     // Example: "Nov 21 13:10:20 2025"
+            "yyyy-MM-dd",               // Date only
+            "MM/dd/yyyy",               // US date format
+            "dd/MM/yyyy",               // European date format
+            "dd-MM-yyyy",               // Common alternative format
+            "yyyy/MM/dd",               // Another common format
+            "MMM dd, yyyy",             // Example: "Nov 21, 2025"
+            "dd MMM yyyy",              // Example: "21 Nov 2025"
+            "yyyy.MM.dd",               // Dotted format
+            // Add more formats as needed
+        };
+
+            if (DateTime.TryParseExact(expirationDateString, dateFormats,
+                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out expirationDate))
+            {
+                DateTime currentDate = DateTime.UtcNow;
                 TimeSpan timeRemaining = expirationDate.Date - currentDate.Date;
                 daysRemaining = (int)timeRemaining.TotalDays;
-
-                Console.WriteLine("Days remaining: " + daysRemaining);
             }
             else
             {
                 GoogleAnalytics.SendExceptionEvent("Profile_Failed_to_parse_expiration_date");
             }
+
             return daysRemaining;
         }
 

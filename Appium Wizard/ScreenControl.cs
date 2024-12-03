@@ -773,8 +773,28 @@ namespace Appium_Wizard
 
         private void UnlockScreen_Click(object sender, EventArgs e)
         {
-            EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
-            enterPassword.ShowDialog();
+            if (OSType.Equals("iOS"))
+            {
+                string isDeviceLocked = iOSAPIMethods.isDeviceLocked(proxyPort);
+                if (isDeviceLocked.Equals("Yes"))
+                {
+                    EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+                    enterPassword.ShowDialog();
+                }
+                else if (isDeviceLocked.Equals("No"))
+                {
+                    MessageBox.Show(deviceName + " is already Unlocked.", "Device Unlocked", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Device Unlocked", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            else
+            {
+                EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+                enterPassword.ShowDialog();
+            }
         }
     }
 }

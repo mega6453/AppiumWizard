@@ -154,15 +154,22 @@ namespace Appium_Wizard
 
         public string GetInstalledAppVersion(string udid, string bundleId)
         {
-            string output = ExecuteCommand("apps --list", udid);
-            string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
-            var match = Regex.Match(output, pattern);
-
-            if (match.Success)
+            try
             {
-                return match.Groups[1].Value;
+                string output = ExecuteCommand("apps --list", udid, true, 10000);
+                string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
+                var match = Regex.Match(output, pattern);
+
+                if (match.Success)
+                {
+                    return match.Groups[1].Value;
+                }
+                return "failedToGetVersion";
             }
-            return "failedToGetVersion";
+            catch (Exception)
+            {
+                return "failedToGetVersion";
+            }
         }
 
         public string GetInstalledWDAVersion(string udid)
@@ -182,10 +189,9 @@ namespace Appium_Wizard
                 else
                 {
                     string ipaWDAVersion = GetWDAIPAVersion();
-
                     Version installed = new Version(installedWDAVersion);
                     Version ipa = new Version(ipaWDAVersion);
-                    return installed.Equals(ipa);
+                    return installed >= ipa;
                 }
 
             }
@@ -408,7 +414,7 @@ namespace Appium_Wizard
             try
             {
                 string certificatPath = "";
-                List<string> deviceList; int expirationDays;
+                List<string> deviceList;
                 bool flag = false;
                 string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
                 foreach (string profileFolder in profileFolders)
@@ -418,10 +424,14 @@ namespace Appium_Wizard
                     {
                         foreach (string provisioningFile in provisioningFiles)
                         {
+                            string directoryPath = Path.GetDirectoryName(provisioningFile);
+                            string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
+                            int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
+
                             var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
                             deviceList = (List<string>)provisionDetails["DevicesList"];
-                            expirationDays = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                            if (deviceList.Contains(udid) && expirationDays > 0)
+                            int expirationDaysFromProvision = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                            if (deviceList.Contains(udid) && expirationDaysFromProvision > 0 && expirationDaysFromPem > 0)
                             {
                                 flag = true;
                                 certificatPath = profileFolder;
@@ -760,11 +770,27 @@ namespace Appium_Wizard
 
         public string GetWDAIPAVersion()
         {
+            string infoPlistPathFromRoot = @"Payload/WebDriverAgentRunner-Runner.app/Info.plist"; // Version is always 1.0 in this plistfile - But while downloading WDA updating the correct version in iPA.
+            string infoPlistPathFromXCTest = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist"; // Correct version given in this file.
+
+            string rootInfoVersion = "1.0";
+            rootInfoVersion = GetWDAIPAVersion(infoPlistPathFromRoot);
+            if (rootInfoVersion.Equals("1.0"))
+            {
+                string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
+                return xcTestInfoVersion;
+            }
+            return rootInfoVersion; 
+        }
+
+        private string GetWDAIPAVersion(string infoPlistPath)
+        {
             Dictionary<string, string> output = new Dictionary<string, string>();
             string tempFolder = Path.GetTempPath();
             tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
             Directory.CreateDirectory(tempFolder);
-            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(tempFolder);
+            
+            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
             if (!string.IsNullOrEmpty(plistFilePath))
             {
                 string xmlString = ExecutePlistUtil(plistFilePath);
@@ -774,7 +800,7 @@ namespace Appium_Wizard
             {
                 return output["CFBundleShortVersionString"];
             }
-            return "8.7.3";
+            return "1.0"; // Return Default version if no key found.
         }
 
         public string ExecutePlistUtil(string plistFilePath)
@@ -2015,6 +2041,31 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public static string isDeviceLocked(int port)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/wda/locked", Method.Get);
+                RestResponse response = client.Execute(request);
+                JObject jsonObject = JObject.Parse(response.Content);
+                bool isLocked = jsonObject["value"].Value<bool>();
+                if (isLocked)
+                {
+                    return "Yes";
+                }
+                return "No";
+            }
+            catch (Exception)
+            {
+                return "Error";   
             }
         }
     }

@@ -88,7 +88,7 @@
                 {
                     commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
                     bool wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
-                    commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign wda..", 15);
+                    commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign wda...", 15);
                     bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
                     if (wdaCheck | profileCheck)
                     {

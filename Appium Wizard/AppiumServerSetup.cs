@@ -28,7 +28,7 @@ namespace Appium_Wizard
                 command = command + " --port " + appiumPort;
             }
             int webDriverAgentProxyPort = Common.GetFreePort();
-            string updatedCommand = "/C "+command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
+            string updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
@@ -113,6 +113,7 @@ namespace Appium_Wizard
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
         string proxiedUDID = "";
+        private static DateTime lastExecutionTime = DateTime.MinValue;
         private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             if (!string.IsNullOrEmpty(e.Data))
@@ -144,15 +145,19 @@ namespace Appium_Wizard
                     //{
                     //    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
                     //}
-
                     if (data.Contains("XCUITestDriver") && data.Contains("Could not proxy command to the remote server"))
                     {
-                        if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                        DateTime now = DateTime.Now;
+                        if ((now - lastExecutionTime).TotalSeconds >= 30)
                         {
-                            Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                            if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                            {
+                                Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
+                            }
+                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            lastExecutionTime = now;
                         }
-                        iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
-                    }                   
+                    }
                     if (data.Contains("POST /session {\"desiredCapabilities\":") | data.Contains("POST /session {\"capabilities\""))
                     {
                         string platformName = "";
@@ -173,7 +178,7 @@ namespace Appium_Wizard
                         //------------------------
                         if (platformName.ToLower().Contains("ios"))
                         {
-                            if (iOSAsyncMethods.PortProcessId != null &&  iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
+                            if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
@@ -204,7 +209,7 @@ namespace Appium_Wizard
                             else
                             {
                                 MainScreen.udidProxyPort.Add(deviceUDID, webDriverAgentProxyPort);
-                            }                            
+                            }
                         }
                     }
                     //------------------------
@@ -233,7 +238,7 @@ namespace Appium_Wizard
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
                                 UpdateScreenControl(currentUDID, "Set Device - " + name);
-                            }                           
+                            }
                             proxiedUDID = currentUDID;
                         }
                     }
@@ -268,8 +273,8 @@ namespace Appium_Wizard
                                     proxiedUDID = currentUDID;
                                 }
                             }
-                           
-                        }                        
+
+                        }
                     }
 
                     //------------------------
@@ -344,7 +349,7 @@ namespace Appium_Wizard
                         {
                             string text = "Set Device - " + deviceUDID;
                             UpdateScreenControl(deviceUDID, text);
-                        }                                          
+                        }
                     }
                     //------------------------
                 }
@@ -548,7 +553,7 @@ namespace Appium_Wizard
                         { "width", width },
                         { "height", height }
                     };
-                }             
+                }
                 return rectangleDict;
             }
             catch (Exception)

@@ -57,11 +57,11 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(20, 45);
+            label2.Location = new Point(2, 46);
             label2.Name = "label2";
-            label2.Size = new Size(57, 15);
+            label2.Size = new Size(87, 15);
             label2.TabIndex = 3;
-            label2.Text = "Password";
+            label2.Text = "Enter Password";
             // 
             // Unlock
             // 
@@ -76,18 +76,21 @@
             // 
             // NoteForiOSLabel
             // 
-            NoteForiOSLabel.Location = new Point(20, 135);
+            NoteForiOSLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
+            NoteForiOSLabel.ForeColor = Color.IndianRed;
+            NoteForiOSLabel.Location = new Point(4, 135);
             NoteForiOSLabel.Name = "NoteForiOSLabel";
-            NoteForiOSLabel.Size = new Size(268, 40);
+            NoteForiOSLabel.Size = new Size(303, 36);
             NoteForiOSLabel.TabIndex = 5;
-            NoteForiOSLabel.Text = "This works only if WebDriverAgent is already \r\nrunning in the iPhone.";
+            NoteForiOSLabel.Text = "Note : This works only if the WebDriverAgent is already running in the iPhone.";
             NoteForiOSLabel.Visible = false;
             // 
             // EnterPassword
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(321, 184);
+            BackColor = SystemColors.ControlLightLight;
+            ClientSize = new Size(312, 184);
             Controls.Add(NoteForiOSLabel);
             Controls.Add(Unlock);
             Controls.Add(label2);
@@ -97,6 +100,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "EnterPassword";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Unlock Screen";
             ResumeLayout(false);

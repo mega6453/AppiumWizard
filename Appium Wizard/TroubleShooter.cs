@@ -5,6 +5,7 @@ namespace Appium_Wizard
 {
     public partial class TroubleShooter : Form
     {
+        bool isDownloaded = false;
         public TroubleShooter()
         {
             InitializeComponent();
@@ -45,11 +46,23 @@ namespace Appium_Wizard
                         string IPAVersion = iOSMethods.GetInstance().GetWDAIPAVersion();
                         Version expectedVersion = new Version(requiredVersion);
                         Version actualVersion = new Version(IPAVersion);
-                        bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
-                        (expectedVersion.Minor == actualVersion.Minor);
-                        if (areEqual)
+                        //bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
+                        //(expectedVersion.Minor == actualVersion.Minor);
+                        //if (areEqual)
+                        //{
+                        //    IsCompatibleWDAAvailable = true;
+                        //}
+                        if (expectedVersion.Equals(actualVersion))
                         {
                             IsCompatibleWDAAvailable = true;
+                        }
+                        else if (isDownloaded)
+                        {
+                            IsCompatibleWDAAvailable = true;
+                        }
+                        else
+                        {
+                            IsCompatibleWDAAvailable = false;
                         }
                     }
                        
@@ -200,8 +213,10 @@ namespace Appium_Wizard
                 Common.GetWebDriverAgentIPAFile();
             });
             commonProgress.Close();
+            isDownloaded = true;
             MessageBox.Show("Downloaded compatible version of WDA.\nDelete the already installed WDA from your iPhone and Open the device again to fix any issues.", "Re-Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent("FixWDAButton_Click");
+            await FindIssues();
         }
     }
 }

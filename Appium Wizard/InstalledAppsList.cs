@@ -15,6 +15,14 @@ namespace Appium_Wizard
             this.deviceName = deviceName;
             InitializeComponent();
             this.Text = "Installed Apps List - " + deviceName;
+            if (os.Equals("Android"))
+            {
+                DropDownButton.Visible = true;
+            }
+            else
+            {
+                DropDownButton.Visible = false;
+            }
         }
         public async Task GetInstalledAppsList(object obj)
         {

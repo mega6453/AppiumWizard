@@ -216,23 +216,23 @@ namespace Appium_Wizard
                 var fileContent = streamReader.ReadToEnd();
                 if (tabNumber == 1)
                 {
-                    Invoke(new Action(() => richTextBox1.Text = fileContent));
+                    Invoke(new Action(() => richTextBox1.Text = fileContent + "\n\n"));
                 }
                 else if (tabNumber == 2)
                 {
-                    Invoke(new Action(() => richTextBox2.Text = fileContent));
+                    Invoke(new Action(() => richTextBox2.Text = fileContent + "\n\n"));
                 }
                 else if (tabNumber == 3)
                 {
-                    Invoke(new Action(() => richTextBox3.Text = fileContent));
+                    Invoke(new Action(() => richTextBox3.Text = fileContent + "\n\n"));
                 }
                 else if (tabNumber == 4)
                 {
-                    Invoke(new Action(() => richTextBox4.Text = fileContent));
+                    Invoke(new Action(() => richTextBox4.Text = fileContent + "\n\n"));
                 }
                 else if (tabNumber == 5)
                 {
-                    Invoke(new Action(() => richTextBox5.Text = fileContent));
+                    Invoke(new Action(() => richTextBox5.Text = fileContent + "\n\n"));
                 }
             }
         }

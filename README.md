@@ -133,6 +133,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/etc" title="etc icons">Etc icons created by riajulislam - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/proxy" title="proxy icons">Proxy icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/unlock" title="unlock icons">Unlock icons created by Design Circle - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/brush" title="brush icons">Brush icons created by Freepik - Flaticon</a>
 
 ## License
 

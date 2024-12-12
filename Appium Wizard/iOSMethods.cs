@@ -1412,7 +1412,7 @@ namespace Appium_Wizard
                     process.StartInfo.FileName = iOSServerFilePath;
                     process.StartInfo.Arguments = "runwda --udid=" + udid;
                     process.StartInfo.UseShellExecute = false;
-                    //process.StartInfo.CreateNoWindow = true;
+                    process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.RedirectStandardError = true;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.EnableRaisingEvents = true;

@@ -127,12 +127,13 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { clearAppDataToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(154, 26);
+            contextMenuStrip1.Size = new Size(181, 48);
             // 
             // clearAppDataToolStripMenuItem
             // 
+            clearAppDataToolStripMenuItem.Image = Properties.Resources.clean_code;
             clearAppDataToolStripMenuItem.Name = "clearAppDataToolStripMenuItem";
-            clearAppDataToolStripMenuItem.Size = new Size(153, 22);
+            clearAppDataToolStripMenuItem.Size = new Size(180, 22);
             clearAppDataToolStripMenuItem.Text = "Clear App Data";
             clearAppDataToolStripMenuItem.Click += clearAppDataToolStripMenuItem_Click;
             // 

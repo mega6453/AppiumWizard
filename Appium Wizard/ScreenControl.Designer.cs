@@ -47,6 +47,7 @@
             UnlockScreen = new ToolStripMenuItem();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
+            RecordButton = new ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -73,7 +74,7 @@
             // 
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, ScreenshotToolStripButton, AppsToolStripButton, SettingsToolStripButton, MoreToolStripButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, AppsToolStripButton, SettingsToolStripButton, ScreenshotToolStripButton, MoreToolStripButton, RecordButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -230,6 +231,16 @@
             statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // RecordButton
+            // 
+            RecordButton.Alignment = ToolStripItemAlignment.Right;
+            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            RecordButton.Image = Properties.Resources.record_button;
+            RecordButton.ImageTransparentColor = Color.Magenta;
+            RecordButton.Name = "RecordButton";
+            RecordButton.Size = new Size(28, 28);
+            RecordButton.Click += RecordButton_Click;
+            // 
             // ScreenControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -280,5 +291,6 @@
         private ToolStripButton SettingsToolStripButton;
         private ToolStripDropDownButton MoreToolStripButton;
         private ToolStripMenuItem UnlockScreen;
+        private ToolStripButton RecordButton;
     }
 }

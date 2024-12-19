@@ -1,4 +1,5 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿using Appium_Wizard.Properties;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Reflection;
@@ -797,6 +798,20 @@ namespace Appium_Wizard
                 EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
                 enterPassword.ShowDialog();
             }
+        }
+
+        bool isRecording = false;
+        private void RecordButton_Click(object sender, EventArgs e)
+        {
+            if (!isRecording) 
+            {
+                RecordButton.Image = Resources.stop_button;
+            }
+            else
+            {
+                RecordButton.Image = Resources.record_button;
+            }            
+            isRecording = !isRecording;
         }
     }
 }

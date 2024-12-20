@@ -801,15 +801,17 @@ namespace Appium_Wizard
         }
 
         bool isRecording = false;
-        private void RecordButton_Click(object sender, EventArgs e)
+        private async void RecordButton_Click(object sender, EventArgs e)
         {
             if (!isRecording) 
             {
-                RecordButton.Image = Resources.stop_button;
+                RecordButton.Image = Resources.record_inprogress;
+                await AndroidAsyncMethods.GetInstance().StartScreenRecording(udid);
             }
             else
             {
                 RecordButton.Image = Resources.record_button;
+                AndroidAsyncMethods.GetInstance().StopRecording(udid);
             }            
             isRecording = !isRecording;
         }

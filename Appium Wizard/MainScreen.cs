@@ -809,7 +809,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Detect Android Device", "Looking for Android device......", 10);
+            commonProgress.UpdateStepLabel("Detect Android Device", "Looking for Android device...", 10);
             List<string> deviceList = new List<string>();
             Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
             try
@@ -826,7 +826,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information......", 50);
+                    commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information...", 50);
                     for (int i = 0; i < count; i++)
                     {
                         if (!isDeviceAlreadyAdded(deviceList[i]))
@@ -838,7 +838,7 @@ namespace Appium_Wizard
                             });
                             if (deviceInfo.Count > 0)
                             {
-                                commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information......", 75);
+                                commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information...", 75);
                                 udid = deviceInfo["ro.serialno"]?.ToString() ?? "";
                                 OSType = "Android";
                                 screenWidth = deviceInfo["Width"];

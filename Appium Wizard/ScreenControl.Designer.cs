@@ -40,14 +40,14 @@
             HomeToolStripButton = new ToolStripButton();
             BackToolStripButton = new ToolStripButton();
             ControlCenterToolStripButton = new ToolStripButton();
-            ScreenshotToolStripButton = new ToolStripButton();
             AppsToolStripButton = new ToolStripButton();
             SettingsToolStripButton = new ToolStripButton();
+            ScreenshotToolStripButton = new ToolStripButton();
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
+            RecordButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
-            RecordButton = new ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -72,6 +72,7 @@
             // 
             // toolStrip1
             // 
+            toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
             toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator4, toolStripSeparator3, ObjectSpyToolStripButton, toolStripSeparator2, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, AppsToolStripButton, SettingsToolStripButton, ScreenshotToolStripButton, MoreToolStripButton, RecordButton });
@@ -160,16 +161,6 @@
             ControlCenterToolStripButton.Size = new Size(28, 28);
             ControlCenterToolStripButton.Click += controlCenter_Click;
             // 
-            // ScreenshotToolStripButton
-            // 
-            ScreenshotToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            ScreenshotToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            ScreenshotToolStripButton.Image = Properties.Resources.screenshot;
-            ScreenshotToolStripButton.ImageTransparentColor = Color.Magenta;
-            ScreenshotToolStripButton.Name = "ScreenshotToolStripButton";
-            ScreenshotToolStripButton.Size = new Size(28, 28);
-            ScreenshotToolStripButton.Click += Screenshot_Click;
-            // 
             // AppsToolStripButton
             // 
             AppsToolStripButton.Alignment = ToolStripItemAlignment.Right;
@@ -190,6 +181,16 @@
             SettingsToolStripButton.Size = new Size(28, 28);
             SettingsToolStripButton.Click += SettingsToolStripButton_Click;
             // 
+            // ScreenshotToolStripButton
+            // 
+            ScreenshotToolStripButton.Alignment = ToolStripItemAlignment.Right;
+            ScreenshotToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            ScreenshotToolStripButton.Image = Properties.Resources.screenshot;
+            ScreenshotToolStripButton.ImageTransparentColor = Color.Magenta;
+            ScreenshotToolStripButton.Name = "ScreenshotToolStripButton";
+            ScreenshotToolStripButton.Size = new Size(28, 28);
+            ScreenshotToolStripButton.Click += Screenshot_Click;
+            // 
             // MoreToolStripButton
             // 
             MoreToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
@@ -203,9 +204,19 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(188, 30);
+            UnlockScreen.Size = new Size(149, 22);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
+            // 
+            // RecordButton
+            // 
+            RecordButton.Alignment = ToolStripItemAlignment.Right;
+            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            RecordButton.Image = Properties.Resources.record_button;
+            RecordButton.ImageTransparentColor = Color.Magenta;
+            RecordButton.Name = "RecordButton";
+            RecordButton.Size = new Size(28, 28);
+            RecordButton.Click += RecordButton_Click;
             // 
             // toolStrip2
             // 
@@ -230,16 +241,6 @@
             statusLabel.Overflow = ToolStripItemOverflow.Never;
             statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // RecordButton
-            // 
-            RecordButton.Alignment = ToolStripItemAlignment.Right;
-            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            RecordButton.Image = Properties.Resources.record_button;
-            RecordButton.ImageTransparentColor = Color.Magenta;
-            RecordButton.Name = "RecordButton";
-            RecordButton.Size = new Size(28, 28);
-            RecordButton.Click += RecordButton_Click;
             // 
             // ScreenControl
             // 

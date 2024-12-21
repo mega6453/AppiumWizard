@@ -642,6 +642,83 @@ namespace Appium_Wizard
             adbProcess.StartInfo = startInfo;
         }
 
+        Process screenRecordingProcess;
+        Dictionary<string, Process> screenRecordingUDIDProcess = new Dictionary<string, Process>();
+        public async Task StartScreenRecording(string udid, string deviceName)
+        {
+            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string filePath = Path.Combine(downloadPath, $"Screen_Recording_{deviceName}_{timestamp}.mp4");
+            filePath = "\"" + filePath + "\"";
+            string adbAndFfmpegCommand = "adb -s " + udid + " exec-out screenrecord --output-format=h264 - | ffmpeg -f h264 -framerate 30 -i - -vf \"fps=30\" -preset ultrafast -c:v libx264 \"" + filePath + "\"";
+            string[] commands = { $"set PATH=\"{FilesPath.executablesFolderPath}\";%PATH%", adbAndFfmpegCommand };
+
+            screenRecordingProcess = new Process();
+            screenRecordingProcess.StartInfo.FileName = "cmd.exe";
+            screenRecordingProcess.StartInfo.Arguments = "/K";
+            screenRecordingProcess.StartInfo.UseShellExecute = false;
+            screenRecordingProcess.StartInfo.CreateNoWindow = true;
+            screenRecordingProcess.StartInfo.RedirectStandardOutput = true;
+            screenRecordingProcess.StartInfo.RedirectStandardError = true;
+            screenRecordingProcess.StartInfo.RedirectStandardInput = true;
+
+            await Task.Run(() =>
+            {
+                screenRecordingProcess.Start();
+                foreach (string command in commands)
+                {
+                    screenRecordingProcess.StandardInput.WriteLine(command);
+                    screenRecordingProcess.StandardInput.WriteLine("echo Command completed");
+                }
+            });
+            screenRecordingUDIDProcess.Add(udid, screenRecordingProcess);
+        }
+
+        public void StopRecording(string udid)
+        {
+            if (screenRecordingUDIDProcess.ContainsKey(udid))
+            {
+                KillAdbProcess(udid);
+                var screenRecordingProcess = screenRecordingUDIDProcess[udid];
+                if (!screenRecordingProcess.HasExited)
+                {
+                    screenRecordingProcess.CloseMainWindow();
+                }
+
+                if (!screenRecordingProcess.HasExited)
+                {
+                    screenRecordingProcess.Kill();
+                }
+                screenRecordingProcess.Close();
+                screenRecordingUDIDProcess.Remove(udid);
+            }
+        }
+
+        public void KillAdbProcess(string udid)
+        {
+            try
+            {
+                var searcher = new ManagementObjectSearcher("SELECT CommandLine, ProcessId FROM Win32_Process WHERE Name = 'adb.exe'");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    string? commandLine = obj["CommandLine"]?.ToString();
+                    if (commandLine != null && commandLine.Contains(udid))
+                    {
+                        int processId = Convert.ToInt32(obj["ProcessId"]);
+                        try
+                        {
+                            Process.GetProcessById(processId).Kill();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
 
     }
 
@@ -776,84 +853,6 @@ namespace Appium_Wizard
             {
                 Console.WriteLine("An error occurred while executing argument " + arguments + ": " + ex.Message);
                 return "Exception";
-            }
-        }
-
-        Process screenRecordingProcess;
-        Dictionary<string,Process> screenRecordingUDIDProcess = new Dictionary<string,Process>();
-        public async Task StartScreenRecording(string udid)
-        {
-            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string filePath = Path.Combine(downloadPath, $"Screen_Recording_{udid}_{timestamp}.mp4");
-            filePath = "\"" + filePath + "\"";
-            string adbAndFfmpegCommand = "adb -s " + udid + " exec-out screenrecord --output-format=h264 - | ffmpeg -f h264 -framerate 30 -i - -vf \"fps=30\" -preset ultrafast -c:v libx264 \"" + filePath + "\"";
-            string[] commands = { $"set PATH=\"{FilesPath.executablesFolderPath}\";%PATH%", adbAndFfmpegCommand };
-
-            screenRecordingProcess = new Process();
-            screenRecordingProcess.StartInfo.FileName = "cmd.exe";
-            screenRecordingProcess.StartInfo.Arguments = "/K";
-            screenRecordingProcess.StartInfo.UseShellExecute = false;
-            screenRecordingProcess.StartInfo.CreateNoWindow = true;
-            screenRecordingProcess.StartInfo.RedirectStandardOutput = true;
-            screenRecordingProcess.StartInfo.RedirectStandardError = true;
-            screenRecordingProcess.StartInfo.RedirectStandardInput = true;
-
-            await Task.Run(() =>
-            {
-                screenRecordingProcess.Start();
-                foreach (string command in commands)
-                {
-                    screenRecordingProcess.StandardInput.WriteLine(command);
-                    screenRecordingProcess.StandardInput.WriteLine("echo Command completed");
-                }
-            });
-            screenRecordingUDIDProcess.Add(udid, screenRecordingProcess);
-        }
-
-        public void StopRecording(string udid)
-        {
-            if (screenRecordingUDIDProcess.ContainsKey(udid))
-            {
-                KillAdbProcess(udid);
-                var screenRecordingProcess = screenRecordingUDIDProcess[udid];
-                if (!screenRecordingProcess.HasExited)
-                {
-                    screenRecordingProcess.CloseMainWindow();
-                }               
-
-                if (!screenRecordingProcess.HasExited)
-                {
-                    screenRecordingProcess.Kill();
-                }
-                screenRecordingProcess.Close();
-                screenRecordingUDIDProcess.Remove(udid);
-            }
-        }
-
-        public void KillAdbProcess(string udid)
-        {
-            try
-            {
-                var searcher = new ManagementObjectSearcher("SELECT CommandLine, ProcessId FROM Win32_Process WHERE Name = 'adb.exe'");
-                foreach (ManagementObject obj in searcher.Get())
-                {
-                    string? commandLine = obj["CommandLine"]?.ToString();
-                    if (commandLine != null && commandLine.Contains(udid))
-                    {
-                        int processId = Convert.ToInt32(obj["ProcessId"]);
-                        try
-                        {
-                            Process.GetProcessById(processId).Kill();
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
             }
         }
 

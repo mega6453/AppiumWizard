@@ -770,6 +770,7 @@ namespace Appium_Wizard
                 EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
                 enterPassword.ShowDialog();
             }
+            GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
         bool isRecording = false;
@@ -816,11 +817,13 @@ namespace Appium_Wizard
                     MessageBox.Show($"Please record for at least {MinimumRecordingDuration} seconds before stopping.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+            GoogleAnalytics.SendEvent("RecordButton_Click");
         }
 
 
         private async void manageAppsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            GoogleAnalytics.SendEvent("Manage_Apps_Click_ScreenControl");
             InstalledAppsList installedAppsList = new InstalledAppsList(OSType, udid, deviceName);
             await installedAppsList.GetInstalledAppsList(this);
             installedAppsList.ShowDialog();

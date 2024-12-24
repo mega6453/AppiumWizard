@@ -781,7 +781,7 @@ namespace Appium_Wizard
                 string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
                 return xcTestInfoVersion;
             }
-            return rootInfoVersion; 
+            return rootInfoVersion;
         }
 
         private string GetWDAIPAVersion(string infoPlistPath)
@@ -790,7 +790,7 @@ namespace Appium_Wizard
             string tempFolder = Path.GetTempPath();
             tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
             Directory.CreateDirectory(tempFolder);
-            
+
             var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
             if (!string.IsNullOrEmpty(plistFilePath))
             {
@@ -1111,15 +1111,16 @@ namespace Appium_Wizard
 
 
         Process screenRecordingProcess;
-        Dictionary<string, Process> screenRecordingUDIDProcess = new Dictionary<string, Process>();
+        public static Dictionary<string, Process> screenRecordingUDIDProcess = new Dictionary<string, Process>();
+        public static Dictionary<string, int> screenRecordingUDIDProcessId = new Dictionary<string, int>();
         public async Task StartScreenRecording(string udid, string deviceName)
         {
             string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string filePath = Path.Combine(downloadPath, $"Screen_Recording_{deviceName}_{timestamp}.mp4");
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+            string filePath = Path.Combine(downloadPath, $"Screen_Recording_{deviceName.Replace("'", "").Replace(" ","_")}_{timestamp}.mp4");
             filePath = "\"" + filePath + "\"";
             string videoUrl = "http://localhost:" + ScreenControl.devicePorts[udid].Item1;
-            string FfmpegCommand = $"ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i {videoUrl} -t 30 -c copy -y " + filePath;
+            string FfmpegCommand = $"ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i {videoUrl} -c copy -y " + filePath;
             string[] commands = { $"set PATH=\"{FilesPath.executablesFolderPath}\";%PATH%", FfmpegCommand };
 
             screenRecordingProcess = new Process();
@@ -1131,7 +1132,7 @@ namespace Appium_Wizard
             screenRecordingProcess.StartInfo.RedirectStandardError = true;
             screenRecordingProcess.StartInfo.RedirectStandardInput = true;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 screenRecordingProcess.Start();
                 foreach (string command in commands)
@@ -1139,33 +1140,68 @@ namespace Appium_Wizard
                     screenRecordingProcess.StandardInput.WriteLine(command);
                     screenRecordingProcess.StandardInput.WriteLine("echo Command completed");
                 }
+                await Task.Delay(3000);
+                int processId = GetFFMpegProcess(udid);
+                if (screenRecordingUDIDProcessId.ContainsKey(udid))
+                {
+                    screenRecordingUDIDProcessId[udid] = processId;
+                }
+                else
+                {
+                    screenRecordingUDIDProcessId.Add(udid, processId);
+                }
+                MainScreen.runningProcesses.Add(processId);
             });
-            screenRecordingUDIDProcess.Add(udid, screenRecordingProcess);
+            if (screenRecordingUDIDProcess.ContainsKey(udid))
+            {
+                screenRecordingUDIDProcess[udid] = screenRecordingProcess;
+            }
+            else
+            {
+                screenRecordingUDIDProcess.Add(udid, screenRecordingProcess);
+            }
             MainScreen.runningProcesses.Add(screenRecordingProcess.Id);
         }
 
-        public void StopRecording(string udid)
+        public async Task StopScreenRecording(string udid)
         {
             if (screenRecordingUDIDProcess.ContainsKey(udid))
             {
-               
                 var screenRecordingProcess = screenRecordingUDIDProcess[udid];
-                if (!screenRecordingProcess.HasExited)
+                try
                 {
-                    screenRecordingProcess.CloseMainWindow();
+                    if (!screenRecordingProcess.HasExited)
+                    {
+                        screenRecordingProcess.StandardInput.WriteLine("q");
+                        screenRecordingProcess.StandardInput.Flush();
+                    }
                 }
-
-                if (!screenRecordingProcess.HasExited)
+                catch (Exception)
                 {
-                    screenRecordingProcess.Kill();
                 }
-                screenRecordingProcess.Close();
-                screenRecordingUDIDProcess.Remove(udid);
-                KillFFMpegProcess(udid);
+                finally
+                {
+                    if (!screenRecordingProcess.HasExited)
+                    {
+                        screenRecordingProcess.Kill();
+                    }
+                    screenRecordingProcess.Close();
+                    try
+                    {
+                        await Task.Delay(5000);
+                        int processId = screenRecordingUDIDProcessId[udid];
+                        Process.GetProcessById(processId).Kill();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    screenRecordingUDIDProcess.Remove(udid);
+                    screenRecordingUDIDProcessId.Remove(udid);
+                }
             }
         }
 
-        public void KillFFMpegProcess(string udid)
+        public int GetFFMpegProcess(string udid)
         {
             try
             {
@@ -1176,19 +1212,15 @@ namespace Appium_Wizard
                     if (commandLine != null && commandLine.Contains(ScreenControl.devicePorts[udid].Item1.ToString()))
                     {
                         int processId = Convert.ToInt32(obj["ProcessId"]);
-                        try
-                        {
-                            Process.GetProcessById(processId).Kill();
-                        }
-                        catch (Exception)
-                        {
-                        }
+                        return processId;
                     }
                 }
             }
             catch (Exception)
             {
+                return 0;
             }
+            return 0;
         }
     }
 
@@ -2148,7 +2180,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                return "Error";   
+                return "Error";
             }
         }
     }

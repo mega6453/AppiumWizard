@@ -620,15 +620,33 @@ namespace Appium_Wizard
             }
             await Task.Run(() =>
             {
-                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                try
                 {
-                    Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
-                    MainScreen.udidProxyPort.Remove(udid);
+                    if (MainScreen.udidProxyPort.ContainsKey(udid))
+                    {
+                        Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
+                        MainScreen.udidProxyPort.Remove(udid);
+                    }
+                    if (MainScreen.udidScreenPort.ContainsKey(udid))
+                    {
+                        Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
+                        MainScreen.udidScreenPort.Remove(udid);
+                    }
+                    if (iOSMethods.screenRecordingUDIDProcessId.ContainsKey(udid))
+                    {
+                        Common.KillProcessById(iOSMethods.screenRecordingUDIDProcessId[udid]);
+                        iOSMethods.screenRecordingUDIDProcess.Remove(udid);
+                        iOSMethods.screenRecordingUDIDProcessId.Remove(udid);
+                    }
+                    if (AndroidMethods.screenRecordingUDIDProcessId.ContainsKey(udid))
+                    {
+                        Common.KillProcessById(AndroidMethods.screenRecordingUDIDProcessId[udid]);
+                        AndroidMethods.screenRecordingUDIDProcess.Remove(udid);
+                        AndroidMethods.screenRecordingUDIDProcessId.Remove(udid);
+                    }
                 }
-                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                catch (Exception)
                 {
-                    Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
-                    MainScreen.udidScreenPort.Remove(udid);
                 }
             });
 
@@ -782,7 +800,7 @@ namespace Appium_Wizard
             {
                 RecordButton.Image = Resources.record_inprogress;
                 recordingStartTime = DateTime.Now;
-
+                isRecording = true;
                 if (OSType.Equals("Android"))
                 {
                     await AndroidMethods.GetInstance().StartScreenRecording(udid, deviceName);
@@ -791,26 +809,26 @@ namespace Appium_Wizard
                 {
                     await iOSMethods.GetInstance().StartScreenRecording(udid, deviceName);
                 }
-                isRecording = true;
+             
             }
             else
             {
                 TimeSpan recordingDuration = DateTime.Now - recordingStartTime;
                 if (recordingDuration.TotalSeconds >= MinimumRecordingDuration)
                 {
-                    RecordButton.Image = Resources.record_button;
-
+                    RecordButton.Enabled = false;
+                    isRecording = false;
                     if (OSType.Equals("Android"))
                     {
-                        AndroidMethods.GetInstance().StopRecording(udid);
+                        await AndroidMethods.GetInstance().StopScreenRecording(udid);
                     }
                     else
                     {
-                        iOSMethods.GetInstance().StopRecording(udid);
+                        await iOSMethods.GetInstance().StopScreenRecording(udid);
                     }
-
+                    RecordButton.Image = Resources.record_button;
+                    RecordButton.Enabled = true;
                     MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    isRecording = false;
                 }
                 else
                 {

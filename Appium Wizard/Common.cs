@@ -15,6 +15,9 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.IO;
 using System.IO.Compression;
+using System.Windows.Forms;
+using Appium_Wizard.Properties;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
 {
@@ -1059,6 +1062,17 @@ namespace Appium_Wizard
                 return 0;
             }
             return 0;
+        }
+
+
+        public static void ShowNotification(string title, string message, ToolTipIcon toolTipIcon)
+        {
+            NotifyIcon notifyIcon = new NotifyIcon();
+            notifyIcon.Visible = true;
+            notifyIcon.BalloonTipTitle = title;
+            notifyIcon.BalloonTipText = message;
+            notifyIcon.BalloonTipIcon = toolTipIcon;
+            notifyIcon.ShowBalloonTip(3000);
         }
     }
 }

@@ -1,2 +1,0 @@
-*.vhdx filter=lfs diff=lfs merge=lfs -text
-Appium[[:space:]]Wizard/Resources/Executables/ffmpeg.exe filter=lfs diff=lfs merge=lfs -text

@@ -20,6 +20,6 @@
         public static string nodeZipPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Server\\Backup\\node.zip";
         public static string zipExtractorFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Server\\Backup\\7za.exe";
         public static string pymd3FilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\iOSServerPy\\iOSServerPy.exe";
-        public static string FFMpegFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\ffmpeg.exe";
+        public static string FFMpegFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\FFMpeg\\";
     }
 }

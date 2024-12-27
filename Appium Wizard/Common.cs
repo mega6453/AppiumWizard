@@ -958,7 +958,7 @@ namespace Appium_Wizard
             filePath = "\"" + filePath + "\"";
             string videoUrl = "http://localhost:" + ScreenControl.devicePorts[udid].Item1;
             string FfmpegCommand = $"ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i {videoUrl} -c copy -y " + filePath;
-            string[] commands = { $"set PATH=\"{FilesPath.executablesFolderPath}\";%PATH%", FfmpegCommand };
+            string[] commands = { $"set PATH=\"{FilesPath.FFMpegFilePath}\";%PATH%", FfmpegCommand };
 
             Process screenRecordingProcess = new Process();
             screenRecordingProcess.StartInfo.FileName = "cmd.exe";

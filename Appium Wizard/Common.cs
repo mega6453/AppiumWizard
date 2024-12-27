@@ -942,5 +942,123 @@ namespace Appium_Wizard
             string updatedPlistContent = plistContent.Replace("<string>1.0</string>", "<string>"+version+"</string>");
             File.WriteAllText(filePath, updatedPlistContent);
         }
+
+
+
+        public static Dictionary<string, Process> screenRecordingUDIDProcess = new Dictionary<string, Process>();
+        public static Dictionary<string, int> screenRecordingUDIDProcessId = new Dictionary<string, int>();
+        public async Task StartScreenRecording(string udid, string deviceName)
+        {
+            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+            string filePath = Path.Combine(downloadPath, $"Screen_Recording_{deviceName.Replace("'", "").Replace(" ", "_")}_{timestamp}.mp4");
+            filePath = "\"" + filePath + "\"";
+            string videoUrl = "http://localhost:" + ScreenControl.devicePorts[udid].Item1;
+            string FfmpegCommand = $"ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i {videoUrl} -c copy -y " + filePath;
+            string[] commands = { $"set PATH=\"{FilesPath.executablesFolderPath}\";%PATH%", FfmpegCommand };
+
+            Process screenRecordingProcess = new Process();
+            screenRecordingProcess.StartInfo.FileName = "cmd.exe";
+            screenRecordingProcess.StartInfo.Arguments = "/K";
+            screenRecordingProcess.StartInfo.UseShellExecute = false;
+            screenRecordingProcess.StartInfo.CreateNoWindow = true;
+            screenRecordingProcess.StartInfo.RedirectStandardOutput = true;
+            screenRecordingProcess.StartInfo.RedirectStandardError = true;
+            screenRecordingProcess.StartInfo.RedirectStandardInput = true;
+
+            await Task.Run(async () =>
+            {
+                screenRecordingProcess.Start();
+                foreach (string command in commands)
+                {
+                    screenRecordingProcess.StandardInput.WriteLine(command);
+                    screenRecordingProcess.StandardInput.WriteLine("echo Command completed");
+                }
+                await Task.Delay(3000);
+                int processId = GetFFMpegProcess(udid);
+                if (screenRecordingUDIDProcessId.ContainsKey(udid))
+                {
+                    screenRecordingUDIDProcessId[udid] = processId;
+                }
+                else
+                {
+                    screenRecordingUDIDProcessId.Add(udid, processId);
+                }
+                MainScreen.runningProcesses.Add(processId);
+            });
+            if (screenRecordingUDIDProcess.ContainsKey(udid))
+            {
+                screenRecordingUDIDProcess[udid] = screenRecordingProcess;
+            }
+            else
+            {
+                screenRecordingUDIDProcess.Add(udid, screenRecordingProcess);
+            }
+            MainScreen.runningProcesses.Add(screenRecordingProcess.Id);
+        }
+
+        public async Task StopScreenRecording(string udid)
+        {
+            if (screenRecordingUDIDProcess.ContainsKey(udid))
+            {
+                var screenRecordingProcess = screenRecordingUDIDProcess[udid];
+                try
+                {
+                    if (!screenRecordingProcess.HasExited)
+                    {
+                        // Send "q" to gracefully stop ffmpeg
+                        screenRecordingProcess.StandardInput.WriteLine("q");
+                        screenRecordingProcess.StandardInput.Flush();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error sending 'q': " + ex.Message);
+                }
+                finally
+                {
+                    if (!screenRecordingProcess.HasExited)
+                    {
+                        screenRecordingProcess.Kill();
+                    }
+                    screenRecordingProcess.Close();
+
+                    try
+                    {
+                        await Task.Delay(3000);
+                        int processId = screenRecordingUDIDProcessId[udid];
+                        Process.GetProcessById(processId).Kill();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error killing process: " + ex.Message);
+                    }
+                    screenRecordingUDIDProcess.Remove(udid);
+                    screenRecordingUDIDProcessId.Remove(udid);
+                }
+            }
+        }
+
+        private int GetFFMpegProcess(string udid)
+        {
+            try
+            {
+                var searcher = new ManagementObjectSearcher("SELECT CommandLine, ProcessId FROM Win32_Process WHERE Name = 'ffmpeg.exe'");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    string? commandLine = obj["CommandLine"]?.ToString();
+                    if (commandLine != null && commandLine.Contains(ScreenControl.devicePorts[udid].Item1.ToString()))
+                    {
+                        int processId = Convert.ToInt32(obj["ProcessId"]);
+                        return processId;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+            return 0;
+        }
     }
 }

@@ -62,12 +62,17 @@ namespace Appium_Wizard
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
                             string version = item.SubItems[1].Text;
+                            string deviceName = item.SubItems[0].Text;
                             string OSVersion = OS + " " + version;
                             item.SubItems[3].Text = "Online";
                             item.SubItems[5].Text = "USB";
                             Database.UpdateDataInDevicesTable(udid, "Connection","USB");
-                            if (ScreenControl.webview2.ContainsKey(udid))
+                            if (MainScreen.DeviceConnectedNotification)
                             {
+                                Common.ShowNotification("Device Connected", deviceName + " connected.", ToolTipIcon.Info);
+                            }
+                            if (ScreenControl.webview2.ContainsKey(udid))
+                            {                               
                                 if (OS.Equals("iOS"))
                                 {
                                     await isiOSScreenLoaded(udid);
@@ -165,8 +170,13 @@ namespace Appium_Wizard
                             string OS = item.SubItems[2].Text;
                             string udid = item.SubItems[4].Text;
                             string version = item.SubItems[1].Text;
+                            string deviceName = item.SubItems[0].Text;
                             string OSVersion = OS + " " + version;
                             string IPAddress = item.SubItems[6].Text;
+                            if (MainScreen.DeviceDisconnectedNotification)
+                            {
+                                Common.ShowNotification("Device Disconnected", deviceName + " Disconnected.", ToolTipIcon.Info);
+                            }
                             if (OS.Equals("iOS"))
                             {
                                 List<string> deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
@@ -175,7 +185,6 @@ namespace Appium_Wizard
                                     item.SubItems[3].Text = "Online";
                                     item.SubItems[5].Text = "Wi-Fi";
                                     Database.UpdateDataInDevicesTable(udid, "Connection", "Wi-Fi");
-
                                     if (ScreenControl.udidScreenControl.ContainsKey(udid))
                                     {
                                         bool isLoaded = false;

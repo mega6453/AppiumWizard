@@ -18,7 +18,7 @@ namespace Appium_Wizard
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
         public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
         public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
-
+        public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
         public MainScreen()
         {
             InitializeComponent();
@@ -66,6 +66,11 @@ namespace Appium_Wizard
                         Controls.Add(tableLayoutPanel1);
                     }
                 }
+                var result = Database.QueryDataFromNotificationsTable();
+                DeviceConnectedNotification = result["DeviceConnected"].Equals("Enable");
+                DeviceDisconnectedNotification = result["DeviceDisconnected"].Equals("Enable");
+                ScreenshotNotification = result["Screenshot"].Equals("Enable");
+                ScreenRecordingNotification = result["ScreenRecording"].Equals("Enable");
             }
             catch (Exception ex)
             {
@@ -1929,7 +1934,7 @@ namespace Appium_Wizard
                 if (item["OS"].Equals("iOS"))
                 {
                     isiOSDeviceAvailable = true;
-                }                
+                }
             }
             if (isiOSDeviceAvailable)
             {
@@ -1938,8 +1943,15 @@ namespace Appium_Wizard
             }
             else
             {
-                MessageBox.Show("Please add an iOS device in the device list and then try again.","No iOS Device available",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("Please add an iOS device in the device list and then try again.", "No iOS Device available", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void notificationsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Notifications notifications = new Notifications();
+            notifications.Owner = this;
+            notifications.ShowDialog();
         }
     }
 }

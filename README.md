@@ -65,8 +65,9 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data for Android
 * Take Device Screenshot
 * Reboot Device
-* Unlock Mobile using Screen Control (**New**)
-* Start iOS proxy manually (**New**)
+* Record Screen from Screen Control (**New**)
+* Unlock Mobile from Screen Control (**New**)
+* Start iOS proxy manually - 3 methods (**New**)
 * iOS Executor - 2 ways to execute iOS actions (**New**)
 * etc.
 
@@ -134,6 +135,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/proxy" title="proxy icons">Proxy icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/unlock" title="unlock icons">Unlock icons created by Design Circle - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/brush" title="brush icons">Brush icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-animated-icons/ui" title="ui animated icons">Ui animated icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/record-button" title="record button icons">record button icons created by sonnycandra - Flaticon</a>
 
 ## License
 

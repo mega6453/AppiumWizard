@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Management;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -780,7 +781,7 @@ namespace Appium_Wizard
                 string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
                 return xcTestInfoVersion;
             }
-            return rootInfoVersion; 
+            return rootInfoVersion;
         }
 
         private string GetWDAIPAVersion(string infoPlistPath)
@@ -789,7 +790,7 @@ namespace Appium_Wizard
             string tempFolder = Path.GetTempPath();
             tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
             Directory.CreateDirectory(tempFolder);
-            
+
             var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
             if (!string.IsNullOrEmpty(plistFilePath))
             {
@@ -2065,7 +2066,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                return "Error";   
+                return "Error";
             }
         }
     }

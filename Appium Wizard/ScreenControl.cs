@@ -1,4 +1,5 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿using Appium_Wizard.Properties;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Reflection;
@@ -198,7 +199,6 @@ namespace Appium_Wizard
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
-            AppsToolStripButton.Enabled = true;
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -251,7 +251,6 @@ namespace Appium_Wizard
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
-            AppsToolStripButton.Enabled = false;
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -516,25 +515,6 @@ namespace Appium_Wizard
             }
         }
 
-        private void ObjectSpy_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo
-                {
-                    FileName = "https://inspector.appiumpro.com/",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
-                GoogleAnalytics.SendEvent("ObjectSpy_Click");
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Exception" + exception);
-                GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
-            }
-        }
-
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
             udidScreenControl.Remove(udid);
@@ -640,15 +620,33 @@ namespace Appium_Wizard
             }
             await Task.Run(() =>
             {
-                if (MainScreen.udidProxyPort.ContainsKey(udid))
+                try
                 {
-                    Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
-                    MainScreen.udidProxyPort.Remove(udid);
+                    if (MainScreen.udidProxyPort.ContainsKey(udid))
+                    {
+                        Common.KillProcessByPortNumber(MainScreen.udidProxyPort[udid]);
+                        MainScreen.udidProxyPort.Remove(udid);
+                    }
+                    if (MainScreen.udidScreenPort.ContainsKey(udid))
+                    {
+                        Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
+                        MainScreen.udidScreenPort.Remove(udid);
+                    }
+                    if (Common.screenRecordingUDIDProcessId.ContainsKey(udid))
+                    {
+                        Common.KillProcessById(Common.screenRecordingUDIDProcessId[udid]);
+                        Common.screenRecordingUDIDProcess.Remove(udid);
+                        Common.screenRecordingUDIDProcessId.Remove(udid);
+                    }
+                    if (Common.screenRecordingUDIDProcess.ContainsKey(udid))
+                    {
+                        Common.screenRecordingUDIDProcess[udid].Kill();
+                        Common.screenRecordingUDIDProcess.Remove(udid);
+                        Common.screenRecordingUDIDProcessId.Remove(udid);
+                    }
                 }
-                if (MainScreen.udidScreenPort.ContainsKey(udid))
+                catch (Exception)
                 {
-                    Common.KillProcessByPortNumber(MainScreen.udidScreenPort[udid]);
-                    MainScreen.udidScreenPort.Remove(udid);
                 }
             });
 
@@ -751,13 +749,6 @@ namespace Appium_Wizard
             }
         }
 
-        private async void appsToolStripButton_Click(object sender, EventArgs e)
-        {
-            InstalledAppsList installedAppsList = new InstalledAppsList(OSType, udid, deviceName);
-            await installedAppsList.GetInstalledAppsList(this);
-            installedAppsList.ShowDialog();
-        }
-
         private void SettingsToolStripButton_Click(object sender, EventArgs e)
         {
             if (OSType.Equals("Android"))
@@ -796,6 +787,70 @@ namespace Appium_Wizard
             {
                 EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
                 enterPassword.ShowDialog();
+            }
+            GoogleAnalytics.SendEvent("UnlockScreen_Click");
+        }
+
+        bool isRecording = false;
+        private DateTime recordingStartTime;
+        private const int MinimumRecordingDuration = 30;
+        private async void RecordButton_Click(object sender, EventArgs e)
+        {
+            if (!isRecording)
+            {
+                RecordButton.Image = Resources.record_inprogress;
+                recordingStartTime = DateTime.Now;
+                isRecording = true;
+
+                Common common = new Common();
+                await common.StartScreenRecording(udid, deviceName);             
+            }
+            else
+            {
+                TimeSpan recordingDuration = DateTime.Now - recordingStartTime;
+                if (recordingDuration.TotalSeconds >= MinimumRecordingDuration)
+                {
+                    RecordButton.Enabled = false;
+                    isRecording = false;
+                    Common common = new Common();
+                    await common.StopScreenRecording(udid);
+                    RecordButton.Image = Resources.record_button;
+                    RecordButton.Enabled = true;
+                    MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"Please record for at least {MinimumRecordingDuration} seconds before stopping.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            GoogleAnalytics.SendEvent("RecordButton_Click");
+        }
+
+
+        private async void manageAppsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent("Manage_Apps_Click_ScreenControl");
+            InstalledAppsList installedAppsList = new InstalledAppsList(OSType, udid, deviceName);
+            await installedAppsList.GetInstalledAppsList(this);
+            installedAppsList.ShowDialog();
+        }
+
+        private void inspectorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://inspector.appiumpro.com/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("ObjectSpy_Click");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Exception" + exception);
+                GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
         }
     }

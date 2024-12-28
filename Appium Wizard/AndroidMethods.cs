@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
-using System.IO;
+using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -641,8 +641,6 @@ namespace Appium_Wizard
             adbProcess = new Process();
             adbProcess.StartInfo = startInfo;
         }
-
-
     }
 
     public class AndroidAsyncMethods

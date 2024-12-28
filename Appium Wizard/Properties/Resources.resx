@@ -226,4 +226,13 @@
   <data name="clean_code" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\clean-code.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="record_button" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\record-button.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="stop_button" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\stop-button.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="record_inprogress" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\record-inprogress.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

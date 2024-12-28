@@ -121,6 +121,16 @@ namespace Appium_Wizard
 
         private void ScreenControl_Load(object sender, EventArgs e)
         {
+            if (MainScreen.alwaysOnTop)
+            {
+                this.TopMost = true;
+            }
+            else
+            {
+                this.TopMost = false;
+            }
+            AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
+
             this.ClientSize = new Size(width, height + toolStrip1.Height + toolStrip2.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Text = deviceName;

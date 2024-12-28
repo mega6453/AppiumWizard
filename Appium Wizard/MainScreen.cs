@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Appium_Wizard.Properties;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Reflection;
 using File = System.IO.File;
@@ -19,6 +20,8 @@ namespace Appium_Wizard
         public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
         public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
         public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
+        public static bool alwaysOnTop;
+
         public MainScreen()
         {
             InitializeComponent();
@@ -71,6 +74,16 @@ namespace Appium_Wizard
                 DeviceDisconnectedNotification = result["DeviceDisconnected"].Equals("Enable");
                 ScreenshotNotification = result["Screenshot"].Equals("Enable");
                 ScreenRecordingNotification = result["ScreenRecording"].Equals("Enable");
+
+                alwaysOnTop = Database.QueryDataFromAlwaysOnTopTable().Equals("Yes");
+                if (alwaysOnTop)
+                {
+                    yesToolStripMenuItem.Image = Resources.check_mark;
+                }
+                else
+                {
+                    noToolStripMenuItem.Image = Resources.check_mark;
+                }
             }
             catch (Exception ex)
             {
@@ -1952,6 +1965,22 @@ namespace Appium_Wizard
             Notifications notifications = new Notifications();
             notifications.Owner = this;
             notifications.ShowDialog();
+        }
+
+        private void yesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            alwaysOnTop = true;
+            Database.UpdateDataIntoAlwaysOnTopTable("Yes");
+            noToolStripMenuItem.Image = null;
+            yesToolStripMenuItem.Image = Resources.check_mark;
+        }
+
+        private void noToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            alwaysOnTop = false;
+            Database.UpdateDataIntoAlwaysOnTopTable("No");
+            yesToolStripMenuItem.Image = null;
+            noToolStripMenuItem.Image = Resources.check_mark;
         }
     }
 }

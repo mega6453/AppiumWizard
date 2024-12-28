@@ -64,6 +64,8 @@ namespace Appium_Wizard
             settingsToolStripMenuItem = new ToolStripMenuItem();
             notificationsToolStripMenuItem = new ToolStripMenuItem();
             alwaysOnTopToolStripMenuItem = new ToolStripMenuItem();
+            yesToolStripMenuItem = new ToolStripMenuItem();
+            noToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             appiumDocsToolStripMenuItem = new ToolStripMenuItem();
             capabilitiesToolStripMenuItem = new ToolStripMenuItem();
@@ -386,16 +388,32 @@ namespace Appium_Wizard
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(152, 22);
+            notificationsToolStripMenuItem.Size = new Size(188, 30);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
             // alwaysOnTopToolStripMenuItem
             // 
+            alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
+            alwaysOnTopToolStripMenuItem.Size = new Size(188, 30);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
+            alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
+            // 
+            // yesToolStripMenuItem
+            // 
+            yesToolStripMenuItem.Name = "yesToolStripMenuItem";
+            yesToolStripMenuItem.Size = new Size(180, 22);
+            yesToolStripMenuItem.Text = "Yes";
+            yesToolStripMenuItem.Click += yesToolStripMenuItem_Click;
+            // 
+            // noToolStripMenuItem
+            // 
+            noToolStripMenuItem.Name = "noToolStripMenuItem";
+            noToolStripMenuItem.Size = new Size(180, 22);
+            noToolStripMenuItem.Text = "No";
+            noToolStripMenuItem.Click += noToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
@@ -973,5 +991,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem notificationsToolStripMenuItem;
         private ToolStripMenuItem alwaysOnTopToolStripMenuItem;
+        private ToolStripMenuItem yesToolStripMenuItem;
+        private ToolStripMenuItem noToolStripMenuItem;
     }
 }

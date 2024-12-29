@@ -121,6 +121,16 @@ namespace Appium_Wizard
 
         private void ScreenControl_Load(object sender, EventArgs e)
         {
+            if (MainScreen.alwaysOnTop)
+            {
+                this.TopMost = true;
+            }
+            else
+            {
+                this.TopMost = false;
+            }
+            AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
+
             this.ClientSize = new Size(width, height + toolStrip1.Height + toolStrip2.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Text = deviceName;
@@ -724,6 +734,7 @@ namespace Appium_Wizard
                 catch (Exception)
                 {
                     MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
                 GoogleAnalytics.SendEvent("Android_TakeScreenshot_ScreenControl");
             }
@@ -739,14 +750,19 @@ namespace Appium_Wizard
                 catch (Exception)
                 {
                     MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
                 GoogleAnalytics.SendEvent("iOS_TakeScreenshot_ScreenControl");
             }
-            if (!isMessageDisplayed)
+            if (MainScreen.ScreenshotNotification)
             {
-                isMessageDisplayed = true;
-                MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.", ToolTipIcon.Info);
             }
+            //if (!isMessageDisplayed)
+            //{
+            //    isMessageDisplayed = true;
+            //    MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //}
         }
 
         private void SettingsToolStripButton_Click(object sender, EventArgs e)
@@ -802,8 +818,16 @@ namespace Appium_Wizard
                 recordingStartTime = DateTime.Now;
                 isRecording = true;
 
-                Common common = new Common();
-                await common.StartScreenRecording(udid, deviceName);             
+                try
+                {
+                    Common common = new Common();
+                    await common.StartScreenRecording(udid, deviceName);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Record Scren", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
             }
             else
             {
@@ -812,11 +836,21 @@ namespace Appium_Wizard
                 {
                     RecordButton.Enabled = false;
                     isRecording = false;
-                    Common common = new Common();
-                    await common.StopScreenRecording(udid);
+                    try
+                    {
+                        Common common = new Common();
+                        await common.StopScreenRecording(udid);
+                    }
+                    catch (Exception)
+                    {
+                    }
                     RecordButton.Image = Resources.record_button;
                     RecordButton.Enabled = true;
-                    MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    //MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (MainScreen.ScreenRecordingNotification)
+                    {
+                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.", ToolTipIcon.Info);
+                    }
                 }
                 else
                 {

@@ -1068,6 +1068,7 @@ namespace Appium_Wizard
         public static void ShowNotification(string title, string message, ToolTipIcon toolTipIcon)
         {
             NotifyIcon notifyIcon = new NotifyIcon();
+            notifyIcon.Icon = SystemIcons.Application;
             notifyIcon.Visible = true;
             notifyIcon.BalloonTipTitle = title;
             notifyIcon.BalloonTipText = message;

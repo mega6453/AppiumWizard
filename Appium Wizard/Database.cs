@@ -445,5 +445,84 @@ namespace Appium_Wizard
                 connection.Close();
             }
         }
+
+
+        public static void UpdateDataIntoNotificationsTable(string DeviceConnected, string DeviceDisconnected, string Screenshot, string ScreenRecording)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE Notifications SET ('DeviceConnected') = ('" + DeviceConnected + "'), ('DeviceDisconnected') = ('" + DeviceDisconnected + "'),('Screenshot') = ('" + Screenshot + "'),('ScreenRecording') = ('" + ScreenRecording + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+        public static Dictionary<string, string> QueryDataFromNotificationsTable()
+        {
+            var output = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM Notifications", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read()) // Assuming you want to read only the first row
+                        {
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                string columnName = reader.GetName(i);
+                                string? columnValue = reader.IsDBNull(i) ? null : reader.GetString(i);
+                                output[columnName] = columnValue;
+                            }
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return output;
+        }
+
+
+        public static void UpdateDataIntoAlwaysOnTopTable(string YesOrNo)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE AlwaysOnTop SET ('SetTop') = ('" + YesOrNo + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
+        public static string QueryDataFromAlwaysOnTopTable()
+        {
+            string output = string.Empty;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM AlwaysOnTop", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            output = reader.GetString(0);
+                        }
+                    }
+                }
+                connection.Close();
+                return output;
+            }
+        }
     }
 }

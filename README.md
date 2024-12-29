@@ -65,10 +65,11 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data for Android
 * Take Device Screenshot
 * Reboot Device
+* Unlock Mobile from Screen Control
+* Start iOS proxy manually - 3 methods
+* iOS Executor - 2 ways to execute iOS actions
 * Record Screen from Screen Control (**New**)
-* Unlock Mobile from Screen Control (**New**)
-* Start iOS proxy manually - 3 methods (**New**)
-* iOS Executor - 2 ways to execute iOS actions (**New**)
+* Notifications - Enable/Disable Notifications for few events (**New**)
 * etc.
 
 ## Features/Improvements in Queue
@@ -89,6 +90,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * imobiledevice-net
 * zsign
 * adb
+* FFMpeg
 * Newtonsoft.Json
 * RestSharp
 * Innosetup

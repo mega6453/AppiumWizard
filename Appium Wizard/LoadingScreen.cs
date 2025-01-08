@@ -200,7 +200,7 @@ namespace Appium_Wizard
 
         private void LoadingScreen_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("LoadingScreen_Shown");
         }
     }
 }

@@ -63,7 +63,7 @@
             },
             "RestSharp": {
               "target": "Package",
-              "version": "[112.0.0, )"
+              "version": "[112.1.0, )"
             },
             "SharpZipLib": {
               "target": "Package",
@@ -71,11 +71,11 @@
             },
             "System.Data.SQLite": {
               "target": "Package",
-              "version": "[1.0.118, )"
+              "version": "[1.0.119, )"
             },
             "System.Management": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[9.0.0, )"
             }
           },
           "imports": [

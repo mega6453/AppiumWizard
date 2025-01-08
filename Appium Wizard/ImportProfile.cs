@@ -381,13 +381,13 @@ namespace Appium_Wizard
 
         private void ImportProfile_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("ImportProfile_Shown");
         }
 
         private void ImportProfile_HelpButtonClicked(object sender, System.ComponentModel.CancelEventArgs e)
         {
             MessageBox.Show("For iOS automation, you need to add valid profiles here. Please contact your iOS developer to get the profiles for your device UDID.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("ImportProfile_HelpButtonClicked");
         }
 
         private void ImportProfile_Load(object sender, EventArgs e)

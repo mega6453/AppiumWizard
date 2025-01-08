@@ -126,7 +126,7 @@ namespace Appium_Wizard
 
         private void iOSProfileManagement_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("iOSProfileManagement_Shown");
         }
 
         private void AdjustFormAndListViewSize()

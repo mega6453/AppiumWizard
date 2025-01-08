@@ -137,6 +137,7 @@ namespace Appium_Wizard
         private async void FixNodeJSButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install NodeJS", "Installing NodeJS, This may take sometime, Please wait...");
             await Task.Run(() =>
@@ -145,12 +146,13 @@ namespace Appium_Wizard
             });
             commonProgress.Close();
             await FindIssues();
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("FixNodeJSButton_Click");
         }
 
         private async void FixAppiumButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install Appium", "Installing Appium Server, This may take sometime, Please wait...");
             await Task.Run(() =>
@@ -159,12 +161,13 @@ namespace Appium_Wizard
             });
             commonProgress.Close();
             await FindIssues();
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("FixAppiumButton_Click");
         }
 
         private async void FixXCUITestButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install XCUITest", "Installing XCUITest(iOS) driver, This may take sometime, Please wait...");
             await Task.Run(() =>
@@ -174,12 +177,13 @@ namespace Appium_Wizard
             commonProgress.Close();
             await FindIssues();
             MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("FixXCUITestButton_Click");
         }
 
         private async void FixUIAutomatorButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Install UIAutomator2", "Installing UIAutomator2(android) driver, This may take sometime, Please wait...");
             await Task.Run(() =>
@@ -189,13 +193,13 @@ namespace Appium_Wizard
             commonProgress.Close();
             await FindIssues();
             MessageBox.Show("Restart the Appium server to apply the changes. Server -> Configuration -> Stop and Start", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("FixUIAutomatorButton_Click");
         }
 
         private async void checkForIssues_Click(object sender, EventArgs e)
         {
             await FindIssues();
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("checkForIssues_Click");
         }
 
         private void TroubleShooter_Shown(object sender, EventArgs e)
@@ -206,6 +210,7 @@ namespace Appium_Wizard
         private async void FixWDAButton_Click(object sender, EventArgs e)
         {
             CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Get WebDriverAgent", "Getting compatible WebDriverAgent based on installed XCUITest driver version, This may take sometime, Please wait...");
             await Task.Run(() =>

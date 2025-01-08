@@ -120,23 +120,8 @@ namespace Appium_Wizard
             Database.UpdateDataIntoServerCapsTable(serverNumber, DefaultCapabilitiesRichTextBox.Text);
             Database.UpdateDataIntoServerFinalCommandTable(serverNumber, finalCommand);
             MessageBox.Show("Please Stop and Start the Server to use the updated command.", "Restart Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            GoogleAnalytics.SendEvent("applyButton_Click");
             this.Close();
-        }
-
-        private void defaultCapLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            try
-            {
-                ProcessStartInfo psInfo = new ProcessStartInfo
-                {
-                    FileName = "https://appium.io/docs/en/latest/guides/caps/",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
-            }
-            catch (Exception)
-            {
-            }
         }
 
         private void resetButton_Click(object sender, EventArgs e)
@@ -144,6 +129,7 @@ namespace Appium_Wizard
             ServerArgsRichTextBox.Text = "--allow-cors --allow-insecure=adb_shell";
             DefaultCapabilitiesRichTextBox.Text = "";
             FinalCommandRichTextBox.Text = $@"appium --port {portNumber} {ServerArgsRichTextBox.Text}" + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            GoogleAnalytics.SendEvent("resetButton_Click");
         }
 
         private void sessionCapabilityToolStripMenuItem_Click(object sender, EventArgs e)
@@ -204,6 +190,7 @@ namespace Appium_Wizard
         {
             Point screenPoint = DefaultCapsLinkLabel.PointToScreen(new Point(0, DefaultCapsLinkLabel.Height));
             contextMenuStrip1.Show(screenPoint);
+            GoogleAnalytics.SendEvent("DefaultCapsLinkLabel_LinkClicked");
         }
     }
 }

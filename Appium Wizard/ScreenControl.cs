@@ -208,7 +208,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +260,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -660,7 +660,7 @@ namespace Appium_Wizard
                 }
             });
 
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)

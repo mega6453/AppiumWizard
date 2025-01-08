@@ -263,7 +263,7 @@ namespace Appium_Wizard
                 statusLabel.Text = "Not Running";
             }
             commonProgress.Close();
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StopServer");
         }
 
 
@@ -271,31 +271,31 @@ namespace Appium_Wizard
         private async void StartButton1_Click(object sender, EventArgs e)
         {
             await StartServer(PortTextBox1, StatusLabel1, 1);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StartButton1_Click");
         }
 
         private async void StartButton2_Click(object sender, EventArgs e)
         {
             await StartServer(PortTextBox2, StatusLabel2, 2);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StartButton2_Click");
         }
 
         private async void StartButton3_Click(object sender, EventArgs e)
         {
             await StartServer(PortTextBox3, StatusLabel3, 3);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StartButton3_Click");
         }
 
         private async void StartButton4_Click(object sender, EventArgs e)
         {
             await StartServer(PortTextBox4, StatusLabel4, 4);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StartButton4_Click");
         }
 
         private async void StartButton5_Click(object sender, EventArgs e)
         {
             await StartServer(PortTextBox5, StatusLabel5, 5);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+            GoogleAnalytics.SendEvent("StartButton5_Click");
         }
 
         //---------------------------------------------------------
@@ -415,7 +415,7 @@ namespace Appium_Wizard
 
         private void ServerConfig_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("ServerConfig_Shown");
         }
 
         private bool isValidPortNumber(int port)

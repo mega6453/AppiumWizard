@@ -223,7 +223,7 @@ namespace Appium_Wizard
                     Thread.Sleep(1000);
                 }
             });
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
         private void UpdateRichTextbox(int tabNumber)

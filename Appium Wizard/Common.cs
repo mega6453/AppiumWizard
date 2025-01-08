@@ -1,23 +1,18 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.IO;
-using System.IO.Compression;
-using System.Windows.Forms;
-using Appium_Wizard.Properties;
-using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
 {
@@ -915,7 +910,7 @@ namespace Appium_Wizard
                     string PayloadFolder = tempFolder + "\\Extracted\\Payload";
                     string finalIPAFile = tempFolder + "\\wda.ipa";
                     System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
-                    UpdateVersionInPlistFile(PayloadFolder+ "\\WebDriverAgentRunner-Runner.app\\Info.plist", version);
+                    UpdateVersionInPlistFile(PayloadFolder + "\\WebDriverAgentRunner-Runner.app\\Info.plist", version);
                     System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
                     //--------------------
                     string destinationFilePath = FilesPath.iOSFilesPath + "wda.ipa";
@@ -942,7 +937,7 @@ namespace Appium_Wizard
         public static void UpdateVersionInPlistFile(string filePath, string version)
         {
             string plistContent = File.ReadAllText(filePath);
-            string updatedPlistContent = plistContent.Replace("<string>1.0</string>", "<string>"+version+"</string>");
+            string updatedPlistContent = plistContent.Replace("<string>1.0</string>", "<string>" + version + "</string>");
             File.WriteAllText(filePath, updatedPlistContent);
         }
 
@@ -1064,16 +1059,40 @@ namespace Appium_Wizard
             return 0;
         }
 
-
-        public static void ShowNotification(string title, string message, ToolTipIcon toolTipIcon)
+        private static bool isActivationHandlerSet = false;
+        public static void ShowNotification(string title, string message)
         {
-            NotifyIcon notifyIcon = new NotifyIcon();
-            notifyIcon.Icon = SystemIcons.Application;
-            notifyIcon.Visible = true;
-            notifyIcon.BalloonTipTitle = title;
-            notifyIcon.BalloonTipText = message;
-            notifyIcon.BalloonTipIcon = toolTipIcon;
-            notifyIcon.ShowBalloonTip(3000);
+            if (message.Contains("Downloads folder")) 
+            {
+                new ToastContentBuilder()
+                   .AddText(title)
+                   .AddText(message)
+                   .SetToastDuration(ToastDuration.Short)
+                   .AddButton(new ToastButton()
+                   .SetContent("Open Downloads")
+                   .AddArgument("action", "openDownloads"))
+                   .Show();
+                if (!isActivationHandlerSet)
+                {
+                    ToastNotificationManagerCompat.OnActivated += toastArgs =>
+                    {
+                        ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
+                        if (args["action"] == "openDownloads")
+                        {
+                            Process.Start("explorer.exe", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads");
+                        }
+                    };
+                    isActivationHandlerSet = true;
+                }
+            }
+            else
+            {
+                new ToastContentBuilder()
+                 .AddText(title)
+                 .AddText(message)
+                 .SetToastDuration(ToastDuration.Short)
+                 .Show();
+            }           
         }
     }
 }

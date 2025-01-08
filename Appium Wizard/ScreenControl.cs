@@ -756,7 +756,7 @@ namespace Appium_Wizard
             }
             if (MainScreen.ScreenshotNotification)
             {
-                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.", ToolTipIcon.Info);
+                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.");
             }
             //if (!isMessageDisplayed)
             //{
@@ -849,7 +849,7 @@ namespace Appium_Wizard
                     //MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     if (MainScreen.ScreenRecordingNotification)
                     {
-                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.", ToolTipIcon.Info);
+                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.");
                     }
                 }
                 else

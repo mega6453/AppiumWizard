@@ -1062,37 +1062,46 @@ namespace Appium_Wizard
         private static bool isActivationHandlerSet = false;
         public static void ShowNotification(string title, string message)
         {
-            if (message.Contains("Downloads folder")) 
+            try
             {
-                new ToastContentBuilder()
-                   .AddText(title)
-                   .AddText(message)
-                   .SetToastDuration(ToastDuration.Short)
-                   .AddButton(new ToastButton()
-                   .SetContent("Open Downloads")
-                   .AddArgument("action", "openDownloads"))
-                   .Show();
-                if (!isActivationHandlerSet)
+                string iconPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\appiumwizardlogo.ico";
+                if (message.Contains("Downloads folder"))
                 {
-                    ToastNotificationManagerCompat.OnActivated += toastArgs =>
+                    new ToastContentBuilder()
+                       .AddText(title)
+                       .AddText(message)
+                       .SetToastDuration(ToastDuration.Short)
+                       .AddAppLogoOverride(new Uri(iconPath), ToastGenericAppLogoCrop.Circle)
+                       .AddButton(new ToastButton()
+                       .SetContent("Open Downloads")
+                       .AddArgument("action", "openDownloads"))
+                       .Show();
+                    if (!isActivationHandlerSet)
                     {
-                        ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
-                        if (args["action"] == "openDownloads")
+                        ToastNotificationManagerCompat.OnActivated += toastArgs =>
                         {
-                            Process.Start("explorer.exe", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads");
-                        }
-                    };
-                    isActivationHandlerSet = true;
+                            ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
+                            if (args["action"] == "openDownloads")
+                            {
+                                Process.Start("explorer.exe", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads");
+                            }
+                        };
+                        isActivationHandlerSet = true;
+                    }
+                }
+                else
+                {
+                    new ToastContentBuilder()
+                     .AddText(title)
+                     .AddText(message)
+                     .SetToastDuration(ToastDuration.Short)
+                     .AddAppLogoOverride(new Uri(iconPath), ToastGenericAppLogoCrop.Circle)
+                     .Show();
                 }
             }
-            else
+            catch (Exception)
             {
-                new ToastContentBuilder()
-                 .AddText(title)
-                 .AddText(message)
-                 .SetToastDuration(ToastDuration.Short)
-                 .Show();
-            }           
+            }
         }
     }
 }

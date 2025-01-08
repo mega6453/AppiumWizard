@@ -64,6 +64,9 @@
     <None Update="ExcludeInInstaller\Information.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\appiumwizardlogo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Docs\Appium Wizard Troubleshooting Guide.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

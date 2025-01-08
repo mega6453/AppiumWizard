@@ -719,8 +719,8 @@ namespace Appium_Wizard
         private async void Screenshot_Click(object sender, EventArgs e)
         {
             string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string filePath = Path.Combine(downloadPath, $"{deviceName}_{timestamp}.png");
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+            string filePath = Path.Combine(downloadPath, $"Screenshot_{deviceName}_{timestamp}.png");
             filePath = "\"" + filePath + "\"";
             if (OSType.Equals("Android"))
             {

@@ -1221,6 +1221,22 @@ namespace Appium_Wizard
             }
         }
 
+        public void StartiOSProxyServer(string udid, int localPort, int iOSPort, string method)
+        {
+            if (method.Equals("go"))
+            {
+                StartiOSProxyServer(udid, localPort, iOSPort, iOSExecutable.go);
+            }
+            else if (method.Equals("py"))
+            {
+                StartiOSProxyServer(udid, localPort, iOSPort, iOSExecutable.py);
+            }
+            else
+            {
+                StartiProxyServer(udid, localPort, iOSPort);
+            }
+        }
+
         public void StartiProxyServer(string udid, int localPort, int iOSPort)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo

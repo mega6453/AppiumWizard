@@ -136,7 +136,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             lastExecutionTime = now;
                         }
                     }
@@ -164,7 +164,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -215,7 +215,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -251,7 +251,7 @@ namespace Appium_Wizard
                                     {
                                         Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                                     }
-                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                                     proxiedUDID = currentUDID;
                                 }
                             }

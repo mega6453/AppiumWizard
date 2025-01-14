@@ -1940,24 +1940,8 @@ namespace Appium_Wizard
 
         private void iOSProxyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var devicesList = Database.QueryDataFromDevicesTable();
-            bool isiOSDeviceAvailable = false;
-            foreach (var item in devicesList)
-            {
-                if (item["OS"].Equals("iOS"))
-                {
-                    isiOSDeviceAvailable = true;
-                }
-            }
-            if (isiOSDeviceAvailable)
-            {
-                iOS_Proxy proxy = new iOS_Proxy();
-                proxy.ShowDialog();
-            }
-            else
-            {
-                MessageBox.Show("Please add an iOS device in the device list and then try again.", "No iOS Device available", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            iOS_Proxy proxy = new iOS_Proxy();
+            proxy.ShowDialog();
         }
 
         private void notificationsToolStripMenuItem_Click(object sender, EventArgs e)

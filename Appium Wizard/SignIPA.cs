@@ -157,7 +157,7 @@ namespace Appium_Wizard
 
         private void SignIPA_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("SignIPA_Shown");
         }
     }
 }

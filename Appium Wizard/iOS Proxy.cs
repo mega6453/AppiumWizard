@@ -4,6 +4,7 @@
     {
         public string udid;
         List<Dictionary<string, string>> devicesList;
+        public static string selectediOSProxyMethod = "go";
         public iOS_Proxy()
         {
             InitializeComponent();
@@ -11,15 +12,18 @@
             ToolTip toolTip = new ToolTip();
 
             // Set the tooltip text
-            toolTip.SetToolTip(methodRadioButton1, "Using iProxy");
-            toolTip.SetToolTip(methodRadioButton2, "Using Go-iOS");
-            toolTip.SetToolTip(methodRadioButton3, "Using Pymobiledevice3");
+            toolTip.SetToolTip(goRadioButtonAuto, "Using Go-iOS");
+            toolTip.SetToolTip(pyRadioButtonAuto, "Using Pymobiledevice3");
+            toolTip.SetToolTip(iProxyRadioButtonAuto, "Using iProxy");
+            toolTip.SetToolTip(goRadioButton, "Using Go-iOS");
+            toolTip.SetToolTip(pyRadioButton, "Using Pymobiledevice3");
+            toolTip.SetToolTip(iProxyRadioButton, "Using iProxy");
         }
 
         private async void startProxyButton_Click(object sender, EventArgs e)
         {
             if (deviceListComboBox.SelectedIndex.Equals(-1) || string.IsNullOrEmpty(portTextBox.Text)
-                || (!methodRadioButton1.Checked && !methodRadioButton2.Checked && !methodRadioButton3.Checked))
+                || (!goRadioButton.Checked && !pyRadioButton.Checked && !iProxyRadioButton.Checked))
             {
                 MessageBox.Show("Select the device, Enter port number and Select a method to Start the iOS Proxy.", "Missing fields", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -42,25 +46,25 @@
                 }
                 else
                 {
-                    string method = "method1";
-                    if (methodRadioButton1.Checked)
+                    string method = "go";
+                    if (goRadioButton.Checked)
                     {
-                        method = "method1";
+                        method = "go";
                     }
-                    else if (methodRadioButton2.Checked)
+                    else if (pyRadioButton.Checked)
                     {
-                        method = "method2";
+                        method = "py";
                     }
                     else
                     {
-                        method = "method3";
+                        method = "ip";
                     }
                     int port = int.Parse(portTextBox.Text);
                     bool isPortBusy = true;
                     CommonProgress commonProgress = new CommonProgress();
                     commonProgress.Show();
                     commonProgress.Owner = this;
-                    commonProgress.UpdateStepLabel("Start iOS Proxy Server", "Please wait while checking the port number "+port+" availability...", 20);
+                    commonProgress.UpdateStepLabel("Start iOS Proxy Server", "Please wait while checking the port number " + port + " availability...", 20);
                     await Task.Run(() =>
                     {
                         isPortBusy = Common.IsPortBeingUsed(port);
@@ -72,10 +76,10 @@
                         {
                             processName = processName + " (By Appium Wizard)";
                         }
-                        var dialogResult = MessageBox.Show(processName+ " is running in Port number "+port+".\nDo you want to kill that process and Start the iOS Proxy server on that port?", "Kill Process?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        var dialogResult = MessageBox.Show(processName + " is running in Port number " + port + ".\nDo you want to kill that process and Start the iOS Proxy server on that port?", "Kill Process?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (dialogResult.Equals(DialogResult.Yes))
                         {
-                            commonProgress.UpdateStepLabel("Start iOS Proxy Server", "Please wait while killing the process "+processName+" running in the port number "+port+"...", 40);
+                            commonProgress.UpdateStepLabel("Start iOS Proxy Server", "Please wait while killing the process " + processName + " running in the port number " + port + "...", 40);
                             await Task.Run(() =>
                             {
                                 Common.KillProcessByPortNumber(port);
@@ -131,24 +135,64 @@
                     deviceListComboBox.Items.Add(device["Name"]);
                 }
             }
+
+            var output = Database.QueryDataFromiOSProxyTable();
+            if (output.Contains("go"))
+            {
+                goRadioButtonAuto.Checked = true;
+            }
+            else if (output.Contains("py"))
+            {
+                pyRadioButtonAuto.Checked = true;
+            }
+            else
+            {
+                iProxyRadioButtonAuto.Checked = true;
+            }
         }
 
 
         private async Task StartProxyServer(string method, int localPort)
         {
-            if (method.Equals("method1"))
-            {
-                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, localPort, 8100);
-            }
-            else if (method.Equals("method2"))
+            if (method.Equals("go"))
             {
                 iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, localPort, 8100, iOSAsyncMethods.iOSExecutable.go);
             }
-            else if (method.Equals("method3"))
+            else if (method.Equals("py"))
             {
-               iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, localPort, 8100, iOSAsyncMethods.iOSExecutable.py);
+                iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, localPort, 8100, iOSAsyncMethods.iOSExecutable.py);
             }
+            else if (method.Equals("ip"))
+            {
+                iOSAsyncMethods.GetInstance().StartiProxyServer(udid, localPort, 8100);
+            }
+            GoogleAnalytics.SendEvent("StartProxyServer_"+method);
             await Task.Delay(3000);
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void ApplyButton_Click(object sender, EventArgs e)
+        {
+            if (goRadioButtonAuto.Checked)
+            {
+                Database.UpdateDataIntoiOSProxyTable("go");
+                selectediOSProxyMethod = "go";
+            }
+            else if (pyRadioButtonAuto.Checked)
+            {
+                Database.UpdateDataIntoiOSProxyTable("py");
+                selectediOSProxyMethod = "py";
+            }
+            else
+            {
+                Database.UpdateDataIntoiOSProxyTable("iproxy");
+                selectediOSProxyMethod = "iproxy";
+            }
+            Close();
         }
     }
 }

@@ -208,7 +208,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +260,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -660,7 +660,7 @@ namespace Appium_Wizard
                 }
             });
 
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)
@@ -719,8 +719,8 @@ namespace Appium_Wizard
         private async void Screenshot_Click(object sender, EventArgs e)
         {
             string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string filePath = Path.Combine(downloadPath, $"{deviceName}_{timestamp}.png");
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+            string filePath = Path.Combine(downloadPath, $"Screenshot_{deviceName}_{timestamp}.png");
             filePath = "\"" + filePath + "\"";
             if (OSType.Equals("Android"))
             {
@@ -756,7 +756,7 @@ namespace Appium_Wizard
             }
             if (MainScreen.ScreenshotNotification)
             {
-                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.", ToolTipIcon.Info);
+                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.");
             }
             //if (!isMessageDisplayed)
             //{
@@ -849,7 +849,7 @@ namespace Appium_Wizard
                     //MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     if (MainScreen.ScreenRecordingNotification)
                     {
-                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.", ToolTipIcon.Info);
+                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.");
                     }
                 }
                 else

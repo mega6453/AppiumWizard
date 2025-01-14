@@ -22,7 +22,7 @@ namespace Appium_Wizard
         private void InstallApp_HelpButton_Clicked(object sender, CancelEventArgs e)
         {
             MessageBox.Show("Sign & Install : If you sign and install then you don't need to manually Trust this app in settings.\n\nJust Install : App Installation may fail. If Installed successfully, then You may need to Trust this app in settings, if it's not signed already.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("InstallApp_HelpButton_Clicked");
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -70,7 +70,7 @@ namespace Appium_Wizard
 
         private void InstallApp_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("InstallApp_Shown");
         }
     }
 }

@@ -40,25 +40,9 @@ namespace Appium_Wizard
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    //FileName = AppiumServerFilePath,
-                    //Arguments = @"--allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",
                     FileName = "cmd.exe",
                     WorkingDirectory = FilesPath.serverInstalledPath,
-                    //Arguments = @"/C appium --allow-cors --default-capabilities ""{\""appium:webDriverAgentUrl\"":\""http://localhost:7777\""}""",                    
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:systemPort\"":{UiAutomatorPort}}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:mjpegServerPort\"":\""{screenport}\""}}",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors  --log-level info --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --allow-insecure=adb_shell --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:newCommandTimeout\"":0}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors",
-                    //Arguments = command + $@" -dc ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     Arguments = updatedCommand,
-                    //working
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:skipServerInstallation\"": \""true\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:dontStopAppOnReset\"":\""true\""}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --session-override --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:skipServerInstallation\"": \""true\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\"",\""appium:noReset\"":true,\""appium:dontStopAppOnReset\"":\""true\""}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --session-override --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\"", \""appium:skipServerInstallation\"": \""true\"",\""appium:skipUnlock\"":\""true\"",\""appium:skipDeviceInitialization\"": \""true\""}}""",
-                    //Arguments = $@"/C appium --port {appiumPort} --allow-cors --default-capabilities ""{{\""appium:webDriverAgentUrl\"":\""http://localhost:{webDriverAgentProxyPort}\""}}",
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
@@ -67,8 +51,6 @@ namespace Appium_Wizard
                 startInfo.EnvironmentVariables["ANDROID_HOME"] = FilesPath.executablesFolderPath;
                 Process appiumServerProcess = new Process();
                 appiumServerProcess.StartInfo = startInfo;
-                //appiumServerProcess.OutputDataReceived += AppiumServer_OutputDataReceived;
-                //appiumServerProcess.ErrorDataReceived += AppiumServer_OutputDataReceived;
                 appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
                 appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
 
@@ -154,7 +136,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             lastExecutionTime = now;
                         }
                     }
@@ -182,7 +164,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -233,7 +215,7 @@ namespace Appium_Wizard
                             {
                                 Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                             }
-                            iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                            iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                             if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                             {
                                 string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -269,7 +251,7 @@ namespace Appium_Wizard
                                     {
                                         Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
                                     }
-                                    iOSAsyncMethods.GetInstance().StartiProxyServer(currentUDID, webDriverAgentProxyPort, 8100);
+                                    iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
                                     proxiedUDID = currentUDID;
                                 }
                             }

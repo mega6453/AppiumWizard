@@ -446,6 +446,41 @@ namespace Appium_Wizard
             }
         }
 
+        public static string QueryDataFromiOSProxyTable()
+        {
+            string output = string.Empty;
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM iOSProxy", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            output = reader.GetString(0);
+                        }
+                    }
+                }
+                connection.Close();
+                return output;
+            }
+        }
+
+        public static void UpdateDataIntoiOSProxyTable(string executionMethod)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE iOSProxy SET ('Method') = ('" + executionMethod + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
 
         public static void UpdateDataIntoNotificationsTable(string DeviceConnected, string DeviceDisconnected, string Screenshot, string ScreenRecording)
         {

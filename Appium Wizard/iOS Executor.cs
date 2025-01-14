@@ -18,6 +18,10 @@ namespace Appium_Wizard
         {
             InitializeComponent();
             listView1 = listView;
+
+            ToolTip toolTip = new ToolTip();
+            toolTip.SetToolTip(goRadioButton, "Using Go-iOS");
+            toolTip.SetToolTip(pyRadioButton, "Using Pymobiledevice3");
         }
 
         private void cancelButton_Click(object sender, EventArgs e)

@@ -64,9 +64,10 @@
             // label1
             // 
             label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             label1.Location = new Point(3, 9);
             label1.Name = "label1";
-            label1.Size = new Size(363, 30);
+            label1.Size = new Size(354, 30);
             label1.TabIndex = 3;
             label1.Text = "If you are facing any issue on performing action from More section \r\non iOS device, then try changing the method below :";
             // 
@@ -117,6 +118,7 @@
             // 
             NoteLabel.AutoSize = true;
             NoteLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            NoteLabel.ForeColor = Color.IndianRed;
             NoteLabel.Location = new Point(6, 206);
             NoteLabel.Name = "NoteLabel";
             NoteLabel.Size = new Size(325, 15);

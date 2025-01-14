@@ -12,6 +12,8 @@
         public async Task GetVersionInformation(MainScreen mainScreen = null)
         {
             string InstalledAppiumServerVersion = string.Empty;
+            string InstalledXCUITestDriverVersion = string.Empty;
+            string InstalledUIAutomatorDriverVersion = string.Empty;
             string AvailableAppiumVersion = string.Empty;
             string AvailableXCUITestVersion = string.Empty;
             string AvailableUIAutomatorVersion = string.Empty;
@@ -33,6 +35,8 @@
                     InstalledAppiumServerVersion = Common.InstalledAppiumServerVersion();
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed Driver version information. This may take sometime...", 30);
                     driverVersion = Common.InstalledDriverVersion();
+                    InstalledXCUITestDriverVersion = driverVersion["xcuitest"];
+                    InstalledUIAutomatorDriverVersion = driverVersion["uiautomator2"];
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while checking for Appium Server updates. This may take sometime...", 50);
                     AvailableAppiumVersion = Common.AvailableAppiumVersion();
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while checking for XCUITest driver updates. This may take sometime...", 70);
@@ -48,14 +52,14 @@
             });
 
             appiumCurrentVersionLabel.Text = InstalledAppiumServerVersion;
-            XCUITestCurrentVersionLabel.Text = driverVersion["xcuitest"];
-            UIAutomatorCurrentVersionLabel.Text = driverVersion["uiautomator2"];
+            XCUITestCurrentVersionLabel.Text = InstalledXCUITestDriverVersion;
+            UIAutomatorCurrentVersionLabel.Text = InstalledUIAutomatorDriverVersion;
             AppiumAvailableVersionLabel.Text = AvailableAppiumVersion;
             XCUITestAvailableVersionLabel.Text = AvailableXCUITestVersion;
             UIAutomatorAvailableVersionLabel.Text = AvailableUIAutomatorVersion;
 
-            Version currentVersionAppium = new Version(appiumCurrentVersionLabel.Text);
-            Version latestVersionAppium = new Version(AppiumAvailableVersionLabel.Text);
+            Version currentVersionAppium = new Version(InstalledAppiumServerVersion);
+            Version latestVersionAppium = new Version(AvailableAppiumVersion);
 
             bool isUpdateAvailableAppium = latestVersionAppium > currentVersionAppium;
             if (isUpdateAvailableAppium)
@@ -68,8 +72,8 @@
             }
 
             //XCUITest
-            Version currentVersionXCUITest = new Version(XCUITestCurrentVersionLabel.Text);
-            Version latestVersionXCUITest = new Version(XCUITestAvailableVersionLabel.Text);
+            Version currentVersionXCUITest = new Version(InstalledXCUITestDriverVersion);
+            Version latestVersionXCUITest = new Version(AvailableXCUITestVersion);
 
             bool isUpdateAvailableXCUITest = latestVersionXCUITest > currentVersionXCUITest;
             if (isUpdateAvailableXCUITest)
@@ -82,8 +86,8 @@
             }
 
             //UIAutomator2
-            Version currentVersionUI = new Version(UIAutomatorCurrentVersionLabel.Text);
-            Version latestVersionUI = new Version(UIAutomatorAvailableVersionLabel.Text);
+            Version currentVersionUI = new Version(InstalledUIAutomatorDriverVersion);
+            Version latestVersionUI = new Version(AvailableUIAutomatorVersion);
 
             bool isUpdateAvailableUI = latestVersionUI > currentVersionUI;
             if (isUpdateAvailableUI)

@@ -94,7 +94,7 @@ namespace Appium_Wizard
 
         private void DeviceInformation_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name);
+           GoogleAnalytics.SendEvent("DeviceInformation_Shown");
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Appium_Wizard
                             Database.UpdateDataInDevicesTable(udid, "Connection","USB");
                             if (MainScreen.DeviceConnectedNotification)
                             {
-                                Common.ShowNotification("Device Connected", deviceName + " connected.", ToolTipIcon.Info);
+                                Common.ShowNotification("Device Connected", deviceName + " connected.");
                             }
                             if (ScreenControl.webview2.ContainsKey(udid))
                             {                               
@@ -175,7 +175,7 @@ namespace Appium_Wizard
                             string IPAddress = item.SubItems[6].Text;
                             if (MainScreen.DeviceDisconnectedNotification)
                             {
-                                Common.ShowNotification("Device Disconnected", deviceName + " Disconnected.", ToolTipIcon.Info);
+                                Common.ShowNotification("Device Disconnected", deviceName + " Disconnected.");
                             }
                             if (OS.Equals("iOS"))
                             {

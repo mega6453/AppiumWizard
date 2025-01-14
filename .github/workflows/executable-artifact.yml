@@ -68,7 +68,7 @@ jobs:
       run: |
         ISCC /Q "${{ env.SCRIPT_PATH }}"
       env:
-        SCRIPT_PATH: "Appium Wizard/bin/Release/net8.0-windows7.0/win-x64/publish/ExcludeInInstaller/Installer Script.iss"  
+        SCRIPT_PATH: "Appium Wizard/bin/Release/net8.0-windows10.0.17763.0/win-x64/publish/ExcludeInInstaller/Installer Script.iss"  
 
     # - name: Zip the EXE file
     #   run: |
@@ -93,4 +93,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AppiumWizard
-        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net8.0-windows7.0\win-x64\publish\output\AppiumWizard.exe
+        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\output\AppiumWizard.exe

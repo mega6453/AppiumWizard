@@ -1187,6 +1187,10 @@ namespace Appium_Wizard
                     {
                         PortProcessId.Add(localPort, processId);
                     }
+                    else
+                    {
+                        PortProcessId[localPort] = processId;
+                    }
                     MainScreen.runningProcesses.Add(processId);
                     MainScreen.runningProcessesPortNumbers.Add(localPort);
                 }
@@ -1211,6 +1215,10 @@ namespace Appium_Wizard
                     if (!PortProcessId.ContainsKey(localPort))
                     {
                         PortProcessId.Add(localPort, processId);
+                    }
+                    else
+                    {
+                        PortProcessId[localPort] = processId;
                     }
                     MainScreen.runningProcesses.Add(processId);
                     MainScreen.runningProcessesPortNumbers.Add(localPort);
@@ -1259,6 +1267,10 @@ namespace Appium_Wizard
             {
                 PortProcessId.Add(localPort, processId);
             }
+            else
+            {
+                PortProcessId[localPort] = processId;
+            }
             MainScreen.runningProcesses.Add(processId);
             MainScreen.runningProcessesPortNumbers.Add(localPort);
         }
@@ -1282,6 +1294,10 @@ namespace Appium_Wizard
             if (!PortProcessId.ContainsKey(localPort1))
             {
                 PortProcessId.Add(localPort1, processId);
+            }
+            else
+            {
+                PortProcessId[localPort1] = processId;
             }
             MainScreen.runningProcesses.Add(processId);
             MainScreen.runningProcessesPortNumbers.Add(localPort1);

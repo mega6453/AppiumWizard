@@ -18,6 +18,21 @@
             toolTip.SetToolTip(goRadioButton, "Using Go-iOS");
             toolTip.SetToolTip(pyRadioButton, "Using Pymobiledevice3");
             toolTip.SetToolTip(iProxyRadioButton, "Using iProxy");
+
+            string WDAPortNumbers = "";
+            for (int i = 1; i <= 5; i++)
+            {
+                if (AppiumServerSetup.serverNumberWDAPortNumber.ContainsKey(i))
+                {
+                    WDAPortNumbers += $"Server {i} - {AppiumServerSetup.serverNumberWDAPortNumber[i]}\n";
+                }
+            }
+
+            toolTip.SetToolTip(portTextBox, WDAPortNumbers);
+            if (AppiumServerSetup.serverNumberWDAPortNumber.ContainsKey(1))
+            {
+                portTextBox.Text = AppiumServerSetup.serverNumberWDAPortNumber[1].ToString();
+            }
         }
 
         private async void startProxyButton_Click(object sender, EventArgs e)

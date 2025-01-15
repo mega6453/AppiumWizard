@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
-using System.Text.Json;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -17,6 +17,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
+        public static Dictionary<int,int> serverNumberWDAPortNumber = new Dictionary<int, int>();
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
             if (!command.Contains("webDriverAgentProxyPort"))
@@ -28,6 +29,14 @@ namespace Appium_Wizard
                 command = command + " --port " + appiumPort;
             }
             int webDriverAgentProxyPort = Common.GetFreePort();
+            if (serverNumberWDAPortNumber.ContainsKey(serverNumber))
+            {
+                serverNumberWDAPortNumber[serverNumber] = webDriverAgentProxyPort;
+            }
+            else
+            {
+                serverNumberWDAPortNumber.Add(serverNumber, webDriverAgentProxyPort);
+            }
             string updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
@@ -171,6 +180,9 @@ namespace Appium_Wizard
                                 UpdateScreenControl(currentUDID, "Set Device - " + name);
                             }
                             proxiedUDID = currentUDID;
+
+                            var proxyManager = new ProxyServerManager();
+                            proxyManager.WaitForProxyServer("localhost", webDriverAgentProxyPort);
                         }
                     }
                     //------------------------
@@ -560,4 +572,42 @@ namespace Appium_Wizard
             return true;
         }
     }
+
+
+
+    public class ProxyServerManager
+    {
+        private const int CheckInterval = 1000; 
+        private const int Timeout =     10000;
+
+        private bool IsProxyServerReady(string host, int port)
+        {
+            try
+            {
+                using (var client = new TcpClient(host, port))
+                {
+                    return true;
+                }
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+        }
+
+        public void WaitForProxyServer(string host, int port)
+        {
+            int elapsed = 0;
+            while (!IsProxyServerReady(host, port))
+            {
+                if (elapsed >= Timeout)
+                {
+                    MessageBox.Show("iOS Proxy server did not start in time. Try selecting different method or start proxy manually from Tools->iOS Proxy", "Failed to start iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                Thread.Sleep(CheckInterval);
+                elapsed += CheckInterval;
+            }
+        }
+    }
+
 }

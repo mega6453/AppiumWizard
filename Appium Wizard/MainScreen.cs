@@ -144,10 +144,12 @@ namespace Appium_Wizard
             try
             {
                 iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
+                iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();                
             }
             catch (Exception)
             {
                 iOS_Executor.selectediOSExecutor = "auto";
+                iOS_Proxy.selectediOSProxyMethod = "go";
             }
             if (!LoadingScreen.isServerStarted)
             {

@@ -58,9 +58,9 @@ namespace Appium_Wizard
                     {
                         statusText = "Click " + element;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
-                        x = x + (width / 2);
-                        y = y + (height / 2);
-                        screenControl.DrawDot(screenControl, x, y);
+                        int updatedX = x + (width / 2);
+                        int updatedY = y + (height / 2);
+                        screenControl.DrawDot(screenControl, updatedX, updatedY);
                     }
                     // Handling for Send text
                     else if (data.Contains("{\"text\":") | (data.Contains("POST /session/") && data.Contains("/value")))

@@ -64,7 +64,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Android Screen Reflection and Screen Control
 * Use Android 11+ device over Wi-Fi
 #### Common
-* Status bar for Element interaction (Find element, Click and Send text as of now)
+* Status bar for Element interaction (Find element, Click and Send text, etc.)
 * Highlight element accessed by Appium in Screen Reflection during execution
 * Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data
 * Reboot Device

@@ -47,30 +47,31 @@ The above issues are expected in Appium Wizard software and not in your mobile a
 PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
 
 ## Features Available
-
-* Upto 5 Parallel Appium servers
+#### Server
+* 5 Parallel Appium servers
 * Server Settings - Set server arguments and default capabilities separately for each server 
 * Update Appium Server and drivers
-* iOS Automation Execution **(including iOS version 17.x)**
+* Troubleshooter to fix appium and driver issues
+#### iOS
+* iOS Automation Execution
 * iOS Screen Reflection and Screen Control
 * iOS Profile management
 * IPA Signer
+* iOS Proxy selection with 3 methods
+* iOS Executor - 2 ways to execute iOS actions
+#### Android 
 * Android Automation Execution
 * Android Screen Reflection and Screen Control
 * Use Android 11+ device over Wi-Fi
-* Server Management
-* Troubleshooter
+#### Common
 * Status bar for Element interaction (Find element, Click and Send text as of now)
 * Highlight element accessed by Appium in Screen Reflection during execution
-* Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data for Android
-* Take Device Screenshot
+* Manage Apps - Install / Launch / Kill / Uninstall / Clear App Data
 * Reboot Device
 * Unlock Mobile from Screen Control
-* Start iOS proxy manually - 3 methods
-* iOS Executor - 2 ways to execute iOS actions
+* Take Device Screenshot
 * Record Screen from Screen Control (**New**)
 * Notifications - Enable/Disable Notifications for few events (**New**)
-* etc.
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window

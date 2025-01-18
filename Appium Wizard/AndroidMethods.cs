@@ -409,6 +409,12 @@ namespace Appium_Wizard
             SendText(udid, password);
         }
 
+        public enum Orientation { Portrait, Landscape };
+        public void SetOrientation(string udid, Orientation orientation)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell settings put system user_rotation "+(int)orientation);
+        }
+
         public bool ClearAppData(string udid, string packageName)
         {
             var output = ExecuteCommandWithCmd("-s " + udid + " shell pm clear "+packageName);

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
-using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -410,10 +409,38 @@ namespace Appium_Wizard
         }
 
         public enum Orientation { Portrait, Landscape };
-        public void SetOrientation(string udid, Orientation orientation)
+        public bool SetOrientation(string udid, Orientation orientation)
         {
-            ExecuteCommandWithCmd("-s " + udid + " shell settings put system user_rotation "+(int)orientation);
+            var result = ExecuteCommandWithCmd("-s " + udid + " shell settings put system user_rotation " + (int)orientation).Replace("\n", "").Trim();
+            return string.IsNullOrEmpty(result);
         }
+
+        public Orientation GetOrientation(string udid)
+        {
+            var result = ExecuteCommand("-s "+ udid + " shell dumpsys input | grep \"SurfaceOrientation\"");
+            string pattern = @"SurfaceOrientation:\s*(\d)";
+            Match match = Regex.Match(result, pattern);
+            if (match.Success)
+            {
+                string orientationValue = match.Groups[1].Value;
+                if (orientationValue.Equals("0"))
+                {
+                    return Orientation.Portrait;
+                }
+                else
+                {
+                    return Orientation.Landscape;
+                }
+            }
+            return Orientation.Portrait;
+        }
+
+        public enum AutoRotate { Off, On };
+        public void SetAutoRotate(string udid, AutoRotate autoRoate)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell settings put system accelerometer_rotation " +(int)autoRoate);
+        }
+
 
         public bool ClearAppData(string udid, string packageName)
         {

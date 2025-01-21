@@ -2102,7 +2102,7 @@ namespace Appium_Wizard
             }
         }
 
-        public enum Orientation {Portrait, Landscape};
+        public enum Orientation { Portrait, Landscape };
         public static bool SetOrientation(string URL, string sessionId, Orientation orientation)
         {
             var options = new RestClientOptions(URL)
@@ -2110,13 +2110,35 @@ namespace Appium_Wizard
                 MaxTimeout = -1,
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/"+sessionId+"/orientation", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/orientation", Method.Post);
             request.AddHeader("Content-Type", "application/json");
             var body = $@"{{""orientation"": ""{orientation.ToString()}""}}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
             return response.IsSuccessful;
+        }
+
+        public static Orientation GetOrientation(string URL, string sessionId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/orientation", Method.Get);
+            RestResponse response = client.Execute(request);
+            using JsonDocument doc = JsonDocument.Parse(response.Content);
+            JsonElement root = doc.RootElement;
+            string value = root.GetProperty("value").GetString();
+            if (value.Equals("PORTRAIT"))
+            {
+                return Orientation.Portrait;
+            }
+            else
+            {
+                return Orientation.Landscape;
+            }
         }
     }
 }

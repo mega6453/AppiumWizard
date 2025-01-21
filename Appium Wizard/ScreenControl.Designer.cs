@@ -45,6 +45,7 @@
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem = new ToolStripMenuItem();
             RecordButton = new ToolStripButton();
+            SetOrientationButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -74,7 +75,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton, SetOrientationButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -108,7 +109,7 @@
             // HomeToolStripButton
             // 
             HomeToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            HomeToolStripButton.BackColor = SystemColors.HighlightText;
+            HomeToolStripButton.BackColor = SystemColors.ControlLightLight;
             HomeToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
             HomeToolStripButton.Image = Properties.Resources.home;
             HomeToolStripButton.ImageTransparentColor = Color.Magenta;
@@ -207,6 +208,16 @@
             RecordButton.Size = new Size(28, 28);
             RecordButton.Click += RecordButton_Click;
             // 
+            // SetOrientationButton
+            // 
+            SetOrientationButton.Alignment = ToolStripItemAlignment.Right;
+            SetOrientationButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            SetOrientationButton.Image = Properties.Resources.screen_rotate;
+            SetOrientationButton.ImageTransparentColor = Color.Magenta;
+            SetOrientationButton.Name = "SetOrientationButton";
+            SetOrientationButton.Size = new Size(28, 28);
+            SetOrientationButton.Click += SetOrientationButton_Click;
+            // 
             // toolStrip2
             // 
             toolStrip2.Dock = DockStyle.Bottom;
@@ -281,5 +292,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripMenuItem inspectorToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton SetOrientationButton;
     }
 }

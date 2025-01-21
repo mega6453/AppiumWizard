@@ -25,8 +25,20 @@ namespace Appium_Wizard
         string canvasFunctionID = string.Empty;
         string color = ColorTranslator.ToHtml(Color.Red);
         int lineWidth = 2;
+        int originalWidth, originalHeight;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
+            if (width>height)
+            {
+                // for iOS, if device is in landscape, then width and height swaps. So, setting actual value below.
+                originalWidth = height; 
+                originalHeight = width;
+            }
+            else
+            {
+                originalWidth = width;
+                originalHeight = height;
+            }
             this.OSType = os;
             this.OSVersion = Version;
             this.udid = udid;
@@ -208,7 +220,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadScreen");
+            GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +272,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
+            GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -277,9 +289,8 @@ namespace Appium_Wizard
             ScreenWebView.CoreWebView2InitializationCompleted += InitializationCompleted;
             await ScreenWebView.EnsureCoreWebView2Async(env);
             Controls.Add(ScreenWebView);
-
-
         }
+
         private async void InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (e.IsSuccess)
@@ -660,7 +671,7 @@ namespace Appium_Wizard
                 }
             });
 
-           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
+            GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)
@@ -886,6 +897,99 @@ namespace Appium_Wizard
                 Console.WriteLine("Exception" + exception);
                 GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
+        }
+        private bool isPortrait = true;
+
+        private async void SetOrientationButton_Click(object sender, EventArgs e)
+        {
+            SetOrientationButton.Enabled = false;
+            //UpdateStatusLabel(this, "Changing Orientation...");
+            bool isOrientationChangeSuccess = false, isPortraitBefore = true;
+            await Task.Run(() => {
+                if (OSType.Equals("iOS"))
+                {
+                    var currentOrientation = iOSAPIMethods.GetOrientation(URL, sessionId);
+                    if (currentOrientation.Equals(iOSAPIMethods.Orientation.Portrait))
+                    {
+                        isPortraitBefore = true; // current orientation
+                        isOrientationChangeSuccess = iOSAPIMethods.SetOrientation(URL, sessionId, iOSAPIMethods.Orientation.Landscape);
+                        //if (isOrientationChangeSuccess)
+                        //{
+                        //    int updatedHeight = originalWidth + toolStrip1.Height + toolStrip2.Height;
+                        //    int updateWidth = originalHeight;
+                        //    this.Size = new Size(updateWidth, updatedHeight);
+                        //    this.ClientSize = new Size(updateWidth, updatedHeight);
+                        //    SetWebViewSize(updateWidth, updatedHeight);
+                        //    this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                        //}
+                        //else
+                        //{
+                        //    MessageBox.Show("Unable to rotate device.","Rotate Screen",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        //}
+                    }
+                    else
+                    {
+                        isPortraitBefore = false; // current orientation
+                        isOrientationChangeSuccess = iOSAPIMethods.SetOrientation(URL, sessionId, iOSAPIMethods.Orientation.Portrait);
+                        //if (isOrientationChangeSuccess)
+                        //{
+                        //    this.Size = new Size(originalWidth, originalHeight);
+                        //    this.ClientSize = new Size(originalWidth, originalHeight + toolStrip1.Height + toolStrip2.Height);
+                        //    SetWebViewSize(originalWidth, originalHeight);
+                        //    this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                        //}
+                        //else
+                        //{
+                        //    MessageBox.Show("Unable to rotate device.", "Rotate Screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //}
+                    }
+                    //isPortrait = !isPortrait;
+                }
+                else
+                {
+                    AndroidMethods.GetInstance().SetAutoRotate(udid, AndroidMethods.AutoRotate.Off); //Turn off Auto Rotate
+                    var currentOrientation = AndroidMethods.GetInstance().GetOrientation(udid);
+                    if (currentOrientation.Equals(AndroidMethods.Orientation.Portrait))
+                    {
+                        isPortraitBefore = true; // current orientation
+                        isOrientationChangeSuccess = AndroidMethods.GetInstance().SetOrientation(udid, AndroidMethods.Orientation.Landscape);
+                    }
+                    else
+                    {
+                        isPortraitBefore = false; // current orientation
+                        isOrientationChangeSuccess = AndroidMethods.GetInstance().SetOrientation(udid, AndroidMethods.Orientation.Portrait);
+                    }
+                }
+
+            });
+            if (isOrientationChangeSuccess)
+            {
+                if (isPortraitBefore)
+                {               
+                    // Rotate form to landscape
+                    int updatedHeight = originalWidth + toolStrip1.Height + toolStrip2.Height;
+                    int updateWidth = originalHeight;
+                    Size = new Size(updateWidth, updatedHeight);
+                    ClientSize = new Size(updateWidth, updatedHeight);
+                    SetWebViewSize(updateWidth, updatedHeight);
+                    FormBorderStyle = FormBorderStyle.FixedSingle;
+                }
+                else
+                {
+                    // Rotate form to portrait
+                    Size = new Size(originalWidth, originalHeight);
+                    ClientSize = new Size(originalWidth, originalHeight + toolStrip1.Height + toolStrip2.Height);
+                    SetWebViewSize(originalWidth, originalHeight);
+                    FormBorderStyle = FormBorderStyle.FixedSingle;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Unable to rotate device.", "Rotate Screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            GoogleAnalytics.SendEvent("SetOrientationButton_Click");
+            //UpdateStatusLabel(this, "");
+            SetOrientationButton.Enabled = true;
         }
     }
 }

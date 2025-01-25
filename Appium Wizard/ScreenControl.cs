@@ -208,7 +208,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadScreen");
+            GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +260,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
+            GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -660,7 +660,7 @@ namespace Appium_Wizard
                 }
             });
 
-           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
+            GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)
@@ -782,8 +782,8 @@ namespace Appium_Wizard
 
         private void UnlockScreen_Click(object sender, EventArgs e)
         {
-                    EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
-                    enterPassword.ShowDialog();
+            EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+            enterPassword.ShowDialog();
             GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
@@ -865,6 +865,77 @@ namespace Appium_Wizard
             {
                 Console.WriteLine("Exception" + exception);
                 GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
+            }
+        }
+
+        private async void inspectorButton_Click(object sender, EventArgs e)
+        {
+            int port = 0;
+            inspectorButton.Enabled = false;
+            foreach (Inspector inspectorForm in Application.OpenForms.OfType<Inspector>())
+            {                                           // brings foreground if opened already
+                if (inspectorForm.Name.Equals(udid, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (inspectorForm.WindowState.Equals(FormWindowState.Minimized))
+                    {
+                        inspectorForm.WindowState = FormWindowState.Maximized;
+                    }
+                    inspectorForm.Activate();
+                    inspectorButton.Enabled = true;
+                    return;
+                }
+            }
+            CommonProgress commonProgress = new CommonProgress();
+            Inspector inspector;
+            try
+            {                
+                if (!AppiumServerSetup.UDIDsessionId.ContainsKey(udid))
+                {
+                    commonProgress.Owner = this;
+                    commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Opening Appium Inspector", "Please wait while checking for any existing appium session....", 5);
+                    var sessionIds = await AppiumServerSetup.GetSessionIdPortNumber();
+                    bool sessionExists = false;
+                    foreach (var sessionId in sessionIds)
+                    {
+                        if (AppiumServerSetup.sessionIdUDID.ContainsKey(sessionId.Key) && AppiumServerSetup.sessionIdUDID[sessionId.Key].Equals(udid))
+                        {
+                            sessionExists = true;
+                            port = sessionId.Value;
+                            break;
+                        }
+                    }
+
+                    if (!sessionExists)
+                    {
+                        commonProgress.UpdateStepLabel("Opening Appium Inspector", "Please wait while checking for server availability....", 25);
+                        port = AppiumServerSetup.GetAnyRunningServer();
+                        if (port == 0)
+                        {
+                            MessageBox.Show("Not found any running Appium Server. Please start a server and then try again.", "Opening Appium Inspector", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            commonProgress.UpdateStepLabel("Opening Appium Inspector", "Please wait while creating new appium session....", 35);
+                            await AppiumServerSetup.CreateAppiumSession(OSType, udid, port);
+                            commonProgress.UpdateStepLabel("Opening Appium Inspector", "Please wait while getting session Id....", 50);
+                            sessionIds = await AppiumServerSetup.GetSessionIdPortNumber();
+                        }
+                    }
+                }
+                commonProgress.UpdateStepLabel("Opening Appium Inspector", "Please wait while attaching session to Appium Inspector....", 70);
+                inspector = new Inspector(AppiumServerSetup.UDIDsessionId[udid], port);
+                inspector.Name = udid;
+                inspector.Show();
+                commonProgress.Close();
+                inspectorButton.Enabled = true;
+            }
+            catch (Exception)
+            {
+                commonProgress.Close();
+                inspector = new Inspector();
+                inspector.Show();
+                inspectorButton.Enabled = true;
             }
         }
     }

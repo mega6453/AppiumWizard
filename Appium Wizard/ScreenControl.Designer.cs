@@ -43,8 +43,8 @@
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
-            inspectorToolStripMenuItem = new ToolStripMenuItem();
             RecordButton = new ToolStripButton();
+            inspectorButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -74,7 +74,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton, inspectorButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -167,7 +167,7 @@
             // MoreToolStripButton
             // 
             MoreToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem, inspectorToolStripMenuItem });
+            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem });
             MoreToolStripButton.Image = Properties.Resources.ellipsis;
             MoreToolStripButton.ImageTransparentColor = Color.Magenta;
             MoreToolStripButton.Name = "MoreToolStripButton";
@@ -177,7 +177,7 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(149, 22);
+            UnlockScreen.Size = new Size(188, 30);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -185,17 +185,9 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(149, 22);
+            manageAppsToolStripMenuItem.Size = new Size(188, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
-            // 
-            // inspectorToolStripMenuItem
-            // 
-            inspectorToolStripMenuItem.Image = Properties.Resources.inspector;
-            inspectorToolStripMenuItem.Name = "inspectorToolStripMenuItem";
-            inspectorToolStripMenuItem.Size = new Size(149, 22);
-            inspectorToolStripMenuItem.Text = "Inspector";
-            inspectorToolStripMenuItem.Click += inspectorToolStripMenuItem_Click;
             // 
             // RecordButton
             // 
@@ -206,6 +198,16 @@
             RecordButton.Name = "RecordButton";
             RecordButton.Size = new Size(28, 28);
             RecordButton.Click += RecordButton_Click;
+            // 
+            // inspectorButton
+            // 
+            inspectorButton.Alignment = ToolStripItemAlignment.Right;
+            inspectorButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            inspectorButton.Image = Properties.Resources.inspector;
+            inspectorButton.ImageTransparentColor = Color.Magenta;
+            inspectorButton.Name = "inspectorButton";
+            inspectorButton.Size = new Size(28, 28);
+            inspectorButton.Click += inspectorButton_Click;
             // 
             // toolStrip2
             // 
@@ -279,7 +281,7 @@
         private ToolStripButton RecordButton;
         private ToolStripMenuItem manageAppsToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator2;
-        private ToolStripMenuItem inspectorToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton inspectorButton;
     }
 }

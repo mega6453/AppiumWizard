@@ -25,6 +25,9 @@
     <Compile Update="ImportProfile.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Inspector.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="InstalledAppsList.cs">
       <SubType>Form</SubType>
     </Compile>

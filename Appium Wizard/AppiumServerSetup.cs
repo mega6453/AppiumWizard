@@ -4,7 +4,10 @@ using RestSharp;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Appium_Wizard
 {
@@ -17,7 +20,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public static Dictionary<int,int> serverNumberWDAPortNumber = new Dictionary<int, int>();
+        public static Dictionary<int, int> serverNumberWDAPortNumber = new Dictionary<int, int>();
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
             if (!command.Contains("webDriverAgentProxyPort"))
@@ -101,7 +104,8 @@ namespace Appium_Wizard
         string currentPlatformName = "none";
         //int proxyPort = 0;
         int screenDensity = 0;
-        Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
+        public static Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
+        public static Dictionary<string, string> UDIDsessionId = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
         string proxiedUDID = "";
         private static DateTime lastExecutionTime = DateTime.MinValue;
@@ -195,7 +199,23 @@ namespace Appium_Wizard
                         if (match1.Success)
                         {
                             currentSessionId = match1.Groups[1].Value;
-                            sessionIdUDID.Add(currentSessionId, currentUDID);
+                            if (sessionIdUDID.ContainsKey(currentSessionId))
+                            {
+                                sessionIdUDID[currentSessionId] = currentUDID;
+                            }
+                            else
+                            {
+                                sessionIdUDID.Add(currentSessionId, currentUDID);
+                            }
+
+                            if (UDIDsessionId.ContainsKey(currentUDID))
+                            {
+                                UDIDsessionId[currentUDID] = currentSessionId;
+                            }
+                            else
+                            {
+                                UDIDsessionId.Add(currentUDID, currentSessionId);
+                            }
                             if (MainScreen.udidProxyPort.ContainsKey(deviceUDID))
                             {
                                 MainScreen.udidProxyPort[currentUDID] = webDriverAgentProxyPort;
@@ -206,6 +226,42 @@ namespace Appium_Wizard
                             }
                         }
                     }
+                    //------------------------
+                    //if (data.Contains("Got response with status 200: {\"sessionId\"") && !data.Contains("\"sessionId\":\"None\""))
+                    //{
+                    //    try
+                    //    {
+                    //        string jsonResponse = GetOnlyJson(data);
+                    //        JObject json = JObject.Parse(jsonResponse);
+                    //        currentSessionId = json["sessionId"].ToString();
+                    //        int startIndex = jsonResponse.IndexOf("\"deviceUDID\":\"") + "\"deviceUDID\":\"".Length;
+                    //        int endIndex = jsonResponse.IndexOf("\"", startIndex);
+                    //        currentUDID = jsonResponse.Substring(startIndex, endIndex - startIndex);
+                    //        if (!string.IsNullOrEmpty(currentUDID) && !string.IsNullOrEmpty(currentSessionId))
+                    //        {
+                    //            if (UDIDsessionId.ContainsKey(currentUDID))
+                    //            {
+                    //                UDIDsessionId[currentUDID] = currentSessionId;
+                    //            }
+                    //            else
+                    //            {
+                    //                UDIDsessionId.Add(currentUDID, currentSessionId);
+                    //            }
+                    //            if (sessionIdUDID.ContainsKey(currentSessionId))
+                    //            {
+                    //                sessionIdUDID[currentSessionId] = currentUDID;
+                    //            }
+                    //            else
+                    //            {
+                    //                sessionIdUDID.Add(currentSessionId, currentUDID);
+                    //            }
+                    //        }
+                    //    }
+                    //    catch (Exception)
+                    //    {
+                    //    }
+
+                    //}
                     //------------------------
 
                     if (data.Contains("POST /session/"))
@@ -285,6 +341,7 @@ namespace Appium_Wizard
                             {
                                 udid = sessionIdUDID[sessionId];
                                 sessionIdUDID.Remove(sessionId);
+                                UDIDsessionId.Remove(udid);
                                 if (MainScreen.DeviceInfo.ContainsKey(udid))
                                 {
                                     string name = MainScreen.DeviceInfo[udid].Item1;
@@ -294,6 +351,7 @@ namespace Appium_Wizard
                                 else
                                 {
                                     string text = "Session Deleted for " + udid;
+                                    //MainScreen.DeviceInfo.Add(udid, Tuple.Create("AndroidDevice","Android"));
                                     UpdateScreenControl(udid, text);
                                 }
                                 if (MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
@@ -391,6 +449,26 @@ namespace Appium_Wizard
 
 
         public bool IsAppiumServerRunning(int port)
+        {
+            var options = new RestClientOptions("http://localhost:" + port)
+            {
+                Timeout = TimeSpan.FromSeconds(5),
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/status", Method.Get);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
+            {
+                return response.Content.Contains("server is ready to accept");
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool IsAppiumServerRunningStatic(int port)
         {
             var options = new RestClientOptions("http://localhost:" + port)
             {
@@ -571,14 +649,159 @@ namespace Appium_Wizard
             }
             return true;
         }
+
+        public static string GetOnlyJson(string text)
+        {
+            Match match = Regex.Match(text, @"\{.*\}");
+            string output;
+            if (match.Success)
+            {
+                output = match.Value;
+            }
+            else
+            {
+                output = "No JSON found in the string";
+            }
+            return output;
+        }
+
+        public async static Task CreateAppiumSession(string os, string udid, int port)
+        {
+            var options = new RestClientOptions("http://localhost:" + port)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            string body = string.Empty;
+            if (os.Equals("Android"))
+            {
+                body = $@"{{""capabilities"":{{""firstMatch"":[{{""platformName"":""Android"",""appium:automationName"":""UiAutomator2"",""appium:udid"":""{udid}"",""appium:newCommandTimeout"":0,""appium:skipServerInstallation"":true,""appium:skipDeviceInitialization"":true,""appium:skipUnlock"":true,""appium:noReset"":true}}]}}}}";
+            }
+            else
+            {
+                body = $@"{{""capabilities"":{{""firstMatch"":[{{""platformName"":""iOS"",""appium:automationName"":""XCUITest"",""appium:udid"":""{udid}"",""appium:newCommandTimeout"":0}}]}}}}";
+            }
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = await client.ExecuteAsync(request);
+        }
+
+        public static int GetAnyRunningServer()
+        {
+            Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
+            for (int i = 1; i <= 5; i++)
+            {
+                var PortNumber = readPortData["PortNumber" + i];
+                if (string.IsNullOrEmpty(PortNumber) || int.Parse(PortNumber) == 0)
+                {
+                    continue;
+                }
+                else
+                {
+                    bool isRunning = IsAppiumServerRunningStatic(int.Parse(PortNumber));
+                    if (isRunning)
+                    {
+                        return int.Parse(PortNumber);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            return 0;
+        }
+
+
+        public async static Task<Dictionary<string,int>> GetSessionIdPortNumber()
+        {
+            Dictionary<string,int> sessionIdPortNumber = new Dictionary<string, int>();
+            Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
+            for (int i = 1; i <= 5; i++)
+            {
+                var PortNumber = readPortData["PortNumber" + i];
+                if (string.IsNullOrEmpty(PortNumber) || int.Parse(PortNumber) == 0)
+                {
+                    continue;
+                }
+                else
+                {
+                    int port = int.Parse(PortNumber);
+                    try
+                    {
+                        var options = new RestClientOptions("http://localhost:"+port)
+                        {
+                            MaxTimeout = -1,
+                        };
+                        var client = new RestClient(options);
+                        var request = new RestRequest("/sessions", Method.Get);
+                        RestResponse response = await client.ExecuteAsync(request);
+                        using JsonDocument doc = JsonDocument.Parse(response.Content);
+                        JsonElement root = doc.RootElement;
+                        JsonElement valueArray = root.GetProperty("value");
+
+                        foreach (JsonElement element in valueArray.EnumerateArray())
+                        {
+                            if (element.TryGetProperty("id", out JsonElement idElement))
+                            {
+                                string id = idElement.GetString();
+                                sessionIdPortNumber.Add(id,port);
+                            }
+                        }
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        return sessionIdPortNumber; 
+                    }
+                }
+            }
+            return sessionIdPortNumber;
+
+
+
+
+
+
+            //List<string> sessionIds = new List<string>();
+            //try
+            //{
+            //    var options = new RestClientOptions("http://localhost:4723")
+            //    {
+            //        MaxTimeout = -1,
+            //    };
+            //    var client = new RestClient(options);
+            //    var request = new RestRequest("/sessions", Method.Get);
+            //    RestResponse response = await client.ExecuteAsync(request);
+
+            //    using JsonDocument doc = JsonDocument.Parse(response.Content);
+            //    JsonElement root = doc.RootElement;
+            //    JsonElement valueArray = root.GetProperty("value");
+
+            //    foreach (JsonElement element in valueArray.EnumerateArray())
+            //    {
+            //        if (element.TryGetProperty("id", out JsonElement idElement))
+            //        {
+            //            string id = idElement.GetString();
+            //            sessionIds.Add(id);
+            //        }
+            //    }
+            //    return sessionIds;
+            //}
+            //catch (Exception ex)
+            //{
+            //    return sessionIds; // Return the list, which will be empty if an exception occurs
+            //}
+        }
     }
 
 
 
     public class ProxyServerManager
     {
-        private const int CheckInterval = 1000; 
-        private const int Timeout =     10000;
+        private const int CheckInterval = 1000;
+        private const int Timeout = 10000;
 
         private bool IsProxyServerReady(string host, int port)
         {

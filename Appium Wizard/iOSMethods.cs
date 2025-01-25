@@ -886,31 +886,21 @@ namespace Appium_Wizard
             }
         }
 
-        public void UnlockScreen(string udid, string password)
+        public void UnlockScreen(string udid, string password, string deviceName)
         {
             if (MainScreen.udidProxyPort.ContainsKey(udid))
             {
-
                 int port = MainScreen.udidProxyPort[udid];
-                iOSAPIMethods.GoToHome(port);
                 string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                 if (!sessionId.Equals("nosession"))
                 {
                     string url = "http://localhost:" + port;
-                    var screenSize = iOSAPIMethods.GetScreenSize(port);
-                    int width = screenSize.Item1;
-                    int height = screenSize.Item2;
-                    int pressX = width / 2;
-                    int pressY = height - 1;
-                    int moveToX = width / 2;
-                    int moveToY = 0;
-                    iOSAPIMethods.Swipe(url, sessionId, pressX, pressY, moveToX, moveToY, 500);
-                    Thread.Sleep(3000);
+                    iOSAPIMethods.Unlock(port);
                     iOSAPIMethods.SendText(url, sessionId, password);
                 }
                 else
                 {
-                    MessageBox.Show("WebDriverAgentRunner is not running iPhone. So, screen unlock failed.");
+                    MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Unlock Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -1878,6 +1868,18 @@ namespace Appium_Wizard
             //var body = $@"{{""actions"":[{{""action"":""press"",""options"":{{""x"":{pressX},""y"":{pressY}}}}},{{""action"":""wait"",""options"":{{""ms"":{waitDuration}}}}},{{""action"":""moveTo"",""options"":{{""x"":{moveToX},""y"":{moveToY}}}}},{{""action"":""release"",""options"":{{}}}}]}}";
             var body = $@"{{""actions"":[{{""type"":""pointer"",""id"":""finger1"",""parameters"":{{""pointerType"":""touch""}},""actions"":[{{""type"":""pointerMove"",""duration"":0,""x"":{pressX},""y"":{pressY}}},{{""type"":""pointerMove"",""duration"":{waitDuration},""origin"":""viewport"",""x"":{moveToX},""y"":{moveToY}}}]}}]}}";
             request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
+
+        public static void Unlock(int proxyPort)
+        {
+            var options = new RestClientOptions("http://localhost:"+proxyPort)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/wda/unlock", Method.Post);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
         }

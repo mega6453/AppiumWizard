@@ -23,7 +23,7 @@ namespace Appium_Wizard
             {
                 NoteForiOSLabel.Visible = false;
             }
-            else 
+            else
             {
                 NoteForiOSLabel.Visible = true;
             }
@@ -35,7 +35,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Unlock Screen - "+deviceName, "Please wait while unlocking screen...");
+            commonProgress.UpdateStepLabel("Unlock Screen - " + deviceName, "Please wait while unlocking screen...");
             await Task.Run(() =>
             {
                 if (os.Equals("Android"))
@@ -44,10 +44,11 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    iOSMethods.GetInstance().UnlockScreen(udid, PasswordTextbox.Text);
+                    iOSMethods.GetInstance().UnlockScreen(udid, PasswordTextbox.Text, deviceName);
                 }
             });
             commonProgress.Close();
+            this.Close();
         }
 
         private void CancelButton_Click(object sender, EventArgs e)

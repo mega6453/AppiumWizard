@@ -466,6 +466,10 @@ namespace Appium_Wizard
                 {                                           // brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        if (screenForm.WindowState.Equals(FormWindowState.Minimized))
+                        {
+                            screenForm.WindowState = FormWindowState.Normal;
+                        }
                         screenForm.Activate();
                         return;
                     }
@@ -481,6 +485,10 @@ namespace Appium_Wizard
                     //Open screen in progress class and brings foreground if opened already
                     if (screenForm.Name.Equals(selectedUDID, StringComparison.InvariantCultureIgnoreCase) | screenForm.Name.Equals(selectedDeviceIP, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        if (screenForm.WindowState.Equals(FormWindowState.Minimized))
+                        {
+                            screenForm.WindowState = FormWindowState.Normal;
+                        }
                         screenForm.Activate();
                         return;
                     }

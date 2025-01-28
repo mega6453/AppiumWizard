@@ -2045,6 +2045,36 @@ namespace Appium_Wizard
             }
         }
 
+        public static Image TakeScreenshot(string URL)
+        {
+            Image image = null;
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+                string jsonString = response.Content;
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    image = Image.FromStream(ms);
+                    return image;
+                }
+            }
+            catch (Exception)
+            {
+                return image;
+            }          
+        }
+
         public static bool IsWDARunning(int port)
         {
             try
@@ -2102,6 +2132,41 @@ namespace Appium_Wizard
             {
                 return "Error";
             }
+        }
+
+        public static string GetPageSource(int port)
+        {
+            string value = "empty";
+            try
+            {
+                string URL = "http://localhost:" + port;
+                string sessionId = GetWDASessionID(URL);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateWDASession(port);
+                    sessionId = GetWDASessionID(URL);
+                }
+                var options = new RestClientOptions(URL)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                {
+                    JsonElement root = doc.RootElement;
+                    value = root.GetProperty("value").GetString();
+                }
+                return value;
+            }
+            catch (Exception)
+            {
+
+                return value;
+            }
+          
         }
     }
 }

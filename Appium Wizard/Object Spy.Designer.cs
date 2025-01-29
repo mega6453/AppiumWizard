@@ -33,13 +33,14 @@
             listView1 = new ListView();
             Property = new ColumnHeader();
             Value = new ColumnHeader();
-            closeButton = new Button();
+            richTextBox1 = new RichTextBox();
+            refreshButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
             // 
-            pictureBox1.Location = new Point(12, 12);
+            pictureBox1.Location = new Point(13, 35);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(275, 426);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -49,7 +50,7 @@
             // 
             // treeView1
             // 
-            treeView1.Location = new Point(295, 12);
+            treeView1.Location = new Point(327, 35);
             treeView1.Name = "treeView1";
             treeView1.Size = new Size(313, 426);
             treeView1.TabIndex = 1;
@@ -58,7 +59,7 @@
             // listView1
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { Property, Value });
-            listView1.Location = new Point(625, 12);
+            listView1.Location = new Point(657, 35);
             listView1.Name = "listView1";
             listView1.Size = new Size(297, 426);
             listView1.TabIndex = 2;
@@ -75,22 +76,31 @@
             Value.Text = "Value";
             Value.Width = 500;
             // 
-            // closeButton
+            // richTextBox1
             // 
-            closeButton.Location = new Point(847, 477);
-            closeButton.Name = "closeButton";
-            closeButton.Size = new Size(75, 23);
-            closeButton.TabIndex = 3;
-            closeButton.Text = "Close";
-            closeButton.UseVisualStyleBackColor = true;
-            closeButton.Click += closeButton_Click;
+            richTextBox1.Location = new Point(328, 467);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(627, 56);
+            richTextBox1.TabIndex = 4;
+            richTextBox1.Text = "";
+            // 
+            // refreshButton
+            // 
+            refreshButton.Location = new Point(191, 6);
+            refreshButton.Name = "refreshButton";
+            refreshButton.Size = new Size(97, 23);
+            refreshButton.TabIndex = 5;
+            refreshButton.Text = "Refresh Screen";
+            refreshButton.UseVisualStyleBackColor = true;
+            refreshButton.Click += refreshButton_Click;
             // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(947, 512);
-            Controls.Add(closeButton);
+            ClientSize = new Size(969, 537);
+            Controls.Add(refreshButton);
+            Controls.Add(richTextBox1);
             Controls.Add(listView1);
             Controls.Add(treeView1);
             Controls.Add(pictureBox1);
@@ -108,6 +118,7 @@
         private ListView listView1;
         private ColumnHeader Property;
         private ColumnHeader Value;
-        private Button closeButton;
+        private RichTextBox richTextBox1;
+        private Button refreshButton;
     }
 }

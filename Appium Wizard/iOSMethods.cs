@@ -2072,7 +2072,7 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return image;
-            }          
+            }
         }
 
         public static bool IsWDARunning(int port)

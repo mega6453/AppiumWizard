@@ -254,7 +254,7 @@ namespace Appium_Wizard
                 xmlDoc.LoadXml(xmlContent);
 
                 // Attempt to select nodes using the XPath expression
-                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(xpathTextbox.Text);
+                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterTextbox.Text);
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -272,7 +272,7 @@ namespace Appium_Wizard
                         }
                     }
 
-                    xpathTextbox.ForeColor = Color.Black;
+                    filterTextbox.ForeColor = Color.Black;
                     TotalElementCount.Text = $"{matchingNodes.Count}";
 
                     if (matchingNodes.Count > 0)
@@ -283,18 +283,18 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    xpathTextbox.ForeColor = Color.Red;
+                    filterTextbox.ForeColor = Color.Red;
                     TotalElementCount.Text = "0";
                 }
             }
             catch (XPathException)
             {
-                xpathTextbox.ForeColor = Color.Red;
+                filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
             }
             catch (XmlException)
             {
-                xpathTextbox.ForeColor = Color.Red;
+                filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
             }
         }
@@ -413,10 +413,11 @@ namespace Appium_Wizard
                     item.Selected = true;
 
                     // Show the context menu at the cursor position
-                    contextMenuStrip1.Show(listView1, e.Location);
+                    listViewContextMenuStrip.Show(listView1, e.Location);
                 }
             }
         }
+
 
         private void copyXpathToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -436,7 +437,7 @@ namespace Appium_Wizard
                 string xpath = $"//*[{combinedPredicate}]";
                 Clipboard.SetText(xpath);
             }
-            else if (listView1.SelectedItems.Count == 0) //one row selected
+            else
             {
                 ListViewItem selectedItem = listView1.SelectedItems[0];
                 string property = selectedItem.Text;
@@ -444,7 +445,7 @@ namespace Appium_Wizard
 
                 string xpathPredicate = $"@{property}='{value}'";
                 string xpath = $"//*[{xpathPredicate}]";
-                Clipboard.SetText(xpath);               
+                Clipboard.SetText(xpath);
             }
         }
 
@@ -464,51 +465,143 @@ namespace Appium_Wizard
 
                 string combinedPredicate = string.Join(" and ", predicates);
 
-                if (!string.IsNullOrWhiteSpace(xpathTextbox.Text))
+                if (!string.IsNullOrWhiteSpace(filterTextbox.Text))
                 {
                     // Append the new combined predicates within the same XPath query
-                    if (xpathTextbox.Text.EndsWith("]"))
+                    if (filterTextbox.Text.EndsWith("]"))
                     {
-                        xpathTextbox.Text = xpathTextbox.Text.TrimEnd(']') + $" and {combinedPredicate}]";
+                        filterTextbox.Text = filterTextbox.Text.TrimEnd(']') + $" and {combinedPredicate}]";
                     }
                     else
                     {
-                        xpathTextbox.Text += $" and {combinedPredicate}";
+                        filterTextbox.Text += $" and {combinedPredicate}";
                     }
                 }
                 else
                 {
                     // Set the initial XPath expression
-                    xpathTextbox.Text = $"//*[{combinedPredicate}]";
+                    filterTextbox.Text = $"//*[{combinedPredicate}]";
                 }
             }
-            else if (listView1.SelectedItems.Count == 0) //one row selected
+            else
             {
                 ListViewItem selectedItem = listView1.SelectedItems[0];
                 string property = selectedItem.Text;
                 string value = selectedItem.SubItems[1].Text;
 
                 string xpathPredicate = $"@{property}='{value}'";
-                if (!string.IsNullOrWhiteSpace(xpathTextbox.Text))
+                if (!string.IsNullOrWhiteSpace(filterTextbox.Text))
                 {
                     // Append the new predicate within the same XPath query
                     // Split the existing XPath to remove the last ']' before appending
-                    if (xpathTextbox.Text.EndsWith("]"))
+                    if (filterTextbox.Text.EndsWith("]"))
                     {
-                        xpathTextbox.Text = xpathTextbox.Text.TrimEnd(']') + $" and {xpathPredicate}]";
+                        filterTextbox.Text = filterTextbox.Text.TrimEnd(']') + $" and {xpathPredicate}]";
                     }
                     else
                     {
-                        xpathTextbox.Text += $" and {xpathPredicate}";
+                        filterTextbox.Text += $" and {xpathPredicate}";
                     }
                 }
                 else
                 {
                     // Set the initial XPath expression
-                    xpathTextbox.Text = $"//*[{xpathPredicate}]";
+                    filterTextbox.Text = $"//*[{xpathPredicate}]";
                 }
-            }          
+            }
         }
+
+        private void copyUniqueXpathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
+            {
+                string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
+                Clipboard.SetText(uniqueXPath);
+            }
+        }
+
+
+
+        private void treeView1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // Select the node under the mouse pointer
+                TreeNode selectedNode = treeView1.GetNodeAt(e.X, e.Y);
+                if (selectedNode != null)
+                {
+                    treeView1.SelectedNode = selectedNode;
+
+                    // Show the context menu at the mouse position
+                    treeViewContextMenuStrip.Show(treeView1, e.Location);
+                }
+            }
+        }
+
+
+        private string GenerateUniqueXPath(XmlNode node)
+        {
+            // List of attributes to consider for creating a unique XPath
+            string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+
+            // Start with the node name
+            string xpath = "//" + node.Name;
+
+            // Check each preferred attribute
+            foreach (string attr in preferredAttributes)
+            {
+                if (node.Attributes[attr] != null)
+                {
+                    xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
+                    return xpath;
+                }
+            }
+
+            // If no preferred attributes are found, check for inner text
+            if (!string.IsNullOrWhiteSpace(node.InnerText))
+            {
+                xpath += $"[text()='{node.InnerText.Trim()}']";
+                return xpath;
+            }
+
+            // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
+            while (node.ParentNode != null)
+            {
+                XmlNode parentNode = node.ParentNode;
+                int index = 1;
+
+                // Count the index of the node among its siblings with the same name
+                foreach (XmlNode sibling in parentNode.ChildNodes)
+                {
+                    if (sibling == node)
+                    {
+                        break;
+                    }
+                    if (sibling.Name == node.Name)
+                    {
+                        index++;
+                    }
+                }
+
+                // Append the current node's position to the XPath
+                xpath = "/" + parentNode.Name + "/" + node.Name + "[" + index + "]" + xpath;
+
+                // Move to the parent node
+                node = parentNode;
+            }
+
+            return xpath;
+        }
+
+        private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
+            {
+                string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
+                filterTextbox.Text = uniqueXPath;
+            }
+        }
+
 
 
 

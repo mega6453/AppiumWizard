@@ -34,18 +34,22 @@
             listView1 = new ListView();
             Property = new ColumnHeader();
             Value = new ColumnHeader();
-            xpathTextbox = new RichTextBox();
+            filterTextbox = new RichTextBox();
             refreshButton = new Button();
             elementNumberTextbox = new TextBox();
             label1 = new Label();
             TotalElementCount = new Label();
             previousButton = new Button();
             nextButton = new Button();
-            contextMenuStrip1 = new ContextMenuStrip(components);
+            listViewContextMenuStrip = new ContextMenuStrip(components);
             copyXpathToolStripMenuItem = new ToolStripMenuItem();
             addToFilterToolStripMenuItem = new ToolStripMenuItem();
+            treeViewContextMenuStrip = new ContextMenuStrip(components);
+            copyUniqueXpathToolStripMenuItem = new ToolStripMenuItem();
+            addUniqueXpathToFilterToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            contextMenuStrip1.SuspendLayout();
+            listViewContextMenuStrip.SuspendLayout();
+            treeViewContextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -65,6 +69,7 @@
             treeView1.Size = new Size(313, 426);
             treeView1.TabIndex = 1;
             treeView1.AfterSelect += TreeView_AfterSelect;
+            treeView1.MouseUp += treeView1_MouseUp;
             // 
             // listView1
             // 
@@ -90,14 +95,14 @@
             Value.Text = "Value";
             Value.Width = 500;
             // 
-            // xpathTextbox
+            // filterTextbox
             // 
-            xpathTextbox.Location = new Point(328, 467);
-            xpathTextbox.Name = "xpathTextbox";
-            xpathTextbox.Size = new Size(506, 58);
-            xpathTextbox.TabIndex = 4;
-            xpathTextbox.Text = "";
-            xpathTextbox.TextChanged += xpathTextbox_TextChanged;
+            filterTextbox.Location = new Point(328, 467);
+            filterTextbox.Name = "filterTextbox";
+            filterTextbox.Size = new Size(506, 58);
+            filterTextbox.TabIndex = 4;
+            filterTextbox.Text = "";
+            filterTextbox.TextChanged += xpathTextbox_TextChanged;
             // 
             // refreshButton
             // 
@@ -158,25 +163,45 @@
             nextButton.UseVisualStyleBackColor = true;
             nextButton.Click += nextButton_Click;
             // 
-            // contextMenuStrip1
+            // listViewContextMenuStrip
             // 
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { copyXpathToolStripMenuItem, addToFilterToolStripMenuItem });
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(181, 70);
+            listViewContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyXpathToolStripMenuItem, addToFilterToolStripMenuItem });
+            listViewContextMenuStrip.Name = "contextMenuStrip1";
+            listViewContextMenuStrip.Size = new Size(140, 48);
             // 
             // copyXpathToolStripMenuItem
             // 
             copyXpathToolStripMenuItem.Name = "copyXpathToolStripMenuItem";
-            copyXpathToolStripMenuItem.Size = new Size(180, 22);
+            copyXpathToolStripMenuItem.Size = new Size(139, 22);
             copyXpathToolStripMenuItem.Text = "Copy XPath";
             copyXpathToolStripMenuItem.Click += copyXpathToolStripMenuItem_Click;
             // 
             // addToFilterToolStripMenuItem
             // 
             addToFilterToolStripMenuItem.Name = "addToFilterToolStripMenuItem";
-            addToFilterToolStripMenuItem.Size = new Size(180, 22);
+            addToFilterToolStripMenuItem.Size = new Size(139, 22);
             addToFilterToolStripMenuItem.Text = "Add to Filter";
             addToFilterToolStripMenuItem.Click += addToFilterToolStripMenuItem_Click;
+            // 
+            // treeViewContextMenuStrip
+            // 
+            treeViewContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyUniqueXpathToolStripMenuItem, addUniqueXpathToFilterToolStripMenuItem });
+            treeViewContextMenuStrip.Name = "treeViewContextMenuStrip";
+            treeViewContextMenuStrip.Size = new Size(215, 48);
+            // 
+            // copyUniqueXpathToolStripMenuItem
+            // 
+            copyUniqueXpathToolStripMenuItem.Name = "copyUniqueXpathToolStripMenuItem";
+            copyUniqueXpathToolStripMenuItem.Size = new Size(214, 22);
+            copyUniqueXpathToolStripMenuItem.Text = "Copy Unique Xpath";
+            copyUniqueXpathToolStripMenuItem.Click += copyUniqueXpathToolStripMenuItem_Click;
+            // 
+            // addUniqueXpathToFilterToolStripMenuItem
+            // 
+            addUniqueXpathToFilterToolStripMenuItem.Name = "addUniqueXpathToFilterToolStripMenuItem";
+            addUniqueXpathToFilterToolStripMenuItem.Size = new Size(214, 22);
+            addUniqueXpathToFilterToolStripMenuItem.Text = "Add Unique Xpath to Filter";
+            addUniqueXpathToFilterToolStripMenuItem.Click += addUniqueXpathToFilterToolStripMenuItem_Click;
             // 
             // Object_Spy
             // 
@@ -189,7 +214,7 @@
             Controls.Add(label1);
             Controls.Add(elementNumberTextbox);
             Controls.Add(refreshButton);
-            Controls.Add(xpathTextbox);
+            Controls.Add(filterTextbox);
             Controls.Add(listView1);
             Controls.Add(treeView1);
             Controls.Add(pictureBox1);
@@ -197,7 +222,8 @@
             Text = "Object Spy";
             Load += Object_Spy_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            contextMenuStrip1.ResumeLayout(false);
+            listViewContextMenuStrip.ResumeLayout(false);
+            treeViewContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -209,15 +235,18 @@
         private ListView listView1;
         private ColumnHeader Property;
         private ColumnHeader Value;
-        private RichTextBox xpathTextbox;
+        private RichTextBox filterTextbox;
         private Button refreshButton;
         private TextBox elementNumberTextbox;
         private Label label1;
         private Label TotalElementCount;
         private Button previousButton;
         private Button nextButton;
-        private ContextMenuStrip contextMenuStrip1;
+        private ContextMenuStrip listViewContextMenuStrip;
         private ToolStripMenuItem addToFilterToolStripMenuItem;
         private ToolStripMenuItem copyXpathToolStripMenuItem;
+        private ContextMenuStrip treeViewContextMenuStrip;
+        private ToolStripMenuItem copyUniqueXpathToolStripMenuItem;
+        private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem;
     }
 }

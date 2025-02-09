@@ -243,49 +243,6 @@ namespace Appium_Wizard
             commonProgress.Close();
         }
 
-
-        //private void xpathTextbox_TextChanged(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        XmlDocument xmlDoc = new XmlDocument();
-        //        xmlDoc.LoadXml(xmlContent);
-
-        //        // Attempt to select a node using the XPath expression
-        //        XmlNode selectedXmlNode = xmlDoc.SelectSingleNode(xpathTextbox.Text);
-
-        //        if (selectedXmlNode != null)
-        //        {
-        //            // Find the corresponding TreeNode
-        //            TreeNode matchingNode = FindTreeNodeByXmlNode(treeView1.Nodes, selectedXmlNode);
-
-        //            if (matchingNode != null)
-        //            {
-        //                xpathTextbox.ForeColor = Color.Black;
-        //                treeView1.SelectedNode = matchingNode;
-        //                treeView1.SelectedNode.EnsureVisible();
-        //            }
-        //            else
-        //            {
-        //                xpathTextbox.ForeColor = Color.Red;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            xpathTextbox.ForeColor = Color.Red;
-        //        }
-        //    }
-        //    catch (XPathException)
-        //    {
-        //        xpathTextbox.ForeColor = Color.Red;
-        //    }
-        //    catch (XmlException)
-        //    {
-        //        xpathTextbox.ForeColor = Color.Red;
-        //    }
-        //}
-
-
         private List<TreeNode> matchingNodes = new List<TreeNode>();
         private int currentIndex = -1;
 
@@ -443,6 +400,114 @@ namespace Appium_Wizard
             {
                 elementNumberTextbox.ForeColor = Color.Red; // Non-numeric input
             }
+        }
+        private void listView1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // Check if a ListViewItem is under the cursor
+                ListViewItem item = listView1.GetItemAt(e.X, e.Y);
+                if (item != null)
+                {
+                    // Select the item under the cursor
+                    item.Selected = true;
+
+                    // Show the context menu at the cursor position
+                    contextMenuStrip1.Show(listView1, e.Location);
+                }
+            }
+        }
+
+        private void copyXpathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 1) // multiple row selected
+            {
+                var predicates = new List<string>();
+
+                foreach (ListViewItem selectedItem in listView1.SelectedItems)
+                {
+                    string property = selectedItem.Text;
+                    string value = selectedItem.SubItems[1].Text;
+                    string xpathPredicate = $"@{property}='{value}'";
+                    predicates.Add(xpathPredicate);
+                }
+
+                string combinedPredicate = string.Join(" and ", predicates);
+                string xpath = $"//*[{combinedPredicate}]";
+                Clipboard.SetText(xpath);
+            }
+            else if (listView1.SelectedItems.Count == 0) //one row selected
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string property = selectedItem.Text;
+                string value = selectedItem.SubItems[1].Text;
+
+                string xpathPredicate = $"@{property}='{value}'";
+                string xpath = $"//*[{xpathPredicate}]";
+                Clipboard.SetText(xpath);               
+            }
+        }
+
+        private void addToFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 1) // multiple row selected
+            {
+                var predicates = new List<string>();
+
+                foreach (ListViewItem selectedItem in listView1.SelectedItems)
+                {
+                    string property = selectedItem.Text;
+                    string value = selectedItem.SubItems[1].Text;
+                    string xpathPredicate = $"@{property}='{value}'";
+                    predicates.Add(xpathPredicate);
+                }
+
+                string combinedPredicate = string.Join(" and ", predicates);
+
+                if (!string.IsNullOrWhiteSpace(xpathTextbox.Text))
+                {
+                    // Append the new combined predicates within the same XPath query
+                    if (xpathTextbox.Text.EndsWith("]"))
+                    {
+                        xpathTextbox.Text = xpathTextbox.Text.TrimEnd(']') + $" and {combinedPredicate}]";
+                    }
+                    else
+                    {
+                        xpathTextbox.Text += $" and {combinedPredicate}";
+                    }
+                }
+                else
+                {
+                    // Set the initial XPath expression
+                    xpathTextbox.Text = $"//*[{combinedPredicate}]";
+                }
+            }
+            else if (listView1.SelectedItems.Count == 0) //one row selected
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string property = selectedItem.Text;
+                string value = selectedItem.SubItems[1].Text;
+
+                string xpathPredicate = $"@{property}='{value}'";
+                if (!string.IsNullOrWhiteSpace(xpathTextbox.Text))
+                {
+                    // Append the new predicate within the same XPath query
+                    // Split the existing XPath to remove the last ']' before appending
+                    if (xpathTextbox.Text.EndsWith("]"))
+                    {
+                        xpathTextbox.Text = xpathTextbox.Text.TrimEnd(']') + $" and {xpathPredicate}]";
+                    }
+                    else
+                    {
+                        xpathTextbox.Text += $" and {xpathPredicate}";
+                    }
+                }
+                else
+                {
+                    // Set the initial XPath expression
+                    xpathTextbox.Text = $"//*[{xpathPredicate}]";
+                }
+            }          
         }
 
 

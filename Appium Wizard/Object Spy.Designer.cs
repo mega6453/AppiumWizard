@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pictureBox1 = new PictureBox();
             treeView1 = new TreeView();
             listView1 = new ListView();
@@ -40,7 +41,11 @@
             TotalElementCount = new Label();
             previousButton = new Button();
             nextButton = new Button();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            copyXpathToolStripMenuItem = new ToolStripMenuItem();
+            addToFilterToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -64,12 +69,16 @@
             // listView1
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { Property, Value });
+            listView1.FullRowSelect = true;
+            listView1.GridLines = true;
+            listView1.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listView1.Location = new Point(657, 35);
             listView1.Name = "listView1";
             listView1.Size = new Size(297, 426);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
+            listView1.MouseUp += listView1_MouseUp;
             // 
             // Property
             // 
@@ -149,6 +158,26 @@
             nextButton.UseVisualStyleBackColor = true;
             nextButton.Click += nextButton_Click;
             // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { copyXpathToolStripMenuItem, addToFilterToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(181, 70);
+            // 
+            // copyXpathToolStripMenuItem
+            // 
+            copyXpathToolStripMenuItem.Name = "copyXpathToolStripMenuItem";
+            copyXpathToolStripMenuItem.Size = new Size(180, 22);
+            copyXpathToolStripMenuItem.Text = "Copy XPath";
+            copyXpathToolStripMenuItem.Click += copyXpathToolStripMenuItem_Click;
+            // 
+            // addToFilterToolStripMenuItem
+            // 
+            addToFilterToolStripMenuItem.Name = "addToFilterToolStripMenuItem";
+            addToFilterToolStripMenuItem.Size = new Size(180, 22);
+            addToFilterToolStripMenuItem.Text = "Add to Filter";
+            addToFilterToolStripMenuItem.Click += addToFilterToolStripMenuItem_Click;
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -168,6 +197,7 @@
             Text = "Object Spy";
             Load += Object_Spy_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -186,5 +216,8 @@
         private Label TotalElementCount;
         private Button previousButton;
         private Button nextButton;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem addToFilterToolStripMenuItem;
+        private ToolStripMenuItem copyXpathToolStripMenuItem;
     }
 }

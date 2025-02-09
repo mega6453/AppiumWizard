@@ -291,7 +291,7 @@ namespace Appium_Wizard
         private void SetWebViewSize(int width, int height)
         {
             ScreenWebView.Width = width;
-            ScreenWebView.Height = height;
+            ScreenWebView.Height = height + toolStrip1.Height + toolStrip2.Height;
         }
 
         private void GetMouseCoordinate(object sender, MouseEventArgs e)

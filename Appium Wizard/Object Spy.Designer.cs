@@ -33,8 +33,13 @@
             listView1 = new ListView();
             Property = new ColumnHeader();
             Value = new ColumnHeader();
-            richTextBox1 = new RichTextBox();
+            xpathTextbox = new RichTextBox();
             refreshButton = new Button();
+            elementNumberTextbox = new TextBox();
+            label1 = new Label();
+            TotalElementCount = new Label();
+            previousButton = new Button();
+            nextButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -76,13 +81,14 @@
             Value.Text = "Value";
             Value.Width = 500;
             // 
-            // richTextBox1
+            // xpathTextbox
             // 
-            richTextBox1.Location = new Point(328, 467);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(627, 56);
-            richTextBox1.TabIndex = 4;
-            richTextBox1.Text = "";
+            xpathTextbox.Location = new Point(328, 467);
+            xpathTextbox.Name = "xpathTextbox";
+            xpathTextbox.Size = new Size(506, 58);
+            xpathTextbox.TabIndex = 4;
+            xpathTextbox.Text = "";
+            xpathTextbox.TextChanged += xpathTextbox_TextChanged;
             // 
             // refreshButton
             // 
@@ -94,13 +100,67 @@
             refreshButton.UseVisualStyleBackColor = true;
             refreshButton.Click += refreshButton_Click;
             // 
+            // elementNumberTextbox
+            // 
+            elementNumberTextbox.BorderStyle = BorderStyle.None;
+            elementNumberTextbox.Location = new Point(840, 472);
+            elementNumberTextbox.Name = "elementNumberTextbox";
+            elementNumberTextbox.Size = new Size(26, 16);
+            elementNumberTextbox.TabIndex = 6;
+            elementNumberTextbox.TextChanged += elementNumberTextbox_TextChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(867, 473);
+            label1.Name = "label1";
+            label1.Size = new Size(12, 15);
+            label1.TabIndex = 7;
+            label1.Text = "/";
+            // 
+            // TotalElementCount
+            // 
+            TotalElementCount.AutoSize = true;
+            TotalElementCount.Location = new Point(875, 473);
+            TotalElementCount.Name = "TotalElementCount";
+            TotalElementCount.Size = new Size(12, 15);
+            TotalElementCount.TabIndex = 8;
+            TotalElementCount.Text = "-";
+            // 
+            // previousButton
+            // 
+            previousButton.AutoSize = true;
+            previousButton.Location = new Point(902, 467);
+            previousButton.Name = "previousButton";
+            previousButton.Size = new Size(25, 25);
+            previousButton.TabIndex = 9;
+            previousButton.Text = "<";
+            previousButton.UseVisualStyleBackColor = true;
+            previousButton.Click += previousButton_Click;
+            // 
+            // nextButton
+            // 
+            nextButton.AutoSize = true;
+            nextButton.Location = new Point(928, 467);
+            nextButton.Name = "nextButton";
+            nextButton.Size = new Size(25, 25);
+            nextButton.TabIndex = 10;
+            nextButton.Text = ">";
+            nextButton.UseVisualStyleBackColor = true;
+            nextButton.Click += nextButton_Click;
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(969, 537);
+            Controls.Add(nextButton);
+            Controls.Add(previousButton);
+            Controls.Add(TotalElementCount);
+            Controls.Add(label1);
+            Controls.Add(elementNumberTextbox);
             Controls.Add(refreshButton);
-            Controls.Add(richTextBox1);
+            Controls.Add(xpathTextbox);
             Controls.Add(listView1);
             Controls.Add(treeView1);
             Controls.Add(pictureBox1);
@@ -109,6 +169,7 @@
             Load += Object_Spy_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -118,7 +179,12 @@
         private ListView listView1;
         private ColumnHeader Property;
         private ColumnHeader Value;
-        private RichTextBox richTextBox1;
+        private RichTextBox xpathTextbox;
         private Button refreshButton;
+        private TextBox elementNumberTextbox;
+        private Label label1;
+        private Label TotalElementCount;
+        private Button previousButton;
+        private Button nextButton;
     }
 }

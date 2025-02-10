@@ -2163,7 +2163,6 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-
                 return value;
             }
           

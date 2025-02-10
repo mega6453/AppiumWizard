@@ -3,6 +3,7 @@ using RestSharp;
 using System.Diagnostics;
 using System.Management;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -826,7 +827,8 @@ namespace Appium_Wizard
             var request = new RestRequest("/session", Method.Post);
             request.AddHeader("Content-Type", "application/json");
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
-            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
+            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2""}}}}";
+            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
             //var body = "{\"capabilities\":{\"firstMatch\":[{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\",\"platform\":\"LINUX\",\"webStorageEnabled\":false,\"takesScreenshot\":true,\"javascriptEnabled\":true,\"databaseEnabled\":false,\"networkConnectionEnabled\":true,\"locationContextEnabled\":false,\"warnings\":{},\"desired\":{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\"}},\"deviceName\":\"R5CN3172FHT\",\"deviceUDID\":\"R5CN3172FHT\"}],\"alwaysMatch\":{}}";
 
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
@@ -934,5 +936,72 @@ namespace Appium_Wizard
             }
         }
 
+        public static string GetPageSource(int port)
+        {
+            string value = "empty";
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port,6666);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/source", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                {
+                    JsonElement root = doc.RootElement;
+                    value = root.GetProperty("value").GetString();
+                }
+                return value;
+            }
+            catch (Exception)
+            {
+                return value;
+            }
+        }
+
+        public static Image TakeScreenshot(int port)
+        {
+            Image image = null;
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port, 6666);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+                string jsonString = response.Content;
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    image = Image.FromStream(ms);
+                    return image;
+                }
+            }
+            catch (Exception)
+            {
+                return image;
+            }
+        }
     }
 }

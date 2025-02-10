@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.XPath;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Appium_Wizard
 {
@@ -13,12 +12,21 @@ namespace Appium_Wizard
         int port, width, height;
         Image screenshot;
         string xmlContent;
-        public Object_Spy(int port, int width, int height)
+        bool isAndroid;
+        public Object_Spy(string os, int port, int width, int height)
         {
             this.port = port;
             this.width = width;
             this.height = height;
             InitializeComponent();
+            if (os.Equals("Android"))
+            {
+                isAndroid = true;
+            }
+            else
+            {
+                isAndroid = false;
+            }
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -34,25 +42,69 @@ namespace Appium_Wizard
             DrawRectangleOnImage(screenshot, actualX, actualY, 100, 100);
         }
 
-        private void Object_Spy_Load(object sender, EventArgs e)
+        private async void Object_Spy_Load(object sender, EventArgs e)
         {
+            FetchScreen();
+        }
+
+        private async void FetchScreen()
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 20);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
-            screenshot = iOSAPIMethods.TakeScreenshot(url);
-
+            await Task.Run(() =>
+            {
+                if (isAndroid)
+                {
+                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
+                }
+                else
+                {
+                    screenshot = iOSAPIMethods.TakeScreenshot(url);
+                }
+            });
+            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 50);
             if (screenshot == null)
             {
-                MessageBox.Show("Failed to retreive screenshot.", "Opening Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to retreive screenshot.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                //image = screenshot;
                 pictureBox1.Image = screenshot;
-                xmlContent = iOSAPIMethods.GetPageSource(port);
-                LoadXmlToTreeView(xmlContent);
-                treeView1.ExpandAll();
+                string xml = "empty";
+                await Task.Run(() =>
+                {
+                    if (isAndroid)
+                    {
+                        xml = AndroidAPIMethods.GetPageSource(port);
+                    }
+                    else
+                    {
+                        xml = iOSAPIMethods.GetPageSource(port);
+                    }
+                });
+                commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 70);
+                if (xml.Equals("empty"))
+                {
+                    MessageBox.Show("Failed to fetch page source.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    await Task.Run(() =>
+                    {
+                        LoadXmlToTreeView(xml);
+                    });
+                    commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 90);
+                    listView1.Items.Clear();
+                    treeView1.ExpandAll();
+                }
             }
+            commonProgress.Close();
         }
+
 
         private void LoadXmlToTreeView(string xmlContent)
         {
@@ -204,44 +256,7 @@ namespace Appium_Wizard
         //}
         private async void refreshButton_Click(object sender, EventArgs e)
         {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Refresh Screen", "Please wait while fetching screen...", 20);
-            string url = "http://localhost:" + port;
-            await Task.Run(() =>
-            {
-                screenshot = iOSAPIMethods.TakeScreenshot(url);
-            });
-            commonProgress.UpdateStepLabel("Refresh Screen", "Please wait while fetching screen...", 50);
-            if (screenshot == null)
-            {
-                MessageBox.Show("Failed to retreive screenshot.", "Refresh Screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                pictureBox1.Image = screenshot;
-                string xml = "empty";
-                await Task.Run(() =>
-                {
-                    xml = iOSAPIMethods.GetPageSource(port);
-                });
-                commonProgress.UpdateStepLabel("Refresh Screen", "Please wait while fetching screen...", 70);
-                if (xml.Equals("empty"))
-                {
-                    MessageBox.Show("Failed to fetch page source.", "Refresh Screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    await Task.Run(() =>
-                    {
-                        LoadXmlToTreeView(xml);
-                    });
-                    commonProgress.UpdateStepLabel("Refresh Screen", "Please wait while fetching screen...", 90);
-                    listView1.Items.Clear();
-                    treeView1.ExpandAll();
-                }
-            }
-            commonProgress.Close();
+            FetchScreen();
         }
 
         private List<TreeNode> matchingNodes = new List<TreeNode>();

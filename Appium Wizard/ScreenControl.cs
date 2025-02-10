@@ -208,7 +208,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadScreen");
+            GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +260,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
+            GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -660,7 +660,7 @@ namespace Appium_Wizard
                 }
             });
 
-           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
+            GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)
@@ -782,8 +782,8 @@ namespace Appium_Wizard
 
         private void UnlockScreen_Click(object sender, EventArgs e)
         {
-                    EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
-                    enterPassword.ShowDialog();
+            EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+            enterPassword.ShowDialog();
             GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
@@ -866,6 +866,12 @@ namespace Appium_Wizard
                 Console.WriteLine("Exception" + exception);
                 GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
+        }
+
+        private void objectSpyButton_Click(object sender, EventArgs e)
+        {
+            Object_Spy object_Spy = new Object_Spy(OSType,proxyPort,width,height);
+            object_Spy.Show();
         }
     }
 }

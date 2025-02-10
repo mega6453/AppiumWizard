@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Object_Spy));
             pictureBox1 = new PictureBox();
             treeView1 = new TreeView();
             listView1 = new ListView();
@@ -47,6 +48,9 @@
             treeViewContextMenuStrip = new ContextMenuStrip(components);
             copyUniqueXpathToolStripMenuItem = new ToolStripMenuItem();
             addUniqueXpathToFilterToolStripMenuItem = new ToolStripMenuItem();
+            hierarchyLabel = new Label();
+            propertiesLabel = new Label();
+            filterLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
@@ -88,7 +92,7 @@
             // Property
             // 
             Property.Text = "Property";
-            Property.Width = 100;
+            Property.Width = 150;
             // 
             // Value
             // 
@@ -97,9 +101,9 @@
             // 
             // filterTextbox
             // 
-            filterTextbox.Location = new Point(328, 467);
+            filterTextbox.Location = new Point(328, 484);
             filterTextbox.Name = "filterTextbox";
-            filterTextbox.Size = new Size(506, 58);
+            filterTextbox.Size = new Size(506, 50);
             filterTextbox.TabIndex = 4;
             filterTextbox.Text = "";
             filterTextbox.TextChanged += xpathTextbox_TextChanged;
@@ -117,7 +121,7 @@
             // elementNumberTextbox
             // 
             elementNumberTextbox.BorderStyle = BorderStyle.None;
-            elementNumberTextbox.Location = new Point(840, 472);
+            elementNumberTextbox.Location = new Point(840, 484);
             elementNumberTextbox.Name = "elementNumberTextbox";
             elementNumberTextbox.Size = new Size(26, 16);
             elementNumberTextbox.TabIndex = 6;
@@ -126,7 +130,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(867, 473);
+            label1.Location = new Point(867, 485);
             label1.Name = "label1";
             label1.Size = new Size(12, 15);
             label1.TabIndex = 7;
@@ -135,7 +139,7 @@
             // TotalElementCount
             // 
             TotalElementCount.AutoSize = true;
-            TotalElementCount.Location = new Point(875, 473);
+            TotalElementCount.Location = new Point(875, 485);
             TotalElementCount.Name = "TotalElementCount";
             TotalElementCount.Size = new Size(12, 15);
             TotalElementCount.TabIndex = 8;
@@ -144,7 +148,7 @@
             // previousButton
             // 
             previousButton.AutoSize = true;
-            previousButton.Location = new Point(902, 467);
+            previousButton.Location = new Point(902, 479);
             previousButton.Name = "previousButton";
             previousButton.Size = new Size(25, 25);
             previousButton.TabIndex = 9;
@@ -155,7 +159,7 @@
             // nextButton
             // 
             nextButton.AutoSize = true;
-            nextButton.Location = new Point(928, 467);
+            nextButton.Location = new Point(928, 479);
             nextButton.Name = "nextButton";
             nextButton.Size = new Size(25, 25);
             nextButton.TabIndex = 10;
@@ -203,11 +207,44 @@
             addUniqueXpathToFilterToolStripMenuItem.Text = "Add Unique Xpath to Filter";
             addUniqueXpathToFilterToolStripMenuItem.Click += addUniqueXpathToFilterToolStripMenuItem_Click;
             // 
+            // hierarchyLabel
+            // 
+            hierarchyLabel.AutoSize = true;
+            hierarchyLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            hierarchyLabel.Location = new Point(328, 17);
+            hierarchyLabel.Name = "hierarchyLabel";
+            hierarchyLabel.Size = new Size(77, 15);
+            hierarchyLabel.TabIndex = 11;
+            hierarchyLabel.Text = "UI Hierarchy";
+            // 
+            // propertiesLabel
+            // 
+            propertiesLabel.AutoSize = true;
+            propertiesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            propertiesLabel.Location = new Point(657, 17);
+            propertiesLabel.Name = "propertiesLabel";
+            propertiesLabel.Size = new Size(65, 15);
+            propertiesLabel.TabIndex = 12;
+            propertiesLabel.Text = "Properties";
+            // 
+            // filterLabel
+            // 
+            filterLabel.AutoSize = true;
+            filterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            filterLabel.Location = new Point(326, 468);
+            filterLabel.Name = "filterLabel";
+            filterLabel.Size = new Size(132, 15);
+            filterLabel.TabIndex = 13;
+            filterLabel.Text = "Filter (XPath Validator)";
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(969, 537);
+            Controls.Add(filterLabel);
+            Controls.Add(propertiesLabel);
+            Controls.Add(hierarchyLabel);
             Controls.Add(nextButton);
             Controls.Add(previousButton);
             Controls.Add(TotalElementCount);
@@ -218,6 +255,8 @@
             Controls.Add(listView1);
             Controls.Add(treeView1);
             Controls.Add(pictureBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Object_Spy";
             Text = "Object Spy";
             Load += Object_Spy_Load;
@@ -248,5 +287,8 @@
         private ContextMenuStrip treeViewContextMenuStrip;
         private ToolStripMenuItem copyUniqueXpathToolStripMenuItem;
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem;
+        private Label hierarchyLabel;
+        private Label propertiesLabel;
+        private Label filterLabel;
     }
 }

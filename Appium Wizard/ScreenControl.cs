@@ -277,9 +277,8 @@ namespace Appium_Wizard
             ScreenWebView.CoreWebView2InitializationCompleted += InitializationCompleted;
             await ScreenWebView.EnsureCoreWebView2Async(env);
             Controls.Add(ScreenWebView);
-
-
         }
+
         private async void InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (e.IsSuccess)
@@ -288,6 +287,7 @@ namespace Appium_Wizard
                     ScreenWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(canvasFunction);
             }
         }
+
         private void SetWebViewSize(int width, int height)
         {
             ScreenWebView.Width = width;

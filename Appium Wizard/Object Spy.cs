@@ -74,20 +74,19 @@ namespace Appium_Wizard
             else
             {
                 pictureBox1.Image = screenshot;
-                string xml = "empty";
                 await Task.Run(() =>
                 {
                     if (isAndroid)
                     {
-                        xml = AndroidAPIMethods.GetPageSource(port);
+                        xmlContent = AndroidAPIMethods.GetPageSource(port);
                     }
                     else
                     {
-                        xml = iOSAPIMethods.GetPageSource(port);
+                        xmlContent = iOSAPIMethods.GetPageSource(port);
                     }
                 });
                 commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 70);
-                if (xml.Equals("empty"))
+                if (xmlContent.Equals("empty"))
                 {
                     MessageBox.Show("Failed to fetch page source.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -95,7 +94,7 @@ namespace Appium_Wizard
                 {
                     await Task.Run(() =>
                     {
-                        LoadXmlToTreeView(xml);
+                        LoadXmlToTreeView(xmlContent);
                     });
                     commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 90);
                     listView1.Items.Clear();
@@ -156,18 +155,25 @@ namespace Appium_Wizard
                 PopulateListView(selectedNode);
                 if (screenshot != null)
                 {
-                    float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
-                    float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
+                    if (isAndroid)
+                    {
+                        DrawRectangleOnImage(screenshot, elementX, elementY, elementWidth, elementHeight);
+                    }
+                    else
+                    {
+                        float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
+                        float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
 
-                    // Calculate the actual coordinates on the image
-                    int actualX = (int)(elementX * xScale);
-                    int actualY = (int)(elementY * yScale);
+                        // Calculate the actual coordinates on the image
+                        int actualX = (int)(elementX * xScale);
+                        int actualY = (int)(elementY * yScale);
 
-                    int actualWidth = (int)(elementWidth * xScale);
-                    int actualHeight = (int)(elementHeight * yScale);
+                        int actualWidth = (int)(elementWidth * xScale);
+                        int actualHeight = (int)(elementHeight * yScale);
 
-                    // Reset to the original image before drawing
-                    DrawRectangleOnImage(screenshot, actualX, actualY, actualWidth, actualHeight);
+                        // Reset to the original image before drawing
+                        DrawRectangleOnImage(screenshot, actualX, actualY, actualWidth, actualHeight);
+                    }                   
                 }
             }
             else
@@ -206,11 +212,55 @@ namespace Appium_Wizard
                 }
             }
 
-            // Specifically extract x, y, width, and height if they exist
-            int.TryParse(xmlNode.Attributes["x"]?.Value, out elementX);
-            int.TryParse(xmlNode.Attributes["y"]?.Value, out elementY);
-            int.TryParse(xmlNode.Attributes["width"]?.Value, out elementWidth);
-            int.TryParse(xmlNode.Attributes["height"]?.Value, out elementHeight);
+            if (isAndroid)
+            {
+                string bounds = xmlNode.Attributes["bounds"]?.Value;
+                if (!string.IsNullOrEmpty(bounds))
+                {
+                    // Split the bounds string correctly
+                    var parts = bounds.Split(new[] { '[', ']', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 4)
+                    {
+                        int.TryParse(parts[0], out int x1);
+                        int.TryParse(parts[1], out int y1);
+                        int.TryParse(parts[2], out int x2);
+                        int.TryParse(parts[3], out int y2);
+
+                        elementX = x1;
+                        elementY = y1;
+                        elementWidth = x2 - x1;
+                        elementHeight = y2 - y1;
+
+                        // Add parsed bounds to ListView
+                        ListViewItem boundsItem = new ListViewItem("Bounds");
+                        boundsItem.SubItems.Add($"[{elementX},{elementY}][{x2},{y2}]");
+                        listView1.Items.Add(boundsItem);
+
+                        ListViewItem xItem = new ListViewItem("X");
+                        xItem.SubItems.Add(elementX.ToString());
+                        listView1.Items.Add(xItem);
+
+                        ListViewItem yItem = new ListViewItem("Y");
+                        yItem.SubItems.Add(elementY.ToString());
+                        listView1.Items.Add(yItem);
+
+                        ListViewItem widthItem = new ListViewItem("Width");
+                        widthItem.SubItems.Add(elementWidth.ToString());
+                        listView1.Items.Add(widthItem);
+
+                        ListViewItem heightItem = new ListViewItem("Height");
+                        heightItem.SubItems.Add(elementHeight.ToString());
+                        listView1.Items.Add(heightItem);
+                    }
+                }
+            }
+            else
+            {
+                int.TryParse(xmlNode.Attributes["x"]?.Value, out elementX);
+                int.TryParse(xmlNode.Attributes["y"]?.Value, out elementY);
+                int.TryParse(xmlNode.Attributes["width"]?.Value, out elementWidth);
+                int.TryParse(xmlNode.Attributes["height"]?.Value, out elementHeight);
+            }           
         }
 
 

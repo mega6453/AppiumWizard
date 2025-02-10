@@ -62,13 +62,14 @@ namespace Appium_Wizard
             TreeNode rootNode = new TreeNode(xmlDoc.DocumentElement.Name);
             if (treeView1.InvokeRequired)
             {
+                treeView1.Invoke(new Action(() => treeView1.Nodes.Clear()));
                 treeView1.Invoke(new Action(() => treeView1.Nodes.Add(rootNode)));
             }
             else
             {
+                treeView1.Nodes.Clear();
                 treeView1.Nodes.Add(rootNode);
             }
-
             AddXmlNodeToTreeNode(xmlDoc.DocumentElement, rootNode);
         }
 

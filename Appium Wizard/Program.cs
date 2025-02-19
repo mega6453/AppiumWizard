@@ -12,10 +12,10 @@ namespace Appium_Wizard
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             //Application.Run(new Object_Spy(5555, 390, 844));
-            //var size = iOSAPIMethods.GetScreenSize(5555);
-            //Application.Run(new Object_Spy(5555, size.Item1, size.Item2));
+            var size = iOSAPIMethods.GetScreenSize(5555);
+            Application.Run(new Object_Spy("ios", 5555, size.Item1, size.Item2));
 
-            Application.Run(new LoadingScreen());
+            //Application.Run(new LoadingScreen());
         }
     }
 }

@@ -49,9 +49,13 @@
             copyUniqueXpathToolStripMenuItem = new ToolStripMenuItem();
             addUniqueXpathToFilterToolStripMenuItem = new ToolStripMenuItem();
             filterLabel = new Label();
+            pictureBoxContextMenuStrip = new ContextMenuStrip(components);
+            copyUniqueXPathToolStripMenuItem1 = new ToolStripMenuItem();
+            addUniqueXpathToFilterToolStripMenuItem1 = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
+            pictureBoxContextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -63,6 +67,7 @@
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.MouseClick += pictureBox1_MouseClick;
+            pictureBox1.MouseUp += pictureBox1_MouseUp;
             // 
             // treeView1
             // 
@@ -216,6 +221,26 @@
             filterLabel.TabIndex = 13;
             filterLabel.Text = "Filter (XPath Validator)";
             // 
+            // pictureBoxContextMenuStrip
+            // 
+            pictureBoxContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyUniqueXPathToolStripMenuItem1, addUniqueXpathToFilterToolStripMenuItem1 });
+            pictureBoxContextMenuStrip.Name = "pictureBoxContextMenuStrip";
+            pictureBoxContextMenuStrip.Size = new Size(215, 70);
+            // 
+            // copyUniqueXPathToolStripMenuItem1
+            // 
+            copyUniqueXPathToolStripMenuItem1.Name = "copyUniqueXPathToolStripMenuItem1";
+            copyUniqueXPathToolStripMenuItem1.Size = new Size(214, 22);
+            copyUniqueXPathToolStripMenuItem1.Text = "Copy Unique XPath";
+            copyUniqueXPathToolStripMenuItem1.Click += copyUniqueXPathToolStripMenuItem1_Click;
+            // 
+            // addUniqueXpathToFilterToolStripMenuItem1
+            // 
+            addUniqueXpathToFilterToolStripMenuItem1.Name = "addUniqueXpathToFilterToolStripMenuItem1";
+            addUniqueXpathToFilterToolStripMenuItem1.Size = new Size(214, 22);
+            addUniqueXpathToFilterToolStripMenuItem1.Text = "Add Unique Xpath to Filter";
+            addUniqueXpathToFilterToolStripMenuItem1.Click += addUniqueXpathToFilterToolStripMenuItem1_Click;
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -240,6 +265,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             listViewContextMenuStrip.ResumeLayout(false);
             treeViewContextMenuStrip.ResumeLayout(false);
+            pictureBoxContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -265,5 +291,8 @@
         private ToolStripMenuItem copyUniqueXpathToolStripMenuItem;
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem;
         private Label filterLabel;
+        private ContextMenuStrip pictureBoxContextMenuStrip;
+        private ToolStripMenuItem copyUniqueXPathToolStripMenuItem1;
+        private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem1;
     }
 }

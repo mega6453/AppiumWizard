@@ -52,6 +52,7 @@
             pictureBoxContextMenuStrip = new ContextMenuStrip(components);
             copyUniqueXPathToolStripMenuItem1 = new ToolStripMenuItem();
             addUniqueXpathToFilterToolStripMenuItem1 = new ToolStripMenuItem();
+            coordLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
@@ -67,6 +68,8 @@
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.MouseClick += pictureBox1_MouseClick;
+            pictureBox1.MouseLeave += pictureBox1_MouseLeave;
+            pictureBox1.MouseMove += pictureBox1_MouseMove;
             pictureBox1.MouseUp += pictureBox1_MouseUp;
             // 
             // treeView1
@@ -225,7 +228,7 @@
             // 
             pictureBoxContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyUniqueXPathToolStripMenuItem1, addUniqueXpathToFilterToolStripMenuItem1 });
             pictureBoxContextMenuStrip.Name = "pictureBoxContextMenuStrip";
-            pictureBoxContextMenuStrip.Size = new Size(215, 70);
+            pictureBoxContextMenuStrip.Size = new Size(215, 48);
             // 
             // copyUniqueXPathToolStripMenuItem1
             // 
@@ -241,11 +244,20 @@
             addUniqueXpathToFilterToolStripMenuItem1.Text = "Add Unique Xpath to Filter";
             addUniqueXpathToFilterToolStripMenuItem1.Click += addUniqueXpathToFilterToolStripMenuItem1_Click;
             // 
+            // coordLabel
+            // 
+            coordLabel.AutoSize = true;
+            coordLabel.Location = new Point(452, 9);
+            coordLabel.Name = "coordLabel";
+            coordLabel.Size = new Size(0, 15);
+            coordLabel.TabIndex = 14;
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1181, 562);
+            Controls.Add(coordLabel);
             Controls.Add(filterLabel);
             Controls.Add(nextButton);
             Controls.Add(previousButton);
@@ -294,5 +306,6 @@
         private ContextMenuStrip pictureBoxContextMenuStrip;
         private ToolStripMenuItem copyUniqueXPathToolStripMenuItem1;
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem1;
+        private Label coordLabel;
     }
 }

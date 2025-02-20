@@ -870,7 +870,8 @@ namespace Appium_Wizard
 
         private void objectSpyButton_Click(object sender, EventArgs e)
         {
-            Object_Spy object_Spy = new Object_Spy(OSType,proxyPort,width,height);
+            var screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
+            Object_Spy object_Spy = new Object_Spy(OSType,proxyPort,width,height, screenDensity);
             object_Spy.Show();
         }
     }

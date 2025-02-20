@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.VisualBasic.Devices;
+using System.ComponentModel;
 using System.Dynamic;
 using System.IO;
 using System.Windows.Forms;
@@ -13,11 +14,13 @@ namespace Appium_Wizard
         Image screenshot;
         string xmlContent;
         bool isAndroid;
-        public Object_Spy(string os, int port, int width, int height)
+        float screenDensity;
+        public Object_Spy(string os, int port, int width, int height, float screenDensity)
         {
             this.port = port;
             this.width = width;
             this.height = height;
+            this.screenDensity = screenDensity;
             InitializeComponent();
             if (os.Equals("Android"))
             {
@@ -29,20 +32,29 @@ namespace Appium_Wizard
             }
         }
 
+        private async void Object_Spy_Load(object sender, EventArgs e)
+        {
+            FetchScreen();
+        }
 
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
             float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
+            int actualX = (int)(e.X * xScale);
+            int actualY = (int)(e.Y * yScale);
 
-            // Calculate the actual coordinates on the image
-            //int actualX = (int)(e.X * xScale);
-            //int actualY = (int)(e.Y * yScale);
+            XmlNode clickedElement;
+            if (isAndroid)
+            {
+                clickedElement = FindElementByCoordinates(actualX, actualY);
+            }
+            else
+            {
+                clickedElement = FindElementByCoordinates(e.X, e.Y);
+            }            
 
-            // Find the element in the XML that matches these coordinates
-            XmlNode clickedElement = FindElementByCoordinates(e.X, e.Y);
-            
             //int elementX, elementY, elementWidth, elementHeight;
             if (clickedElement != null)
             {
@@ -71,6 +83,7 @@ namespace Appium_Wizard
 
                             elementWidth = x2 - elementX;
                             elementHeight = y2 - elementY;
+                            DrawRectangleOnImage(screenshot, elementX, elementY, elementWidth, elementHeight);
                         }
                     }
                 }
@@ -82,21 +95,15 @@ namespace Appium_Wizard
                     int.TryParse(clickedElement.Attributes["height"]?.Value, out elementHeight);
 
 
-                    int actualX = (int)(elementX * xScale);
-                    int actualY = (int)(elementY * yScale);
+                    actualX = (int)(elementX * xScale);
+                    actualY = (int)(elementY * yScale);
 
                     int actualWidth = (int)(elementWidth * xScale);
                     int actualHeight = (int)(elementHeight * yScale);
                     DrawRectangleOnImage(screenshot, actualX, actualY, actualWidth, actualHeight);
                 }
-
-
-                // Draw the rectangle on the image using the element's bounds
-                //DrawRectangleOnImage(screenshot, elementX, elementY, elementWidth, elementHeight);
             }
         }
-
-
 
         private XmlNode FindElementByCoordinates(int x, int y)
         {
@@ -106,50 +113,6 @@ namespace Appium_Wizard
             var r = FindElementByCoordinatesRecursive(xmlDoc.DocumentElement, x, y);
             return r;
         }
-
-        //private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
-        //{
-        //    if (node == null) return null;
-
-        //    // First, check if the current node contains the point
-        //    if (IsPointInElementBounds(node, x, y))
-        //    {
-        //        Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
-        //        return node;
-        //    }
-
-        //    // Check all child nodes
-        //    XmlNode mostSpecificNode = null;
-        //    foreach (XmlNode childNode in node.ChildNodes)
-        //    {
-        //        XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
-        //        if (foundNode != null)
-        //        {
-        //            mostSpecificNode = foundNode;
-        //            break;
-        //            //return foundNode;
-        //        }
-        //    }
-
-        //    // If no child node contains the point, check following siblings
-        //    XmlNode nextSibling = node.NextSibling;
-        //    while (nextSibling != null)
-        //    {
-        //        XmlNode foundNode = FindElementByCoordinatesRecursive(nextSibling, x, y);
-        //        if (foundNode != null)
-        //        {
-        //            //return foundNode;
-        //            mostSpecificNode = foundNode;
-        //            break;
-        //        }
-        //        nextSibling = nextSibling.NextSibling;
-        //    }
-
-        //    return mostSpecificNode;
-        //}
-
-
-
 
         private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
         {
@@ -178,160 +141,68 @@ namespace Appium_Wizard
             return mostSpecificNode;
         }
 
-        //private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
-        //{
-        //    if (node == null) return null;
-
-        //    // Check all children first to find the deepest matching node
-        //    XmlNode mostSpecificNode = null;
-        //    foreach (XmlNode childNode in node.ChildNodes)
-        //    {
-        //        if (childNode.Name.Contains("Button"))
-        //        {
-        //            Console.WriteLine(childNode.Name);
-        //        }
-        //        XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
-        //        if (foundNode != null)
-        //        {
-        //            mostSpecificNode = foundNode;
-        //        }
-        //    }
-
-        //    //If no more specific child node contains the point, check the current node
-        //    if (mostSpecificNode == null && IsPointInElementBounds(node, x, y))
-        //    {
-        //        Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
-        //        return node;
-        //    }
-        //    return mostSpecificNode;
-        //}
 
         private bool IsPointInElementBounds(XmlNode node, int x, int y)
         {
             int elementX = 0, elementY = 0, elementWidth = 0, elementHeight = 0;
 
-            // Check if the node has the necessary attributes
-            if (node.Attributes["x"] != null &&
-                node.Attributes["y"] != null &&
-                node.Attributes["width"] != null &&
-                node.Attributes["height"] != null)
+            if (isAndroid)
             {
-                int.TryParse(node.Attributes["x"].Value, out elementX);
-                int.TryParse(node.Attributes["y"].Value, out elementY);
-                int.TryParse(node.Attributes["width"].Value, out elementWidth);
-                int.TryParse(node.Attributes["height"].Value, out elementHeight);
-
-                // Debug: Log bounds and point
-                Console.WriteLine($"Checking node: {node.Name}, Bounds: [{elementX}, {elementY}, {elementWidth}, {elementHeight}], Point: ({x}, {y})");
-
-                // Validate bounds
-                if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                string bounds = node.Attributes["bounds"]?.Value;
+                if (!string.IsNullOrEmpty(bounds))
                 {
-                    return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
+                    var parts = bounds.Split(new[] { '[', ']', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 4)
+                    {
+                        int.TryParse(parts[0], out elementX);
+                        int.TryParse(parts[1], out elementY);
+                        int.TryParse(parts[2], out int x2);
+                        int.TryParse(parts[3], out int y2);
+
+                        elementWidth = x2 - elementX;
+                        elementHeight = y2 - elementY;
+
+                        // Debug: Log bounds and point
+                        Console.WriteLine($"Checking Android node: {node.Name}, Bounds: [{elementX}, {elementY}, {x2}, {y2}], Point: ({x}, {y})");
+
+                        // Validate bounds
+                        if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                        {
+                            return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
+                        }
+                    }
                 }
+                return false;
             }
+            else
+            {
+                // Check if the node has the necessary attributes
+                if (node.Attributes["x"] != null &&
+                    node.Attributes["y"] != null &&
+                    node.Attributes["width"] != null &&
+                    node.Attributes["height"] != null)
+                {
+                    int.TryParse(node.Attributes["x"].Value, out elementX);
+                    int.TryParse(node.Attributes["y"].Value, out elementY);
+                    int.TryParse(node.Attributes["width"].Value, out elementWidth);
+                    int.TryParse(node.Attributes["height"].Value, out elementHeight);
 
-            // If bounds are not valid or attributes are missing, return false
-            return false;
+                    // Debug: Log bounds and point
+                    Console.WriteLine($"Checking node: {node.Name}, Bounds: [{elementX}, {elementY}, {elementWidth}, {elementHeight}], Point: ({x}, {y})");
+
+                    // Validate bounds
+                    if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                    {
+                        return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
+                    }
+                }
+
+                // If bounds are not valid or attributes are missing, return false
+                return false;
+            }
         }
 
 
-
-
-        //private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
-        //{
-        //    if (node == null) return null;
-
-        //    // Recursively check each child node first
-        //    foreach (XmlNode childNode in node.ChildNodes)
-        //    {
-        //        XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
-        //        if (foundNode != null)
-        //        {
-        //            return foundNode;
-        //        }
-        //    }
-
-        //    // If no child node contains the point, check the current node
-        //    if (IsPointInElementBounds(node, x, y))
-        //    {
-        //        return node;
-        //    }
-
-        //    // Return null if neither the node nor its children contain the point
-        //    return null;
-        //}
-
-        //private bool IsPointInElementBounds(XmlNode node, int x, int y)
-        //{
-        //    int elementX, elementY, elementWidth, elementHeight;
-
-        //    if (isAndroid)
-        //    {
-        //        string bounds = node.Attributes["bounds"]?.Value;
-        //        if (!string.IsNullOrEmpty(bounds))
-        //        {
-        //            var parts = bounds.Split(new[] { '[', ']', ',' }, StringSplitOptions.RemoveEmptyEntries);
-        //            if (parts.Length == 4)
-        //            {
-        //                int.TryParse(parts[0], out elementX);
-        //                int.TryParse(parts[1], out elementY);
-        //                int.TryParse(parts[2], out int x2);
-        //                int.TryParse(parts[3], out int y2);
-
-        //                elementWidth = x2 - elementX;
-        //                elementHeight = y2 - elementY;
-
-        //                // Debug: Log bounds and point
-        //                Console.WriteLine($"Checking Android node: {node.Name}, Bounds: [{elementX}, {elementY}, {x2}, {y2}], Point: ({x}, {y})");
-
-        //                return x >= elementX && x <= x2 && y >= elementY && y <= y2;
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        int.TryParse(node.Attributes["x"]?.Value, out elementX);
-        //        int.TryParse(node.Attributes["y"]?.Value, out elementY);
-        //        int.TryParse(node.Attributes["width"]?.Value, out elementWidth);
-        //        int.TryParse(node.Attributes["height"]?.Value, out elementHeight);
-
-        //        // Validate bounds
-        //        if (elementWidth <= 0 || elementHeight <= 0)
-        //        {
-        //            return false;
-        //        }
-
-        //        // Debug: Log bounds and point
-        //        Console.WriteLine($"Checking iOS node: {node.Name}, Bounds: [{elementX}, {elementY}, {elementWidth}, {elementHeight}], Point: ({x}, {y})");
-
-        //        return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
-        //    }
-
-        //    return false;
-        //}
-
-
-
-
-
-        //private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
-        //{
-        //    float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
-        //    float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
-
-        //    // Calculate the actual coordinates on the image
-        //    int actualX = (int)(e.X * xScale);
-        //    int actualY = (int)(e.Y * yScale);
-
-        //    // Draw the rectangle on the image using the actual coordinates
-        //    DrawRectangleOnImage(screenshot, actualX, actualY, 100, 100);
-        //}
-
-        private async void Object_Spy_Load(object sender, EventArgs e)
-        {
-            FetchScreen();
-        }
 
         private async void FetchScreen()
         {
@@ -556,14 +427,19 @@ namespace Appium_Wizard
             Close();
         }
 
-        Graphics g;
-        private void DrawRectangleOnImage(Image image, int x, int y, int width, int height)
+
+        private void DrawRectangleOnImage(Image originalImage, int x, int y, int width, int height)
         {
             try
             {
-                //this.Invalidate();
-                using (g = Graphics.FromImage(image))
+                // Create a new bitmap from the original image to avoid altering the original
+                Bitmap imageCopy = new Bitmap(originalImage);
+
+                using (Graphics g = Graphics.FromImage(imageCopy))
                 {
+                    // Clear the existing drawings by filling with a transparent color, if needed
+                    // g.Clear(Color.Transparent); // Uncomment if you want to clear with a specific color
+
                     // Create a pen to draw the rectangle
                     using (Pen pen = new Pen(Color.Red, 7))
                     {
@@ -571,25 +447,20 @@ namespace Appium_Wizard
                         g.DrawRectangle(pen, x, y, width, height);
                     }
                 }
-                pictureBox1.Image = image;
+
+                // Assign the modified image to the PictureBox
+                pictureBox1.Image = imageCopy;
+
                 // Refresh the PictureBox to show the updated image
                 pictureBox1.Refresh();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Handle exceptions if needed
+                Console.WriteLine(ex.Message);
             }
-
         }
-        //private Rectangle rectangleToDraw;
-        //private Image image;
-        //private void DrawRectangleOnImage(Image img, int x, int y, int width, int height)
-        //{
-        //    //pictureBox1.Invalidate();
-        //    pictureBox1.Image = img;
-        //    //image = img;
-        //    //rectangleToDraw = new Rectangle(x, y, width, height);
 
-        //}
         private async void refreshButton_Click(object sender, EventArgs e)
         {
             FetchScreen();
@@ -892,8 +763,18 @@ namespace Appium_Wizard
 
         private string GenerateUniqueXPath(XmlNode node)
         {
+            List<string> preferredAttributes = new List<string>();
+            if (node.Attributes != null)
+            {
+                // Iterate over each attribute in the node
+                foreach (XmlAttribute attribute in node.Attributes)
+                {
+                    // Add the attribute name to the list
+                    preferredAttributes.Add(attribute.Name);
+                }
+            }
             // List of attributes to consider for creating a unique XPath
-            string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+            //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
 
             // Start with the node name
             string xpath = "//" + node.Name;
@@ -986,8 +867,19 @@ namespace Appium_Wizard
 
         private string GenerateUniqueXPathOld(XmlNode node)
         {
+            List<string> preferredAttributes = new List<string>();
+            if (node.Attributes != null)
+            {
+                // Iterate over each attribute in the node
+                foreach (XmlAttribute attribute in node.Attributes)
+                {
+                    // Add the attribute name to the list
+                    preferredAttributes.Add(attribute.Name);
+                }
+            }
+
             // List of attributes to consider for creating a unique XPath
-            string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+           //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
 
             // Start with the node name
             string xpath = "//" + node.Name;
@@ -1047,12 +939,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void copyUniqueXPathToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            XmlNode clickedElement = FindElementByCoordinates(clickedX, clickedY);
-            string uniqueXPath = GenerateUniqueXPath(clickedElement);
-            Clipboard.SetText(uniqueXPath);
-        }
+      
 
         int clickedX; int clickedY;
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -1065,30 +952,54 @@ namespace Appium_Wizard
             }
         }
 
+        private void copyUniqueXPathToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
+            float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
+            int actualX = (int)(clickedX * xScale);
+            int actualY = (int)(clickedY * yScale);
+
+            XmlNode clickedElement;
+            if (isAndroid)
+            {
+                clickedElement = FindElementByCoordinates(actualX, actualY);
+            }
+            else
+            {
+                clickedElement = FindElementByCoordinates(clickedX, clickedY);
+            }
+            string uniqueXPath = GenerateUniqueXPath(clickedElement);
+            Clipboard.SetText(uniqueXPath);
+        }
+
         private void addUniqueXpathToFilterToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            XmlNode clickedElement = FindElementByCoordinates(clickedX, clickedY);
+            float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
+            float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
+            int actualX = (int)(clickedX * xScale);
+            int actualY = (int)(clickedY * yScale);
+
+            XmlNode clickedElement;
+            if (isAndroid)
+            {
+                clickedElement = FindElementByCoordinates(actualX, actualY);
+            }
+            else
+            {
+                clickedElement = FindElementByCoordinates(clickedX, clickedY);
+            }
             string uniqueXPath = GenerateUniqueXPath(clickedElement);
             filterTextbox.Text = uniqueXPath;
         }
 
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            coordLabel.Text = $"X: {e.X}, Y: {e.Y}";
+        }
 
-
-
-
-        //private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        //{
-        //    if (!image.Equals(null))
-        //    {
-        //        e.Graphics.DrawImage(image, 0, 0, image.Width, image.Height);
-
-        //        // Create a pen to draw the rectangle
-        //        using (Pen pen = new Pen(Color.Red, 7))
-        //        {
-        //            // Draw the rectangle
-        //            e.Graphics.DrawRectangle(pen, rectangleToDraw);
-        //        }
-        //    }
-        //}
+        private void pictureBox1_MouseLeave(object sender, EventArgs e)
+        {
+            coordLabel.Text = string.Empty;
+        }
     }
 }

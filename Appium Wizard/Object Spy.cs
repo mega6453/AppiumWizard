@@ -42,10 +42,19 @@ namespace Appium_Wizard
 
             // Find the element in the XML that matches these coordinates
             XmlNode clickedElement = FindElementByCoordinates(e.X, e.Y);
+            
             //int elementX, elementY, elementWidth, elementHeight;
-
             if (clickedElement != null)
             {
+                TreeNode matchingNode = FindTreeNodeByXmlNode(treeView1.Nodes, clickedElement);
+
+                if (matchingNode != null)
+                {
+                    // Select the TreeNode
+                    treeView1.SelectedNode = matchingNode;
+                    matchingNode.EnsureVisible();
+                }
+
                 // Extract the bounds of the element
                 if (isAndroid)
                 {

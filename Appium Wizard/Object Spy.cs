@@ -14,13 +14,11 @@ namespace Appium_Wizard
         Image screenshot;
         string xmlContent;
         bool isAndroid;
-        float screenDensity;
-        public Object_Spy(string os, int port, int width, int height, float screenDensity)
+        public Object_Spy(string os, int port, int width, int height)
         {
             this.port = port;
             this.width = width;
             this.height = height;
-            this.screenDensity = screenDensity;
             InitializeComponent();
             if (os.Equals("Android"))
             {
@@ -226,7 +224,9 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 50);
             if (screenshot == null)
             {
+                commonProgress.Close();
                 MessageBox.Show("Failed to retreive screenshot.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
             else
             {
@@ -245,7 +245,9 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 70);
                 if (xmlContent.Equals("empty"))
                 {
+                    commonProgress.Close();
                     MessageBox.Show("Failed to fetch page source.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                 }
                 else
                 {
@@ -761,6 +763,90 @@ namespace Appium_Wizard
             }
         }
 
+        //private string GenerateUniqueXPath(XmlNode node)
+        //{
+        //    List<string> preferredAttributes = new List<string>();
+        //    if (node.Attributes != null)
+        //    {
+        //        foreach (XmlAttribute attribute in node.Attributes)
+        //        {
+        //            preferredAttributes.Add(attribute.Name);
+        //        }
+        //    }
+        //    preferredAttributes.Remove("index");
+        //    preferredAttributes.Remove("x");
+        //    preferredAttributes.Remove("y");
+        //    preferredAttributes.Remove("width");
+        //    preferredAttributes.Remove("height");
+
+        //    string xpath = $"//*";
+
+        //    // Check each preferred attribute individually
+        //    foreach (string attr in preferredAttributes)
+        //    {
+        //        if (node.Attributes[attr] != null)
+        //        {
+        //            string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
+        //            XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
+        //            if (nodes.Count == 1)
+        //            {
+        //                return singleAttributeXPath;
+        //            }
+        //        }
+        //    }
+
+        //    // Check combined attributes
+        //    string combinedAttributesXPath = xpath;
+        //    foreach (string attr in preferredAttributes)
+        //    {
+        //        if (node.Attributes[attr] != null)
+        //        {
+        //            combinedAttributesXPath += $"[@{attr}='{node.Attributes[attr].Value}']";
+        //        }
+        //    }
+        //    XmlNodeList combinedNodes = node.OwnerDocument.SelectNodes(combinedAttributesXPath);
+        //    if (combinedNodes.Count == 1)
+        //    {
+        //        return combinedAttributesXPath;
+        //    }
+
+        //    // If no unique XPath is found with attributes, check for inner text
+        //    if (!string.IsNullOrWhiteSpace(node.InnerText))
+        //    {
+        //        string textXPath = $"{xpath}[text()='{node.InnerText.Trim()}']";
+        //        XmlNodeList textNodes = node.OwnerDocument.SelectNodes(textXPath);
+        //        if (textNodes.Count == 1)
+        //        {
+        //            return textXPath;
+        //        }
+        //    }
+
+        //    // If still not unique, wrap in parentheses and append index
+        //    while (node.ParentNode != null)
+        //    {
+        //        XmlNode parentNode = node.ParentNode;
+        //        int index = 1;
+
+        //        foreach (XmlNode sibling in parentNode.ChildNodes)
+        //        {
+        //            if (sibling == node)
+        //            {
+        //                break;
+        //            }
+        //            if (sibling.Name == node.Name)
+        //            {
+        //                index++;
+        //            }
+        //        }
+
+        //        xpath = $"/{parentNode.Name}({node.Name})[{index}]" + xpath;
+        //        node = parentNode;
+        //    }
+
+        //    return xpath;
+        //}
+
+
         private string GenerateUniqueXPath(XmlNode node)
         {
             List<string> preferredAttributes = new List<string>();
@@ -776,8 +862,43 @@ namespace Appium_Wizard
             // List of attributes to consider for creating a unique XPath
             //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
 
+            preferredAttributes.Remove("index");
+            preferredAttributes.Remove("x");
+            preferredAttributes.Remove("y");
+            preferredAttributes.Remove("width");
+            preferredAttributes.Remove("height");
             // Start with the node name
-            string xpath = "//" + node.Name;
+            //string xpath = "//" + node.Name;
+            string xpath = "//*";
+            int attCount = preferredAttributes.Count;
+            int counter=1;
+            foreach (string attr in preferredAttributes)
+            {
+                if (node.Attributes[attr] != null)
+                {
+                    string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
+                    XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
+                    if (nodes.Count == 1)
+                    {
+                        return singleAttributeXPath;
+                    }
+                    if (attCount == counter)
+                    {
+                        int index = 1;
+                        foreach (XmlNode sibling in nodes)
+                        {
+                            if (sibling == node)
+                            {
+                                xpath = $"({xpath})[{index}]";
+                                return xpath;
+                            }
+                            index++;
+                        }
+                    }
+                    counter++;
+                }
+            }
+
 
             // Check each preferred attribute
             foreach (string attr in preferredAttributes)
@@ -936,6 +1057,7 @@ namespace Appium_Wizard
             {
                 string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
                 filterTextbox.Text = uniqueXPath;
+                treeView1.SelectedNode = treeView1.SelectedNode;
             }
         }
 

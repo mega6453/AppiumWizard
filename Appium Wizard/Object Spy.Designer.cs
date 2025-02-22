@@ -74,6 +74,7 @@
             // 
             // treeView1
             // 
+            treeView1.HideSelection = false;
             treeView1.Location = new Point(326, 35);
             treeView1.Name = "treeView1";
             treeView1.Size = new Size(483, 426);
@@ -271,7 +272,7 @@
             Controls.Add(pictureBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Object_Spy";
-            Text = "Object Spy";
+            Text = "Object Spy - BETA";
             WindowState = FormWindowState.Maximized;
             Load += Object_Spy_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

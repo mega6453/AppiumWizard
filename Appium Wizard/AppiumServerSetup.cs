@@ -303,7 +303,7 @@ namespace Appium_Wizard
                                         int androidProxyPort = (int)OpenDevice.deviceDetails[deviceUDID]["proxyPort"];
                                         int screenServerPort = (int)OpenDevice.deviceDetails[deviceUDID]["screenPort"];
                                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(deviceUDID);
-                                        AndroidAPIMethods.CreateSession(androidProxyPort, screenServerPort);
+                                        AndroidAPIMethods.CreateSession(androidProxyPort);
                                     }
                                     catch (Exception)
                                     {

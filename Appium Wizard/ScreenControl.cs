@@ -208,7 +208,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadScreen");
+            GoogleAnalytics.SendEvent("LoadScreen");
             BackToolStripButton.Enabled = true;
             ControlCenterToolStripButton.Enabled = true;
             HomeToolStripButton.Enabled = true;
@@ -260,7 +260,7 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
-           GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
+            GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
             BackToolStripButton.Enabled = false;
             ControlCenterToolStripButton.Enabled = false;
             HomeToolStripButton.Enabled = false;
@@ -277,9 +277,8 @@ namespace Appium_Wizard
             ScreenWebView.CoreWebView2InitializationCompleted += InitializationCompleted;
             await ScreenWebView.EnsureCoreWebView2Async(env);
             Controls.Add(ScreenWebView);
-
-
         }
+
         private async void InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (e.IsSuccess)
@@ -288,10 +287,11 @@ namespace Appium_Wizard
                     ScreenWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(canvasFunction);
             }
         }
+
         private void SetWebViewSize(int width, int height)
         {
             ScreenWebView.Width = width;
-            ScreenWebView.Height = height;
+            ScreenWebView.Height = height + toolStrip1.Height + toolStrip2.Height;
         }
 
         private void GetMouseCoordinate(object sender, MouseEventArgs e)
@@ -458,7 +458,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return AndroidAPIMethods.CreateSession(proxyPort, screenPort);
+                return AndroidAPIMethods.CreateSession(proxyPort);
             }
         }
 
@@ -660,7 +660,7 @@ namespace Appium_Wizard
                 }
             });
 
-           GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
+            GoogleAnalytics.SendEvent("ScreenControl_FormClosed");
         }
 
         private void ScreenControl_Shown(object sender, EventArgs e)
@@ -782,8 +782,8 @@ namespace Appium_Wizard
 
         private void UnlockScreen_Click(object sender, EventArgs e)
         {
-                    EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
-                    enterPassword.ShowDialog();
+            EnterPassword enterPassword = new EnterPassword(OSType, udid, deviceName);
+            enterPassword.ShowDialog();
             GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
@@ -866,6 +866,12 @@ namespace Appium_Wizard
                 Console.WriteLine("Exception" + exception);
                 GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
+        }
+
+        private void objectSpyButton_Click(object sender, EventArgs e)
+        {
+            Object_Spy object_Spy = new Object_Spy(OSType,proxyPort,width,height);
+            object_Spy.Show();
         }
     }
 }

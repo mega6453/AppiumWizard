@@ -43,10 +43,11 @@
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
-            inspectorToolStripMenuItem = new ToolStripMenuItem();
             RecordButton = new ToolStripButton();
+            objectSpyButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
+            toolStripSeparator4 = new ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -74,7 +75,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -167,7 +168,7 @@
             // MoreToolStripButton
             // 
             MoreToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem, inspectorToolStripMenuItem });
+            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem });
             MoreToolStripButton.Image = Properties.Resources.ellipsis;
             MoreToolStripButton.ImageTransparentColor = Color.Magenta;
             MoreToolStripButton.Name = "MoreToolStripButton";
@@ -177,7 +178,7 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(149, 22);
+            UnlockScreen.Size = new Size(188, 30);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -185,17 +186,9 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(149, 22);
+            manageAppsToolStripMenuItem.Size = new Size(188, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
-            // 
-            // inspectorToolStripMenuItem
-            // 
-            inspectorToolStripMenuItem.Image = Properties.Resources.inspector;
-            inspectorToolStripMenuItem.Name = "inspectorToolStripMenuItem";
-            inspectorToolStripMenuItem.Size = new Size(149, 22);
-            inspectorToolStripMenuItem.Text = "Inspector";
-            inspectorToolStripMenuItem.Click += inspectorToolStripMenuItem_Click;
             // 
             // RecordButton
             // 
@@ -206,6 +199,16 @@
             RecordButton.Name = "RecordButton";
             RecordButton.Size = new Size(28, 28);
             RecordButton.Click += RecordButton_Click;
+            // 
+            // objectSpyButton
+            // 
+            objectSpyButton.Alignment = ToolStripItemAlignment.Right;
+            objectSpyButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            objectSpyButton.Image = Properties.Resources.search;
+            objectSpyButton.ImageTransparentColor = Color.Magenta;
+            objectSpyButton.Name = "objectSpyButton";
+            objectSpyButton.Size = new Size(28, 28);
+            objectSpyButton.Click += objectSpyButton_Click;
             // 
             // toolStrip2
             // 
@@ -230,6 +233,12 @@
             statusLabel.Overflow = ToolStripItemOverflow.Never;
             statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Alignment = ToolStripItemAlignment.Right;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 31);
             // 
             // ScreenControl
             // 
@@ -279,7 +288,8 @@
         private ToolStripButton RecordButton;
         private ToolStripMenuItem manageAppsToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator2;
-        private ToolStripMenuItem inspectorToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton objectSpyButton;
+        private ToolStripSeparator toolStripSeparator4;
     }
 }

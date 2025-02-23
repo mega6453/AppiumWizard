@@ -3,6 +3,7 @@ using RestSharp;
 using System.Diagnostics;
 using System.Management;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Appium_Wizard
@@ -15,30 +16,23 @@ namespace Appium_Wizard
         private string aaptFilePath = FilesPath.aaptFilePath;
         private string serverAPKFilePath = FilesPath.serverAPKFilePath;
         private string settingsAPKFilePath = FilesPath.settingsAPKFilePath;
-        private Process adbProcess = new Process();
+        private Process adbProcess;
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
 
         public void StartAdbServer(int AdbPort)
         {
             ProcessStartInfo adbStartInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, // Replace with the path to your adb executable if not in PATH
-                Arguments = "-p " + AdbPort + " start-server",
+                FileName = adbFilePath, 
+                Arguments = "-P " + AdbPort + " start-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            Process adbProcess = new Process { StartInfo = adbStartInfo };
-            adbProcess.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            adbProcess.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
+            adbProcess = new Process { StartInfo = adbStartInfo };         
             adbProcess.Start();
-            adbProcess.BeginOutputReadLine();
-            adbProcess.BeginErrorReadLine();
-
-            // Wait for the ADB server to start (you can adjust the sleep duration based on your needs)
             Thread.Sleep(2000);
             int processId = adbProcess.Id;
             MainScreen.runningProcesses.Add(processId);
@@ -48,22 +42,16 @@ namespace Appium_Wizard
         {
             ProcessStartInfo adbStopInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, // Replace with the path to your adb executable if not in PATH
-                Arguments = "-p" + AdbPort + " kill-server",
+                FileName = adbFilePath, 
+                Arguments = "-P " + AdbPort + " kill-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            Process adbProcess = new Process { StartInfo = adbStopInfo };
-            adbProcess.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            adbProcess.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
+            adbProcess = new Process { StartInfo = adbStopInfo };
             adbProcess.Start();
-            adbProcess.BeginOutputReadLine();
-            adbProcess.BeginErrorReadLine();
-
             adbProcess.WaitForExit();
         }
 
@@ -816,7 +804,7 @@ namespace Appium_Wizard
     public class AndroidAPIMethods
     {
 
-        public static string CreateSession(int proxyPort, int screenPort)
+        public static string CreateSession(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
@@ -826,7 +814,8 @@ namespace Appium_Wizard
             var request = new RestRequest("/session", Method.Post);
             request.AddHeader("Content-Type", "application/json");
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0}}}}";
-            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
+            var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2""}}}}";
+            //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""ensureWebviewsHavePages"":true,""takesScreenshot"":true,""javascriptEnabled"":true,""mjpegServerPort"":{screenPort}}}}}";
             //var body = "{\"capabilities\":{\"firstMatch\":[{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\",\"platform\":\"LINUX\",\"webStorageEnabled\":false,\"takesScreenshot\":true,\"javascriptEnabled\":true,\"databaseEnabled\":false,\"networkConnectionEnabled\":true,\"locationContextEnabled\":false,\"warnings\":{},\"desired\":{\"platformName\":\"Android\",\"automationName\":\"UiAutomator2\",\"newCommandTimeout\":0,\"mjpegServerPort\":5555,\"ensureWebviewsHavePages\":true,\"nativeWebScreenshot\":true,\"connectHardwareKeyboard\":true,\"webDriverAgentUrl\":\"http://localhost:51436\"}},\"deviceName\":\"R5CN3172FHT\",\"deviceUDID\":\"R5CN3172FHT\"}],\"alwaysMatch\":{}}";
 
             //var body = $@"{{""capabilities"":{{""platformName"":""Android"",""automationName"":""UiAutomator2"",""newCommandTimeout"":0,""mjpegServerPort"":{screenPort}}}}}";
@@ -934,5 +923,72 @@ namespace Appium_Wizard
             }
         }
 
+        public static string GetPageSource(int port)
+        {
+            string value = "empty";
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/source", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                {
+                    JsonElement root = doc.RootElement;
+                    value = root.GetProperty("value").GetString();
+                }
+                return value;
+            }
+            catch (Exception)
+            {
+                return value;
+            }
+        }
+
+        public static Image TakeScreenshot(int port)
+        {
+            Image image = null;
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+                string jsonString = response.Content;
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    image = Image.FromStream(ms);
+                    return image;
+                }
+            }
+            catch (Exception)
+            {
+                return image;
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "6.2.0";
-        public const string ReleaseNotes = "iOS Proxy automatic";
+        public const string VersionNumber = "7.0.0";
+        public const string ReleaseNotes = "Object Spy";
     }
 }

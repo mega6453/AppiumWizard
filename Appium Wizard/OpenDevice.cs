@@ -489,7 +489,7 @@
                     {
                         commonProgress.UpdateStepLabel(title, "Starting UIAutomator...", 75);
                         AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                        sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                        sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort);
                     }
                     else
                     {
@@ -518,7 +518,7 @@
                             commonProgress.UpdateStepLabel(title, "Restarting UIAutomator...", 80);
                             AndroidMethods.GetInstance().StopUIAutomator(udid);
                             AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                            sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort, screenServerPort);
+                            sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort);
                         }
                     }
                     if (sessionIdCreatedForScreenServer != string.Empty)

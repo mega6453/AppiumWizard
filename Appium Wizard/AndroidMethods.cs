@@ -817,7 +817,7 @@ namespace Appium_Wizard
     public class AndroidAPIMethods
     {
 
-        public static string CreateSession(int proxyPort, int screenPort)
+        public static string CreateSession(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
@@ -944,7 +944,7 @@ namespace Appium_Wizard
                 string sessionId = GetSessionID(port);
                 if (sessionId.Equals("nosession"))
                 {
-                    CreateSession(port,6666);
+                    CreateSession(port);
                     sessionId = GetSessionID(port);
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
@@ -976,7 +976,7 @@ namespace Appium_Wizard
                 string sessionId = GetSessionID(port);
                 if (sessionId.Equals("nosession"))
                 {
-                    CreateSession(port, 6666);
+                    CreateSession(port);
                     sessionId = GetSessionID(port);
                 }
                 var options = new RestClientOptions("http://localhost:" + port)

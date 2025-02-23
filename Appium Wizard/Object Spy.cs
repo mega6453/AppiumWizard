@@ -14,8 +14,10 @@ namespace Appium_Wizard
         Image screenshot;
         string xmlContent;
         bool isAndroid;
+        string os;
         public Object_Spy(string os, int port, int width, int height)
         {
+            this.os = os;
             this.port = port;
             this.width = width;
             this.height = height;
@@ -51,7 +53,7 @@ namespace Appium_Wizard
             else
             {
                 clickedElement = FindElementByCoordinates(e.X, e.Y);
-            }            
+            }
 
             //int elementX, elementY, elementWidth, elementHeight;
             if (clickedElement != null)
@@ -204,10 +206,11 @@ namespace Appium_Wizard
 
         private async void FetchScreen()
         {
+            string messageTitle = "Object Spy - BETA";
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 20);
+            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 20);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
             await Task.Run(() =>
@@ -221,11 +224,11 @@ namespace Appium_Wizard
                     screenshot = iOSAPIMethods.TakeScreenshot(url);
                 }
             });
-            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 50);
+            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
             if (screenshot == null)
             {
                 commonProgress.Close();
-                MessageBox.Show("Failed to retreive screenshot.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to retreive screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
             }
             else
@@ -242,11 +245,11 @@ namespace Appium_Wizard
                         xmlContent = iOSAPIMethods.GetPageSource(port);
                     }
                 });
-                commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 70);
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 70);
                 if (xmlContent.Equals("empty"))
                 {
                     commonProgress.Close();
-                    MessageBox.Show("Failed to fetch page source.", "Object Spy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                 }
                 else
@@ -255,7 +258,7 @@ namespace Appium_Wizard
                     {
                         LoadXmlToTreeView(xmlContent);
                     });
-                    commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 90);
+                    commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
                     listView1.Items.Clear();
                     treeView1.ExpandAll();
                 }
@@ -465,6 +468,7 @@ namespace Appium_Wizard
 
         private async void refreshButton_Click(object sender, EventArgs e)
         {
+            GoogleAnalytics.SendEvent("Object_Spy_Refresh", os);
             FetchScreen();
         }
 
@@ -646,6 +650,7 @@ namespace Appium_Wizard
 
         private void copyXpathToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_ListView_CopyXPath", os);
             if (listView1.SelectedItems.Count > 1) // multiple row selected
             {
                 var predicates = new List<string>();
@@ -676,6 +681,7 @@ namespace Appium_Wizard
 
         private void addToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_ListView_AddToFilter", os);
             if (listView1.SelectedItems.Count > 1) // multiple row selected
             {
                 var predicates = new List<string>();
@@ -738,6 +744,7 @@ namespace Appium_Wizard
 
         private void copyUniqueXpathToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_TreeView_CopyXPath", os);
             if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
             {
                 string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
@@ -871,7 +878,7 @@ namespace Appium_Wizard
             //string xpath = "//" + node.Name;
             string xpath = "//*";
             int attCount = preferredAttributes.Count;
-            int counter=1;
+            int counter = 1;
             foreach (string attr in preferredAttributes)
             {
                 if (node.Attributes[attr] != null)
@@ -1000,7 +1007,7 @@ namespace Appium_Wizard
             }
 
             // List of attributes to consider for creating a unique XPath
-           //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+            //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
 
             // Start with the node name
             string xpath = "//" + node.Name;
@@ -1053,6 +1060,7 @@ namespace Appium_Wizard
 
         private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_TreeView_AddToFilter", os);
             if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
             {
                 string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
@@ -1061,7 +1069,7 @@ namespace Appium_Wizard
             }
         }
 
-      
+
 
         int clickedX; int clickedY;
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -1076,6 +1084,7 @@ namespace Appium_Wizard
 
         private void copyUniqueXPathToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_PictureBox_CopyXPath", os);
             float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
             float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
             int actualX = (int)(clickedX * xScale);
@@ -1096,6 +1105,7 @@ namespace Appium_Wizard
 
         private void addUniqueXpathToFilterToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //GoogleAnalytics.SendEvent("Object_Spy_PictureBox_AddToFilter", os);
             float xScale = (float)screenshot.Width / pictureBox1.ClientSize.Width;
             float yScale = (float)screenshot.Height / pictureBox1.ClientSize.Height;
             int actualX = (int)(clickedX * xScale);
@@ -1122,6 +1132,11 @@ namespace Appium_Wizard
         private void pictureBox1_MouseLeave(object sender, EventArgs e)
         {
             coordLabel.Text = string.Empty;
+        }
+
+        private void Object_Spy_Shown(object sender, EventArgs e)
+        {
+            GoogleAnalytics.SendEvent("Object_Spy_Shown",os);
         }
     }
 }

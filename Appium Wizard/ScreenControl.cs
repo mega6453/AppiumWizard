@@ -458,7 +458,7 @@ namespace Appium_Wizard
             }
             else
             {
-                return AndroidAPIMethods.CreateSession(proxyPort, screenPort);
+                return AndroidAPIMethods.CreateSession(proxyPort);
             }
         }
 

@@ -47,6 +47,7 @@
             objectSpyButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
+            toolStripSeparator4 = new ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -74,7 +75,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, ScreenshotToolStripButton, MoreToolStripButton, RecordButton, objectSpyButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -233,6 +234,12 @@
             statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Alignment = ToolStripItemAlignment.Right;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 31);
+            // 
             // ScreenControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -283,5 +290,6 @@
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripButton objectSpyButton;
+        private ToolStripSeparator toolStripSeparator4;
     }
 }

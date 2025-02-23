@@ -16,30 +16,23 @@ namespace Appium_Wizard
         private string aaptFilePath = FilesPath.aaptFilePath;
         private string serverAPKFilePath = FilesPath.serverAPKFilePath;
         private string settingsAPKFilePath = FilesPath.settingsAPKFilePath;
-        private Process adbProcess = new Process();
+        private Process adbProcess;
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
 
         public void StartAdbServer(int AdbPort)
         {
             ProcessStartInfo adbStartInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, // Replace with the path to your adb executable if not in PATH
-                Arguments = "-p " + AdbPort + " start-server",
+                FileName = adbFilePath, 
+                Arguments = "-P " + AdbPort + " start-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            Process adbProcess = new Process { StartInfo = adbStartInfo };
-            adbProcess.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            adbProcess.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
+            adbProcess = new Process { StartInfo = adbStartInfo };         
             adbProcess.Start();
-            adbProcess.BeginOutputReadLine();
-            adbProcess.BeginErrorReadLine();
-
-            // Wait for the ADB server to start (you can adjust the sleep duration based on your needs)
             Thread.Sleep(2000);
             int processId = adbProcess.Id;
             MainScreen.runningProcesses.Add(processId);
@@ -49,22 +42,16 @@ namespace Appium_Wizard
         {
             ProcessStartInfo adbStopInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, // Replace with the path to your adb executable if not in PATH
-                Arguments = "-p" + AdbPort + " kill-server",
+                FileName = adbFilePath, 
+                Arguments = "-P " + AdbPort + " kill-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            Process adbProcess = new Process { StartInfo = adbStopInfo };
-            adbProcess.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            adbProcess.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
+            adbProcess = new Process { StartInfo = adbStopInfo };
             adbProcess.Start();
-            adbProcess.BeginOutputReadLine();
-            adbProcess.BeginErrorReadLine();
-
             adbProcess.WaitForExit();
         }
 

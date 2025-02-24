@@ -664,7 +664,7 @@ namespace Appium_Wizard
                 string error = iOSProcess.StandardError.ReadToEnd();
 
                 iOSProcess.WaitForExit();
-
+                MainScreen.runningProcesses.Add(iOSProcess.Id);
                 // Combine the output and error messages
                 return output + error;
             }
@@ -1418,7 +1418,6 @@ namespace Appium_Wizard
             {
                 if (MainScreen.udidProxyPort.ContainsKey(udid))
                 {
-                    int port1 = MainScreen.udidProxyPort[udid];
                     string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
                     if (!sessionId.Equals("nosession"))
                     {

@@ -10,7 +10,8 @@
         string deviceName, udid, OSType, OSVersion, connectionType;
         bool isScreenServerStarted = false;
         string title;
-        public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress)
+        bool usePreInstalledWDA;
+        public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress, bool usePreInstalledWDA)
         {
             this.udid = udid;
             this.deviceName = selectedDeviceName;
@@ -20,6 +21,7 @@
             var screeSize = getDeviceScreenSize(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
+            this.usePreInstalledWDA = usePreInstalledWDA;
             title = "Opening " + deviceName;
             if (OSType.Equals("Android") && connectionType.Equals("Wi-Fi"))
             {
@@ -86,10 +88,32 @@
                 }
                 try
                 {
-                    commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
-                    bool wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
-                    commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign wda...", 15);
-                    bool profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
+                    bool wdaCheck = false; bool profileCheck = false;
+                    commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...", 10);
+                    bool isInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                    if (usePreInstalledWDA)
+                    {
+                        if (isInstalled) 
+                        {
+                            wdaCheck = true;
+                        }
+                        else
+                        {
+                            wdaCheck = false;
+                            profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
+                        }
+                    }
+                    else
+                    {
+                        //commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
+                        wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
+                        commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign WDA...", 15);
+                        profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
+                        if (isInstalled && !wdaCheck && !profileCheck) // WDA installed but not latest version and profile not available to sign.
+                        {
+                            wdaCheck = true;  // considering WDA available, so that it won't try to install again and not throw error saying no profile found.
+                        }                      
+                    }
                     if (wdaCheck | profileCheck)
                     {
                         keyValuePairs = new Dictionary<object, object>();
@@ -404,7 +428,8 @@
                     {
                         commonProgress.Close();
                         isScreenServerStarted = false;
-                        MessageBox.Show("No profile found for device " + deviceName + "(" + udid + ").\nAdd a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("No pre-installed WebDriverAgent found, and no provisioning profile is available for the device " + deviceName + "(" + udid + ").\n\nEither install the WebDriverAgent manually or add a provisioning profile in Tools → iOS Profile Management so that AppiumWizard can install the WebDriverAgent automatically.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //MessageBox.Show("No Pre-Installed WebDriverAgent found and No provisioning profile found for device " + deviceName + "(" + udid + ").\n\nEither install WDA by yourself or Add a profile in Tools->iOS Profile Management.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
                 }

@@ -21,6 +21,8 @@ namespace Appium_Wizard
         public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
         public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
         public static bool alwaysOnTop;
+        List<string> UDIDPreInstalledWDA = new List<string>();
+
 
         public MainScreen()
         {
@@ -84,6 +86,8 @@ namespace Appium_Wizard
                 {
                     noToolStripMenuItem.Image = Resources.check_mark;
                 }
+
+                UDIDPreInstalledWDA = Database.QueryUDIDsFromUsePreInstalledWDAList();
             }
             catch (Exception ex)
             {
@@ -144,7 +148,7 @@ namespace Appium_Wizard
             try
             {
                 iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
-                iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();                
+                iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();
             }
             catch (Exception)
             {
@@ -225,7 +229,7 @@ namespace Appium_Wizard
                     Thread.Sleep(1000);
                 }
             });
-           GoogleAnalytics.SendEvent("MainScreen_Shown");
+            GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
         private void UpdateRichTextbox(int tabNumber)
@@ -474,7 +478,7 @@ namespace Appium_Wizard
                         return;
                     }
                 }
-                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
+                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP, UDIDPreInstalledWDA.Contains(selectedUDID));
                 var isStarted = await openDevice.StartBackgroundTasks();
                 if (isStarted)
                 {
@@ -1690,7 +1694,7 @@ namespace Appium_Wizard
                 catch (Exception ex)
                 {
                     commonProgress.Close();
-                    MessageBox.Show("Unhandled Exception", "Check for Updates...");
+                    MessageBox.Show("Failed to check update - Go to https://github.com/mega6453/AppiumWizard and check manually.", "Check for Updates...");
                     GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
                 }
             }
@@ -1975,6 +1979,42 @@ namespace Appium_Wizard
             Database.UpdateDataIntoAlwaysOnTopTable("No");
             yesToolStripMenuItem.Image = null;
             noToolStripMenuItem.Image = Resources.check_mark;
+        }
+
+        private void usePreInstalledWDAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (UDIDPreInstalledWDA.Contains(selectedUDID))
+            {
+                Database.DeleteUDIDFromUsePreInstalledWDAList(selectedUDID);
+                UDIDPreInstalledWDA.Remove(selectedUDID);
+                usePreInstalledWDAToolStripMenuItem.Image = null;
+            }
+            else
+            {
+                Database.InsertUDIDIntoUsePreInstalledWDAList(selectedUDID);
+                UDIDPreInstalledWDA.Add(selectedUDID);
+                usePreInstalledWDAToolStripMenuItem.Image = Resources.check_mark;
+            }
+        }
+
+        private void contextMenuStrip2_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (selectedOS.Equals("iOS"))
+            {
+                usePreInstalledWDAToolStripMenuItem.Visible = true;
+                if (UDIDPreInstalledWDA.Contains(selectedUDID))
+                {
+                    usePreInstalledWDAToolStripMenuItem.Image = Resources.check_mark;
+                }
+                else
+                {
+                    usePreInstalledWDAToolStripMenuItem.Image = null;
+                }
+            }
+            else
+            {
+                usePreInstalledWDAToolStripMenuItem.Visible = false;
+            }
         }
     }
 }

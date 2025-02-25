@@ -482,8 +482,12 @@ namespace Appium_Wizard
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xmlContent);
 
-                // Attempt to select nodes using the XPath expression
-                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterTextbox.Text);
+                string filterText = filterTextbox.Text;
+                if (filterText.Contains("'"))
+                {
+                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]");
+                }
+                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterText);
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -530,13 +534,19 @@ namespace Appium_Wizard
 
         private void HighlightCurrentNode()
         {
-            if (currentIndex >= 0 && currentIndex < matchingNodes.Count)
+            try
             {
-                TreeNode currentNode = matchingNodes[currentIndex];
-                treeView1.SelectedNode = currentNode;
-                treeView1.SelectedNode.EnsureVisible();
-                elementNumberTextbox.Text = (currentIndex + 1).ToString();
+                if (currentIndex >= 0 && currentIndex < matchingNodes.Count)
+                {
+                    TreeNode currentNode = matchingNodes[currentIndex];
+                    treeView1.SelectedNode = currentNode;
+                    treeView1.SelectedNode.EnsureVisible();
+                    elementNumberTextbox.Text = (currentIndex + 1).ToString();
+                }
             }
+            catch (Exception)
+            {
+            }          
         }
 
         private void nextButton_Click(object sender, EventArgs e)
@@ -562,24 +572,31 @@ namespace Appium_Wizard
 
         private TreeNode FindTreeNodeByXmlNode(TreeNodeCollection nodes, XmlNode xmlNode)
         {
-            foreach (TreeNode treeNode in nodes)
+            try
             {
-                if (treeNode.Tag is XmlNode node)
+                foreach (TreeNode treeNode in nodes)
                 {
-                    // Compare the node names and attributes to determine equivalence
-                    if (AreNodesEquivalent(node, xmlNode))
+                    if (treeNode.Tag is XmlNode node)
                     {
-                        return treeNode;
+                        // Compare the node names and attributes to determine equivalence
+                        if (AreNodesEquivalent(node, xmlNode))
+                        {
+                            return treeNode;
+                        }
+                    }
+                    // Recursively search in child nodes
+                    TreeNode foundNode = FindTreeNodeByXmlNode(treeNode.Nodes, xmlNode);
+                    if (foundNode != null)
+                    {
+                        return foundNode;
                     }
                 }
-                // Recursively search in child nodes
-                TreeNode foundNode = FindTreeNodeByXmlNode(treeNode.Nodes, xmlNode);
-                if (foundNode != null)
-                {
-                    return foundNode;
-                }
+                return null;
             }
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }            
         }
 
         private bool AreNodesEquivalent(XmlNode node1, XmlNode node2)
@@ -770,149 +787,98 @@ namespace Appium_Wizard
             }
         }
 
-        //private string GenerateUniqueXPath(XmlNode node)
-        //{
-        //    List<string> preferredAttributes = new List<string>();
-        //    if (node.Attributes != null)
-        //    {
-        //        foreach (XmlAttribute attribute in node.Attributes)
-        //        {
-        //            preferredAttributes.Add(attribute.Name);
-        //        }
-        //    }
-        //    preferredAttributes.Remove("index");
-        //    preferredAttributes.Remove("x");
-        //    preferredAttributes.Remove("y");
-        //    preferredAttributes.Remove("width");
-        //    preferredAttributes.Remove("height");
-
-        //    string xpath = $"//*";
-
-        //    // Check each preferred attribute individually
-        //    foreach (string attr in preferredAttributes)
-        //    {
-        //        if (node.Attributes[attr] != null)
-        //        {
-        //            string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
-        //            XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-        //            if (nodes.Count == 1)
-        //            {
-        //                return singleAttributeXPath;
-        //            }
-        //        }
-        //    }
-
-        //    // Check combined attributes
-        //    string combinedAttributesXPath = xpath;
-        //    foreach (string attr in preferredAttributes)
-        //    {
-        //        if (node.Attributes[attr] != null)
-        //        {
-        //            combinedAttributesXPath += $"[@{attr}='{node.Attributes[attr].Value}']";
-        //        }
-        //    }
-        //    XmlNodeList combinedNodes = node.OwnerDocument.SelectNodes(combinedAttributesXPath);
-        //    if (combinedNodes.Count == 1)
-        //    {
-        //        return combinedAttributesXPath;
-        //    }
-
-        //    // If no unique XPath is found with attributes, check for inner text
-        //    if (!string.IsNullOrWhiteSpace(node.InnerText))
-        //    {
-        //        string textXPath = $"{xpath}[text()='{node.InnerText.Trim()}']";
-        //        XmlNodeList textNodes = node.OwnerDocument.SelectNodes(textXPath);
-        //        if (textNodes.Count == 1)
-        //        {
-        //            return textXPath;
-        //        }
-        //    }
-
-        //    // If still not unique, wrap in parentheses and append index
-        //    while (node.ParentNode != null)
-        //    {
-        //        XmlNode parentNode = node.ParentNode;
-        //        int index = 1;
-
-        //        foreach (XmlNode sibling in parentNode.ChildNodes)
-        //        {
-        //            if (sibling == node)
-        //            {
-        //                break;
-        //            }
-        //            if (sibling.Name == node.Name)
-        //            {
-        //                index++;
-        //            }
-        //        }
-
-        //        xpath = $"/{parentNode.Name}({node.Name})[{index}]" + xpath;
-        //        node = parentNode;
-        //    }
-
-        //    return xpath;
-        //}
-
-
         private string GenerateUniqueXPath(XmlNode node)
         {
-            List<string> preferredAttributes = new List<string>();
-            if (node.Attributes != null)
+            try
             {
-                // Iterate over each attribute in the node
-                foreach (XmlAttribute attribute in node.Attributes)
+                List<string> preferredAttributes = new List<string>();
+                if (node.Attributes != null)
                 {
-                    // Add the attribute name to the list
-                    preferredAttributes.Add(attribute.Name);
-                }
-            }
-            // List of attributes to consider for creating a unique XPath
-            //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
-
-            preferredAttributes.Remove("index");
-            preferredAttributes.Remove("x");
-            preferredAttributes.Remove("y");
-            preferredAttributes.Remove("width");
-            preferredAttributes.Remove("height");
-            // Start with the node name
-            //string xpath = "//" + node.Name;
-            string xpath = "//*";
-            int attCount = preferredAttributes.Count;
-            int counter = 1;
-            foreach (string attr in preferredAttributes)
-            {
-                if (node.Attributes[attr] != null)
-                {
-                    string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
-                    XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-                    if (nodes.Count == 1)
+                    // Iterate over each attribute in the node
+                    foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        return singleAttributeXPath;
+                        // Add the attribute name to the list
+                        preferredAttributes.Add(attribute.Name);
                     }
-                    if (attCount == counter)
+                }
+                // List of attributes to consider for creating a unique XPath
+                //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+
+                preferredAttributes.Remove("index");
+                preferredAttributes.Remove("x");
+                preferredAttributes.Remove("y");
+                preferredAttributes.Remove("width");
+                preferredAttributes.Remove("height");
+                // Start with the node name
+                //string xpath = "//" + node.Name;
+                string xpath = "//*";
+                int attCount = preferredAttributes.Count;
+                int counter = 1;
+                foreach (string attr in preferredAttributes)
+                {
+                    if (node.Attributes[attr] != null)
                     {
-                        int index = 1;
-                        foreach (XmlNode sibling in nodes)
+                        string escapedValue = node.Attributes[attr].Value.Replace("'", "&apos;");
+                        string singleAttributeXPath = $"{xpath}[@{attr}='{escapedValue}']";
+                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
+                        //string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
+                        //XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
+                        if (nodes.Count == 1)
                         {
-                            if (sibling == node)
+                            return singleAttributeXPath;
+                        }
+                        if (attCount == counter)
+                        {
+                            int index = 1;
+                            foreach (XmlNode sibling in nodes)
                             {
-                                xpath = $"({xpath})[{index}]";
-                                return xpath;
+                                if (sibling == node)
+                                {
+                                    xpath = $"({xpath})[{index}]";
+                                    return xpath;
+                                }
+                                index++;
                             }
-                            index++;
+                        }
+                        counter++;
+                    }
+                }
+
+
+                // Check each preferred attribute
+                foreach (string attr in preferredAttributes)
+                {
+                    if (node.Attributes[attr] != null)
+                    {
+                        xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
+
+                        // Check if this XPath is unique
+                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
+                        if (nodes.Count == 1)
+                        {
+                            return xpath;
+                        }
+                        else
+                        {
+                            // If not unique, wrap in parentheses and append index
+                            int index = 1;
+                            foreach (XmlNode sibling in nodes)
+                            {
+                                if (sibling == node)
+                                {
+                                    xpath = $"({xpath})[{index}]";
+                                    return xpath;
+                                }
+                                index++;
+                            }
                         }
                     }
-                    counter++;
                 }
-            }
 
-
-            // Check each preferred attribute
-            foreach (string attr in preferredAttributes)
-            {
-                if (node.Attributes[attr] != null)
+                // If no preferred attributes are found, check for inner text
+                if (!string.IsNullOrWhiteSpace(node.InnerText))
                 {
-                    xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
+                    xpath += $"[text()='{node.InnerText.Trim()}']";
 
                     // Check if this XPath is unique
                     XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
@@ -935,129 +901,41 @@ namespace Appium_Wizard
                         }
                     }
                 }
-            }
 
-            // If no preferred attributes are found, check for inner text
-            if (!string.IsNullOrWhiteSpace(node.InnerText))
-            {
-                xpath += $"[text()='{node.InnerText.Trim()}']";
-
-                // Check if this XPath is unique
-                XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
-                if (nodes.Count == 1)
+                // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
+                while (node.ParentNode != null)
                 {
-                    return xpath;
-                }
-                else
-                {
-                    // If not unique, wrap in parentheses and append index
+                    XmlNode parentNode = node.ParentNode;
                     int index = 1;
-                    foreach (XmlNode sibling in nodes)
+
+                    // Count the index of the node among its siblings with the same name
+                    foreach (XmlNode sibling in parentNode.ChildNodes)
                     {
                         if (sibling == node)
                         {
-                            xpath = $"({xpath})[{index}]";
-                            return xpath;
+                            break;
                         }
-                        index++;
+                        if (sibling.Name == node.Name)
+                        {
+                            index++;
+                        }
                     }
+
+                    // Wrap the XPath in parentheses and append the index
+                    xpath = $"/{parentNode.Name}/({node.Name})[{index}]" + xpath;
+
+                    // Move to the parent node
+                    node = parentNode;
                 }
-            }
-
-            // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
-            while (node.ParentNode != null)
-            {
-                XmlNode parentNode = node.ParentNode;
-                int index = 1;
-
-                // Count the index of the node among its siblings with the same name
-                foreach (XmlNode sibling in parentNode.ChildNodes)
-                {
-                    if (sibling == node)
-                    {
-                        break;
-                    }
-                    if (sibling.Name == node.Name)
-                    {
-                        index++;
-                    }
-                }
-
-                // Wrap the XPath in parentheses and append the index
-                xpath = $"/{parentNode.Name}/({node.Name})[{index}]" + xpath;
-
-                // Move to the parent node
-                node = parentNode;
-            }
-
-            return xpath;
-        }
-
-        private string GenerateUniqueXPathOld(XmlNode node)
-        {
-            List<string> preferredAttributes = new List<string>();
-            if (node.Attributes != null)
-            {
-                // Iterate over each attribute in the node
-                foreach (XmlAttribute attribute in node.Attributes)
-                {
-                    // Add the attribute name to the list
-                    preferredAttributes.Add(attribute.Name);
-                }
-            }
-
-            // List of attributes to consider for creating a unique XPath
-            //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
-
-            // Start with the node name
-            string xpath = "//" + node.Name;
-
-            // Check each preferred attribute
-            foreach (string attr in preferredAttributes)
-            {
-                if (node.Attributes[attr] != null)
-                {
-                    xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
-                    return xpath;
-                }
-            }
-
-            // If no preferred attributes are found, check for inner text
-            if (!string.IsNullOrWhiteSpace(node.InnerText))
-            {
-                xpath += $"[text()='{node.InnerText.Trim()}']";
                 return xpath;
             }
-
-            // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
-            while (node.ParentNode != null)
+            catch (Exception)
             {
-                XmlNode parentNode = node.ParentNode;
-                int index = 1;
-
-                // Count the index of the node among its siblings with the same name
-                foreach (XmlNode sibling in parentNode.ChildNodes)
-                {
-                    if (sibling == node)
-                    {
-                        break;
-                    }
-                    if (sibling.Name == node.Name)
-                    {
-                        index++;
-                    }
-                }
-
-                // Append the current node's position to the XPath
-                xpath = "/" + parentNode.Name + "/" + node.Name + "[" + index + "]" + xpath;
-
-                // Move to the parent node
-                node = parentNode;
-            }
-
-            return xpath;
+                return "";
+            }            
         }
 
+       
         private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //GoogleAnalytics.SendEvent("Object_Spy_TreeView_AddToFilter", os);

@@ -559,5 +559,55 @@ namespace Appium_Wizard
                 return output;
             }
         }
+
+        // Method to insert a single UDID
+        public static void InsertUDIDIntoUsePreInstalledWDAList(string udid)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO UsePreInstalledWDAUDIDList (UDID) VALUES (@UDID)";
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UDID", udid);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Method to query and return a list of UDIDs
+        public static List<string> QueryUDIDsFromUsePreInstalledWDAList()
+        {
+            var udids = new List<string>();
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT UDID FROM UsePreInstalledWDAUDIDList";
+                using (var command = new SQLiteCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        udids.Add(reader["UDID"].ToString());
+                    }
+                }
+            }
+            return udids;
+        }
+
+        // Method to delete a single UDID
+        public static void DeleteUDIDFromUsePreInstalledWDAList(string udid)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM UsePreInstalledWDAUDIDList WHERE UDID = @UDID";
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UDID", udid);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

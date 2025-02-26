@@ -53,6 +53,7 @@
             copyUniqueXPathToolStripMenuItem1 = new ToolStripMenuItem();
             addUniqueXpathToFilterToolStripMenuItem1 = new ToolStripMenuItem();
             coordLabel = new Label();
+            helpButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
@@ -252,12 +253,25 @@
             coordLabel.Name = "coordLabel";
             coordLabel.Size = new Size(0, 15);
             coordLabel.TabIndex = 14;
+            coordLabel.Visible = false;
+            // 
+            // helpButton
+            // 
+            helpButton.Location = new Point(1094, 5);
+            helpButton.Name = "helpButton";
+            helpButton.Size = new Size(75, 23);
+            helpButton.TabIndex = 15;
+            helpButton.Text = "Help";
+            helpButton.UseVisualStyleBackColor = true;
+            helpButton.Click += helpButton_Click;
             // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1181, 562);
+            Controls.Add(helpButton);
             Controls.Add(coordLabel);
             Controls.Add(filterLabel);
             Controls.Add(nextButton);
@@ -309,5 +323,6 @@
         private ToolStripMenuItem copyUniqueXPathToolStripMenuItem1;
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem1;
         private Label coordLabel;
+        private Button helpButton;
     }
 }

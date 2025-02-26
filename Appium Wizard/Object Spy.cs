@@ -546,7 +546,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-            }          
+            }
         }
 
         private void nextButton_Click(object sender, EventArgs e)
@@ -596,7 +596,7 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return null;
-            }            
+            }
         }
 
         private bool AreNodesEquivalent(XmlNode node1, XmlNode node2)
@@ -932,10 +932,10 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return "";
-            }            
+            }
         }
 
-       
+
         private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //GoogleAnalytics.SendEvent("Object_Spy_TreeView_AddToFilter", os);
@@ -1014,7 +1014,14 @@ namespace Appium_Wizard
 
         private void Object_Spy_Shown(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent("Object_Spy_Shown",os);
+            GoogleAnalytics.SendEvent("Object_Spy_Shown", os);
+        }
+
+        private void helpButton_Click(object sender, EventArgs e)
+        {
+            string message = "Right click on an element/property in the image/tree view/list view to get the xpath." +
+                "            \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
+            MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
         }
     }
 }

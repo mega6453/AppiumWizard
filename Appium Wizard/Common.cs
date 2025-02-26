@@ -547,6 +547,100 @@ namespace Appium_Wizard
             }
         }
 
+        public static Dictionary<string, string> GetListOfInstalledPlugins()
+        {
+            Dictionary<string, string> plugins = new Dictionary<string, string>();
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.Arguments = "/C appium plugin list";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                output += error;
+                string cleanedOutput = Regex.Replace(output, @"\x1B\[[0-9;]*[a-zA-Z]", "");
+                string[] lines = cleanedOutput.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
+                {
+                    var match = Regex.Match(line, @"- ([a-zA-Z0-9\-]+)(?:@([\d.]+))? \[.*\]");
+                    if (match.Success)
+                    {
+                        string pluginName = match.Groups[1].Value;
+                        string version = match.Groups[2].Success ? match.Groups[2].Value : "NotInstalled";
+                        plugins[pluginName] = version;
+                    }
+                }
+                return plugins;
+            }
+            catch (Exception)
+            {
+                return plugins;
+            }
+        }
+
+        public static void InstallPlugin(string plugin,string installOrUpdate, bool ShowWindow)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH");
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                if (ShowWindow)
+                {
+                    process.StartInfo.Arguments = "/K appium plugin "+installOrUpdate+" "+ plugin;
+                    process.StartInfo.UseShellExecute = false; // Use the shell to execute the command
+                    process.StartInfo.CreateNoWindow = false; // Show the window
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C appium plugin " + installOrUpdate + " " + plugin;
+                    process.StartInfo.CreateNoWindow = true; // Hide the window
+                }
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static void UninstallPlugin(string plugin, bool ShowWindow)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH");
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                process.StartInfo.Arguments = "/C appium plugin uninstall " + plugin;
+                if (ShowWindow)
+                {
+                    process.StartInfo.UseShellExecute = false; // Use the shell to execute the command
+                    process.StartInfo.CreateNoWindow = false; // Show the window
+                }
+                else
+                {
+                    process.StartInfo.CreateNoWindow = true; // Hide the window
+                }
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+
         const int SM_REBOOTREQUIRED = 0x42;
         [DllImport("user32.dll", SetLastError = true)]
         static extern int GetSystemMetrics(int nIndex);

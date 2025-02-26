@@ -1170,7 +1170,7 @@ namespace Appium_Wizard
             }
             catch (Exception exception)
             {
-                GoogleAnalytics.SendEvent("XCUITestToolStripMenuItem_Click", exception.Message);
+                GoogleAnalytics.SendExceptionEvent("XCUITestToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -2015,6 +2015,34 @@ namespace Appium_Wizard
             {
                 usePreInstalledWDAToolStripMenuItem.Visible = false;
             }
+        }
+
+        private void pluginsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://appium.io/docs/en/latest/ecosystem/plugins/",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("pluginsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("pluginsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private async void pluginsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            Plugins plugins = new Plugins();
+            await plugins.UpdatePluginList(commonProgress);
+            plugins.ShowDialog();
         }
     }
 }

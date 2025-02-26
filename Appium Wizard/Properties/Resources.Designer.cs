@@ -333,6 +333,16 @@ namespace Appium_Wizard.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap plug_in {
+            get {
+                object obj = ResourceManager.GetObject("plug_in", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap proxy {
             get {
                 object obj = ResourceManager.GetObject("proxy", resourceCulture);

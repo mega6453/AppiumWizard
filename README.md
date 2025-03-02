@@ -52,6 +52,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Server Settings - Set server arguments and default capabilities separately for each server 
 * Update Appium Server and drivers
 * Troubleshooter to fix appium and driver issues
+* Plugins Manager - Install, Update and Uninstall (**New**)
 #### iOS
 * iOS Automation Execution
 * iOS Screen Reflection and Screen Control
@@ -70,8 +71,10 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Reboot Device
 * Unlock Mobile from Screen Control
 * Take Device Screenshot
-* Record Screen from Screen Control (**New**)
-* Notifications - Enable/Disable Notifications for few events (**New**)
+* Record Screen from Screen Control
+* Notifications - Enable/Disable Notifications for few events 
+* Object Spy - Beta version (**New**)
+* Option to use pre-installed WDA by right clicking on iPhone (skipping certificate check) (**New**)
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window
@@ -83,7 +86,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Performance issues
 
 ## Built With
-* .Net C# & Windows Forms 
+* .Net C# & Windows Forms
 * NodeJS
 * Appium, XCUITest, UIAutomator2
 * go-ios

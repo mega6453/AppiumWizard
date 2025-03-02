@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace Appium_Wizard
 {
@@ -118,6 +119,8 @@ namespace Appium_Wizard
             UpdateStepLabel("Starting Appium Server...");
             Database.UpdateDataIntoFirstTimeRunTable("No");
             await ExecuteBackgroundMethod();
+            UpdateStepLabel("Scanning for detached Appium Wizard processes...");
+            Common.ScanForDetachedProcesses();
             UpdateStepLabel("Loading Modules...");
             int adbPort = 5037;
             AndroidMethods.GetInstance().StartAdbServer(adbPort);

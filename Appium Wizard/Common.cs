@@ -1197,5 +1197,64 @@ namespace Appium_Wizard
             {
             }
         }
+
+        public static void ScanForDetachedProcesses()
+        {
+            try
+            {
+                StringBuilder runningProcesses = new StringBuilder();
+                List<int> processIds = new List<int>();
+
+                Process[] iproxyProcesses = Process.GetProcessesByName("iproxy");
+                if (iproxyProcesses.Length > 0)
+                {
+                    runningProcesses.AppendLine("iproxy");
+                    foreach (var process in iproxyProcesses)
+                    {
+                        processIds.Add(process.Id);
+                    }
+                }
+
+                Process[] iOSServerProcesses = Process.GetProcessesByName("iOSServer");
+                if (iOSServerProcesses.Length > 0)
+                {
+                    runningProcesses.AppendLine("iOSServer");
+                    foreach (var process in iOSServerProcesses)
+                    {
+                        processIds.Add(process.Id);
+                    }
+                }
+
+                Process[] iOSServerPyProcesses = Process.GetProcessesByName("iOSServerPy");
+                if (iOSServerPyProcesses.Length > 0)
+                {
+                    runningProcesses.AppendLine("iOSServerPy");
+                    foreach (var process in iOSServerPyProcesses)
+                    {
+                        processIds.Add(process.Id);
+                    }
+                }
+
+                if (runningProcesses.Length > 0)
+                {
+                    var dialogResult = MessageBox.Show(
+                        $"The following Appium Wizard detached processes are running. If you did not start these processes manually, press Yes to kill the processes to run Appium Wizard smoothly or press No(You might face issues with your iOS execution):\n\n{runningProcesses}",
+                        "Detached Process",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        foreach (var item in processIds)
+                        {
+                            KillProcessById(item);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
     }
 }

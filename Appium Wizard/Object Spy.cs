@@ -1019,8 +1019,9 @@ namespace Appium_Wizard
 
         private void helpButton_Click(object sender, EventArgs e)
         {
-            string message = "Right click on an element/property in the image/tree view/list view to get the xpath." +
-                "            \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
+            string message = "Right click on an element/property in the image/tree/list view to get the xpath." +
+                             " \n\nList view(Properities list) xpath is more stable than image/tree view in this release. Select multiple properties to get the combined xpath. "+
+                             " \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
             MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
         }
     }

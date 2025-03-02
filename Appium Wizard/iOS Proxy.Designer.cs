@@ -125,34 +125,34 @@
             // goRadioButtonAuto
             // 
             goRadioButtonAuto.AutoSize = true;
-            goRadioButtonAuto.Location = new Point(156, 22);
+            goRadioButtonAuto.Location = new Point(241, 22);
             goRadioButtonAuto.Name = "goRadioButtonAuto";
             goRadioButtonAuto.Size = new Size(76, 19);
             goRadioButtonAuto.TabIndex = 7;
             goRadioButtonAuto.TabStop = true;
-            goRadioButtonAuto.Text = "Method 1";
+            goRadioButtonAuto.Text = "Method 2";
             goRadioButtonAuto.UseVisualStyleBackColor = true;
             // 
             // pyRadioButtonAuto
             // 
             pyRadioButtonAuto.AutoSize = true;
-            pyRadioButtonAuto.Location = new Point(238, 22);
+            pyRadioButtonAuto.Location = new Point(332, 22);
             pyRadioButtonAuto.Name = "pyRadioButtonAuto";
             pyRadioButtonAuto.Size = new Size(76, 19);
             pyRadioButtonAuto.TabIndex = 8;
             pyRadioButtonAuto.TabStop = true;
-            pyRadioButtonAuto.Text = "Method 2";
+            pyRadioButtonAuto.Text = "Method 3";
             pyRadioButtonAuto.UseVisualStyleBackColor = true;
             // 
             // iProxyRadioButtonAuto
             // 
             iProxyRadioButtonAuto.AutoSize = true;
-            iProxyRadioButtonAuto.Location = new Point(320, 22);
+            iProxyRadioButtonAuto.Location = new Point(155, 22);
             iProxyRadioButtonAuto.Name = "iProxyRadioButtonAuto";
             iProxyRadioButtonAuto.Size = new Size(76, 19);
             iProxyRadioButtonAuto.TabIndex = 9;
             iProxyRadioButtonAuto.TabStop = true;
-            iProxyRadioButtonAuto.Text = "Method 3";
+            iProxyRadioButtonAuto.Text = "Method 1";
             iProxyRadioButtonAuto.UseVisualStyleBackColor = true;
             // 
             // label5
@@ -256,34 +256,34 @@
             // iProxyRadioButton
             // 
             iProxyRadioButton.AutoSize = true;
-            iProxyRadioButton.Location = new Point(317, 20);
+            iProxyRadioButton.Location = new Point(154, 20);
             iProxyRadioButton.Name = "iProxyRadioButton";
             iProxyRadioButton.Size = new Size(76, 19);
             iProxyRadioButton.TabIndex = 19;
             iProxyRadioButton.TabStop = true;
-            iProxyRadioButton.Text = "Method 3";
+            iProxyRadioButton.Text = "Method 1";
             iProxyRadioButton.UseVisualStyleBackColor = true;
             // 
             // pyRadioButton
             // 
             pyRadioButton.AutoSize = true;
-            pyRadioButton.Location = new Point(235, 20);
+            pyRadioButton.Location = new Point(332, 22);
             pyRadioButton.Name = "pyRadioButton";
             pyRadioButton.Size = new Size(76, 19);
             pyRadioButton.TabIndex = 18;
             pyRadioButton.TabStop = true;
-            pyRadioButton.Text = "Method 2";
+            pyRadioButton.Text = "Method 3";
             pyRadioButton.UseVisualStyleBackColor = true;
             // 
             // goRadioButton
             // 
             goRadioButton.AutoSize = true;
-            goRadioButton.Location = new Point(153, 20);
+            goRadioButton.Location = new Point(241, 22);
             goRadioButton.Name = "goRadioButton";
             goRadioButton.Size = new Size(76, 19);
             goRadioButton.TabIndex = 17;
             goRadioButton.TabStop = true;
-            goRadioButton.Text = "Method 1";
+            goRadioButton.Text = "Method 2";
             goRadioButton.UseVisualStyleBackColor = true;
             // 
             // iOS_Proxy

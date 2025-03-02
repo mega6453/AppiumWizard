@@ -60,6 +60,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * IPA Signer
 * iOS Proxy selection with 3 methods
 * iOS Executor - 2 ways to execute iOS actions
+* Option to use pre-installed WDA by right clicking on iPhone (skipping certificate check) (**New**)
 #### Android 
 * Android Automation Execution
 * Android Screen Reflection and Screen Control
@@ -74,7 +75,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Record Screen from Screen Control
 * Notifications - Enable/Disable Notifications for few events 
 * Object Spy - Beta version (**New**)
-* Option to use pre-installed WDA by right clicking on iPhone (skipping certificate check) (**New**)
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window

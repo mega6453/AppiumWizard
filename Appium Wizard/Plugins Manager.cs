@@ -20,28 +20,6 @@ namespace Appium_Wizard
             InitializeComponent();
         }
 
-        //public async Task GetPluginInformation(MainScreen mainScreen = null)
-        //{
-        //    CommonProgress commonProgress = new CommonProgress();
-        //    commonProgress.Owner = mainScreen;
-        //    commonProgress.Show();
-        //    commonProgress.UpdateStepLabel("Get Plugins List", "Please wait while fetching plugins list...");
-        //    await Task.Run(() =>
-        //    {
-        //        var result = Common.GetListOfInstalledPlugins();
-        //        listView1.Items.Clear();
-
-        //        foreach (var kvp in result)
-        //        {
-        //            ListViewItem item = new ListViewItem(kvp.Key);
-        //            item.SubItems.Add(kvp.Value);
-        //            listView1.Items.Add(item);
-        //        }
-        //    });
-        //    commonProgress.Close();
-        //    GoogleAnalytics.SendEvent("GetPluginInformation");
-        //}
-
         private void pluginsLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
@@ -95,7 +73,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.Owner = this;
-            if (checkBox1.Checked)
+            if (showProgressCheckBox1.Checked)
             {
                 commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin " + selectedPlugin + "..." +
                                                "\n\nPlease close the cmd window once the execution completed to continue here...");
@@ -106,9 +84,9 @@ namespace Appium_Wizard
             }
             await Task.Run(() =>
             {
-                Common.InstallPlugin(selectedPlugin, "install", checkBox1.Checked);
+                Common.InstallPlugin(selectedPlugin, "install", showProgressCheckBox1.Checked);
             });
-            UpdatePluginList(commonProgress);
+            await UpdatePluginList(commonProgress);
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -118,7 +96,7 @@ namespace Appium_Wizard
                 ListViewItem selectedItem = listView1.SelectedItems[0];
                 selectedPlugin = selectedItem.SubItems[0].Text;
                 selectedVersion = selectedItem.SubItems[1].Text;
-                checkBox1.Enabled = true;
+                showProgressCheckBox1.Enabled = true;
                 if (selectedVersion.Equals("NotInstalled"))
                 {
                     installButton.Enabled = true;
@@ -136,7 +114,7 @@ namespace Appium_Wizard
             {
                 installButton.Enabled = false;
                 uninstallButton.Enabled = false;
-                checkBox1.Enabled = false;
+                showProgressCheckBox1.Enabled = false;
                 updateButton.Enabled = false;
             }
         }
@@ -151,12 +129,12 @@ namespace Appium_Wizard
             if (textBox1.Text.Length > 0)
             {
                 otherPluginInstallButton.Enabled = true;
-                checkBox2.Enabled = true;
+                showProgressCheckBox2.Enabled = true;
             }
             else
             {
                 otherPluginInstallButton.Enabled = false;
-                checkBox2.Enabled = false;
+                showProgressCheckBox2.Enabled = false;
             }
         }
 
@@ -166,7 +144,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.Owner = this;
-            if (checkBox1.Checked)
+            if (showProgressCheckBox1.Checked)
             {
                 commonProgress.UpdateStepLabel("Update Plugin", "Please wait while updating plugin " + selectedPlugin + "..." +
                                                "\n\nPlease close the cmd window once the execution completed to continue here...");
@@ -177,9 +155,9 @@ namespace Appium_Wizard
             }
             await Task.Run(() =>
             {
-                Common.InstallPlugin(selectedPlugin, "update", checkBox1.Checked);
+                Common.InstallPlugin(selectedPlugin, "update", showProgressCheckBox1.Checked);
             });
-            UpdatePluginList(commonProgress);
+            await UpdatePluginList(commonProgress);
         }
 
         private async void otherPluginInstallButton_Click(object sender, EventArgs e)
@@ -188,7 +166,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
             commonProgress.Owner = this;
-            if (checkBox2.Checked)
+            if (showProgressCheckBox2.Checked)
             {
                 commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin " + textBox1.Text + "..." +
                                                "\n\nPlease close the cmd window once the execution completed to continue here...");
@@ -199,9 +177,9 @@ namespace Appium_Wizard
             }
             await Task.Run(() =>
             {
-                Common.InstallPlugin(textBox1.Text, "install", checkBox2.Checked);
+                Common.InstallPlugin(textBox1.Text, "install", showProgressCheckBox2.Checked);
             });
-            UpdatePluginList(commonProgress);
+            await UpdatePluginList(commonProgress);
         }
 
         private void Plugins_Shown(object sender, EventArgs e)
@@ -218,9 +196,25 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel("Uninstall Plugin", "Please wait while uninstalling plugin " + selectedPlugin + "...");
             await Task.Run(() =>
             {
-                Common.UninstallPlugin(selectedPlugin,checkBox1.Checked);
+                Common.UninstallPlugin(selectedPlugin, showProgressCheckBox1.Checked);
             });
-            UpdatePluginList(commonProgress);
+            await UpdatePluginList(commonProgress);
+        }
+
+        private void showProgressCheckBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (showProgressCheckBox2.Checked)
+            {
+                MessageBox.Show("Checking this box will display the CMD window where the plugin installation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void showProgressCheckBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (showProgressCheckBox1.Checked)
+            {
+                MessageBox.Show("Checking this box will display the CMD window where the plugin installation/updation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }

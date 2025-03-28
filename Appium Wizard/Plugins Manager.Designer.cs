@@ -40,8 +40,8 @@
             otherPluginInstallButton = new Button();
             closeButton = new Button();
             pluginsLinkLabel = new LinkLabel();
-            checkBox1 = new CheckBox();
-            checkBox2 = new CheckBox();
+            showProgressCheckBox1 = new CheckBox();
+            showProgressCheckBox2 = new CheckBox();
             updateButton = new Button();
             SuspendLayout();
             // 
@@ -114,8 +114,9 @@
             // 
             // textBox1
             // 
+            textBox1.Anchor = AnchorStyles.None;
             textBox1.BorderStyle = BorderStyle.FixedSingle;
-            textBox1.Location = new Point(21, 227);
+            textBox1.Location = new Point(17, 227);
             textBox1.Name = "textBox1";
             textBox1.PlaceholderText = "<installation key>";
             textBox1.Size = new Size(341, 23);
@@ -137,7 +138,7 @@
             // closeButton
             // 
             closeButton.AutoSize = true;
-            closeButton.Location = new Point(287, 256);
+            closeButton.Location = new Point(263, 256);
             closeButton.Name = "closeButton";
             closeButton.Size = new Size(75, 25);
             closeButton.TabIndex = 7;
@@ -156,27 +157,29 @@
             pluginsLinkLabel.Text = "Plugins";
             pluginsLinkLabel.LinkClicked += pluginsLinkLabel_LinkClicked;
             // 
-            // checkBox1
+            // showProgressCheckBox1
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Enabled = false;
-            checkBox1.Location = new Point(12, 166);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(148, 19);
-            checkBox1.TabIndex = 9;
-            checkBox1.Text = "Show progress window";
-            checkBox1.UseVisualStyleBackColor = true;
+            showProgressCheckBox1.AutoSize = true;
+            showProgressCheckBox1.Enabled = false;
+            showProgressCheckBox1.Location = new Point(12, 166);
+            showProgressCheckBox1.Name = "showProgressCheckBox1";
+            showProgressCheckBox1.Size = new Size(148, 19);
+            showProgressCheckBox1.TabIndex = 9;
+            showProgressCheckBox1.Text = "Show progress window";
+            showProgressCheckBox1.UseVisualStyleBackColor = true;
+            showProgressCheckBox1.CheckedChanged += showProgressCheckBox1_CheckedChanged;
             // 
-            // checkBox2
+            // showProgressCheckBox2
             // 
-            checkBox2.AutoSize = true;
-            checkBox2.Enabled = false;
-            checkBox2.Location = new Point(12, 260);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(148, 19);
-            checkBox2.TabIndex = 10;
-            checkBox2.Text = "Show progress window";
-            checkBox2.UseVisualStyleBackColor = true;
+            showProgressCheckBox2.AutoSize = true;
+            showProgressCheckBox2.Enabled = false;
+            showProgressCheckBox2.Location = new Point(12, 260);
+            showProgressCheckBox2.Name = "showProgressCheckBox2";
+            showProgressCheckBox2.Size = new Size(148, 19);
+            showProgressCheckBox2.TabIndex = 10;
+            showProgressCheckBox2.Text = "Show progress window";
+            showProgressCheckBox2.UseVisualStyleBackColor = true;
+            showProgressCheckBox2.CheckedChanged += showProgressCheckBox2_CheckedChanged;
             // 
             // updateButton
             // 
@@ -197,8 +200,8 @@
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(435, 288);
             Controls.Add(updateButton);
-            Controls.Add(checkBox2);
-            Controls.Add(checkBox1);
+            Controls.Add(showProgressCheckBox2);
+            Controls.Add(showProgressCheckBox1);
             Controls.Add(pluginsLinkLabel);
             Controls.Add(closeButton);
             Controls.Add(otherPluginInstallButton);
@@ -212,8 +215,9 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Plugins";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Plugins";
+            Text = "Plugins Manager";
             Load += Plugins_Load;
             Shown += Plugins_Shown;
             ResumeLayout(false);
@@ -233,8 +237,8 @@
         private Button otherPluginInstallButton;
         private Button closeButton;
         private LinkLabel pluginsLinkLabel;
-        private CheckBox checkBox1;
-        private CheckBox checkBox2;
+        private CheckBox showProgressCheckBox1;
+        private CheckBox showProgressCheckBox2;
         private Button updateButton;
     }
 }

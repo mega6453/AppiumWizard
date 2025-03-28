@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
-using System.ComponentModel;
-using System.Dynamic;
-using System.IO;
-using System.Windows.Forms;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.XPath;
 
 namespace Appium_Wizard

@@ -204,8 +204,21 @@ namespace Appium_Wizard
 
         public bool iSWDAInstalled(string udid)
         {
-            bool isInstalled = GetListOfInstalledApps(udid).Contains("com.facebook.WebDriverAgentRunner.xctrunner");
-            return isInstalled;
+            var installedApps = GetListOfInstalledApps(udid);
+            if (installedApps.Contains("com.facebook.WebDriverAgentRunner.xctrunner"))
+            {
+                return true;
+            }
+            if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
+            {
+                return installedApps.Contains(MainScreen.UDIDPreInstalledWDA[udid]);
+            }
+            return false;
+        }
+
+        public bool iSAppInstalled(string udid, string bundleId)
+        {
+            return GetListOfInstalledApps(udid).Contains(bundleId);
         }
 
         public bool isPasswordProtected(string udid)
@@ -651,7 +664,15 @@ namespace Appium_Wizard
                 //iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
                 //iOSProcess.Start();
                 //return "";
-                iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+
+                if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                {
+                    iOSProcess.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
+                }
+                else
+                {
+                    iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                }
                 iOSProcess.StartInfo.RedirectStandardOutput = true;
                 iOSProcess.StartInfo.RedirectStandardError = true;
                 iOSProcess.StartInfo.UseShellExecute = false;
@@ -670,7 +691,15 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                if(MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                {
+                    return ExecuteCommandPy("developer dvt launch " + MainScreen.UDIDPreInstalledWDA[udid], udid, false);
+
+                }
+                else
+                {
+                    return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                }
             }
         }
 
@@ -1166,6 +1195,7 @@ namespace Appium_Wizard
 
         public void StartiOSProxyServer(string udid, int localPort, int iOSPort, iOSExecutable executable = iOSExecutable.go)
         {
+            Common.KillProcessByPortNumber(localPort);
             if (executable.Equals(iOSExecutable.go))
             {
                 try
@@ -1267,6 +1297,8 @@ namespace Appium_Wizard
 
         public void StartiProxyServer(string udid, int localPort1, int iOSPort1, int localPort2, int iOSPort2)
         {
+            Common.KillProcessByPortNumber(localPort1);
+            Common.KillProcessByPortNumber(localPort2);
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = iProxyFilePath,
@@ -1432,7 +1464,15 @@ namespace Appium_Wizard
 
                     // Configure the process
                     process.StartInfo.FileName = iOSServerFilePath;
-                    process.StartInfo.Arguments = "runwda --udid=" + udid;
+                    if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iOSMethods.GetInstance().iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                    {
+                        process.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
+                    }
+                    else
+                    {
+                        process.StartInfo.Arguments = "runwda --udid=" + udid;
+                    }
+                    //process.StartInfo.Arguments = "runwda --udid=" + udid;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.RedirectStandardError = true;
@@ -1527,7 +1567,15 @@ namespace Appium_Wizard
                     //{
                     //    return RunWebDriverAgentQuick(commonProgress,udid,port);
                     //}
-                    return "unhandled";
+                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        return sessionId;
+                    }
+                    else
+                    {
+                        return "unhandled";
+                    }                    
                 }
                 else
                 {

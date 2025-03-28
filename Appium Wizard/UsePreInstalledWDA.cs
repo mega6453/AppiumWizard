@@ -1,0 +1,106 @@
+﻿using Appium_Wizard.Properties;
+using System.Linq;
+
+namespace Appium_Wizard
+{
+    public partial class UsePreInstalledWDA : Form
+    {
+        string udid, deviceName;
+        string defaultBundleId = "com.facebook.WebDriverAgentRunner.xctrunner";
+        public UsePreInstalledWDA(string udid, string deviceName)
+        {
+            this.udid = udid;
+            this.deviceName = deviceName;
+            InitializeComponent();
+        }
+
+        private void ApplyButton_Click(object sender, EventArgs e)
+        {
+            if (dontUseRadioButton.Checked)
+            {
+                Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
+                MainScreen.UDIDPreInstalledWDA.Remove(udid);
+                Close();
+            }
+            if (customRadioButton.Checked)
+            {
+                if (string.IsNullOrEmpty(bundleIdTextbox.Text.Trim()) | string.IsNullOrWhiteSpace(bundleIdTextbox.Text.Trim()))
+                {
+                    MessageBox.Show("Please enter the bundle id of WebDriverAgentRunner which you have installed in your device and then apply.", "Use Pre-Installed WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
+                    Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, bundleIdTextbox.Text.Trim());
+                    MainScreen.UDIDPreInstalledWDA.Remove(udid);
+                    MainScreen.UDIDPreInstalledWDA.Add(udid, bundleIdTextbox.Text.Trim());
+                    Close();
+                }
+            }
+            if (defaultRadioButton.Checked)
+            {
+                Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
+                Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, defaultBundleId);
+                MainScreen.UDIDPreInstalledWDA.Remove(udid);
+                MainScreen.UDIDPreInstalledWDA.Add(udid,defaultBundleId);
+                Close();
+            }
+        }
+
+        private void UsePreInstalledWDA_Load(object sender, EventArgs e)
+        {
+            deviceNameLabel.Text = deviceName;            
+            var udids = Database.QueryUDIDsFromUsePreInstalledWDAList();
+            var udidsAndBundleIds = Database.QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList();
+
+            if (udids.Contains(udid))
+            {
+                foreach (var item in udidsAndBundleIds)
+                {
+                    if (item.UDID.Equals(udid))
+                    {
+                        if (item.BundleId.Equals(defaultBundleId))
+                        {
+                            defaultRadioButton.Checked = true;
+                            label1.Enabled = false;
+                            bundleIdTextbox.Enabled = false;
+                        }
+                        else
+                        {
+                            customRadioButton.Checked = true;
+                            label1.Enabled = true;
+                            bundleIdTextbox.Enabled = true;
+                            bundleIdTextbox.Text = item.BundleId.ToString();
+                        }
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                dontUseRadioButton.Select();
+                label1.Enabled = false;
+                bundleIdTextbox.Enabled = false;
+            }           
+        }
+
+        private void customRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (customRadioButton.Checked)
+            {
+                label1.Enabled = true;
+                bundleIdTextbox.Enabled = true;
+            }
+            else
+            {
+                label1.Enabled = false;
+                bundleIdTextbox.Enabled = false;
+            }
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+    }
+}

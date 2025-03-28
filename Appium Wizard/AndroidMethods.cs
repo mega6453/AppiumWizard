@@ -23,7 +23,7 @@ namespace Appium_Wizard
         {
             ProcessStartInfo adbStartInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, 
+                FileName = adbFilePath,
                 Arguments = "-P " + AdbPort + " start-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -31,7 +31,7 @@ namespace Appium_Wizard
                 CreateNoWindow = true
             };
 
-            adbProcess = new Process { StartInfo = adbStartInfo };         
+            adbProcess = new Process { StartInfo = adbStartInfo };
             adbProcess.Start();
             Thread.Sleep(2000);
             int processId = adbProcess.Id;
@@ -42,7 +42,7 @@ namespace Appium_Wizard
         {
             ProcessStartInfo adbStopInfo = new ProcessStartInfo
             {
-                FileName = adbFilePath, 
+                FileName = adbFilePath,
                 Arguments = "-P " + AdbPort + " kill-server",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -60,6 +60,38 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server", false);
             ExecuteCommand("-s " + udid + " shell am force-stop io.appium.uiautomator2.server.test", false);
         }
+
+        public void UninstallOtherInstrumentationApps(string udid)
+        {
+            var apps = ListOfInstrumentationPackages(udid);
+            apps.Remove("io.appium.uiautomator2.server.test");
+            apps.Remove("io.appium.uiautomator2.server");
+            foreach (var item in apps)
+            {
+                UnInstallApp(udid,item);
+            }
+        }
+
+        public List<string> ListOfInstrumentationPackages(string udid)
+        {
+            string instrumentations = ExecuteCommand("-s " + udid + " shell pm list instrumentation", false);
+            List<string> packageNames = new List<string>();
+            string pattern = @"instrumentation:([\w\.]+)/";
+
+            MatchCollection matches = Regex.Matches(instrumentations, pattern);
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count > 1)
+                {
+                    packageNames.Add(match.Groups[1].Value);
+                }
+            }
+
+            return packageNames;
+        }
+
+
 
         public List<string> GetListOfDevicesUDID()
         {
@@ -220,9 +252,9 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell am start -n " + activityName);
         }
 
-        public bool isUIAutomatorInstalled(string udid)
+        public bool isUIAutomatorInstalled(string udid, bool waitForExit = true, int timeout = 0)
         {
-            string output = ExecuteCommand("-s " + udid + " shell pm list instrumentation");
+            string output = ExecuteCommand("-s " + udid + " shell pm list instrumentation", waitForExit, timeout);
             return output.Contains("io.appium.uiautomator2.server.test/androidx.test.runner.AndroidJUnitRunner") ? true : false;
         }
 
@@ -290,7 +322,7 @@ namespace Appium_Wizard
                 string service = match.Groups[2].Value;
                 string ipAddress = match.Groups[3].Value;
                 string portNumber = match.Groups[4].Value;
-                string address = ipAddress+":" + portNumber;
+                string address = ipAddress + ":" + portNumber;
                 if (service.Contains("pairing"))
                 {
                     if (keyValuePairs.ContainsKey(deviceName))
@@ -399,7 +431,7 @@ namespace Appium_Wizard
 
         public bool ClearAppData(string udid, string packageName)
         {
-            var output = ExecuteCommandWithCmd("-s " + udid + " shell pm clear "+packageName);
+            var output = ExecuteCommandWithCmd("-s " + udid + " shell pm clear " + packageName);
             if (output.Contains("Success"))
             {
                 return true;
@@ -430,15 +462,28 @@ namespace Appium_Wizard
             AndroidMethods.GetInstance().UnInstallApp(udid, "io.appium.uiautomator2.server.test");
             AndroidMethods.GetInstance().UnInstallApp(udid, "com.experitest.uiautomator.test");
         }
-        public string ExecuteCommand(string arguments, bool waitForExit = true)
+        public string ExecuteCommand(string arguments, bool waitForExit = true, int timeout = 0)
         {
             try
             {
                 adbProcess.StartInfo.Arguments = arguments;
                 adbProcess.Start();
+                bool processExited = false;
                 if (waitForExit)
                 {
-                    adbProcess.WaitForExit();
+                    if (timeout == 0)
+                    {
+                        adbProcess.WaitForExit();
+                    }
+                    else
+                    {
+                        processExited = adbProcess.WaitForExit(timeout);
+                    }
+                }
+                if (timeout != 0 && !processExited)
+                {
+                    adbProcess.Kill(); // Kill the process if it did not exit within the timeout
+                    return "Process did not complete within the allotted time.";
                 }
                 string output = adbProcess.StandardOutput.ReadToEnd();
                 string error = adbProcess.StandardError.ReadToEnd();
@@ -939,7 +984,7 @@ namespace Appium_Wizard
                     MaxTimeout = -1,
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest("/session/"+sessionId+"/source", Method.Get);
+                var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
                 using (JsonDocument doc = JsonDocument.Parse(response.Content))
@@ -971,7 +1016,7 @@ namespace Appium_Wizard
                     MaxTimeout = -1,
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest("/session/"+sessionId+"/screenshot", Method.Get);
+                var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
                 RestResponse response = client.Execute(request);
                 string jsonString = response.Content;
 

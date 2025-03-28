@@ -257,6 +257,7 @@ namespace Appium_Wizard
             richTextBox1.Location = new Point(0, 0);
             richTextBox1.Margin = new Padding(2);
             richTextBox1.Name = "richTextBox1";
+            richTextBox1.ReadOnly = true;
             richTextBox1.Size = new Size(1000, 602);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
@@ -327,7 +328,7 @@ namespace Appium_Wizard
             // 
             // updaterToolStripMenuItem
             // 
-            updaterToolStripMenuItem.Image = (Image)resources.GetObject("updaterToolStripMenuItem.Image");
+            updaterToolStripMenuItem.Image = Properties.Resources.update;
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
             updaterToolStripMenuItem.Size = new Size(188, 30);
             updaterToolStripMenuItem.Text = "Updater";
@@ -644,6 +645,7 @@ namespace Appium_Wizard
             richTextBox2.Location = new Point(0, 0);
             richTextBox2.Margin = new Padding(2);
             richTextBox2.Name = "richTextBox2";
+            richTextBox2.ReadOnly = true;
             richTextBox2.Size = new Size(524, 277);
             richTextBox2.TabIndex = 0;
             richTextBox2.Text = resources.GetString("richTextBox2.Text");
@@ -666,6 +668,7 @@ namespace Appium_Wizard
             richTextBox3.Location = new Point(0, 0);
             richTextBox3.Margin = new Padding(2);
             richTextBox3.Name = "richTextBox3";
+            richTextBox3.ReadOnly = true;
             richTextBox3.Size = new Size(524, 276);
             richTextBox3.TabIndex = 0;
             richTextBox3.Text = resources.GetString("richTextBox3.Text");
@@ -688,6 +691,7 @@ namespace Appium_Wizard
             richTextBox4.Location = new Point(0, 0);
             richTextBox4.Margin = new Padding(2);
             richTextBox4.Name = "richTextBox4";
+            richTextBox4.ReadOnly = true;
             richTextBox4.Size = new Size(524, 276);
             richTextBox4.TabIndex = 0;
             richTextBox4.Text = resources.GetString("richTextBox4.Text");
@@ -710,6 +714,7 @@ namespace Appium_Wizard
             richTextBox5.Location = new Point(0, 0);
             richTextBox5.Margin = new Padding(2);
             richTextBox5.Name = "richTextBox5";
+            richTextBox5.ReadOnly = true;
             richTextBox5.Size = new Size(524, 277);
             richTextBox5.TabIndex = 0;
             richTextBox5.Text = resources.GetString("richTextBox5.Text");

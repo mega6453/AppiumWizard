@@ -323,85 +323,247 @@ namespace Appium_Wizard
             }
         }
 
-        public static void InstallAppiumGlobally()
+        public static void InstallAppiumGlobally(bool showExecution = false)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                if (showExecution)
+                {
+                    process.StartInfo.Arguments = $"/K npm i -g appium";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = $"/C npm i -g appium";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while installing appium. \nOringal exception:"+e.Message,"Install Appium",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }           
+        }
+
+        public static void UninstallAppium(bool showExecution = false)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                process.StartInfo.WorkingDirectory = serverFolderPath;
+                process.StartInfo.UseShellExecute = false;
+                if (showExecution)
+                {
+                    // Uninstall Appium
+                    process.StartInfo.Arguments = "/K npm uninstall -g appium";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    // Uninstall Appium
+                    process.StartInfo.Arguments = "/C npm uninstall -g appium";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.Start();
+                process.WaitForExit();
+
+                // Clear npm cache
+                process.StartInfo.Arguments = "/C npm cache clean --force";
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while uninstalling appium. \nOringal exception:" + e.Message, "Uninstall Appium", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static void InstallXCUITestDriver(bool showExecution = false)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+                if (showExecution)
+                {
+                    process.StartInfo.Arguments = "/K appium driver install xcuitest";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C appium driver install xcuitest";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while installing xcuitest driver. \nOriginal exception: " + e.Message, "Install xcuitest driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static void UninstallXCUITestDriver(bool showExecution = false)
+        {
+            try
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+                if (showExecution)
+                {
+                    process.StartInfo.Arguments = "/K appium driver uninstall xcuitest";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C appium driver uninstall xcuitest";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while uninstalling xcuitest driver. \nOriginal exception: " + e.Message, "Uninstall xcuitest driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        public static void UpdateXCUITestDriver(bool showExecution = false, bool unsafeUpdate = false)
+        {
+            try
+            {
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd",
+                        UseShellExecute = false,
+                        CreateNoWindow = !showExecution
+                    }
+                };
+
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+
+                string command = "appium driver update xcuitest";
+                if (unsafeUpdate)
+                {
+                    command += " --unsafe";
+                }
+
+                process.StartInfo.Arguments = (showExecution ? "/K " : "/C ") + command;
+
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while updating xcuitest driver. \nOriginal exception: " + e.Message, "Update xcuitest driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        public static void InstallUIAutomatorDriver(bool showExecution = false)
         {
             Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            process.StartInfo.FileName = "cmd";
+            string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
             pathVariable += ";" + serverFolderPath;
             process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-            process.StartInfo.WorkingDirectory = serverFolderPath;
-            process.StartInfo.Arguments = $"/C npm i -g appium";
-            process.StartInfo.RedirectStandardOutput = true;
+            if (showExecution)
+            {
+                process.StartInfo.Arguments = "/K appium driver install uiautomator2";
+                process.StartInfo.CreateNoWindow = false;
+            }
+            else
+            {
+                process.StartInfo.Arguments = "/C appium driver install uiautomator2";
+                process.StartInfo.CreateNoWindow = true;
+            }
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
             process.Start();
             process.WaitForExit();
         }
 
-        public static void InstallXCUITestDriver()
+        public static void UninstallUIAutomatorDriver(bool showExecution = false)
         {
             Process process = new Process();
             process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
+            string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
             pathVariable += ";" + serverFolderPath;
             process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-
-            process.StartInfo.Arguments = "/C appium driver install xcuitest";
-            process.StartInfo.RedirectStandardOutput = true;
+            if (showExecution)
+            {
+                process.StartInfo.Arguments = "/K appium driver uninstall uiautomator2";
+                process.StartInfo.CreateNoWindow = false;
+            }
+            else
+            {
+                process.StartInfo.Arguments = "/C appium driver uninstall uiautomator2";
+                process.StartInfo.CreateNoWindow = true;
+            }
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
             process.Start();
             process.WaitForExit();
         }
 
-        public static void UpdateXCUITestDriver()
+        public static void UpdateUIAutomatorDriver(bool showExecution = false, bool unsafeUpdate = false)
         {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
-            pathVariable += ";" + serverFolderPath;
-            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+            try
+            {
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd",
+                        UseShellExecute = false,
+                        CreateNoWindow = !showExecution
+                    }
+                };
 
-            process.StartInfo.Arguments = "/C appium driver update xcuitest";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
-        }
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
 
+                string command = "appium driver update uiautomator2";
+                if (unsafeUpdate)
+                {
+                    command += " --unsafe";
+                }
 
-        public static void InstallUIAutomatorDriver()
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
-            pathVariable += ";" + serverFolderPath;
-            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-
-            process.StartInfo.Arguments = "/C appium driver install uiautomator2";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
-        }
-
-        public static void UpdateUIAutomatorDriver()
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH");
-            pathVariable += ";" + serverFolderPath;
-            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-
-            process.StartInfo.Arguments = "/C appium driver update uiautomator2";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
+                process.StartInfo.Arguments = (showExecution ? "/K " : "/C ") + command;
+                process.Start();
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while updating UIAutomator2 driver. \nOriginal exception: " + e.Message, "Update UIAutomator2 driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 
@@ -519,7 +681,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                return "";
+                return "NA";
             }
         }
 
@@ -543,7 +705,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                return "";
+                return "NA";
             }
         }
 
@@ -660,17 +822,22 @@ namespace Appium_Wizard
         }
 
 
-        public static void InstallNodeJs()
+        public static void InstallNodeJs(bool showExecution = false)
         {
             Process process = new Process();
             process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
-            process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\"";
+            process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\" -y";
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
+            if (showExecution)
+            {
+                process.StartInfo.CreateNoWindow = false;
+            }
+            else
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
             process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
+            process.WaitForExit();           
         }
 
         public static string WSLHelp()

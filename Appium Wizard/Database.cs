@@ -609,5 +609,46 @@ namespace Appium_Wizard
                 }
             }
         }
+
+
+
+
+        // Method to insert a single UDID and BundleId
+        public static void InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(string udid, string bundleId)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO UsePreInstalledWDAUDIDList (UDID, BundleId) VALUES (@UDID, @BundleId)";
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UDID", udid);
+                    command.Parameters.AddWithValue("@BundleId", bundleId);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Method to query and return a list of UDIDs and BundleIds
+        public static List<(string UDID, string BundleId)> QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList()
+        {
+            var udidsAndBundleIds = new List<(string UDID, string BundleId)>();
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT UDID, BundleId FROM UsePreInstalledWDAUDIDList";
+                using (var command = new SQLiteCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var udid = reader["UDID"].ToString();
+                        var bundleId = reader["BundleId"].ToString();
+                        udidsAndBundleIds.Add((udid, bundleId));
+                    }
+                }
+            }
+            return udidsAndBundleIds;
+        }
     }
 }

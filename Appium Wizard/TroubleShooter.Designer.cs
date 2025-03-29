@@ -49,6 +49,8 @@
             FixNodeJSButton = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             WDAStatusLabel = new Label();
+            reInstallAllButton = new Button();
+            showProgresscheckBox = new CheckBox();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -129,7 +131,7 @@
             // checkForIssues
             // 
             checkForIssues.AutoSize = true;
-            checkForIssues.Location = new Point(216, 226);
+            checkForIssues.Location = new Point(24, 226);
             checkForIssues.Margin = new Padding(2);
             checkForIssues.Name = "checkForIssues";
             checkForIssues.Size = new Size(106, 25);
@@ -323,12 +325,38 @@
             WDAStatusLabel.TabIndex = 22;
             WDAStatusLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
+            // reInstallAllButton
+            // 
+            reInstallAllButton.AutoSize = true;
+            reInstallAllButton.BackColor = Color.FromArgb(255, 224, 192);
+            reInstallAllButton.Location = new Point(386, 226);
+            reInstallAllButton.Name = "reInstallAllButton";
+            reInstallAllButton.Size = new Size(140, 25);
+            reInstallAllButton.TabIndex = 20;
+            reInstallAllButton.Text = "Re-Install Everything";
+            reInstallAllButton.UseVisualStyleBackColor = false;
+            reInstallAllButton.Click += reInstallAllButton_Click;
+            reInstallAllButton.MouseHover += reInstallAllButton_MouseHover;
+            // 
+            // showProgresscheckBox
+            // 
+            showProgresscheckBox.AutoSize = true;
+            showProgresscheckBox.Location = new Point(207, 232);
+            showProgresscheckBox.Name = "showProgresscheckBox";
+            showProgresscheckBox.Size = new Size(148, 19);
+            showProgresscheckBox.TabIndex = 21;
+            showProgresscheckBox.Text = "Show progress window";
+            showProgresscheckBox.UseVisualStyleBackColor = true;
+            showProgresscheckBox.CheckedChanged += showProgresscheckBox_CheckedChanged;
+            // 
             // TroubleShooter
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(538, 256);
+            Controls.Add(showProgresscheckBox);
+            Controls.Add(reInstallAllButton);
             Controls.Add(checkForIssues);
             Controls.Add(tableLayoutPanel1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -368,5 +396,7 @@
         private Button FixNodeJSButton;
         private TableLayoutPanel tableLayoutPanel1;
         private Label WDAStatusLabel;
+        private Button reInstallAllButton;
+        private CheckBox showProgresscheckBox;
     }
 }

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(iOSProfileManagement));
-            button1 = new Button();
+            importProfileButton = new Button();
             listView1 = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -39,17 +39,17 @@
             deleteProfileButton = new Button();
             SuspendLayout();
             // 
-            // button1
+            // importProfileButton
             // 
-            button1.AutoSize = true;
-            button1.Location = new Point(8, 7);
-            button1.Margin = new Padding(2);
-            button1.Name = "button1";
-            button1.Size = new Size(99, 25);
-            button1.TabIndex = 0;
-            button1.Text = "Import Profile";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            importProfileButton.AutoSize = true;
+            importProfileButton.Location = new Point(8, 7);
+            importProfileButton.Margin = new Padding(2);
+            importProfileButton.Name = "importProfileButton";
+            importProfileButton.Size = new Size(99, 25);
+            importProfileButton.TabIndex = 0;
+            importProfileButton.Text = "Import Profile";
+            importProfileButton.UseVisualStyleBackColor = true;
+            importProfileButton.Click += import_Click;
             // 
             // listView1
             // 
@@ -100,7 +100,7 @@
             deleteProfileButton.TabIndex = 3;
             deleteProfileButton.Text = "Delete Profile";
             deleteProfileButton.UseVisualStyleBackColor = true;
-            deleteProfileButton.Click += button3_Click;
+            deleteProfileButton.Click += delete_Click;
             // 
             // iOSProfileManagement
             // 
@@ -110,7 +110,7 @@
             ClientSize = new Size(821, 233);
             Controls.Add(deleteProfileButton);
             Controls.Add(listView1);
-            Controls.Add(button1);
+            Controls.Add(importProfileButton);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(2);
@@ -120,7 +120,6 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "iOS Profile Management";
-            Load += iOSProfileManagement_Load;
             Shown += iOSProfileManagement_Shown;
             ResumeLayout(false);
             PerformLayout();
@@ -128,7 +127,7 @@
 
         #endregion
 
-        private Button button1;
+        private Button importProfileButton;
         private ListView listView1;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Management;
 using System.Net;
+using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -30,80 +31,94 @@ namespace Appium_Wizard
         public List<string> GetListOfDevicesUDID(iOSExecutable executable = iOSExecutable.go)
         {
             List<string> list = new List<string>();
-            if (executable == iOSExecutable.go)
+            try
             {
-                string deviceListString = ExecuteCommand("list", "any", true, 10000);
-                if (deviceListString.Contains("Process did not complete within the allotted time"))
+                if (executable == iOSExecutable.go)
                 {
-                    return GetListOfDevicesUDID(iOSExecutable.py);
-                }
-                else
-                {
-                    if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
+                    string deviceListString = ExecuteCommand("list", "any", true, 10000);
+                    if (deviceListString.Contains("Process did not complete within the allotted time"))
                     {
-                        list.Add("ITunes not installed");
+                        return GetListOfDevicesUDID(iOSExecutable.py);
                     }
                     else
                     {
-                        JObject json = JObject.Parse(deviceListString);
-                        JArray deviceList = (JArray)json["deviceList"];
-                        foreach (JToken device in deviceList)
+                        if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
                         {
-                            string udid = device.ToString();
-                            list.Add(udid);
+                            list.Add("ITunes not installed");
                         }
+                        else
+                        {
+                            JObject json = JObject.Parse(deviceListString);
+                            JArray deviceList = (JArray)json["deviceList"];
+                            foreach (JToken device in deviceList)
+                            {
+                                string udid = device.ToString();
+                                list.Add(udid);
+                            }
+                        }
+                        return list;
+                    }
+                }
+                else
+                {
+                    string deviceListString = ExecuteCommandPy("usbmux list");
+                    List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
+                    foreach (dynamic device in devices)
+                    {
+                        list.Add(device.UniqueDeviceID.ToString());
                     }
                     return list;
                 }
             }
-            else
+            catch (Exception)
             {
-                string deviceListString = ExecuteCommandPy("usbmux list");
-                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
-                foreach (dynamic device in devices)
-                {
-                    list.Add(device.UniqueDeviceID.ToString());
-                }
                 return list;
             }
         }
 
         public Dictionary<string, object> GetDeviceInformation(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            if (executable == iOSExecutable.go)
+            Dictionary<string, object> deviceValues = new Dictionary<string, object>();
+            try
             {
-                string output = ExecuteCommand("info", udid, true, 10000);
-                if (output.Contains("Process did not complete within the allotted time")
-                    | output.Contains("failed getting info"))
+                if (executable == iOSExecutable.go)
                 {
-                    return GetDeviceInformation(udid, iOSExecutable.py);
+                    string output = ExecuteCommand("info", udid, true, 10000);
+                    if (output.Contains("Process did not complete within the allotted time")
+                        | output.Contains("failed getting info"))
+                    {
+                        return GetDeviceInformation(udid, iOSExecutable.py);
+                    }
+                    else
+                    {
+                        deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
+                        return deviceValues;
+                    }
                 }
                 else
                 {
-                    Dictionary<string, object> deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
+                    string output = ExecuteCommandPy("usbmux list");
+                    List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
+
+                    foreach (dynamic device in devices)
+                    {
+                        string uniqueDeviceID = device.UniqueDeviceID.ToString();
+                        if (uniqueDeviceID == udid)
+                        {
+                            foreach (var property in device)
+                            {
+                                string key = property.Name.ToString();
+                                string value = property.Value;
+                                deviceValues[key] = value;
+                            }
+                            break;
+                        }
+                    }
                     return deviceValues;
                 }
             }
-            else
+            catch (Exception)
             {
-                string output = ExecuteCommandPy("usbmux list");
-                List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
-
-                Dictionary<string, object> deviceValues = new Dictionary<string, object>();
-                foreach (dynamic device in devices)
-                {
-                    string uniqueDeviceID = device.UniqueDeviceID.ToString();
-                    if (uniqueDeviceID == udid)
-                    {
-                        foreach (var property in device)
-                        {
-                            string key = property.Name.ToString();
-                            string value = property.Value;
-                            deviceValues[key] = value;
-                        }
-                        break;
-                    }
-                }
                 return deviceValues;
             }
         }
@@ -123,32 +138,39 @@ namespace Appium_Wizard
         public List<string> GetListOfInstalledApps(string udid, iOSExecutable executable = iOSExecutable.go)
         {
             List<string> packageList = new List<string>();
-            if (executable == iOSExecutable.go)
+            try
             {
-                var output = ExecuteCommand("apps --list", udid);
-                string pattern = @"(\w+(\.\w+)*)\s";
-                MatchCollection matches = Regex.Matches(output, pattern);
-
-                foreach (Match match in matches)
+                if (executable == iOSExecutable.go)
                 {
-                    bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
-                    if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                    var output = ExecuteCommand("apps --list", udid);
+                    string pattern = @"(\w+(\.\w+)*)\s";
+                    MatchCollection matches = Regex.Matches(output, pattern);
+
+                    foreach (Match match in matches)
                     {
-                        packageList.Add(match.Groups[1].Value);
+                        bool containsAlphabets = Regex.IsMatch(match.Groups[1].Value, @"[a-zA-Z]");
+                        if (containsAlphabets && match.Groups[1].Value.Contains("."))
+                        {
+                            packageList.Add(match.Groups[1].Value);
+                        }
                     }
+                    return packageList;
                 }
-                return packageList;
-            }
-            else
-            {
-                var output = ExecuteCommandPy("apps list -t User", udid);
-                JObject data = JObject.Parse(output);
-                var keys = data.Properties().Select(p => p.Name);
-
-                foreach (var key in keys)
+                else
                 {
-                    packageList.Add(key);
+                    var output = ExecuteCommandPy("apps list -t User", udid);
+                    JObject data = JObject.Parse(output);
+                    var keys = data.Properties().Select(p => p.Name);
+
+                    foreach (var key in keys)
+                    {
+                        packageList.Add(key);
+                    }
+                    return packageList;
                 }
+            }
+            catch (Exception)
+            {
                 return packageList;
             }
         }
@@ -204,8 +226,21 @@ namespace Appium_Wizard
 
         public bool iSWDAInstalled(string udid)
         {
-            bool isInstalled = GetListOfInstalledApps(udid).Contains("com.facebook.WebDriverAgentRunner.xctrunner");
-            return isInstalled;
+            var installedApps = GetListOfInstalledApps(udid);
+            if (installedApps.Contains("com.facebook.WebDriverAgentRunner.xctrunner"))
+            {
+                return true;
+            }
+            if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
+            {
+                return installedApps.Contains(MainScreen.UDIDPreInstalledWDA[udid]);
+            }
+            return false;
+        }
+
+        public bool iSAppInstalled(string udid, string bundleId)
+        {
+            return GetListOfInstalledApps(udid).Contains(bundleId);
         }
 
         public bool isPasswordProtected(string udid)
@@ -234,19 +269,26 @@ namespace Appium_Wizard
 
         public bool RebootDevice(string udid, iOSExecutable executable = iOSExecutable.go)
         {
-            if (executable.Equals(iOSExecutable.go))
+            try
             {
-                var output = ExecuteCommand("reboot", udid);
-                if (output.Contains("\"msg\":\"ok\""))
+                if (executable.Equals(iOSExecutable.go))
                 {
-                    return true;
+                    var output = ExecuteCommand("reboot", udid);
+                    if (output.Contains("\"msg\":\"ok\""))
+                    {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+                else
+                {
+                    ExecuteCommandPy("diagnostics restart", udid);
+                    return true; //Need to verify and fix
+                }
             }
-            else
+            catch (Exception)
             {
-                ExecuteCommandPy("diagnostics restart", udid);
-                return true; //Need to verify and fix
+                return false;
             }
         }
 
@@ -488,90 +530,112 @@ namespace Appium_Wizard
         public static string signIPAStackTrace = "";
         public string SignIPA(string udid, string IPAFilePath, CommonProgress commonProgress = null, string message = null)
         {
-            var output = isProfileAvailableToSign(udid);
-            bool isProfileAvailable = output.Item1;
-            string certificatPath = output.Item2;
-            if (isProfileAvailable)
+            try
             {
-                string tempFolder = Path.GetTempPath();
-                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
-                Directory.CreateDirectory(tempFolder);
-                string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
-                return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress, message);
-            }
-            else
-            {
-                return "ProfileNotAvailable";
-            }
-        }
-
-
-        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid, CommonProgress commonProgress = null, string message = null)
-        {
-            if (udid != "")
-            {
-                bool isProfileAvailable = isProfileHasUDID(profilePath, udid);
+                var output = isProfileAvailableToSign(udid);
+                bool isProfileAvailable = output.Item1;
+                string certificatPath = output.Item2;
                 if (isProfileAvailable)
                 {
-                    return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message);
+                    string tempFolder = Path.GetTempPath();
+                    tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                    Directory.CreateDirectory(tempFolder);
+                    string signedIPAFilePath = tempFolder + "\\signedIPA.ipa";
+                    return SignIPA(certificatPath, IPAFilePath, signedIPAFilePath, commonProgress, message);
                 }
                 else
                 {
                     return "ProfileNotAvailable";
                 }
             }
-            else
+            catch (Exception)
             {
-                return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message);
-            }
+                return "ProfileNotAvailable";
+            }          
         }
 
-        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress = null, string message = null)
+
+        public string SignIPA(string profilePath, string IPAFilePath, string outputPath, string udid, CommonProgress commonProgress = null, string message = "", string newBundleId = "", string newBundleName = "", string newBundleVersion = "")
         {
-            string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
-            string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
-            string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
-            string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
-            string[] commands = {
-                $"set PATH=\"{iOSFilesPath}\";%PATH%",
-                $"cd \"{profilePath}\"",
-                $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\" -z 9 -o \"{outputPath}\" \"{IPAFilePath}\""
-                 };
-
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/K";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardInput = true;
-
-            process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, commonProgress, message);
-            process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, commonProgress, message);
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            foreach (string command in commands)
+            if (!string.IsNullOrWhiteSpace(udid) && !isProfileHasUDID(profilePath, udid))
             {
-                process.StandardInput.WriteLine(command);
-                process.StandardInput.WriteLine("echo Command completed");
+                return "ProfileNotAvailable";
             }
-            process.StandardInput.Close();
-            process.WaitForExit();
-            int exitCode = process.ExitCode;
-            process.Close();
+            return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message, newBundleId, newBundleName, newBundleVersion);
+        }
 
-            if (signIPAStackTrace == "Archive Failed")
+        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress = null, string message = "", string newBundleId = "", string newBundleName = "", string newBundleVersion = "")
+        {
+            try
             {
-                return "Sign_IPA_Failed";
+                string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
+                string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
+                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
+                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
+
+                // Construct the zsign command with optional parameters
+                string zsignCommand = $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\"";
+
+                if (!string.IsNullOrEmpty(newBundleId))
+                {
+                    zsignCommand += $" --bundle_id \"{newBundleId}\"";
+                }
+                if (!string.IsNullOrEmpty(newBundleName))
+                {
+                    zsignCommand += $" --bundle_name \"{newBundleName}\"";
+                }
+                if (!string.IsNullOrEmpty(newBundleVersion))
+                {
+                    zsignCommand += $" --bundle_version \"{newBundleVersion}\"";
+                }
+
+                zsignCommand += $" -z 9 -o \"{outputPath}\" \"{IPAFilePath}\"";
+                string[] commands = {
+                                $"set PATH=\"{iOSFilesPath}\";%PATH%",
+                                $"cd \"{profilePath}\"",
+                                zsignCommand,
+                                "exit"
+                                };
+
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/K";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardInput = true;
+
+                process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, commonProgress, message);
+                process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, commonProgress, message);
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                foreach (string command in commands)
+                {
+                    process.StandardInput.WriteLine(command);
+                    process.StandardInput.WriteLine("echo Command completed");
+                }
+                process.StandardInput.Close();
+                process.WaitForExit();
+                int exitCode = process.ExitCode;
+                process.Close();
+
+                if (signIPAStackTrace == "Archive Failed")
+                {
+                    return "Sign_IPA_Failed";
+                }
+                else if (signIPAStackTrace == "Archive OK")
+                {
+                    return outputPath;
+                }
+                else
+                {
+                    return "Sign_IPA_Failed";
+                }
             }
-            else if (signIPAStackTrace == "Archive OK")
-            {
-                return outputPath;
-            }
-            else
+            catch (Exception)
             {
                 return "Sign_IPA_Failed";
             }
@@ -646,31 +710,54 @@ namespace Appium_Wizard
 
         public string RunWebDriverAgentQuick(string udid)
         {
-            if (isGo)
+            try
             {
-                //iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
-                //iOSProcess.Start();
-                //return "";
-                iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
-                iOSProcess.StartInfo.RedirectStandardOutput = true;
-                iOSProcess.StartInfo.RedirectStandardError = true;
-                iOSProcess.StartInfo.UseShellExecute = false;
-                iOSProcess.StartInfo.CreateNoWindow = true;
+                if (isGo)
+                {
+                    //iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                    //iOSProcess.Start();
+                    //return "";
 
-                iOSProcess.Start();
+                    if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                    {
+                        iOSProcess.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
+                    }
+                    else
+                    {
+                        iOSProcess.StartInfo.Arguments = "launch com.facebook.WebDriverAgentRunner.xctrunner" + " --udid=" + udid;
+                    }
+                    iOSProcess.StartInfo.RedirectStandardOutput = true;
+                    iOSProcess.StartInfo.RedirectStandardError = true;
+                    iOSProcess.StartInfo.UseShellExecute = false;
+                    iOSProcess.StartInfo.CreateNoWindow = true;
 
-                // Read the standard output and standard error
-                string output = iOSProcess.StandardOutput.ReadToEnd();
-                string error = iOSProcess.StandardError.ReadToEnd();
+                    iOSProcess.Start();
 
-                iOSProcess.WaitForExit();
-                MainScreen.runningProcesses.Add(iOSProcess.Id);
-                // Combine the output and error messages
-                return output + error;
+                    // Read the standard output and standard error
+                    string output = iOSProcess.StandardOutput.ReadToEnd();
+                    string error = iOSProcess.StandardError.ReadToEnd();
+
+                    iOSProcess.WaitForExit();
+                    MainScreen.runningProcesses.Add(iOSProcess.Id);
+                    // Combine the output and error messages
+                    return output + error;
+                }
+                else
+                {
+                    if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                    {
+                        return ExecuteCommandPy("developer dvt launch " + MainScreen.UDIDPreInstalledWDA[udid], udid, false);
+
+                    }
+                    else
+                    {
+                        return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                    }
+                }
             }
-            else
+            catch (Exception)
             {
-                return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                return "unhandled";
             }
         }
 
@@ -717,19 +804,26 @@ namespace Appium_Wizard
         public bool IsWDARunningInAppsList(string udid)
         {
             bool isRunning = false; string output = "";
-            if (isGo)
+            try
             {
-                output = ExecuteCommand("ps --apps", udid, false);
+                if (isGo)
+                {
+                    output = ExecuteCommand("ps --apps", udid, false);
+                }
+                else
+                {
+                    output = ExecuteCommandPy("developer core-device list-processes");
+                }
+                if (output.Contains("WebDriverAgentRunner-Runner"))
+                {
+                    isRunning = true;
+                }
+                return isRunning;
             }
-            else
+            catch (Exception)
             {
-                output = ExecuteCommandPy("developer core-device list-processes");
+                return isRunning;
             }
-            if (output.Contains("WebDriverAgentRunner-Runner"))
-            {
-                isRunning = true;
-            }
-            return isRunning;
         }
 
         public string MountImage(string udid)
@@ -757,51 +851,71 @@ namespace Appium_Wizard
         public Dictionary<string, string> GetIPAInformation(string ipaFilePath)
         {
             Dictionary<string, string> output = new Dictionary<string, string>();
-            string tempFolder = Path.GetTempPath();
-            tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
-            Directory.CreateDirectory(tempFolder);
-            var plistFilePath = Common.ExtractInfoPlistFromIPA(ipaFilePath, tempFolder);
-            if (!string.IsNullOrEmpty(plistFilePath))
+            try
             {
-                string xmlString = ExecutePlistUtil(plistFilePath);
-                output = Common.GetValueFromXml(xmlString);
+                string tempFolder = Path.GetTempPath();
+                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                Directory.CreateDirectory(tempFolder);
+                var plistFilePath = Common.ExtractInfoPlistFromIPA(ipaFilePath, tempFolder);
+                if (!string.IsNullOrEmpty(plistFilePath))
+                {
+                    string xmlString = ExecutePlistUtil(plistFilePath);
+                    output = Common.GetValueFromXml(xmlString);
+                }
+                return output;
             }
-            return output;
+            catch (Exception)
+            {
+                return output;
+            }
         }
 
         public string GetWDAIPAVersion()
         {
             string infoPlistPathFromRoot = @"Payload/WebDriverAgentRunner-Runner.app/Info.plist"; // Version is always 1.0 in this plistfile - But while downloading WDA updating the correct version in iPA.
             string infoPlistPathFromXCTest = @"Payload/WebDriverAgentRunner-Runner.app/PlugIns/WebDriverAgentRunner.xctest/Frameworks/WebDriverAgentLib.framework/Info.plist"; // Correct version given in this file.
-
             string rootInfoVersion = "1.0";
-            rootInfoVersion = GetWDAIPAVersion(infoPlistPathFromRoot);
-            if (rootInfoVersion.Equals("1.0"))
+            try
             {
-                string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
-                return xcTestInfoVersion;
+                rootInfoVersion = GetWDAIPAVersion(infoPlistPathFromRoot);
+                if (rootInfoVersion.Equals("1.0"))
+                {
+                    string xcTestInfoVersion = GetWDAIPAVersion(infoPlistPathFromXCTest);
+                    return xcTestInfoVersion;
+                }
+                return rootInfoVersion;
             }
-            return rootInfoVersion;
+            catch (Exception)
+            {
+                return rootInfoVersion;
+            }
         }
 
         private string GetWDAIPAVersion(string infoPlistPath)
         {
-            Dictionary<string, string> output = new Dictionary<string, string>();
-            string tempFolder = Path.GetTempPath();
-            tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
-            Directory.CreateDirectory(tempFolder);
+            try
+            {
+                Dictionary<string, string> output = new Dictionary<string, string>();
+                string tempFolder = Path.GetTempPath();
+                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                Directory.CreateDirectory(tempFolder);
 
-            var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
-            if (!string.IsNullOrEmpty(plistFilePath))
-            {
-                string xmlString = ExecutePlistUtil(plistFilePath);
-                output = Common.GetValueFromXml(xmlString);
+                var plistFilePath = Common.ExtractInfoPlistFromWDAIPA(infoPlistPath, tempFolder);
+                if (!string.IsNullOrEmpty(plistFilePath))
+                {
+                    string xmlString = ExecutePlistUtil(plistFilePath);
+                    output = Common.GetValueFromXml(xmlString);
+                }
+                if (output.ContainsKey("CFBundleShortVersionString"))
+                {
+                    return output["CFBundleShortVersionString"];
+                }
+                return "1.0"; // Return Default version if no key found.
             }
-            if (output.ContainsKey("CFBundleShortVersionString"))
+            catch (Exception)
             {
-                return output["CFBundleShortVersionString"];
+                return "1.0"; // Return Default version if any exception.
             }
-            return "1.0"; // Return Default version if no key found.
         }
 
         public string ExecutePlistUtil(string plistFilePath)
@@ -1166,6 +1280,7 @@ namespace Appium_Wizard
 
         public void StartiOSProxyServer(string udid, int localPort, int iOSPort, iOSExecutable executable = iOSExecutable.go)
         {
+            Common.KillProcessByPortNumber(localPort);
             if (executable.Equals(iOSExecutable.go))
             {
                 try
@@ -1267,6 +1382,8 @@ namespace Appium_Wizard
 
         public void StartiProxyServer(string udid, int localPort1, int iOSPort1, int localPort2, int iOSPort2)
         {
+            Common.KillProcessByPortNumber(localPort1);
+            Common.KillProcessByPortNumber(localPort2);
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = iProxyFilePath,
@@ -1432,7 +1549,15 @@ namespace Appium_Wizard
 
                     // Configure the process
                     process.StartInfo.FileName = iOSServerFilePath;
-                    process.StartInfo.Arguments = "runwda --udid=" + udid;
+                    if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iOSMethods.GetInstance().iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+                    {
+                        process.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
+                    }
+                    else
+                    {
+                        process.StartInfo.Arguments = "runwda --udid=" + udid;
+                    }
+                    //process.StartInfo.Arguments = "runwda --udid=" + udid;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.RedirectStandardError = true;
@@ -1527,7 +1652,15 @@ namespace Appium_Wizard
                     //{
                     //    return RunWebDriverAgentQuick(commonProgress,udid,port);
                     //}
-                    return "unhandled";
+                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        return sessionId;
+                    }
+                    else
+                    {
+                        return "unhandled";
+                    }                    
                 }
                 else
                 {
@@ -1570,43 +1703,47 @@ namespace Appium_Wizard
 
         public string RunWebDriverAgentQuick(CommonProgress commonProgress, string udid, int port)
         {
-            int count = 1;
-            string sessionId = string.Empty;
-            string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-            if (output.Contains("Process launched"))
+            try
             {
-                Thread.Sleep(2000);
-                sessionId = iOSAPIMethods.CreateWDASession(port);
-                while (sessionId.Equals("nosession") && count <= 5)
+                int count = 1;
+                string sessionId = string.Empty;
+                string output = iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                if (output.Contains("Process launched"))
                 {
-                    Thread.Sleep(7000);
-                    iOSMethods.GetInstance().GoToHomeScreen(udid);
                     Thread.Sleep(2000);
                     sessionId = iOSAPIMethods.CreateWDASession(port);
-                    if (!sessionId.Equals("nosession"))
+                    while (sessionId.Equals("nosession") && count <= 5)
                     {
-                        break;
+                        Thread.Sleep(7000);
+                        iOSMethods.GetInstance().GoToHomeScreen(udid);
+                        Thread.Sleep(2000);
+                        sessionId = iOSAPIMethods.CreateWDASession(port);
+                        if (!sessionId.Equals("nosession"))
+                        {
+                            break;
+                        }
+                        commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
+                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");
+                        count++;
                     }
-                    commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
-                    iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                    commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");
-                    count++;
                 }
+                else if (output.Contains("'BSErrorCodeDescription': 'Locked'") | output.Contains("'PasswordProtected'"))
+                {
+                    return "Password Protected";
+                }
+                //else if (!iOSMethods.GetInstance().isDeveloperModeDisabled(udid))
+                //{
+                //    return "Enable Developer Mode";
+                //}
+                iOSMethods.GetInstance().GoToHomeScreen(udid);
+                return sessionId;
             }
-            else if (output.Contains("'BSErrorCodeDescription': 'Locked'") | output.Contains("'PasswordProtected'"))
+            catch (Exception)
             {
-                return "Password Protected";
+                return "unhandled";
             }
-            //else if (!iOSMethods.GetInstance().isDeveloperModeDisabled(udid))
-            //{
-            //    return "Enable Developer Mode";
-            //}
-            iOSMethods.GetInstance().GoToHomeScreen(udid);
-            return sessionId;
-
         }
-
-
 
         Process tunnelProcess;
         public bool CreateTunnel()

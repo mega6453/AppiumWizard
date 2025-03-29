@@ -21,7 +21,8 @@ namespace Appium_Wizard
         public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
         public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
         public static bool alwaysOnTop;
-        List<string> UDIDPreInstalledWDA = new List<string>();
+        //public static List<string> UDIDPreInstalledWDA = new List<string>();
+        public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string,string>();
 
 
         public MainScreen()
@@ -87,7 +88,7 @@ namespace Appium_Wizard
                     noToolStripMenuItem.Image = Resources.check_mark;
                 }
 
-                UDIDPreInstalledWDA = Database.QueryUDIDsFromUsePreInstalledWDAList();
+                UDIDPreInstalledWDA = Database.QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList().ToDictionary();
             }
             catch (Exception ex)
             {
@@ -478,7 +479,7 @@ namespace Appium_Wizard
                         return;
                     }
                 }
-                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP, UDIDPreInstalledWDA.Contains(selectedUDID));
+                OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
                 var isStarted = await openDevice.StartBackgroundTasks();
                 if (isStarted)
                 {
@@ -656,6 +657,8 @@ namespace Appium_Wizard
                 if (valueExists)
                 {
                     Database.DeleteDataFromDevicesTable(selectedUDID);
+                    Database.DeleteUDIDFromUsePreInstalledWDAList(selectedUDID);
+                    UDIDPreInstalledWDA.Remove(selectedUDID);
                     if (listView1.SelectedItems.Count > 0)
                     {
                         ListViewItem selectedItem = listView1.SelectedItems[0];
@@ -1106,7 +1109,7 @@ namespace Appium_Wizard
                 if (result == DialogResult.OK)
                 {
                     TroubleShooter troubleShooter = new TroubleShooter();
-                    await troubleShooter.FindIssues(main);
+                    await troubleShooter.FindIssues();
                     troubleShooter.ShowDialog();
                     GoogleAnalytics.SendEvent("Server_Node_Not_Installed_Show_Trouble");
                 }
@@ -1211,9 +1214,13 @@ namespace Appium_Wizard
             }
         }
 
-        private void iOSProfileManagementToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void iOSProfileManagementToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
             iOSProfileManagement iOSProfileManagement = new iOSProfileManagement();
+            await iOSProfileManagement.UpdateProfilesList(commonProgress);
             iOSProfileManagement.ShowDialog();
         }
 
@@ -1314,7 +1321,7 @@ namespace Appium_Wizard
         private async void fixInstallationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TroubleShooter troubleShooter = new TroubleShooter();
-            await troubleShooter.FindIssues(main);
+            await troubleShooter.FindIssues();
             troubleShooter.ShowDialog(this);
         }
 
@@ -1710,7 +1717,7 @@ namespace Appium_Wizard
         private async void updaterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Updater updater = new Updater();
-            await updater.GetVersionInformation(main);
+            await updater.GetVersionInformation();
             updater.ShowDialog();
         }
 
@@ -1983,18 +1990,9 @@ namespace Appium_Wizard
 
         private void usePreInstalledWDAToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (UDIDPreInstalledWDA.Contains(selectedUDID))
-            {
-                Database.DeleteUDIDFromUsePreInstalledWDAList(selectedUDID);
-                UDIDPreInstalledWDA.Remove(selectedUDID);
-                usePreInstalledWDAToolStripMenuItem.Image = null;
-            }
-            else
-            {
-                Database.InsertUDIDIntoUsePreInstalledWDAList(selectedUDID);
-                UDIDPreInstalledWDA.Add(selectedUDID);
-                usePreInstalledWDAToolStripMenuItem.Image = Resources.check_mark;
-            }
+             
+            UsePreInstalledWDA usePreInstalledWDA = new UsePreInstalledWDA(selectedUDID,selectedDeviceName);
+            usePreInstalledWDA.ShowDialog();
         }
 
         private void contextMenuStrip2_Opening(object sender, System.ComponentModel.CancelEventArgs e)
@@ -2002,7 +2000,7 @@ namespace Appium_Wizard
             if (selectedOS.Equals("iOS"))
             {
                 usePreInstalledWDAToolStripMenuItem.Visible = true;
-                if (UDIDPreInstalledWDA.Contains(selectedUDID))
+                if (UDIDPreInstalledWDA.ContainsKey(selectedUDID))
                 {
                     usePreInstalledWDAToolStripMenuItem.Image = Resources.check_mark;
                 }

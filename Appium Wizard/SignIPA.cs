@@ -35,7 +35,7 @@ namespace Appium_Wizard
         {
             if (profilesListComboBox.SelectedIndex.Equals(-1) || string.IsNullOrEmpty(IPAFilePathTextBox.Text) || string.IsNullOrEmpty(OutputPathTextBox.Text))
             {
-                MessageBox.Show("All the fields are required to Sign IPA. Please check missing fields.", "Missing fields", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("All the mandatory(*) fields are required to Sign IPA. Please check missing fields.", "Missing fields", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
@@ -43,14 +43,14 @@ namespace Appium_Wizard
                 string message = string.Empty;
                 string profilePath = profilesDictionary[profilesListComboBox.SelectedIndex];
                 CommonProgress commonProgress = new CommonProgress();
-                if (UDIDTextbox.Text == "")
+                if (string.IsNullOrEmpty(UDIDTextbox.Text) | string.IsNullOrWhiteSpace(UDIDTextbox.Text))
                 {
                     commonProgress.Show();
                     message = "Attempting to sign the given IPA file. Please wait, this may take some time...\n\nIPA file : " + IPAFilePathTextBox.Name + "\nProfile : " + profilesListComboBox.SelectedItem;
                     commonProgress.UpdateStepLabel("Sign App", message, 10);
                     await Task.Run(() =>
                     {
-                        output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message);
+                        output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message, newBundleIdTextBox.Text, newBundleNameTextBox.Text, newBundleVersionTextBox.Text);
                     });
                 }
                 else
@@ -63,7 +63,7 @@ namespace Appium_Wizard
                         commonProgress.UpdateStepLabel("Sign App", message, 10);
                         await Task.Run(() =>
                         {
-                            output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message);
+                            output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, UDIDTextbox.Text, commonProgress, message, newBundleIdTextBox.Text, newBundleNameTextBox.Text, newBundleVersionTextBox.Text);
                         });
                     }
                     else
@@ -76,7 +76,7 @@ namespace Appium_Wizard
                             commonProgress.UpdateStepLabel("Sign App", message, 10);
                             await Task.Run(() =>
                             {
-                                output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, "", commonProgress, message);
+                                output = iOSMethods.GetInstance().SignIPA(profilePath, IPAFilePathTextBox.Text, OutputPathTextBox.Text, "", commonProgress, message, newBundleIdTextBox.Text, newBundleNameTextBox.Text, newBundleVersionTextBox.Text);
                             });
                             GoogleAnalytics.SendEvent("ProfileNotAvailable_Yes_Sign");
                         }
@@ -157,7 +157,7 @@ namespace Appium_Wizard
 
         private void SignIPA_Shown(object sender, EventArgs e)
         {
-           GoogleAnalytics.SendEvent("SignIPA_Shown");
+            GoogleAnalytics.SendEvent("SignIPA_Shown");
         }
     }
 }

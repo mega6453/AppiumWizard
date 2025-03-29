@@ -20,6 +20,7 @@ namespace Appium_Wizard
             {
                 if (dontUseRadioButton.Checked)
                 {
+                    GoogleAnalytics.SendEvent("preinstalledwda_dontuse");
                     Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                     MainScreen.UDIDPreInstalledWDA.Remove(udid);
                     Close();
@@ -32,6 +33,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        GoogleAnalytics.SendEvent("preinstalledwda_custom");
                         Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                         Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, bundleIdTextbox.Text.Trim());
                         MainScreen.UDIDPreInstalledWDA.Remove(udid);
@@ -41,6 +43,7 @@ namespace Appium_Wizard
                 }
                 if (defaultRadioButton.Checked)
                 {
+                    GoogleAnalytics.SendEvent("preinstalledwda_default");
                     Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                     Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, defaultBundleId);
                     MainScreen.UDIDPreInstalledWDA.Remove(udid);

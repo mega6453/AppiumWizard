@@ -13,19 +13,13 @@ namespace Appium_Wizard
             AdjustFormAndListViewSize();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void import_Click(object sender, EventArgs e)
         {
             ImportProfile importProfile = new ImportProfile(listView1);
             importProfile.ShowDialog();
         }
 
-
-        private void iOSProfileManagement_Load(object sender, EventArgs e)
-        {
-            UpdateProfilesList(listView1);
-        }
-
-        private void button3_Click(object sender, EventArgs e)
+        private void delete_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedProfileName + " profile?", "Delete Profile", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
@@ -62,66 +56,82 @@ namespace Appium_Wizard
         public static List<string[]> FetchProfiles()
         {
             List<string[]> profilesList = new List<string[]>();
-            if (!Directory.Exists(ProfilesFilePath))
+            try
             {
-                Directory.CreateDirectory(ProfilesFilePath);
-            }
-            string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
-            foreach (string profileFolder in profileFolders)
-            {
-                string[] provisioningFiles = Directory.EnumerateFiles(profileFolder, "*.mobileprovision").ToArray();
-
-                if (provisioningFiles.Length > 0)
+                if (!Directory.Exists(ProfilesFilePath))
                 {
-                    foreach (string provisioningFile in provisioningFiles)
-                    {
-                        string directoryPath = Path.GetDirectoryName(provisioningFile);
-                        string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
-                        int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
+                    Directory.CreateDirectory(ProfilesFilePath);
+                }
+                string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
+                foreach (string profileFolder in profileFolders)
+                {
+                    string[] provisioningFiles = Directory.EnumerateFiles(profileFolder, "*.mobileprovision").ToArray();
 
-                        var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
-                        string profileName = provisionDetails["Name"].ToString();
-                        int expirationDaysFromProvisionFile = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                        string appId = provisionDetails["application-identifier"].ToString();
-                        string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
-                        string updatedExpirationDays = string.Empty;
-                        try
+                    if (provisioningFiles.Length > 0)
+                    {
+                        foreach (string provisioningFile in provisioningFiles)
                         {
-                            if (expirationDaysFromProvisionFile <= 0 | expirationDaysFromPem <= 0)
+                            string directoryPath = Path.GetDirectoryName(provisioningFile);
+                            string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
+                            int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
+
+                            var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
+                            string profileName = provisionDetails["Name"].ToString();
+                            int expirationDaysFromProvisionFile = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
+                            string appId = provisionDetails["application-identifier"].ToString();
+                            string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
+                            string updatedExpirationDays = string.Empty;
+                            try
                             {
-                                updatedExpirationDays = "Expired";
-                            }
-                            else
-                            {
-                                if (expirationDaysFromPem < expirationDaysFromProvisionFile)
+                                if (expirationDaysFromProvisionFile <= 0 | expirationDaysFromPem <= 0)
                                 {
-                                    updatedExpirationDays = expirationDaysFromPem.ToString() + " days";
+                                    updatedExpirationDays = "Expired";
                                 }
                                 else
                                 {
-                                    updatedExpirationDays = expirationDaysFromProvisionFile.ToString() + " days";
+                                    if (expirationDaysFromPem < expirationDaysFromProvisionFile)
+                                    {
+                                        updatedExpirationDays = expirationDaysFromPem.ToString() + " days";
+                                    }
+                                    else
+                                    {
+                                        updatedExpirationDays = expirationDaysFromProvisionFile.ToString() + " days";
+                                    }
                                 }
+                                string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
+                                profilesList.Add(item1);
                             }
-                            string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
-                            profilesList.Add(item1);
-                        }
-                        catch (Exception)
-                        {
+                            catch (Exception)
+                            {
+                            }
                         }
                     }
                 }
             }
+            catch (Exception)
+            {
+            }
             return profilesList;
-            //GoogleAnalytics.SendEvent("RefreshProfilesListView");
         }
 
-        private void UpdateProfilesList(ListView listView)
+        public async Task UpdateProfilesList(CommonProgress commonProgress)
         {
-            List<string[]> profilesList = FetchProfiles();
-            foreach (var item in profilesList)
-            {
-                listView.Items.Add(new ListViewItem(item));
-            }
+            commonProgress.UpdateStepLabel("Load Profiles", "Please wait while fetching profiles...");
+            await Task.Run(() => {
+                List<string[]> profilesList = FetchProfiles();
+                foreach (var item in profilesList)
+                {
+                    if (listView1.InvokeRequired)
+                    {
+                        listView1.Invoke(new Action(() => listView1.Items.Add(new ListViewItem(item))));
+                    }
+                    else
+                    {
+                        listView1.Items.Add(new ListViewItem(item));
+                    }
+                }
+            });
+            commonProgress.Close();
         }
 
         private void iOSProfileManagement_Shown(object sender, EventArgs e)

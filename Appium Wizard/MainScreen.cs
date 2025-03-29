@@ -1214,9 +1214,13 @@ namespace Appium_Wizard
             }
         }
 
-        private void iOSProfileManagementToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void iOSProfileManagementToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
             iOSProfileManagement iOSProfileManagement = new iOSProfileManagement();
+            await iOSProfileManagement.UpdateProfilesList(commonProgress);
             iOSProfileManagement.ShowDialog();
         }
 

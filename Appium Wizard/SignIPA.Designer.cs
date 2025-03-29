@@ -41,7 +41,12 @@
             label4 = new Label();
             UDIDTextbox = new TextBox();
             label1 = new Label();
-            label2 = new Label();
+            newBundleIdTextBox = new TextBox();
+            label3 = new Label();
+            newBundleNameTextBox = new TextBox();
+            label6 = new Label();
+            newBundleVersionTextBox = new TextBox();
+            label7 = new Label();
             SuspendLayout();
             // 
             // profilesListComboBox
@@ -67,7 +72,7 @@
             // SignButton
             // 
             SignButton.AutoSize = true;
-            SignButton.Location = new Point(305, 211);
+            SignButton.Location = new Point(302, 303);
             SignButton.Margin = new Padding(2);
             SignButton.Name = "SignButton";
             SignButton.Size = new Size(78, 25);
@@ -79,7 +84,7 @@
             // CancelButton
             // 
             CancelButton.AutoSize = true;
-            CancelButton.Location = new Point(185, 211);
+            CancelButton.Location = new Point(182, 303);
             CancelButton.Margin = new Padding(2);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(78, 25);
@@ -154,42 +159,92 @@
             // 
             // UDIDTextbox
             // 
-            UDIDTextbox.Location = new Point(93, 150);
+            UDIDTextbox.Location = new Point(93, 165);
             UDIDTextbox.Margin = new Padding(2);
             UDIDTextbox.Name = "UDIDTextbox";
-            UDIDTextbox.PlaceholderText = "Optional";
+            UDIDTextbox.PlaceholderText = "Optional - Verify the profile has this UDID or not";
             UDIDTextbox.Size = new Size(435, 23);
             UDIDTextbox.TabIndex = 37;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(4, 154);
+            label1.Location = new Point(4, 169);
             label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
             label1.Size = new Size(72, 15);
             label1.TabIndex = 36;
             label1.Text = "Device UDID";
             // 
-            // label2
+            // newBundleIdTextBox
             // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
-            label2.ForeColor = Color.Chocolate;
-            label2.Location = new Point(93, 175);
-            label2.Margin = new Padding(2, 0, 2, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(396, 15);
-            label2.TabIndex = 38;
-            label2.Text = "If you enter an UDID, it will verify if the selected profile contains this UDID.";
+            newBundleIdTextBox.Location = new Point(93, 198);
+            newBundleIdTextBox.Margin = new Padding(2);
+            newBundleIdTextBox.Name = "newBundleIdTextBox";
+            newBundleIdTextBox.PlaceholderText = "Optional - New Bundle ID to change";
+            newBundleIdTextBox.Size = new Size(435, 23);
+            newBundleIdTextBox.TabIndex = 40;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(4, 201);
+            label3.Margin = new Padding(2, 0, 2, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(58, 15);
+            label3.TabIndex = 39;
+            label3.Text = "Bundle ID";
+            // 
+            // newBundleNameTextBox
+            // 
+            newBundleNameTextBox.Location = new Point(93, 231);
+            newBundleNameTextBox.Margin = new Padding(2);
+            newBundleNameTextBox.Name = "newBundleNameTextBox";
+            newBundleNameTextBox.PlaceholderText = "Optional - New Bundle name to change";
+            newBundleNameTextBox.Size = new Size(435, 23);
+            newBundleNameTextBox.TabIndex = 42;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(4, 236);
+            label6.Margin = new Padding(2, 0, 2, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(79, 15);
+            label6.TabIndex = 41;
+            label6.Text = "Bundle Name";
+            // 
+            // newBundleVersionTextBox
+            // 
+            newBundleVersionTextBox.Location = new Point(93, 267);
+            newBundleVersionTextBox.Margin = new Padding(2);
+            newBundleVersionTextBox.Name = "newBundleVersionTextBox";
+            newBundleVersionTextBox.PlaceholderText = "Optional - New Bundle version to change";
+            newBundleVersionTextBox.Size = new Size(435, 23);
+            newBundleVersionTextBox.TabIndex = 44;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(4, 275);
+            label7.Margin = new Padding(2, 0, 2, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(85, 15);
+            label7.TabIndex = 43;
+            label7.Text = "Bundle Version";
             // 
             // SignIPA
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(570, 247);
-            Controls.Add(label2);
+            ClientSize = new Size(570, 335);
+            Controls.Add(newBundleVersionTextBox);
+            Controls.Add(label7);
+            Controls.Add(newBundleNameTextBox);
+            Controls.Add(label6);
+            Controls.Add(newBundleIdTextBox);
+            Controls.Add(label3);
             Controls.Add(UDIDTextbox);
             Controls.Add(label1);
             Controls.Add(OutputPathTextBox);
@@ -231,6 +286,11 @@
         private Label label4;
         private TextBox UDIDTextbox;
         private Label label1;
-        private Label label2;
+        private TextBox newBundleIdTextBox;
+        private Label label3;
+        private TextBox newBundleNameTextBox;
+        private Label label6;
+        private TextBox newBundleVersionTextBox;
+        private Label label7;
     }
 }

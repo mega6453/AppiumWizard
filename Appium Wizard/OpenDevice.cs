@@ -342,7 +342,7 @@
                         {
                             commonProgress.Close();
                             isScreenServerStarted = false;
-                            MessageBox.Show("No pre-installed WebDriverAgent found, and no provisioning profile is available for the device " + deviceName + "(" + udid + ").\n\nEither install the WebDriverAgent manually or add a provisioning profile in Tools → iOS Profile Management so that AppiumWizard can install the WebDriverAgent automatically.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("No pre-installed WebDriverAgent found, and no provisioning profile is available for the device " + deviceName + "(" + udid + ").\n\nOption 1 : Install WDA manually and configure to use pre-installed WDA by right clicking on the device in the list.\n\nOption 2 : Add a provisioning profile in Tools → iOS Profile Management so that AppiumWizard can install the WDA automatically.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                     }

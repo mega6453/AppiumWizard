@@ -490,46 +490,60 @@ namespace Appium_Wizard
 
         public static void InstallUIAutomatorDriver(bool showExecution = false)
         {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
-            pathVariable += ";" + serverFolderPath;
-            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-            if (showExecution)
+            try
             {
-                process.StartInfo.Arguments = "/K appium driver install uiautomator2";
-                process.StartInfo.CreateNoWindow = false;
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                if (showExecution)
+                {
+                    process.StartInfo.Arguments = "/K appium driver install uiautomator2";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C appium driver install uiautomator2";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
             }
-            else
+            catch (Exception e)
             {
-                process.StartInfo.Arguments = "/C appium driver install uiautomator2";
-                process.StartInfo.CreateNoWindow = true;
+                MessageBox.Show("Error while installing uiautomator2 driver. \nOriginal exception: " + e.Message, "Install UiAutomator2 driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            process.StartInfo.UseShellExecute = false;
-            process.Start();
-            process.WaitForExit();
         }
 
         public static void UninstallUIAutomatorDriver(bool showExecution = false)
         {
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd";
-            string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
-            pathVariable += ";" + serverFolderPath;
-            process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-            if (showExecution)
+            try
             {
-                process.StartInfo.Arguments = "/K appium driver uninstall uiautomator2";
-                process.StartInfo.CreateNoWindow = false;
+                Process process = new Process();
+                process.StartInfo.FileName = "cmd";
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+                pathVariable += ";" + serverFolderPath;
+                process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
+                if (showExecution)
+                {
+                    process.StartInfo.Arguments = "/K appium driver uninstall uiautomator2";
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.Arguments = "/C appium driver uninstall uiautomator2";
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
             }
-            else
+            catch (Exception e)
             {
-                process.StartInfo.Arguments = "/C appium driver uninstall uiautomator2";
-                process.StartInfo.CreateNoWindow = true;
+                MessageBox.Show("Error while uninstalling uiautomator2 driver. \nOriginal exception: " + e.Message, "Uninstall UiAutomator2 driver", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            process.StartInfo.UseShellExecute = false;
-            process.Start();
-            process.WaitForExit();
         }
 
         public static void UpdateUIAutomatorDriver(bool showExecution = false, bool unsafeUpdate = false)
@@ -753,7 +767,7 @@ namespace Appium_Wizard
             {
                 Process process = new Process();
                 process.StartInfo.FileName = "cmd";
-                string pathVariable = Environment.GetEnvironmentVariable("PATH");
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
                 pathVariable += ";" + serverFolderPath;
                 process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
                 if (ShowWindow)
@@ -770,8 +784,9 @@ namespace Appium_Wizard
                 process.Start();
                 process.WaitForExit();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                MessageBox.Show("Error while installing "+plugin+" plugin. \nOriginal exception: " + e.Message, "Install Plugin", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -781,24 +796,26 @@ namespace Appium_Wizard
             {
                 Process process = new Process();
                 process.StartInfo.FileName = "cmd";
-                string pathVariable = Environment.GetEnvironmentVariable("PATH");
+                string pathVariable = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
                 pathVariable += ";" + serverFolderPath;
                 process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
-                process.StartInfo.Arguments = "/C appium plugin uninstall " + plugin;
+                process.StartInfo.UseShellExecute = false; // Use the shell to execute the command
                 if (ShowWindow)
                 {
-                    process.StartInfo.UseShellExecute = false; // Use the shell to execute the command
+                    process.StartInfo.Arguments = "/K appium plugin uninstall " + plugin;
                     process.StartInfo.CreateNoWindow = false; // Show the window
                 }
                 else
                 {
+                    process.StartInfo.Arguments = "/C appium plugin uninstall " + plugin;
                     process.StartInfo.CreateNoWindow = true; // Hide the window
                 }
                 process.Start();
                 process.WaitForExit();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                MessageBox.Show("Error while uninstalling " + plugin + " plugin. \nOriginal exception: " + e.Message, "Uninstall Plugin", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -824,20 +841,27 @@ namespace Appium_Wizard
 
         public static void InstallNodeJs(bool showExecution = false)
         {
-            Process process = new Process();
-            process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
-            process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\" -y";
-            process.StartInfo.UseShellExecute = false;
-            if (showExecution)
+            try
             {
-                process.StartInfo.CreateNoWindow = false;
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
+                process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\" -y";
+                process.StartInfo.UseShellExecute = false;
+                if (showExecution)
+                {
+                    process.StartInfo.CreateNoWindow = false;
+                }
+                else
+                {
+                    process.StartInfo.CreateNoWindow = true;
+                }
+                process.Start();
+                process.WaitForExit();
             }
-            else
+            catch (Exception e)
             {
-                process.StartInfo.CreateNoWindow = true;
-            }
-            process.Start();
-            process.WaitForExit();           
+                MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }           
         }
 
         public static string WSLHelp()

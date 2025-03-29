@@ -16,34 +16,41 @@ namespace Appium_Wizard
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-            if (dontUseRadioButton.Checked)
+            try
             {
-                Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
-                MainScreen.UDIDPreInstalledWDA.Remove(udid);
-                Close();
-            }
-            if (customRadioButton.Checked)
-            {
-                if (string.IsNullOrEmpty(bundleIdTextbox.Text.Trim()) | string.IsNullOrWhiteSpace(bundleIdTextbox.Text.Trim()))
-                {
-                    MessageBox.Show("Please enter the bundle id of WebDriverAgentRunner which you have installed in your device and then apply.", "Use Pre-Installed WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
+                if (dontUseRadioButton.Checked)
                 {
                     Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
-                    Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, bundleIdTextbox.Text.Trim());
                     MainScreen.UDIDPreInstalledWDA.Remove(udid);
-                    MainScreen.UDIDPreInstalledWDA.Add(udid, bundleIdTextbox.Text.Trim());
+                    Close();
+                }
+                if (customRadioButton.Checked)
+                {
+                    if (string.IsNullOrEmpty(bundleIdTextbox.Text.Trim()) | string.IsNullOrWhiteSpace(bundleIdTextbox.Text.Trim()))
+                    {
+                        MessageBox.Show("Please enter the bundle id of WebDriverAgentRunner which you have installed in your device and then apply.", "Use Pre-Installed WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
+                        Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, bundleIdTextbox.Text.Trim());
+                        MainScreen.UDIDPreInstalledWDA.Remove(udid);
+                        MainScreen.UDIDPreInstalledWDA.Add(udid, bundleIdTextbox.Text.Trim());
+                        Close();
+                    }
+                }
+                if (defaultRadioButton.Checked)
+                {
+                    Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
+                    Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, defaultBundleId);
+                    MainScreen.UDIDPreInstalledWDA.Remove(udid);
+                    MainScreen.UDIDPreInstalledWDA.Add(udid, defaultBundleId);
                     Close();
                 }
             }
-            if (defaultRadioButton.Checked)
-            {
-                Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
-                Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, defaultBundleId);
-                MainScreen.UDIDPreInstalledWDA.Remove(udid);
-                MainScreen.UDIDPreInstalledWDA.Add(udid,defaultBundleId);
-                Close();
+            catch (Exception ex)
+            {            
+                MessageBox.Show("Error while applying user preferences for pre-installed wda. \nOriginal exception: " + ex.Message, "Use Pre-Installed WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

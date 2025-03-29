@@ -10,128 +10,136 @@ namespace Appium_Wizard
         {
             InitializeComponent();
         }
-        public async Task FindIssues(MainScreen mainScreen = null)
+        public async Task FindIssues()
         {
-            bool IsNodeInstalled = false;
-            bool IsAppiumInstalled = false;
-            bool IsXCUITestDriverInstalled = false;
-            bool IsUIAutomatorDriverInstalled = false;
-            bool IsCompatibleWDAAvailable = false;
-            CommonProgress commonProgress = new CommonProgress();
-            if (mainScreen == null)
+            try
             {
-                commonProgress.Owner = this;
-            }
-            else
-            {
-                commonProgress.Owner = mainScreen;
-            }
-            commonProgress.Show();
-            await Task.Run(() =>
-            {
-                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for NodeJS installation...", 10);
-                IsNodeInstalled = Common.IsNodeInstalled();
-                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for Appium installation...", 50);
-                IsAppiumInstalled = Common.IsAppiumInstalled();
-                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for drivers installation...", 75);
-                string InstalledDriverList = Common.AppiumInstalledDriverList();
-                IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
-                IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
-                commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for WebDriverAgent compatibility...", 90);
-                if (IsXCUITestDriverInstalled)
+                var mainScreen = MainScreen.main;
+                bool IsNodeInstalled = false;
+                bool IsAppiumInstalled = false;
+                bool IsXCUITestDriverInstalled = false;
+                bool IsUIAutomatorDriverInstalled = false;
+                bool IsCompatibleWDAAvailable = false;
+                CommonProgress commonProgress = new CommonProgress();
+                if (mainScreen == null)
                 {
-                    string requiredVersion = Common.GetRequiredWebDriverAgentVersion();
-                    if (requiredVersion != "versionNotFound" & requiredVersion != "fileNotFound")
-                    {
-                        string IPAVersion = iOSMethods.GetInstance().GetWDAIPAVersion();
-                        Version expectedVersion = new Version(requiredVersion);
-                        Version actualVersion = new Version(IPAVersion);
-                        //bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
-                        //(expectedVersion.Minor == actualVersion.Minor);
-                        //if (areEqual)
-                        //{
-                        //    IsCompatibleWDAAvailable = true;
-                        //}
-                        if (expectedVersion.Equals(actualVersion))
-                        {
-                            IsCompatibleWDAAvailable = true;
-                        }
-                        else if (isDownloaded)
-                        {
-                            IsCompatibleWDAAvailable = true;
-                        }
-                        else
-                        {
-                            IsCompatibleWDAAvailable = false;
-                        }
-                    }
-
-                }
-            });
-            if (!IsNodeInstalled)
-            {
-                NodeJSStatusLabel.Text = "Not OK";
-                AppiumStatusLabel.Text = "NodeJS Required";
-                XCUITestStatusLabel.Text = "Appium Required";
-                UIAutomatorStatusLabel.Text = "Appium Required";
-                WDAStatusLabel.Text = "XCUITest Driver Required";
-                FixNodeJSButton.Enabled = true;
-                GoogleAnalytics.SendEvent("Trouble_NodeJS_Not_Installed");
-            }
-            else
-            {
-                NodeJSStatusLabel.Text = "OK";
-                FixNodeJSButton.Enabled = false;
-                if (!IsAppiumInstalled)
-                {
-                    AppiumStatusLabel.Text = "Not OK";
-                    XCUITestStatusLabel.Text = "Appium Required";
-                    UIAutomatorStatusLabel.Text = "Appium Required";
-                    WDAStatusLabel.Text = "XCUITest Driver Required";
-                    FixAppiumButton.Enabled = true;
-                    GoogleAnalytics.SendEvent("Trouble_Appium_Not_Installed");
+                    commonProgress.Owner = this;
                 }
                 else
                 {
-                    AppiumStatusLabel.Text = "OK";
-                    FixAppiumButton.Enabled = false;
-                    if (!IsXCUITestDriverInstalled)
+                    commonProgress.Owner = mainScreen;
+                }
+                commonProgress.Show();
+                await Task.Run(() =>
+                {
+                    commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for NodeJS installation...", 10);
+                    IsNodeInstalled = Common.IsNodeInstalled();
+                    commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for Appium installation...", 50);
+                    IsAppiumInstalled = Common.IsAppiumInstalled();
+                    commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for drivers installation...", 75);
+                    string InstalledDriverList = Common.AppiumInstalledDriverList();
+                    IsXCUITestDriverInstalled = InstalledDriverList.Contains("xcuitest@");
+                    IsUIAutomatorDriverInstalled = InstalledDriverList.Contains("uiautomator2@");
+                    commonProgress.UpdateStepLabel("Find Issues", "Please wait while checking for WebDriverAgent compatibility...", 90);
+                    if (IsXCUITestDriverInstalled)
                     {
-                        XCUITestStatusLabel.Text = "Not OK";
+                        string requiredVersion = Common.GetRequiredWebDriverAgentVersion();
+                        if (requiredVersion != "versionNotFound" & requiredVersion != "fileNotFound")
+                        {
+                            string IPAVersion = iOSMethods.GetInstance().GetWDAIPAVersion();
+                            Version expectedVersion = new Version(requiredVersion);
+                            Version actualVersion = new Version(IPAVersion);
+                            //bool areEqual = (expectedVersion.Major == actualVersion.Major) &&
+                            //(expectedVersion.Minor == actualVersion.Minor);
+                            //if (areEqual)
+                            //{
+                            //    IsCompatibleWDAAvailable = true;
+                            //}
+                            if (expectedVersion.Equals(actualVersion))
+                            {
+                                IsCompatibleWDAAvailable = true;
+                            }
+                            else if (isDownloaded)
+                            {
+                                IsCompatibleWDAAvailable = true;
+                            }
+                            else
+                            {
+                                IsCompatibleWDAAvailable = false;
+                            }
+                        }
+
+                    }
+                });
+                if (!IsNodeInstalled)
+                {
+                    NodeJSStatusLabel.Text = "Not OK";
+                    AppiumStatusLabel.Text = "NodeJS Required";
+                    XCUITestStatusLabel.Text = "Appium Required";
+                    UIAutomatorStatusLabel.Text = "Appium Required";
+                    WDAStatusLabel.Text = "XCUITest Driver Required";
+                    FixNodeJSButton.Enabled = true;
+                    GoogleAnalytics.SendEvent("Trouble_NodeJS_Not_Installed");
+                }
+                else
+                {
+                    NodeJSStatusLabel.Text = "OK";
+                    FixNodeJSButton.Enabled = false;
+                    if (!IsAppiumInstalled)
+                    {
+                        AppiumStatusLabel.Text = "Not OK";
+                        XCUITestStatusLabel.Text = "Appium Required";
+                        UIAutomatorStatusLabel.Text = "Appium Required";
                         WDAStatusLabel.Text = "XCUITest Driver Required";
-                        FixXCUITestButton.Enabled = true;
-                        GoogleAnalytics.SendEvent("Trouble_XCUITest_Not_Installed");
+                        FixAppiumButton.Enabled = true;
+                        GoogleAnalytics.SendEvent("Trouble_Appium_Not_Installed");
                     }
                     else
                     {
-                        XCUITestStatusLabel.Text = "OK";
-                        FixXCUITestButton.Enabled = false;
-                        FixWDAButton.Enabled = true;
-                        if (IsCompatibleWDAAvailable)
+                        AppiumStatusLabel.Text = "OK";
+                        FixAppiumButton.Enabled = false;
+                        if (!IsXCUITestDriverInstalled)
                         {
-                            WDAStatusLabel.Text = "OK";
-                            FixWDAButton.Enabled = false;
+                            XCUITestStatusLabel.Text = "Not OK";
+                            WDAStatusLabel.Text = "XCUITest Driver Required";
+                            FixXCUITestButton.Enabled = true;
+                            GoogleAnalytics.SendEvent("Trouble_XCUITest_Not_Installed");
                         }
                         else
                         {
-                            WDAStatusLabel.Text = "Not OK";
+                            XCUITestStatusLabel.Text = "OK";
+                            FixXCUITestButton.Enabled = false;
                             FixWDAButton.Enabled = true;
+                            if (IsCompatibleWDAAvailable)
+                            {
+                                WDAStatusLabel.Text = "OK";
+                                FixWDAButton.Enabled = false;
+                            }
+                            else
+                            {
+                                WDAStatusLabel.Text = "Not OK";
+                                FixWDAButton.Enabled = true;
+                            }
+                        }
+                        if (!IsUIAutomatorDriverInstalled)
+                        {
+                            UIAutomatorStatusLabel.Text = "Not OK";
+                            FixUIAutomatorButton.Enabled = true;
+                            GoogleAnalytics.SendEvent("Trouble_UIAutomator_Not_Installed");
+                        }
+                        else
+                        {
+                            UIAutomatorStatusLabel.Text = "OK";
+                            FixUIAutomatorButton.Enabled = false;
                         }
                     }
-                    if (!IsUIAutomatorDriverInstalled)
-                    {
-                        UIAutomatorStatusLabel.Text = "Not OK";
-                        FixUIAutomatorButton.Enabled = true;
-                        GoogleAnalytics.SendEvent("Trouble_UIAutomator_Not_Installed");
-                    }
-                    else
-                    {
-                        UIAutomatorStatusLabel.Text = "OK";
-                        FixUIAutomatorButton.Enabled = false;
-                    }
                 }
+                commonProgress.Close();
             }
-            commonProgress.Close();
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while identifying the issues. \nOriginal exception: " + e.Message, "Find Issues", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void FixNodeJSButton_Click(object sender, EventArgs e)

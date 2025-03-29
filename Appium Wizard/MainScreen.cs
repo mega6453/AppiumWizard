@@ -1109,7 +1109,7 @@ namespace Appium_Wizard
                 if (result == DialogResult.OK)
                 {
                     TroubleShooter troubleShooter = new TroubleShooter();
-                    await troubleShooter.FindIssues(main);
+                    await troubleShooter.FindIssues();
                     troubleShooter.ShowDialog();
                     GoogleAnalytics.SendEvent("Server_Node_Not_Installed_Show_Trouble");
                 }
@@ -1321,7 +1321,7 @@ namespace Appium_Wizard
         private async void fixInstallationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TroubleShooter troubleShooter = new TroubleShooter();
-            await troubleShooter.FindIssues(main);
+            await troubleShooter.FindIssues();
             troubleShooter.ShowDialog(this);
         }
 

@@ -74,20 +74,25 @@ namespace Appium_Wizard
 
         public List<string> ListOfInstrumentationPackages(string udid)
         {
-            string instrumentations = ExecuteCommand("-s " + udid + " shell pm list instrumentation", false);
             List<string> packageNames = new List<string>();
-            string pattern = @"instrumentation:([\w\.]+)/";
-
-            MatchCollection matches = Regex.Matches(instrumentations, pattern);
-
-            foreach (Match match in matches)
+            try
             {
-                if (match.Groups.Count > 1)
+                string instrumentations = ExecuteCommand("-s " + udid + " shell pm list instrumentation", false);
+                string pattern = @"instrumentation:([\w\.]+)/";
+
+                MatchCollection matches = Regex.Matches(instrumentations, pattern);
+
+                foreach (Match match in matches)
                 {
-                    packageNames.Add(match.Groups[1].Value);
+                    if (match.Groups.Count > 1)
+                    {
+                        packageNames.Add(match.Groups[1].Value);
+                    }
                 }
             }
-
+            catch (Exception)
+            {
+            }
             return packageNames;
         }
 

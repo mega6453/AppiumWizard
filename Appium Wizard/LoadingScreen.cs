@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-
+﻿using NLog;
+using NLog.Fluent;
+using System.Diagnostics;
 namespace Appium_Wizard
 {
     public partial class LoadingScreen : Form
@@ -9,10 +9,12 @@ namespace Appium_Wizard
         public static int UiAutomatorPort;
         public static int appiumPort = 4723;
         public static bool isServerStarted;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public LoadingScreen()
         {
             InitializeComponent();
             statusLabel.Text = "Initializing...";
+            Logger.Debug("Initializing...");
             try
             {
                 Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
@@ -20,20 +22,24 @@ namespace Appium_Wizard
                 {
                     if (!string.IsNullOrEmpty(portValue))
                     {
+                        Logger.Debug("Using port from db to start server 1, port number : "+portValue);
                         appiumPort = int.Parse(portValue);
                     }
                     else
                     {
+                        Logger.Debug("Server number 1 port is empty, using default port 4723");
                         Database.UpdateDataIntoPortNumberTable("PortNumber1", appiumPort);
                     }
                 }
                 else
                 {
+                    Logger.Debug("Server number 1 port is empty, using default port 4723");
                     Database.UpdateDataIntoPortNumberTable("PortNumber1", appiumPort);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, "Exception in getting port number");
             }
             string clientId = Database.QueryDataFromGUIDTable();
             if (clientId.Equals("Empty"))
@@ -42,11 +48,13 @@ namespace Appium_Wizard
                 GoogleAnalytics.clientId = guid.ToString();
                 Database.UpdateDataIntoGUIDTable(guid.ToString());
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "First Launch", true);
+                Logger.Debug("First Launch");
             }
             else
             {
                 GoogleAnalytics.clientId = clientId;
                 GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.App_Launched, "Not First Launch");
+                Logger.Debug("Not First Launch");
             }
         }
         private async void LoadingScreen_Load(object sender, EventArgs e)
@@ -62,8 +70,10 @@ namespace Appium_Wizard
             await Task.Run(() =>
             {
                 Common.SetAndroidHomeEnvironmentVariable();
+                Logger.Debug("SetAndroidHomeEnvironmentVariable");
             });
             productVersion.Text = "Version " + VersionInfo.VersionNumber;
+            Logger.Info(productVersion.Text);
             productVersion.Refresh();
 #if DEBUG
             Console.WriteLine("Running in Debug mode.");
@@ -124,6 +134,7 @@ namespace Appium_Wizard
             UpdateStepLabel("Loading Modules...");
             int adbPort = 5037;
             AndroidMethods.GetInstance().StartAdbServer(adbPort);
+            Common.DeleteLogFiles();
             UpdateStepLabel("Initializing User Interface...");
             var endTime = DateTime.Now;
             string timeTaken = Common.GetDuration(startTime, endTime);
@@ -137,6 +148,7 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
+                Logger.Error(ex,"App crashed");
                 GoogleAnalytics.SendEvent("App_Crashed", ex.Message);
                 Close();
             }
@@ -175,6 +187,7 @@ namespace Appium_Wizard
                         {
                             if (serverSetup.statusText.Contains("address already in use"))
                             {
+                                Logger.Debug("address already in use");
                                 MessageBox.Show("Go to Server -> Config -> Set a port number -> Start the Appium Server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             }
@@ -190,6 +203,7 @@ namespace Appium_Wizard
 
         public void UpdateStepLabel(string stepText)
         {
+            Logger.Debug(stepText);
             if (statusLabel.InvokeRequired)
             {
                 statusLabel.Invoke(new Action<string>(UpdateStepLabel), stepText);
@@ -203,7 +217,8 @@ namespace Appium_Wizard
 
         private void LoadingScreen_Shown(object sender, EventArgs e)
         {
-           GoogleAnalytics.SendEvent("LoadingScreen_Shown");
+            Logger.Debug("LoadingScreen_Shown");
+            GoogleAnalytics.SendEvent("LoadingScreen_Shown");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json.Linq;
+using NLog;
 using RestSharp;
 using System.Diagnostics;
 using System.IO.Compression;
@@ -21,6 +22,8 @@ namespace Appium_Wizard
         private static string executablesFolderPath = FilesPath.executablesFolderPath;
         private static string serverFolderPath = FilesPath.serverInstalledPath;
         private static string nodeFilePath = FilesPath.nodeZipPath;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public static void TerminateProcess(string command)
         {
             try
@@ -349,8 +352,8 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error while installing appium. \nOringal exception:"+e.Message,"Install Appium",MessageBoxButtons.OK,MessageBoxIcon.Error);
-            }           
+                MessageBox.Show("Error while installing appium. \nOringal exception:" + e.Message, "Install Appium", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static void UninstallAppium(bool showExecution = false)
@@ -761,7 +764,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static void InstallPlugin(string plugin,string installOrUpdate, bool ShowWindow)
+        public static void InstallPlugin(string plugin, string installOrUpdate, bool ShowWindow)
         {
             try
             {
@@ -772,7 +775,7 @@ namespace Appium_Wizard
                 process.StartInfo.EnvironmentVariables["PATH"] = pathVariable;
                 if (ShowWindow)
                 {
-                    process.StartInfo.Arguments = "/K appium plugin "+installOrUpdate+" "+ plugin;
+                    process.StartInfo.Arguments = "/K appium plugin " + installOrUpdate + " " + plugin;
                     process.StartInfo.UseShellExecute = false; // Use the shell to execute the command
                     process.StartInfo.CreateNoWindow = false; // Show the window
                 }
@@ -786,7 +789,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error while installing "+plugin+" plugin. \nOriginal exception: " + e.Message, "Install Plugin", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error while installing " + plugin + " plugin. \nOriginal exception: " + e.Message, "Install Plugin", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -861,7 +864,7 @@ namespace Appium_Wizard
             catch (Exception e)
             {
                 MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }           
+            }
         }
 
         public static string WSLHelp()
@@ -1447,5 +1450,38 @@ namespace Appium_Wizard
             {
             }
         }
+
+        public static void DeleteLogFiles()
+        {
+            try
+            {
+                DirectoryInfo directory = new DirectoryInfo(FilesPath.logsFilesPath);
+                if (directory.Exists)
+                {
+                    // Get all files in the directory
+                    FileInfo[] files = directory.GetFiles();
+
+                    foreach (FileInfo file in files)
+                    {
+                        // Check if the file is older than 3 days
+                        if (file.LastWriteTime.Date < DateTime.Today.AddDays(-2).Date)
+                        {
+                            // Delete the file
+                            file.Delete();
+                            Logger.Info("Deleted log file - " + file + ", last modified - " + file.LastWriteTime.Date);
+                        }
+                    }
+                }
+                else
+                {
+                    Logger.Info("Delete log file - Directory does not exist");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Delete log file - exception");
+            }
+        }
     }
+
 }

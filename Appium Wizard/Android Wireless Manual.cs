@@ -1,9 +1,13 @@
-﻿namespace Appium_Wizard
+﻿using NLog;
+
+namespace Appium_Wizard
 {
     public partial class AndroidWirelessManual : Form
     {
         AndroidWireless androidWireless;
         string networkPortion = string.Empty;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public AndroidWirelessManual(AndroidWireless androidWireless)
         {
             this.androidWireless = androidWireless;

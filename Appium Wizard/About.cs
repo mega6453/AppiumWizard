@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using NLog;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -7,6 +8,7 @@ namespace Appium_Wizard
 {
     public partial class About : Form
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public About()
         {
             InitializeComponent();
@@ -15,7 +17,7 @@ namespace Appium_Wizard
         private async void About_Load(object sender, EventArgs e)
         {
             label1.Text = "Version : " + VersionInfo.VersionNumber;
-           
+
             try
             {
                 string dual = "This project is dual-licensed under the MIT and GPL 3.0 licenses.";
@@ -35,8 +37,15 @@ namespace Appium_Wizard
             }
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void About_Shown(object sender, EventArgs e)
         {
+            GoogleAnalytics.SendEvent("About_Shown");
+            Logger.Info("About_Shown");
+        }
+
+        private void gitHubRepoLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Logger.Info("GithubRepo_Link_Clicked");
             string eventName = "GithubRepo_Link_Clicked";
             try
             {
@@ -46,17 +55,14 @@ namespace Appium_Wizard
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
+                Logger.Info("GithubRepo_Link_Clicked process started");
             }
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent(eventName, exception.Message);
+                Logger.Error(exception, "GithubRepo_Link_Clicked exception");
             }
             GoogleAnalytics.SendEvent(eventName);
-        }
-
-        private void About_Shown(object sender, EventArgs e)
-        {
-            GoogleAnalytics.SendEvent("About_Shown");
         }
     }
 

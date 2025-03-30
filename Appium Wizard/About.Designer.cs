@@ -32,7 +32,7 @@
             pictureBox1 = new PictureBox();
             tabControl1 = new TabControl();
             AboutTabPage = new TabPage();
-            linkLabel1 = new LinkLabel();
+            gitHubRepoLinkLabel = new LinkLabel();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
@@ -72,7 +72,7 @@
             // 
             // AboutTabPage
             // 
-            AboutTabPage.Controls.Add(linkLabel1);
+            AboutTabPage.Controls.Add(gitHubRepoLinkLabel);
             AboutTabPage.Controls.Add(label3);
             AboutTabPage.Controls.Add(label2);
             AboutTabPage.Controls.Add(label1);
@@ -84,16 +84,17 @@
             AboutTabPage.Text = "About";
             AboutTabPage.UseVisualStyleBackColor = true;
             // 
-            // linkLabel1
+            // gitHubRepoLinkLabel
             // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.Location = new Point(87, 77);
-            linkLabel1.Margin = new Padding(2, 0, 2, 0);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(252, 15);
-            linkLabel1.TabIndex = 8;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "https://github.com/mega6453/AppiumWizard";
+            gitHubRepoLinkLabel.AutoSize = true;
+            gitHubRepoLinkLabel.Location = new Point(87, 77);
+            gitHubRepoLinkLabel.Margin = new Padding(2, 0, 2, 0);
+            gitHubRepoLinkLabel.Name = "gitHubRepoLinkLabel";
+            gitHubRepoLinkLabel.Size = new Size(252, 15);
+            gitHubRepoLinkLabel.TabIndex = 8;
+            gitHubRepoLinkLabel.TabStop = true;
+            gitHubRepoLinkLabel.Text = "https://github.com/mega6453/AppiumWizard";
+            gitHubRepoLinkLabel.LinkClicked += gitHubRepoLinkLabel_LinkClicked;
             // 
             // label3
             // 
@@ -203,7 +204,7 @@
         private RichTextBox LicenseRichTextBox;
         private TabPage ThanksToTabPage;
         private RichTextBox ThanksToRichTextBox;
-        private LinkLabel linkLabel1;
+        private LinkLabel gitHubRepoLinkLabel;
         private Label label3;
         private Label label2;
         private Label label1;

@@ -52,7 +52,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Server Settings - Set server arguments and default capabilities separately for each server 
 * Update Appium Server and drivers
 * Troubleshooter to fix appium and driver issues
-* Plugins Manager - Install, Update and Uninstall (**New**)
+* Plugins Manager - Install, Update and Uninstall
 #### iOS
 * iOS Automation Execution
 * iOS Screen Reflection and Screen Control
@@ -74,7 +74,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Take Device Screenshot
 * Record Screen from Screen Control
 * Notifications - Enable/Disable Notifications for few events 
-* Object Spy - Beta version (**New**)
+* Object Spy - Beta version
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window
@@ -104,7 +104,6 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS device features in windows. 
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
-* [Dadoum](https://github.com/Dadoum/zsign-Windows) - For providing zsign windows executable.
 
 ## Icons
 * <a href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow icons created by Lizel Arina - Flaticon</a>
@@ -146,6 +145,7 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/notification" title="notification icons">Notification icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/tick" title="tick icons">Tick icons created by Octopocto - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/plugin" title="plugin icons">Plugin icons created by prettycons - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/log" title="log icons">Log icons created by juicy_fish - Flaticon</a>
 
 ## License
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using NLog;
+using System.Reflection;
 
 namespace Appium_Wizard
 {
@@ -7,6 +8,8 @@ namespace Appium_Wizard
         static string ProfilesFilePath = FilesPath.ProfilesFilePath;
         string selectedProfileName, selectedProfilePath;
         ListViewItem selectedItem;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public iOSProfileManagement()
         {
             InitializeComponent();
@@ -21,17 +24,20 @@ namespace Appium_Wizard
 
         private void delete_Click(object sender, EventArgs e)
         {
+            Logger.Info("delete_Click, selectedProfileName :" + selectedProfileName);
             DialogResult result = MessageBox.Show("Are you sure you want to delete " + selectedProfileName + " profile?", "Delete Profile", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.OK)
             {
                 try
                 {
+                    Logger.Info("delete_Click, selectedProfilePath :" + selectedProfilePath);
                     Directory.Delete(selectedProfilePath, true);
                     MessageBox.Show(selectedProfileName + " removed successfully.", "Delete Profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     listView1.Items.Remove(selectedItem);
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex,"profile delete exception");
                     MessageBox.Show("Exception - " + ex, "Failed to Delete", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -46,6 +52,8 @@ namespace Appium_Wizard
                 selectedProfileName = selectedItem.SubItems[0].Text;
                 selectedProfilePath = selectedItem.SubItems[4].Text;
                 deleteProfileButton.Enabled = true;
+                Logger.Info("listView1_SelectedIndexChanged, selectedProfileName :" + selectedProfileName);
+                Logger.Info("listView1_SelectedIndexChanged, selectedProfilePath :" + selectedProfilePath);
             }
             else
             {
@@ -60,6 +68,7 @@ namespace Appium_Wizard
             {
                 if (!Directory.Exists(ProfilesFilePath))
                 {
+                    Logger.Info("!Directory.Exists(ProfilesFilePath), creating directory : "+ProfilesFilePath);
                     Directory.CreateDirectory(ProfilesFilePath);
                 }
                 string[] profileFolders = Directory.GetDirectories(ProfilesFilePath);
@@ -98,6 +107,13 @@ namespace Appium_Wizard
                                         updatedExpirationDays = expirationDaysFromProvisionFile.ToString() + " days";
                                     }
                                 }
+                                Logger.Info("profileName : " + profileName);
+                                Logger.Info("expirationDaysFromProvisionFile : " + expirationDaysFromProvisionFile);
+                                Logger.Info("expirationDaysFromPem : " + expirationDaysFromPem);
+                                Logger.Info("updatedExpirationDays : " + updatedExpirationDays);
+                                Logger.Info("appId : " + appId);
+                                Logger.Info("teamId : " + teamId);
+                                Logger.Info("profileFolder : " + profileFolder);
                                 string[] item1 = { profileName, updatedExpirationDays, appId, teamId, profileFolder };
                                 profilesList.Add(item1);
                             }

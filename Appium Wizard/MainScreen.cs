@@ -1586,9 +1586,18 @@ namespace Appium_Wizard
             }
         }
 
-        private void signIPAToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void signIPAToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var profilesList = iOSProfileManagement.FetchProfiles();
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel("Load Profiles", "Please wait while fetching profiles...");
+            List<string[]> profilesList = new List<string[]>();
+            await Task.Run(() =>
+            {
+                profilesList = iOSProfileManagement.FetchProfiles();
+            });
+            commonProgress.Close();
             if (profilesList.Count == 0)
             {
                 MessageBox.Show("Provisioning Profiles not found. First Import profile in Tools->iOS Profile Management and then try again.", "Provisioning Profiles not found", MessageBoxButtons.OK, MessageBoxIcon.Error);

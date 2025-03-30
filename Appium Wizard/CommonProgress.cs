@@ -1,7 +1,11 @@
-﻿namespace Appium_Wizard
+﻿using NLog;
+
+namespace Appium_Wizard
 {
     public partial class CommonProgress : Form
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public CommonProgress()
         {
             InitializeComponent();
@@ -16,6 +20,7 @@
 
         public void UpdateStepLabel(string title, string stepText, int progressPercent = 50)
         {
+            Logger.Debug(stepText);
             if (!this.Visible)
             {
                 return;
@@ -47,6 +52,7 @@
 
         public void UpdateStepLabel(string stepText)
         {
+            Logger.Debug(stepText);
             if (this.InvokeRequired)
             {
                 this.Invoke((MethodInvoker)delegate

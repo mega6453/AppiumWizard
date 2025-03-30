@@ -2,6 +2,6 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)entityframework\6.4.4\buildTransitive\netcoreapp3.0\EntityFramework.targets" Condition="Exists('$(NuGetPackageRoot)entityframework\6.4.4\buildTransitive\netcoreapp3.0\EntityFramework.targets')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.web.webview2\1.0.2739.15\build\Microsoft.Web.WebView2.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.web.webview2\1.0.2739.15\build\Microsoft.Web.WebView2.targets')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.web.webview2\1.0.3124.44\buildTransitive\Microsoft.Web.WebView2.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.web.webview2\1.0.3124.44\buildTransitive\Microsoft.Web.WebView2.targets')" />
   </ImportGroup>
 </Project>

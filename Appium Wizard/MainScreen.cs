@@ -22,7 +22,7 @@ namespace Appium_Wizard
         public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
         public static bool alwaysOnTop;
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
-        public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string,string>();
+        public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
 
 
         public MainScreen()
@@ -1990,8 +1990,8 @@ namespace Appium_Wizard
 
         private void usePreInstalledWDAToolStripMenuItem_Click(object sender, EventArgs e)
         {
-             
-            UsePreInstalledWDA usePreInstalledWDA = new UsePreInstalledWDA(selectedUDID,selectedDeviceName);
+
+            UsePreInstalledWDA usePreInstalledWDA = new UsePreInstalledWDA(selectedUDID, selectedDeviceName);
             usePreInstalledWDA.ShowDialog();
         }
 
@@ -2041,6 +2041,11 @@ namespace Appium_Wizard
             Plugins plugins = new Plugins();
             await plugins.UpdatePluginList(commonProgress);
             plugins.ShowDialog();
+        }
+
+        private void openLogsFolderToolstripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Logs");
         }
     }
 }

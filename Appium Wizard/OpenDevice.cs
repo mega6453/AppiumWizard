@@ -1,4 +1,6 @@
-﻿namespace Appium_Wizard
+﻿using NLog;
+
+namespace Appium_Wizard
 {
     public class OpenDevice
     {
@@ -10,6 +12,7 @@
         string deviceName, udid, OSType, OSVersion, connectionType;
         bool isScreenServerStarted = false;
         string title;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public OpenDevice(string udid, string selectedOS, string selectedVersion, string selectedDeviceName, string connectionType, string deviceIPAddress)
         {
             this.udid = udid;
@@ -76,6 +79,7 @@
         private async Task ExecuteiOSBackgroundMethod()
         {
             bool usePreInstalledWDA = MainScreen.UDIDPreInstalledWDA.ContainsKey(udid);
+            Logger.Info("usePreInstalledWDA : " + usePreInstalledWDA);
             await Task.Run(() =>
             {
                 var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
@@ -89,6 +93,7 @@
                 {
                     if (deviceDetails.ContainsKey(udid))
                     {
+                        Logger.Info("deviceDetails.ContainsKey : "+udid);
                         proxyPort = (int)deviceDetails[udid]["proxyPort"];
                         screenServerPort = (int)deviceDetails[udid]["screenPort"];
                         width = (int)deviceDetails[udid]["width"];
@@ -96,17 +101,20 @@
                     }
                     else
                     {
+                        Logger.Info("deviceDetails does not contain : " + udid);
                         proxyPort = Common.GetFreePort();
                         screenServerPort = Common.GetFreePort();
                     }
                     commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 50);
                     if (connectionType.Equals("Wi-Fi"))
                     {
+                        Logger.Info("connectionType.Equals(\"Wi-Fi\"), Start Go-iOS Proxy server");
                         iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100);
                         iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, screenServerPort, 9100);
                     }
                     else
                     {
+                        Logger.Info("connectionType NOT Equals(\"Wi-Fi\"), Start iProxy server");
                         iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                     }
                     WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
@@ -132,21 +140,26 @@
                             if (isInstalled)
                             {
                                 wdaCheck = true;
+                                Logger.Info("wda installed");
                             }
                             else
                             {
                                 wdaCheck = false;
+                                Logger.Info("wda not installed");
                                 profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
+                                Logger.Info("isProfileAvailableToSign: "+profileCheck);
                             }
                         }
                         else
                         {
                             //commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
                             wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
+                            Logger.Info("isLatestVersionWDAInstalled:"+wdaCheck);
                             commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign WDA...", 15);
                             profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
                             if (isInstalled && !wdaCheck && !profileCheck) // WDA installed but not latest version and profile not available to sign.
                             {
+                                Logger.Info("WDA installed but not latest version and profile not available to sign, so considering WDA available");
                                 wdaCheck = true;  // considering WDA available, so that it won't try to install again and not throw error saying no profile found.
                             }
                         }
@@ -165,10 +178,8 @@
                                 {
                                     commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 20);
                                 }
-                                iOSMethods.GetInstance().InstallWDA(udid);
-                                installedNow = true;
+                                installedNow = iOSMethods.GetInstance().InstallWDA(udid);
                             }
-                            commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 30);
                             if (installedNow)
                             {
                                 isRunning = false;
@@ -212,22 +223,28 @@
                             else
                             {
                                 Version deviceVersion = new Version(OSVersion);
+                                Logger.Info(deviceVersion);
                                 Version version17Plus = new Version("17.0.0");
                                 if (deviceVersion >= version17Plus)
                                 {
+                                    Logger.Info("device version >= 17.0.0 , so creating tunnel");
                                     //commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 35);
                                     bool isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
                                     if (isTunnelStarted)
                                     {
+                                        Logger.Info("tunnel started");
                                         iOSMethods.isGo = true;
                                         iOSAsyncMethods.isGo = true;
                                     }
                                     else
                                     {
+                                        Logger.Info("tunnel not started");
                                         var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                                         if (result == DialogResult.Yes)
                                         {
+                                            Logger.Info("Clicked yes to create tunnel with admin rights.");
                                             isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnel();
+                                            Logger.Info("isTunnelStarted - " + isTunnelStarted);
                                             if (isTunnelStarted)
                                             {
                                                 iOSMethods.isGo = false;
@@ -276,6 +293,7 @@
                                 }
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.", 70);
                                 WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
+                                Logger.Info("WDAsessionId:"+ WDAsessionId);
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
                                     commonProgress.Close();
@@ -388,6 +406,7 @@
                     AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 15);
                     bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
+                    Logger.Info("isUIAutomatorInstalled : "+ isUIAutomatorInstalled);
                     if (!isUIAutomatorInstalled)
                     {
                         commonProgress.UpdateStepLabel(title, "Installing UIAutomator...", 30);
@@ -396,6 +415,7 @@
                 }
                 catch (Exception e)
                 {
+                    Logger.Error(e, "Error installing uiautomator");
                     MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isScreenServerStarted = false;
                     return;
@@ -438,10 +458,12 @@
                         bool isSessionCreated = false, isItValidSession = false;
                         if (deviceSessionId.ContainsKey(udid))
                         {
+                            Logger.Info("deviceSessionId.ContainsKey(udid) : "+udid);
                             AndroidAPIMethods.DeleteSession(proxyPort);
                         }
                         else
                         {
+                            Logger.Info("deviceSessionId does not ContainsKey(udid) : " + udid);
                             sessionIdAvailableForAutomation = AndroidAPIMethods.GetSessionID(proxyPort);
                             isSessionCreated = !sessionIdAvailableForAutomation.Equals("nosession");
                         }

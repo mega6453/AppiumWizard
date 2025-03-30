@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 using RestSharp;
 using System.Diagnostics;
 using System.Drawing.Imaging;
@@ -16,7 +17,7 @@ namespace Appium_Wizard
     {
         private static iOSMethods? instance;
         private static readonly object lockObject = new object();
-
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private string iOSServerFilePath = FilesPath.iOSServerFilePath;
         private string iOSFilesPath = FilesPath.iOSFilesPath;
         private string pListUtilFilePath = FilesPath.pListUtilFilePath;
@@ -229,10 +230,12 @@ namespace Appium_Wizard
             var installedApps = GetListOfInstalledApps(udid);
             if (installedApps.Contains("com.facebook.WebDriverAgentRunner.xctrunner"))
             {
+                Logger.Info("installedApps.Contains(\"com.facebook.WebDriverAgentRunner.xctrunner\")");
                 return true;
             }
             if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
             {
+                Logger.Info("MainScreen.UDIDPreInstalledWDA.value : "+ MainScreen.UDIDPreInstalledWDA[udid]);
                 return installedApps.Contains(MainScreen.UDIDPreInstalledWDA[udid]);
             }
             return false;
@@ -441,14 +444,23 @@ namespace Appium_Wizard
             return sessionId;
         }
 
-        public void InstallWDA(string udid)
+        public bool InstallWDA(string udid)
         {
             string WDAPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\wda.ipa";
             string signedIPA = SignIPA(udid, WDAPath);
-            if (!signedIPA.Equals("notsigned"))
+            if (signedIPA.Equals("notsigned"))
             {
+                Logger.Info("InstallWDA, notsigned");
+                return false;
+            }
+            else
+            {
+                Logger.Info("install wda");
                 iOSAsyncMethods.GetInstance().InstallApp(udid, signedIPA);
                 Thread.Sleep(3000);
+                bool result = iSWDAInstalled(udid);
+                Logger.Info("install wda, result - "+result);
+                return result;
             }
         }
 
@@ -1040,6 +1052,7 @@ namespace Appium_Wizard
 
         public string ExecuteCommand(string arguments, string udid = "any", bool waitForExit = true, int timeout = 0)
         {
+            Logger.Debug("Execute command arguments : " + arguments);
             try
             {
                 if (udid.Equals("any"))
@@ -1065,11 +1078,14 @@ namespace Appium_Wizard
                 }
                 if (timeout != 0 && !processExited)
                 {
+                    Logger.Debug("Process did not complete within the allotted time. killing process");
                     iOSProcess.Kill(); // Kill the process if it did not exit within the timeout
                     return "Process did not complete within the allotted time.";
                 }
                 string output = iOSProcess.StandardOutput.ReadToEnd();
                 string error = iOSProcess.StandardError.ReadToEnd();
+                Logger.Debug("Execute command output : " + output);
+                Logger.Debug("Execute command error : " + error);
                 if (!string.IsNullOrEmpty(output))
                 {
                     return output;
@@ -1220,6 +1236,7 @@ namespace Appium_Wizard
     {
         private string iOSServerFilePath = FilesPath.iOSServerFilePath;
         private string iProxyFilePath = FilesPath.iProxyFilePath;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private static iOSAsyncMethods? instance;
         private static readonly object lockObject = new object();
@@ -1535,7 +1552,9 @@ namespace Appium_Wizard
             {
                 if (MainScreen.udidProxyPort.ContainsKey(udid))
                 {
+                    Logger.Info("MainScreen.udidProxyPort.ContainsKey(udid)"+udid);
                     string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                    Logger.Info("sessionid:"+sessionId);
                     if (!sessionId.Equals("nosession"))
                     {
                         return sessionId;
@@ -1544,6 +1563,7 @@ namespace Appium_Wizard
 
                 if (isGo && !is17Plus)
                 {
+                    Logger.Info("isGo:"+isGo+" and !is17plus:"+!is17Plus);
                     // Create a new process
                     Process process = new Process();
 
@@ -1551,10 +1571,12 @@ namespace Appium_Wizard
                     process.StartInfo.FileName = iOSServerFilePath;
                     if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iOSMethods.GetInstance().iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
                     {
+                        Logger.Info("launch "+ MainScreen.UDIDPreInstalledWDA[udid]);
                         process.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
                     }
                     else
                     {
+                        Logger.Info("runwda");
                         process.StartInfo.Arguments = "runwda --udid=" + udid;
                     }
                     //process.StartInfo.Arguments = "runwda --udid=" + udid;
@@ -1596,6 +1618,7 @@ namespace Appium_Wizard
                             if (runwdaError.Contains("Process started successfully"))
                             {
                                 sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                                Logger.Debug("sessionid"+sessionId);
                                 while (sessionId.Equals("nosession") && count <= 6)
                                 {
                                     await Task.Run(async () =>
@@ -1603,7 +1626,9 @@ namespace Appium_Wizard
                                         //Thread.Sleep(5000);
                                         await Task.Delay(5000);
                                         sessionId = iOSAPIMethods.CreateWDASession(port);
+                                        Logger.Debug("sessionid" + sessionId);
                                         bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
+                                        Logger.Debug("IsWDARunningInAppsList" + IsWDARunningInAppsList);
                                         if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
                                         {
                                             commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
@@ -1636,6 +1661,7 @@ namespace Appium_Wizard
                             }
                         }
                     }
+                    Logger.Error("runwdaError:" + runwdaError);
                     if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
                     {
                         return "Enable Developer Mode";
@@ -1659,17 +1685,20 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        Logger.Error(runwdaError,"unhandled");
                         return "unhandled";
                     }                    
                 }
                 else
                 {
+                    Logger.Info("RunWebDriverAgentQuick");
                     return RunWebDriverAgentQuick(commonProgress, udid, port);
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, "Exception in RunWebDriverAgent, so RunWebDriverAgentQuick method");
                 return RunWebDriverAgentQuick(commonProgress, udid, port);
             }
         }
@@ -1754,6 +1783,7 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunning();
+            Logger.Info("isTunnelRunning already : "+isTunnelRunning);
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (isTunnelRunning)
             {
@@ -1781,9 +1811,10 @@ namespace Appium_Wizard
                         {
                             var id = tunnelProcess.Id; // just to check if there's exception.
                         }
-                        catch (InvalidOperationException)
+                        catch (InvalidOperationException ex)
                         {
                             commonProgress.Close();
+                            Logger.Error(ex, "Admin Permission denied");
                             MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return false;
                         }
@@ -1793,6 +1824,7 @@ namespace Appium_Wizard
                             if (tunnelProcess.HasExited)
                             {
                                 commonProgress.Close();
+                                Logger.Error(errorMessage, "Admin Permission denied");
                                 MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return false;
                             }
@@ -1806,6 +1838,7 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                         commonProgress.Close();
+                        Logger.Error(errorMessage, "Admin Permission denied");
                         MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
@@ -1813,6 +1846,7 @@ namespace Appium_Wizard
                 else
                 {
                     commonProgress.Close();
+                    Logger.Error(errorMessage, "Admin Permission denied");
                     MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try
@@ -1845,6 +1879,7 @@ namespace Appium_Wizard
             }
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+            Logger.Info("isTunnelRunning already :"+isTunnelRunning);
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (!isTunnelRunning)
             {
@@ -1870,13 +1905,16 @@ namespace Appium_Wizard
                         var processId = tunnelProcess.Id;
                         MainScreen.runningProcesses.Add(processId);
                         commonProgress.Close();
+                        Logger.Info("Tunnel started");
                         return true;
                     }
                     commonProgress.Close();
+                    Logger.Info("Tunnel not started");
                     return false;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.Error(e,"tunnel creation exception");
                     commonProgress.Close();
                     return false;
                 }
@@ -1908,6 +1946,8 @@ namespace Appium_Wizard
 
     public class iOSAPIMethods
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public static string CreateWDASession(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
@@ -1947,6 +1987,7 @@ namespace Appium_Wizard
             var request = new RestRequest("/window/size", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            Logger.Info("GetScreenSize response content : "+response.Content);
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 dynamic jsonObj = JsonConvert.DeserializeObject(response.Content);
@@ -2223,6 +2264,7 @@ namespace Appium_Wizard
                 var request = new RestRequest("/status", Method.Get);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
+                Logger.Info("IsWDARunning response content : "+response.Content);
                 if (response.Content != null)
                 {
                     if (response.Content.Contains("WebDriverAgent is ready to accept commands"))

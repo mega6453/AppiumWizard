@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using NLog;
 using RestSharp;
 using System.Diagnostics;
 using System.Management;
@@ -18,6 +19,7 @@ namespace Appium_Wizard
         private string settingsAPKFilePath = FilesPath.settingsAPKFilePath;
         private Process adbProcess;
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public void StartAdbServer(int AdbPort)
         {
@@ -68,6 +70,7 @@ namespace Appium_Wizard
             apps.Remove("io.appium.uiautomator2.server");
             foreach (var item in apps)
             {
+                Logger.Info("UninstallOtherInstrumentationApps :"+item);
                 UnInstallApp(udid,item);
             }
         }
@@ -239,6 +242,8 @@ namespace Appium_Wizard
         public bool InstallApp(string udid, string path)
         {
             var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");
+            Logger.Info("install app - " + path);
+            Logger.Info("install app output :"+output);
             return output.Contains("Success");
         }
 
@@ -687,6 +692,8 @@ namespace Appium_Wizard
         private static readonly object lockObject = new object();
         private string adbFilePath = FilesPath.adbFilePath;
         private Process adbAsyncProcess = new Process();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public void StartUIAutomatorServer(string udid, bool stop)
         {
             // if fails, then only need to uninstall.. need to add a condition here..
@@ -853,7 +860,7 @@ namespace Appium_Wizard
 
     public class AndroidAPIMethods
     {
-
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public static string CreateSession(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)

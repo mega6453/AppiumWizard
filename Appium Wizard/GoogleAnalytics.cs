@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NLog;
 
 namespace Appium_Wizard
 {
@@ -7,10 +8,11 @@ namespace Appium_Wizard
         static string APISecret = "{GOOGLEANALYTICSAPISECRET}";
         static string MeasurementID = "{GOOGLEANALYTICSMEASUREMENTID}";
         public static string clientId = string.Empty;
-
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public static void SendEvent(object eventName, string info = "", bool addUserCount = false)
         {
+            Logger.Info(eventName+" : "+info);
             try
             {
                 Task.Run(() =>
@@ -67,6 +69,8 @@ namespace Appium_Wizard
 
         public static void SendExceptionEvent(object eventName, string message="", bool addUserCount = false)
         {
+            string eventNameString = eventName?.ToString() ?? "Unknown Exception";
+            Logger.Error(eventNameString, message);
             if (!APISecret.Contains("ANALYTICSAPISECRET"))
             {
                 Task.Run(async () =>

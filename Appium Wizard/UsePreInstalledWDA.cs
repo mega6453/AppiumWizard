@@ -1,4 +1,5 @@
 ﻿using Appium_Wizard.Properties;
+using NLog;
 using System.Linq;
 
 namespace Appium_Wizard
@@ -7,6 +8,7 @@ namespace Appium_Wizard
     {
         string udid, deviceName;
         string defaultBundleId = "com.facebook.WebDriverAgentRunner.xctrunner";
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public UsePreInstalledWDA(string udid, string deviceName)
         {
             this.udid = udid;
@@ -20,6 +22,7 @@ namespace Appium_Wizard
             {
                 if (dontUseRadioButton.Checked)
                 {
+                    Logger.Info("Don't use Pre installed WDA");
                     GoogleAnalytics.SendEvent("preinstalledwda_dontuse");
                     Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                     MainScreen.UDIDPreInstalledWDA.Remove(udid);
@@ -33,6 +36,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        Logger.Info("Use Pre installed custom WDA. Bundle Id : "+ bundleIdTextbox.Text.Trim());
                         GoogleAnalytics.SendEvent("preinstalledwda_custom");
                         Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                         Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, bundleIdTextbox.Text.Trim());
@@ -43,6 +47,7 @@ namespace Appium_Wizard
                 }
                 if (defaultRadioButton.Checked)
                 {
+                    Logger.Info("Use Pre installed default WDA. Bundle Id : "+defaultBundleId);
                     GoogleAnalytics.SendEvent("preinstalledwda_default");
                     Database.DeleteUDIDFromUsePreInstalledWDAList(udid);
                     Database.InsertUDIDAndBundleIdIntoUsePreInstalledWDAList(udid, defaultBundleId);
@@ -52,7 +57,8 @@ namespace Appium_Wizard
                 }
             }
             catch (Exception ex)
-            {            
+            {
+                Logger.Error(ex, "Error while applying user preferences for pre-installed wda.");
                 MessageBox.Show("Error while applying user preferences for pre-installed wda. \nOriginal exception: " + ex.Message, "Use Pre-Installed WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

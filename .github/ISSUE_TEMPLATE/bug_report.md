@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+**In Appium Wizard, Go to Help-> Open logs folder to find the log file and attach it to this bug.**
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

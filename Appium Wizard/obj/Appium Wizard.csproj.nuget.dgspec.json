@@ -55,7 +55,7 @@
             },
             "Microsoft.Web.WebView2": {
               "target": "Package",
-              "version": "[1.0.2739.15, )"
+              "version": "[1.0.3124.44, )"
             },
             "NLog": {
               "target": "Package",
@@ -79,7 +79,7 @@
             },
             "System.Management": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[9.0.3, )"
             }
           },
           "imports": [

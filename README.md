@@ -1,6 +1,6 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mega6453/AppiumWizard/total)
 ![GitHub Release](https://img.shields.io/github/v/release/mega6453/AppiumWizard)
-
+![GitHub Repo stars](https://img.shields.io/github/stars/mega6453/AppiumWizard)
 
 <p align="center">
   <img src="logo.jpg" alt="Appium Wizard Logo">
@@ -8,7 +8,9 @@
 
 # Appium Wizard for Mobile Automation Testing
 
-Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool helps testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows.
+Appium Wizard is a Windows software designed to streamline mobile automation using the open-source Appium server. This user-friendly tool helps testers to seamlessly run mobile automation tests on android and iOS(without depending on Mac machine) platforms in windows. 
+
+:star2: Star :star2: this project to find it easily again, show your appreciation, and help make this project popular! :smiley:
 
 
 
@@ -34,17 +36,6 @@ to install it during the first time launch which may take sometime to complete i
 3. For iOS : Go to Tools -> iOS profile management and Add your iOS provisioning profiles (Get the profiles from Apple Developer account for your device or Check with your iOS developer)
 4. Select the device and Click Open device to open the device reflection.<br>
 5. Now start running automation from your automation script. (Make sure you have given the correct appium server port number and device id in your script)
-
-## NOTE
-Appium Wizard is in it's early stage of development. So,expect 
-* Unhandled exceptions
-* Crashes 
-* Performance issues
-* Reliability issues
-  
-The above issues are expected in Appium Wizard software and not in your mobile app under test.
-
-PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
 
 ## Features Available
 #### Server
@@ -81,9 +72,8 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * Status bar for Element interaction (WaitForElement, Swipe, etc.)
 * Performance and Reliability Improvements
 * Error handling
-
-## Known Issues (fix in progress)
-* Performance issues
+* Use devices remotely
+* and more...
 
 ## Built With
 * .Net C# & Windows Forms
@@ -147,6 +137,17 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION, IF YOU ARE OBSERVING ANY ISSUE WHIC
 * <a href="https://www.flaticon.com/free-icons/plugin" title="plugin icons">Plugin icons created by prettycons - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/log" title="log icons">Log icons created by juicy_fish - Flaticon</a>
 
+## NOTE
+Appium Wizard is in it's early stage of development. So,expect 
+* Unhandled exceptions
+* Crashes 
+* Performance issues
+* Reliability issues
+  
+The above issues are expected in Appium Wizard software and not in your mobile app under test.
+
+PLEASE CREATE AN ISSUE UNDER ISSUES SECTION(WITH LOGS FROM APPIUM WIZARD->HELP->OPEN LOGS FOLDER), IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
+
 ## License
 
 This project is dual-licensed under the MIT and GPL 3.0 licenses.
@@ -157,7 +158,10 @@ This project is dual-licensed under the MIT and GPL 3.0 licenses.
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)
 
-## Want to add features or fix things?
-* Fork the Repo
-* Make changes
-* Create a pull request
+## Contributing to the Project
+* **Fork the Repo**: Click the "Fork" button at the top right of the repository page to create your own copy of the repository.
+* **Make Changes**: Clone your forked repository to your local machine, and make the necessary changes in a new branch. It's a good practice to give your branch a descriptive name related to the changes you're making.
+* **Test Your Changes**: Ensure your changes work as expected and do not introduce new issues. Add tests if applicable.
+* **Commit Your Changes**: Commit your changes with clear and descriptive commit messages.
+* **Push to Your Fork**: Push your changes to your forked repository on GitHub.
+* **Create a Pull Request**: Navigate to the original repository and click "New Pull Request." Provide a detailed description of the changes you made and why they are necessary.

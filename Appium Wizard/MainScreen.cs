@@ -2056,5 +2056,55 @@ namespace Appium_Wizard
         {
             Process.Start("explorer.exe", Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Logs");
         }
+
+        private void shareDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                var selectedItem = listView1.SelectedItems[0];
+
+                var deviceDetails = new
+                {
+                    DeviceName = selectedItem.SubItems[0].Text,
+                    DeviceVersion = selectedItem.SubItems[1].Text,
+                    DeviceOS = selectedItem.SubItems[2].Text,
+                    DeviceStatus = selectedItem.SubItems[3].Text,
+                    DeviceUDID = getDeviceUdidByName(selectedDeviceName),
+                    DeviceConnection = selectedItem.SubItems[5].Text,
+                    DeviceIP = selectedItem.SubItems[6].Text
+                };
+                List<dynamic> devices;
+                if (!Directory.Exists(FilesPath.remoteExecutionPath))
+                {
+                    Directory.CreateDirectory(FilesPath.remoteExecutionPath);
+                }
+                string filePath = FilesPath.remoteExecutionPath + "\\sharedDevices.json";
+
+                // Read existing data from JSON file if it exists
+                if (File.Exists(filePath))
+                {
+                    string existingJson = File.ReadAllText(filePath);
+                    devices = JsonConvert.DeserializeObject<List<dynamic>>(existingJson) ?? new List<dynamic>();
+                }
+                else
+                {
+                    devices = new List<dynamic>();
+                }
+                // Add new device details
+                devices.Add(deviceDetails);
+
+                // Write updated list back to JSON file
+                string json = JsonConvert.SerializeObject(devices, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+
+                MessageBox.Show("Device shared for remote execution.");
+            }
+        }
+
+        private void remoteDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddRemoteDevice addRemoteDevice = new AddRemoteDevice();
+            addRemoteDevice.ShowDialog();
+        }
     }
 }

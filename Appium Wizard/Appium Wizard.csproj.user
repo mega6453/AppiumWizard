@@ -7,6 +7,9 @@
     <Compile Update="About.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="AddRemoteDevice.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Android Wireless Manual.cs">
       <SubType>Form</SubType>
     </Compile>

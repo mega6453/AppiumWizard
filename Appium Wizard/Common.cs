@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
@@ -14,6 +15,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Windows.Devices.AllJoyn;
 
 namespace Appium_Wizard
 {
@@ -1482,6 +1484,38 @@ namespace Appium_Wizard
                 Logger.Error(ex, "Delete log file - exception");
             }
         }
-    }
 
+        public static async Task<string> ReadJsonFromRemote(string fileUrl)
+        {
+            // URL of the file you want to download
+            string jsonContent = string.Empty;
+
+            await Task.Run(() =>
+            {
+                // Create a new instance of HttpClient
+                using (HttpClient client = new HttpClient())
+                {
+                    try
+                    {
+                        // Send a GET request to the specified URL synchronously
+                        HttpResponseMessage response = client.GetAsync(fileUrl).Result;
+
+                        // Ensure the request was successful
+                        response.EnsureSuccessStatusCode();
+
+                        // Read the response content as a string synchronously
+                        jsonContent = response.Content.ReadAsStringAsync().Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred: {ex.Message}");
+                        // Handle the exception as needed
+                        jsonContent = string.Empty; // or null, depending on your preference
+                    }
+                }
+            });
+
+            return jsonContent;
+        }
+    }
 }

@@ -192,6 +192,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\Logs\" />
+    <Folder Include="Resources\RemoteExecution\" />
   </ItemGroup>
 
 </Project>

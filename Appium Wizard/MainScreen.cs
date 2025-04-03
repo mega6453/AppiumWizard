@@ -2071,7 +2071,10 @@ namespace Appium_Wizard
                     DeviceStatus = selectedItem.SubItems[3].Text,
                     DeviceUDID = getDeviceUdidByName(selectedDeviceName),
                     DeviceConnection = selectedItem.SubItems[5].Text,
-                    DeviceIP = selectedItem.SubItems[6].Text
+                    DeviceIP = selectedItem.SubItems[6].Text,
+                    SystemIPAddress = Common.GetIPAddress(),
+                    ProxyPort = 5555,
+                    ScreenPort = 7777
                 };
                 List<dynamic> devices;
                 if (!Directory.Exists(FilesPath.remoteExecutionPath))
@@ -2143,7 +2146,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        MessageBox.Show("Device not found.");
+                        MessageBox.Show("Device not shared.");
                     }
                 }
                 else

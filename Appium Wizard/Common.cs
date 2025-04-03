@@ -1004,7 +1004,7 @@ namespace Appium_Wizard
             }
         }
 
-        private static string GetIPAddress()
+        public static string GetIPAddress()
         {
             try
             {

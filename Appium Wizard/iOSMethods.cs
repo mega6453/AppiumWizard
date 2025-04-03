@@ -1108,62 +1108,68 @@ namespace Appium_Wizard
 
         public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
-            bool isTunnelRunning = false;
-            if (command.Contains("developer"))
+            try
             {
-                isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
-                if (!isTunnelRunning)
+                bool isTunnelRunning = false;
+                if (command.Contains("developer"))
                 {
-                    return "tunnel not created";
+                    isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
+                    if (!isTunnelRunning)
+                    {
+                        return "tunnel not created";
+                    }
                 }
-            }
-            Process process = new Process();
-            process.StartInfo.FileName = FilesPath.pymd3FilePath;
-            if (udid == "")
-            {
-                process.StartInfo.Arguments = command;
-            }
-            else
-            {
-                process.StartInfo.Arguments = command + " --udid " + udid;
-            }
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            bool processExited = false;
-            string error = process.StandardError.ReadToEnd();
-            string output = process.StandardOutput.ReadToEnd();
-            string result = output + error;
-            if (timeout == 0)
-            {
-                process.WaitForExit();
-            }
-            else
-            {
-                processExited = iOSProcess.WaitForExit(timeout);
-            }
-            if (timeout != 0 && !processExited)
-            {
-                process.Kill(); // Kill the process if it did not exit within the timeout
-                MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return "Process did not complete within the allotted time.";
-            }
-            result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
-            process.Close();
-            if (closeTunnel)
-            {
-                try
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.pymd3FilePath;
+                if (udid == "")
                 {
-                    iOSAsyncMethods.GetInstance().CloseTunnel();
+                    process.StartInfo.Arguments = command;
                 }
-                catch (Exception)
+                else
                 {
+                    process.StartInfo.Arguments = command + " --udid " + udid;
                 }
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                bool processExited = false;
+                string error = process.StandardError.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
+                string result = output + error;
+                if (timeout == 0)
+                {
+                    process.WaitForExit();
+                }
+                else
+                {
+                    processExited = iOSProcess.WaitForExit(timeout);
+                }
+                if (timeout != 0 && !processExited)
+                {
+                    process.Kill(); // Kill the process if it did not exit within the timeout
+                    MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return "Process did not complete within the allotted time.";
+                }
+                result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+                process.Close();
+                if (closeTunnel)
+                {
+                    try
+                    {
+                        iOSAsyncMethods.GetInstance().CloseTunnel();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                return result;
             }
-            return result;
-
+            catch (Exception)
+            {
+                return "Exception";
+            }
         }
 
         public string GetDeviceModel(string input)
@@ -1871,56 +1877,63 @@ namespace Appium_Wizard
 
         public bool CreateTunnelGo(bool showProgress = true)
         {
-            CommonProgress commonProgress = new CommonProgress();
-            int count = 0;
-            if (showProgress)
+            try
             {
-                commonProgress.Show();
-            }
-            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
-            bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
-            Logger.Info("isTunnelRunning already :"+isTunnelRunning);
-            commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
-            if (!isTunnelRunning)
-            {
-                commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\nNote : Tunnel will be created only once for a application lifecycle.");
-                try
+                CommonProgress commonProgress = new CommonProgress();
+                int count = 0;
+                if (showProgress)
                 {
-                    tunnelProcess = new Process();
-                    tunnelProcess.StartInfo.FileName = iOSServerFilePath;
-                    tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
-                    tunnelProcess.StartInfo.UseShellExecute = false;
-                    tunnelProcess.StartInfo.CreateNoWindow = true;
-                    tunnelProcess.Start();
-                    do
+                    commonProgress.Show();
+                }
+                commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
+                bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+                Logger.Info("isTunnelRunning already :" + isTunnelRunning);
+                commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
+                if (!isTunnelRunning)
+                {
+                    commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while creating tunnel, This may take few seconds...\nNote : Tunnel will be created only once for a application lifecycle.");
+                    try
                     {
-                        Thread.Sleep(1000);
-                        isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
-                        count++;
-                    }
-                    while (count <= 5 && !isTunnelRunning);
+                        tunnelProcess = new Process();
+                        tunnelProcess.StartInfo.FileName = iOSServerFilePath;
+                        tunnelProcess.StartInfo.Arguments = "tunnel start --userspace";
+                        tunnelProcess.StartInfo.UseShellExecute = false;
+                        tunnelProcess.StartInfo.CreateNoWindow = true;
+                        tunnelProcess.Start();
+                        do
+                        {
+                            Thread.Sleep(1000);
+                            isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
+                            count++;
+                        }
+                        while (count <= 5 && !isTunnelRunning);
 
-                    if (isTunnelRunning)
-                    {
-                        var processId = tunnelProcess.Id;
-                        MainScreen.runningProcesses.Add(processId);
+                        if (isTunnelRunning)
+                        {
+                            var processId = tunnelProcess.Id;
+                            MainScreen.runningProcesses.Add(processId);
+                            commonProgress.Close();
+                            Logger.Info("Tunnel started");
+                            return true;
+                        }
                         commonProgress.Close();
-                        Logger.Info("Tunnel started");
-                        return true;
+                        Logger.Info("Tunnel not started");
+                        return false;
                     }
-                    commonProgress.Close();
-                    Logger.Info("Tunnel not started");
-                    return false;
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "tunnel creation exception");
+                        commonProgress.Close();
+                        return false;
+                    }
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e,"tunnel creation exception");
-                    commonProgress.Close();
-                    return false;
-                }
+                commonProgress.Close();
+                return isTunnelRunning;
             }
-            commonProgress.Close();
-            return isTunnelRunning;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public void CloseTunnel()

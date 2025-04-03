@@ -206,13 +206,13 @@ namespace Appium_Wizard
             contextMenuStrip1.ImageScalingSize = new Size(24, 24);
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { iOSToolStripMenuItem, androidToolStripMenuItem, androidWiFiToolStripMenuItem, remoteDeviceToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(189, 146);
+            contextMenuStrip1.Size = new Size(162, 124);
             // 
             // iOSToolStripMenuItem
             // 
             iOSToolStripMenuItem.Image = Properties.Resources.apple;
             iOSToolStripMenuItem.Name = "iOSToolStripMenuItem";
-            iOSToolStripMenuItem.Size = new Size(188, 30);
+            iOSToolStripMenuItem.Size = new Size(161, 30);
             iOSToolStripMenuItem.Text = "iOS";
             iOSToolStripMenuItem.Click += iOSToolStripMenuItem_Click;
             // 
@@ -220,7 +220,7 @@ namespace Appium_Wizard
             // 
             androidToolStripMenuItem.Image = Properties.Resources.android;
             androidToolStripMenuItem.Name = "androidToolStripMenuItem";
-            androidToolStripMenuItem.Size = new Size(188, 30);
+            androidToolStripMenuItem.Size = new Size(161, 30);
             androidToolStripMenuItem.Text = "Android";
             androidToolStripMenuItem.Click += androidToolStripMenuItem_Click;
             // 
@@ -228,14 +228,14 @@ namespace Appium_Wizard
             // 
             androidWiFiToolStripMenuItem.Image = (Image)resources.GetObject("androidWiFiToolStripMenuItem.Image");
             androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
-            androidWiFiToolStripMenuItem.Size = new Size(188, 30);
+            androidWiFiToolStripMenuItem.Size = new Size(161, 30);
             androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
             androidWiFiToolStripMenuItem.Click += androidWiFiToolStripMenuItem_Click;
             // 
             // remoteDeviceToolStripMenuItem
             // 
             remoteDeviceToolStripMenuItem.Name = "remoteDeviceToolStripMenuItem";
-            remoteDeviceToolStripMenuItem.Size = new Size(188, 30);
+            remoteDeviceToolStripMenuItem.Size = new Size(161, 30);
             remoteDeviceToolStripMenuItem.Text = "Remote Device";
             remoteDeviceToolStripMenuItem.Click += remoteDeviceToolStripMenuItem_Click;
             // 
@@ -870,15 +870,16 @@ namespace Appium_Wizard
             // shareDeviceToolStripMenuItem
             // 
             shareDeviceToolStripMenuItem.Name = "shareDeviceToolStripMenuItem";
-            shareDeviceToolStripMenuItem.Size = new Size(180, 22);
+            shareDeviceToolStripMenuItem.Size = new Size(155, 22);
             shareDeviceToolStripMenuItem.Text = "Share Device";
             shareDeviceToolStripMenuItem.Click += shareDeviceToolStripMenuItem_Click;
             // 
             // unshareDeviceToolStripMenuItem
             // 
             unshareDeviceToolStripMenuItem.Name = "unshareDeviceToolStripMenuItem";
-            unshareDeviceToolStripMenuItem.Size = new Size(180, 22);
+            unshareDeviceToolStripMenuItem.Size = new Size(155, 22);
             unshareDeviceToolStripMenuItem.Text = "Unshare Device";
+            unshareDeviceToolStripMenuItem.Click += unshareDeviceToolStripMenuItem_Click;
             // 
             // label1
             // 

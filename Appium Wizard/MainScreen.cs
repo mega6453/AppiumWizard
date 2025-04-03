@@ -2090,14 +2090,23 @@ namespace Appium_Wizard
                 {
                     devices = new List<dynamic>();
                 }
-                // Add new device details
-                devices.Add(deviceDetails);
+                bool deviceExists = devices.Any(d => d.DeviceUDID == deviceDetails.DeviceUDID);
 
-                // Write updated list back to JSON file
-                string json = JsonConvert.SerializeObject(devices, Formatting.Indented);
-                File.WriteAllText(filePath, json);
+                if (deviceExists)
+                {
+                    MessageBox.Show("Device is already shared for remote execution.");
+                }
+                else
+                {
+                    // Add new device details
+                    devices.Add(deviceDetails);
 
-                MessageBox.Show("Device shared for remote execution.");
+                    // Write updated list back to JSON file
+                    string json = JsonConvert.SerializeObject(devices, Formatting.Indented);
+                    File.WriteAllText(filePath, json);
+
+                    MessageBox.Show("Device shared for remote execution.");
+                }
             }
         }
 
@@ -2105,6 +2114,47 @@ namespace Appium_Wizard
         {
             AddRemoteDevice addRemoteDevice = new AddRemoteDevice();
             addRemoteDevice.ShowDialog();
+        }
+
+        private void unshareDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                var selectedItem = listView1.SelectedItems[0];
+                string selectedUdid = getDeviceUdidByName(selectedItem.SubItems[0].Text);
+
+                string filePath = FilesPath.remoteExecutionPath + "\\sharedDevices.json";
+
+                if (File.Exists(filePath))
+                {
+                    string existingJson = File.ReadAllText(filePath);
+                    var devices = JsonConvert.DeserializeObject<List<dynamic>>(existingJson) ?? new List<dynamic>();
+
+                    // Remove all devices with the specified UDID
+                    int removedCount = devices.RemoveAll(d => d.DeviceUDID == selectedUdid);
+
+                    if (removedCount > 0)
+                    {
+                        // Write the updated list back to JSON file
+                        string json = JsonConvert.SerializeObject(devices, Formatting.Indented);
+                        File.WriteAllText(filePath, json);
+
+                        MessageBox.Show($"{removedCount} device(s) unshared successfully.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Device not found.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No devices are currently shared.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("No device selected.");
+            }
         }
     }
 }

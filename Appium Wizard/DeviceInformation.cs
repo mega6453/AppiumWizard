@@ -4,10 +4,9 @@ namespace Appium_Wizard
 {
     public partial class DeviceInformation : Form
     {
-        MainScreen mainScreen;
-        public DeviceInformation(MainScreen mainScreen)
+        public DeviceInformation()
         {
-            this.mainScreen = mainScreen;
+            this.Owner = MainScreen.main;
             InitializeComponent();
         }
 
@@ -72,7 +71,7 @@ namespace Appium_Wizard
             }
             Hide();
             Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height, Connection, IPAddress);
-            mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
+            MainScreen.main.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
             if (OSType.ToLower().Contains("ios"))
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>();

@@ -3,12 +3,10 @@
     public partial class PairingCodePrompt : Form
     {
         string pairingAddress, connectIPAddress, deviceName;
-        MainScreen mainScreen;
         AndroidWireless androidWireless;
-        public PairingCodePrompt(AndroidWireless androidWireless, MainScreen mainScreen, string deviceName, string pairingAddress, string connectAddress)
+        public PairingCodePrompt(AndroidWireless androidWireless, string deviceName, string pairingAddress, string connectAddress)
         {
             this.androidWireless = androidWireless;
-            this.mainScreen = mainScreen;
             this.deviceName = deviceName;
             this.pairingAddress = pairingAddress;
             this.connectIPAddress = connectAddress;

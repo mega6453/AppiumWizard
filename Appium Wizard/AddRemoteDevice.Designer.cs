@@ -174,6 +174,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AddRemoteDevice";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Add Remote Device";
             ResumeLayout(false);

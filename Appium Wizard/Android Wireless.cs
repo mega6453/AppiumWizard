@@ -2,14 +2,12 @@
 {
     public partial class AndroidWireless : Form
     {
-        MainScreen mainScreen;
         string selectedDevice = string.Empty;
         string selectedAddress = string.Empty;
         ListViewItem selectedItem = new ListViewItem();
         Dictionary<string, Tuple<string, string>> listOfDevices = new Dictionary<string, Tuple<string, string>>();
-        public AndroidWireless(MainScreen mainScreen)
+        public AndroidWireless()
         {
-            this.mainScreen = mainScreen;
             InitializeComponent();
             int listViewWidth = listView1.Width;
             int columnWidth = listViewWidth / 2;
@@ -94,7 +92,7 @@
             }
             if (!string.IsNullOrEmpty(pairingAddress) & !string.IsNullOrEmpty(connectAddress))
             {
-                PairingCodePrompt pairingCodePrompt = new PairingCodePrompt(this, mainScreen, selectedDevice, selectedAddress, connectAddress);
+                PairingCodePrompt pairingCodePrompt = new PairingCodePrompt(this, selectedDevice, selectedAddress, connectAddress);
                 pairingCodePrompt.ShowDialog();
             }
             GoogleAnalytics.SendEvent("PairButton_Click");
@@ -148,7 +146,7 @@
                     deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
                 });
                 commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 75);
-                DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
+                DeviceInformation deviceInformation = new DeviceInformation();
                 if (deviceInfo.ContainsKey("ro.serialno"))
                 {
                     string udid = deviceInfo["ro.serialno"]?.ToString() ?? "";

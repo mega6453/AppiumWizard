@@ -93,7 +93,6 @@ namespace Appium_Wizard
                     else
                     {
                         deviceValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(output);
-                        return deviceValues;
                     }
                 }
                 else
@@ -115,8 +114,19 @@ namespace Appium_Wizard
                             break;
                         }
                     }
-                    return deviceValues;
                 }
+                try
+                {
+                    int scale = int.Parse(ExecuteCommandiDeviceInfo("-q com.apple.mobile.iTunes -k ScreenScaleFactor", udid));
+                    int width = int.Parse(ExecuteCommandiDeviceInfo("-q com.apple.mobile.iTunes -k ScreenWidth", udid)) / scale;
+                    int height = int.Parse(ExecuteCommandiDeviceInfo("-q com.apple.mobile.iTunes -k ScreenHeight", udid)) / scale;
+                    deviceValues.Add("ScreenWidth", width);
+                    deviceValues.Add("ScreenHeight", height);
+                }
+                catch (Exception)
+                {
+                }
+                return deviceValues;
             }
             catch (Exception)
             {
@@ -1171,6 +1181,64 @@ namespace Appium_Wizard
                 return "Exception";
             }
         }
+
+
+        public string ExecuteCommandiDeviceInfo(string arguments, string udid, bool waitForExit = true, int timeout = 0)
+        {
+            Logger.Debug("Execute command arguments : " + arguments);
+            try
+            {
+                Process iDeviceProcess = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = FilesPath.iDeviceInfoFilePath,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    Arguments = arguments + " -u " + udid
+
+                };
+
+                iDeviceProcess.StartInfo = startInfo;
+                iDeviceProcess.Start();
+                bool processExited = false;
+                if (waitForExit)
+                {
+                    if (timeout == 0)
+                    {
+                        iDeviceProcess.WaitForExit();
+                    }
+                    else
+                    {
+                        processExited = iDeviceProcess.WaitForExit(timeout);
+                    }
+                }
+                if (timeout != 0 && !processExited)
+                {
+                    Logger.Debug("Process did not complete within the allotted time. killing process");
+                    iDeviceProcess.Kill(); // Kill the process if it did not exit within the timeout
+                    return "Process did not complete within the allotted time.";
+                }
+                string output = iDeviceProcess.StandardOutput.ReadToEnd().Trim();
+                string error = iDeviceProcess.StandardError.ReadToEnd().Trim();
+                Logger.Debug("Execute command output : " + output);
+                Logger.Debug("Execute command error : " + error);
+                if (!string.IsNullOrEmpty(output))
+                {
+                    return output;
+                }
+                else
+                {
+                    return "Error:" + error;
+                }
+            }
+            catch (Exception)
+            {
+                return "Exception";
+            }
+        }
+
 
         public string GetDeviceModel(string input)
         {

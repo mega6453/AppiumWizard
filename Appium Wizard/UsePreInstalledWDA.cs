@@ -13,6 +13,7 @@ namespace Appium_Wizard
         {
             this.udid = udid;
             this.deviceName = deviceName;
+            this.Owner = MainScreen.main;
             InitializeComponent();
         }
 

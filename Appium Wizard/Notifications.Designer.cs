@@ -219,6 +219,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Notifications";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Notifications";
             Shown += Notifications_Shown;

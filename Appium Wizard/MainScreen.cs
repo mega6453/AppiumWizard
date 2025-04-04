@@ -759,7 +759,7 @@ namespace Appium_Wizard
                         {
                             if (!isDeviceAlreadyAdded(deviceList[i]))
                             {
-                                DeviceInformation deviceInformation = new DeviceInformation(main);
+                                DeviceInformation deviceInformation = new DeviceInformation();
                                 await Task.Run(() =>
                                 {
                                     deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
@@ -796,18 +796,30 @@ namespace Appium_Wizard
                                     {
                                         connectedVia = "";
                                     }
+                                    if (deviceInfo.ContainsKey("ScreenWidth"))
+                                    {
+                                        screenWidth = deviceInfo["ScreenWidth"]?.ToString() ?? "0";
+                                    }
+                                    if (deviceInfo.ContainsKey("ScreenHeight"))
+                                    {
+                                        screenHeight = deviceInfo["ScreenHeight"]?.ToString() ?? "0";
+                                    }
                                     string[] name = { "Name", DeviceName };
                                     string[] version = { "OS", OSType };
                                     string[] os = { "Version", OSVersion };
                                     string[] UniqueDeviceID = { "Udid", udid };
                                     string[] DeviceModel = { "Model", Model };
                                     string[] Connection = { "Connection Type", connectedVia };
+                                    string[] width = { "Width", screenWidth };
+                                    string[] height = { "Height", screenHeight };
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(name));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(os));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(version));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(DeviceModel));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(UniqueDeviceID));
                                     deviceInformation.infoListView.Items.Add(new ListViewItem(Connection));
+                                    deviceInformation.infoListView.Items.Add(new ListViewItem(width));
+                                    deviceInformation.infoListView.Items.Add(new ListViewItem(height));
                                     commonProgress.Close();
                                     deviceInformation.ShowDialog();
                                     GoogleAnalytics.SendEvent("DeviceInformation_iOS");
@@ -866,7 +878,7 @@ namespace Appium_Wizard
                     {
                         if (!isDeviceAlreadyAdded(deviceList[i]))
                         {
-                            DeviceInformation deviceInformation = new DeviceInformation(main);
+                            DeviceInformation deviceInformation = new DeviceInformation();
                             await Task.Run(() =>
                             {
                                 deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
@@ -1339,7 +1351,7 @@ namespace Appium_Wizard
 
         private void androidWiFiToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AndroidWireless androidWireless = new AndroidWireless(main);
+            AndroidWireless androidWireless = new AndroidWireless();
             androidWireless.ShowDialog();
         }
 
@@ -2063,18 +2075,29 @@ namespace Appium_Wizard
             {
                 var selectedItem = listView1.SelectedItems[0];
 
+                var devicesList = Database.QueryDataFromDevicesTable();
+                foreach (var dictionary in devicesList)
+                {
+                    if (dictionary["UDID"].Equals(selectedUDID))
+                    {
+                        screenWidth = dictionary["Width"];
+                        screenHeight = dictionary["Height"];
+                    }
+                }
                 var deviceDetails = new
                 {
-                    DeviceName = selectedItem.SubItems[0].Text,
-                    DeviceVersion = selectedItem.SubItems[1].Text,
-                    DeviceOS = selectedItem.SubItems[2].Text,
-                    DeviceStatus = selectedItem.SubItems[3].Text,
-                    DeviceUDID = getDeviceUdidByName(selectedDeviceName),
-                    DeviceConnection = selectedItem.SubItems[5].Text,
-                    DeviceIP = selectedItem.SubItems[6].Text,
+                    DeviceName = selectedDeviceName,
+                    DeviceVersion = selectedDeviceVersion,
+                    DeviceOS = selectedOS,
+                    DeviceStatus = selectedDeviceStatus,
+                    DeviceUDID = selectedUDID,
+                    DeviceConnection = selectedDeviceConnection,
+                    DeviceIP = selectedDeviceIP,
                     SystemIPAddress = Common.GetIPAddress(),
                     ProxyPort = 5555,
-                    ScreenPort = 7777
+                    ScreenPort = 7777,
+                    ScreenWidth = int.Parse(screenWidth),
+                    ScreenHeight = int.Parse(screenHeight)
                 };
                 List<dynamic> devices;
                 if (!Directory.Exists(FilesPath.remoteExecutionPath))

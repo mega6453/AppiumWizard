@@ -125,6 +125,8 @@ namespace Appium_Wizard
                 }
                 catch (Exception)
                 {
+                    deviceValues.Add("ScreenWidth", 0);
+                    deviceValues.Add("ScreenHeight", 0);
                 }
                 return deviceValues;
             }

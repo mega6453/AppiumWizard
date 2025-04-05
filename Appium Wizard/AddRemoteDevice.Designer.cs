@@ -41,14 +41,18 @@
             columnHeader6 = new ColumnHeader();
             columnHeader7 = new ColumnHeader();
             columnHeader8 = new ColumnHeader();
+            columnHeader9 = new ColumnHeader();
+            columnHeader10 = new ColumnHeader();
+            columnHeader11 = new ColumnHeader();
             ReserveButton = new Button();
             closeButton = new Button();
             label2 = new Label();
+            columnHeader12 = new ColumnHeader();
             SuspendLayout();
             // 
             // IPTextBox
             // 
-            IPTextBox.Location = new Point(149, 14);
+            IPTextBox.Location = new Point(193, 12);
             IPTextBox.Name = "IPTextBox";
             IPTextBox.PlaceholderText = "IPAddress:PortNumber";
             IPTextBox.Size = new Size(200, 23);
@@ -57,7 +61,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(13, 18);
+            label1.Location = new Point(57, 16);
             label1.Name = "label1";
             label1.Size = new Size(129, 15);
             label1.TabIndex = 1;
@@ -66,7 +70,7 @@
             // findDevicesButton
             // 
             findDevicesButton.AutoSize = true;
-            findDevicesButton.Location = new Point(356, 12);
+            findDevicesButton.Location = new Point(400, 10);
             findDevicesButton.Name = "findDevicesButton";
             findDevicesButton.Size = new Size(107, 25);
             findDevicesButton.TabIndex = 4;
@@ -76,12 +80,12 @@
             // 
             // remoteDevicesList
             // 
-            remoteDevicesList.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4, columnHeader5, columnHeader6, columnHeader7, columnHeader8 });
+            remoteDevicesList.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4, columnHeader5, columnHeader12, columnHeader6, columnHeader7, columnHeader8, columnHeader9, columnHeader10, columnHeader11 });
             remoteDevicesList.FullRowSelect = true;
             remoteDevicesList.GridLines = true;
             remoteDevicesList.Location = new Point(12, 74);
             remoteDevicesList.Name = "remoteDevicesList";
-            remoteDevicesList.Size = new Size(695, 287);
+            remoteDevicesList.Size = new Size(834, 287);
             remoteDevicesList.TabIndex = 5;
             remoteDevicesList.UseCompatibleStateImageBehavior = false;
             remoteDevicesList.View = View.Details;
@@ -112,23 +116,44 @@
             // 
             // columnHeader6
             // 
-            columnHeader6.Text = "IP Address";
+            columnHeader6.DisplayIndex = 5;
+            columnHeader6.Text = "Device IP Address";
             columnHeader6.Width = 0;
             // 
             // columnHeader7
             // 
+            columnHeader7.DisplayIndex = 6;
             columnHeader7.Text = "Proxy Port";
             columnHeader7.Width = 0;
             // 
             // columnHeader8
             // 
+            columnHeader8.DisplayIndex = 7;
             columnHeader8.Text = "Screen Port";
             columnHeader8.Width = 0;
+            // 
+            // columnHeader9
+            // 
+            columnHeader9.DisplayIndex = 8;
+            columnHeader9.Text = "Screen Width";
+            columnHeader9.Width = 0;
+            // 
+            // columnHeader10
+            // 
+            columnHeader10.DisplayIndex = 9;
+            columnHeader10.Text = "Screen Height";
+            columnHeader10.Width = 0;
+            // 
+            // columnHeader11
+            // 
+            columnHeader11.DisplayIndex = 10;
+            columnHeader11.Text = "Remote IP Address";
+            columnHeader11.Width = 0;
             // 
             // ReserveButton
             // 
             ReserveButton.AutoSize = true;
-            ReserveButton.Location = new Point(358, 376);
+            ReserveButton.Location = new Point(442, 376);
             ReserveButton.Name = "ReserveButton";
             ReserveButton.Size = new Size(75, 25);
             ReserveButton.TabIndex = 6;
@@ -139,7 +164,7 @@
             // closeButton
             // 
             closeButton.AutoSize = true;
-            closeButton.Location = new Point(254, 376);
+            closeButton.Location = new Point(295, 376);
             closeButton.Name = "closeButton";
             closeButton.Size = new Size(75, 25);
             closeButton.TabIndex = 7;
@@ -157,12 +182,18 @@
             label2.TabIndex = 8;
             label2.Text = "Devices list:";
             // 
+            // columnHeader12
+            // 
+            columnHeader12.DisplayIndex = 11;
+            columnHeader12.Text = "Host";
+            columnHeader12.Width = 200;
+            // 
             // AddRemoteDevice
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(712, 413);
+            ClientSize = new Size(846, 413);
             Controls.Add(label2);
             Controls.Add(closeButton);
             Controls.Add(ReserveButton);
@@ -198,5 +229,9 @@
         private ColumnHeader columnHeader8;
         private Label label2;
         private ColumnHeader columnHeader5;
+        private ColumnHeader columnHeader9;
+        private ColumnHeader columnHeader10;
+        private ColumnHeader columnHeader11;
+        private ColumnHeader columnHeader12;
     }
 }

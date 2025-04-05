@@ -234,6 +234,7 @@ namespace Appium_Wizard
             // 
             // remoteDeviceToolStripMenuItem
             // 
+            remoteDeviceToolStripMenuItem.Image = Properties.Resources.cloud_phone;
             remoteDeviceToolStripMenuItem.Name = "remoteDeviceToolStripMenuItem";
             remoteDeviceToolStripMenuItem.Size = new Size(161, 30);
             remoteDeviceToolStripMenuItem.Text = "Remote Device";
@@ -818,7 +819,7 @@ namespace Appium_Wizard
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
             contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem, shareUnshareToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(240, 184);
+            contextMenuStrip4.Size = new Size(240, 206);
             // 
             // installAppToolStripMenuItem
             // 
@@ -863,6 +864,7 @@ namespace Appium_Wizard
             // shareUnshareToolStripMenuItem
             // 
             shareUnshareToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { shareDeviceToolStripMenuItem, unshareDeviceToolStripMenuItem });
+            shareUnshareToolStripMenuItem.Image = Properties.Resources.sharing;
             shareUnshareToolStripMenuItem.Name = "shareUnshareToolStripMenuItem";
             shareUnshareToolStripMenuItem.Size = new Size(239, 30);
             shareUnshareToolStripMenuItem.Text = "Share | Unshare";
@@ -870,14 +872,14 @@ namespace Appium_Wizard
             // shareDeviceToolStripMenuItem
             // 
             shareDeviceToolStripMenuItem.Name = "shareDeviceToolStripMenuItem";
-            shareDeviceToolStripMenuItem.Size = new Size(155, 22);
+            shareDeviceToolStripMenuItem.Size = new Size(180, 22);
             shareDeviceToolStripMenuItem.Text = "Share Device";
             shareDeviceToolStripMenuItem.Click += shareDeviceToolStripMenuItem_Click;
             // 
             // unshareDeviceToolStripMenuItem
             // 
             unshareDeviceToolStripMenuItem.Name = "unshareDeviceToolStripMenuItem";
-            unshareDeviceToolStripMenuItem.Size = new Size(155, 22);
+            unshareDeviceToolStripMenuItem.Size = new Size(180, 22);
             unshareDeviceToolStripMenuItem.Text = "Unshare Device";
             unshareDeviceToolStripMenuItem.Click += unshareDeviceToolStripMenuItem_Click;
             // 

@@ -70,22 +70,18 @@ namespace Appium_Wizard
                 }
             }
             Hide();
-            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height, Connection, IPAddress);
+            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, Model, "Online", udid, Width, Height, Connection, IPAddress, 0, 0, "local" );
             MainScreen.main.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic.Add("Model", Model);
+            dic.Add("OSVersion", OSVersion);
+            dic.Add("ConnectionType", Connection);
             if (OSType.ToLower().Contains("ios"))
             {
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                dic.Add("Model", Model);
-                dic.Add("OSVersion", OSVersion);
-                dic.Add("ConnectionType", Connection);
                 GoogleAnalytics.SendEvent("Device_Added_iOS", dic);
             }
             else
             {
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                dic.Add("Model", Model);
-                dic.Add("OSVersion", OSVersion);
-                dic.Add("ConnectionType", Connection);
                 GoogleAnalytics.SendEvent("Device_Added_Android", dic);
             }
             Close();

@@ -658,6 +658,7 @@ namespace Appium_Wizard
                 {
                     Database.DeleteDataFromDevicesTable(selectedUDID);
                     Database.DeleteUDIDFromUsePreInstalledWDAList(selectedUDID);
+                    RemoveDeviceFromSharedDevices();
                     UDIDPreInstalledWDA.Remove(selectedUDID);
                     if (listView1.SelectedItems.Count > 0)
                     {
@@ -2073,8 +2074,13 @@ namespace Appium_Wizard
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                var selectedItem = listView1.SelectedItems[0];
+                string machineName = Environment.MachineName ?? "Unknown Machine";
+                string username = Environment.UserName ?? "Unknown User";
+                string userDomainName = Environment.UserDomainName ?? "Unknown Domain";
 
+                string hostMachineInfo = $"{userDomainName} - {username} - {machineName}";
+
+                var selectedItem = listView1.SelectedItems[0];
                 var devicesList = Database.QueryDataFromDevicesTable();
                 foreach (var dictionary in devicesList)
                 {
@@ -2097,7 +2103,8 @@ namespace Appium_Wizard
                     ProxyPort = 5555,
                     ScreenPort = 7777,
                     ScreenWidth = int.Parse(screenWidth),
-                    ScreenHeight = int.Parse(screenHeight)
+                    ScreenHeight = int.Parse(screenHeight),
+                    Host = hostMachineInfo
                 };
                 List<dynamic> devices;
                 if (!Directory.Exists(FilesPath.remoteExecutionPath))
@@ -2144,6 +2151,11 @@ namespace Appium_Wizard
 
         private void unshareDeviceToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            RemoveDeviceFromSharedDevices();
+        }
+
+        public void RemoveDeviceFromSharedDevices()
+        {
             if (listView1.SelectedItems.Count > 0)
             {
                 var selectedItem = listView1.SelectedItems[0];
@@ -2181,6 +2193,7 @@ namespace Appium_Wizard
             {
                 MessageBox.Show("No device selected.");
             }
+
         }
     }
 }

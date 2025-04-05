@@ -17,6 +17,7 @@ namespace Appium_Wizard
             port3 = int.Parse(readPortData["PortNumber3"]);
             port4 = int.Parse(readPortData["PortNumber4"]);
             port5 = int.Parse(readPortData["PortNumber5"]);
+            this.Owner = MainScreen.main;
         }
 
         private void ServerConfig_Load(object sender, EventArgs e)

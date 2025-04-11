@@ -274,6 +274,7 @@ namespace Appium_Wizard
             richTextBox1.Size = new Size(1000, 602);
             richTextBox1.TabIndex = 6;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            richTextBox1.LinkClicked += richTextBox1_LinkClicked;
             richTextBox1.TextChanged += richTextBox1_TextChanged;
             // 
             // checkBox1
@@ -670,6 +671,7 @@ namespace Appium_Wizard
             richTextBox2.Size = new Size(524, 277);
             richTextBox2.TabIndex = 0;
             richTextBox2.Text = resources.GetString("richTextBox2.Text");
+            richTextBox2.LinkClicked += richTextBox2_LinkClicked;
             richTextBox2.TextChanged += richTextBox2_TextChanged;
             // 
             // tabPage3
@@ -693,6 +695,7 @@ namespace Appium_Wizard
             richTextBox3.Size = new Size(524, 276);
             richTextBox3.TabIndex = 0;
             richTextBox3.Text = resources.GetString("richTextBox3.Text");
+            richTextBox3.LinkClicked += richTextBox3_LinkClicked;
             richTextBox3.TextChanged += richTextBox3_TextChanged;
             // 
             // tabPage4
@@ -716,6 +719,7 @@ namespace Appium_Wizard
             richTextBox4.Size = new Size(524, 276);
             richTextBox4.TabIndex = 0;
             richTextBox4.Text = resources.GetString("richTextBox4.Text");
+            richTextBox4.LinkClicked += richTextBox4_LinkClicked;
             richTextBox4.TextChanged += richTextBox4_TextChanged;
             // 
             // tabPage5
@@ -739,6 +743,7 @@ namespace Appium_Wizard
             richTextBox5.Size = new Size(524, 277);
             richTextBox5.TabIndex = 0;
             richTextBox5.Text = resources.GetString("richTextBox5.Text");
+            richTextBox5.LinkClicked += richTextBox5_LinkClicked;
             richTextBox5.TextChanged += richTextBox5_TextChanged;
             // 
             // contextMenuStrip2
@@ -819,7 +824,7 @@ namespace Appium_Wizard
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
             contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem, shareUnshareToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(240, 206);
+            contextMenuStrip4.Size = new Size(240, 184);
             // 
             // installAppToolStripMenuItem
             // 
@@ -872,14 +877,14 @@ namespace Appium_Wizard
             // shareDeviceToolStripMenuItem
             // 
             shareDeviceToolStripMenuItem.Name = "shareDeviceToolStripMenuItem";
-            shareDeviceToolStripMenuItem.Size = new Size(180, 22);
+            shareDeviceToolStripMenuItem.Size = new Size(155, 22);
             shareDeviceToolStripMenuItem.Text = "Share Device";
             shareDeviceToolStripMenuItem.Click += shareDeviceToolStripMenuItem_Click;
             // 
             // unshareDeviceToolStripMenuItem
             // 
             unshareDeviceToolStripMenuItem.Name = "unshareDeviceToolStripMenuItem";
-            unshareDeviceToolStripMenuItem.Size = new Size(180, 22);
+            unshareDeviceToolStripMenuItem.Size = new Size(155, 22);
             unshareDeviceToolStripMenuItem.Text = "Unshare Device";
             unshareDeviceToolStripMenuItem.Click += unshareDeviceToolStripMenuItem_Click;
             // 

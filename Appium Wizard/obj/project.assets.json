@@ -2,6 +2,22 @@
   "version": 3,
   "targets": {
     "net8.0-windows10.0.17763": {
+      "EmbedIO/3.5.2": {
+        "type": "package",
+        "dependencies": {
+          "Unosquare.Swan.Lite": "3.1.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/EmbedIO.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/EmbedIO.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "dependencies": {
@@ -526,9 +542,41 @@
             "rid": "win"
           }
         }
+      },
+      "Unosquare.Swan.Lite/3.1.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.5.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Swan.Lite.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Swan.Lite.dll": {
+            "related": ".xml"
+          }
+        }
       }
     },
     "net8.0-windows10.0.17763/win-x64": {
+      "EmbedIO/3.5.2": {
+        "type": "package",
+        "dependencies": {
+          "Unosquare.Swan.Lite": "3.1.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/EmbedIO.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/EmbedIO.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "dependencies": {
@@ -944,10 +992,40 @@
             "related": ".xml"
           }
         }
+      },
+      "Unosquare.Swan.Lite/3.1.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.5.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Swan.Lite.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Swan.Lite.dll": {
+            "related": ".xml"
+          }
+        }
       }
     }
   },
   "libraries": {
+    "EmbedIO/3.5.2": {
+      "sha512": "YU4j+3XvuO8/VPkNf7KWOF1TpMhnyVhXnPsG1mvnDhTJ9D5BZOFXVDvCpE/SkQ1AJ0Aa+dXOVSW3ntgmLL7aJg==",
+      "type": "package",
+      "path": "embedio/3.5.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "embedio.3.5.2.nupkg.sha512",
+        "embedio.nuspec",
+        "lib/netstandard2.0/EmbedIO.dll",
+        "lib/netstandard2.0/EmbedIO.pdb",
+        "lib/netstandard2.0/EmbedIO.xml"
+      ]
+    },
     "EntityFramework/6.4.4": {
       "sha512": "yj1+/4tci7Panu3jKDHYizxwVm0Jvm7b7m057b5h4u8NUHGCR8WIWirBTw+8EptRffwftIWPBeIRGNKD1ewEMQ==",
       "type": "package",
@@ -2132,10 +2210,26 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "Unosquare.Swan.Lite/3.1.0": {
+      "sha512": "X3s5QE/KMj3WAPFqFve7St+Ds10BB50u8kW8PmKIn7FVkn7yEXe9Yxr2htt1WV85DRqfFR0MN/BUNHkGHtL4OQ==",
+      "type": "package",
+      "path": "unosquare.swan.lite/3.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net461/Swan.Lite.dll",
+        "lib/net461/Swan.Lite.xml",
+        "lib/netstandard2.0/Swan.Lite.dll",
+        "lib/netstandard2.0/Swan.Lite.xml",
+        "unosquare.swan.lite.3.1.0.nupkg.sha512",
+        "unosquare.swan.lite.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
     "net8.0-windows10.0.17763": [
+      "EmbedIO >= 3.5.2",
       "Microsoft.Toolkit.Uwp.Notifications >= 7.1.3",
       "Microsoft.Web.WebView2 >= 1.0.3124.44",
       "NLog >= 5.4.0",
@@ -2195,6 +2289,10 @@
       "net8.0-windows10.0.17763": {
         "targetAlias": "net8.0-windows10.0.17763.0",
         "dependencies": {
+          "EmbedIO": {
+            "target": "Package",
+            "version": "[3.5.2, )"
+          },
           "Microsoft.Toolkit.Uwp.Notifications": {
             "target": "Package",
             "version": "[7.1.3, )"

@@ -12,6 +12,7 @@ namespace Appium_Wizard
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public LoadingScreen()
         {
+            Common.StartHttpServer();
             InitializeComponent();
             statusLabel.Text = "Initializing...";
             Logger.Debug("Initializing...");

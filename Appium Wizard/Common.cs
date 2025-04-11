@@ -1,4 +1,7 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using EmbedIO;
+using EmbedIO.Routing;
+using EmbedIO.WebApi;
+using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -1516,6 +1519,79 @@ namespace Appium_Wizard
             });
 
             return jsonContent;
+        }
+
+        //public static async Task StartHttpServer()
+        //{
+
+        //// Create an instance of HttpListener
+        //HttpListener listener = new HttpListener();
+
+        //// Add a prefix for the listener to respond to
+        //// Use "http://localhost:8080/" to avoid requiring admin rights
+        //listener.Prefixes.Add("http://localhost:8080/");
+
+        //// Start the listener
+        //listener.Start();
+        //Console.WriteLine("Listening for connections on http://localhost:8080/");
+
+        //// Handle incoming requests asynchronously
+        //while (true)
+        //{
+        //    // Wait for an incoming request
+        //    HttpListenerContext context = await listener.GetContextAsync();
+
+        //    // Get the request and response objects
+        //    HttpListenerRequest request = context.Request;
+        //    HttpListenerResponse response = context.Response;
+
+        //    // Create a response string
+        //    string responseString = "<html><body>Hello, world!</body></html>";
+        //    byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+
+        //    // Set the content length and write the response
+        //    response.ContentLength64 = buffer.Length;
+        //    await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+
+        //    // Close the output stream
+        //    response.OutputStream.Close();
+        //}
+        //}
+        public static async Task StartHttpServer()
+        {
+            // Use a specific IP address or "0.0.0.0" to listen on all interfaces
+            using (var server = CreateWebServer("http://0.0.0.0:9696/"))
+            {
+                // Start the server and wait for it to complete
+                //MessageBox.Show("Server starting...");
+                await server.RunAsync();
+            }
+        }
+
+        private static WebServer CreateWebServer(string url)
+        {
+            return new WebServer(o => o
+                    .WithUrlPrefix(url)
+                    .WithMode(HttpListenerMode.EmbedIO))
+                .WithWebApi("/api", m => m
+                    .WithController<HelloWorldController>());
+        }
+    }
+
+    public class HelloWorldController : WebApiController
+    {
+        // Define a GET endpoint
+        [Route(HttpVerbs.Get, "/hello")]
+        public string GetHello()
+        {
+            try
+            {
+                return "Hello from EmbedIO!";
+            }
+            catch (Exception ex)
+            {
+                return "An error occurred.";
+            }
         }
     }
 }

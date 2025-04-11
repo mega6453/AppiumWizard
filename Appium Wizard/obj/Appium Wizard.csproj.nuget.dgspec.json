@@ -49,6 +49,10 @@
         "net8.0-windows10.0.17763": {
           "targetAlias": "net8.0-windows10.0.17763.0",
           "dependencies": {
+            "EmbedIO": {
+              "target": "Package",
+              "version": "[3.5.2, )"
+            },
             "Microsoft.Toolkit.Uwp.Notifications": {
               "target": "Package",
               "version": "[7.1.3, )"

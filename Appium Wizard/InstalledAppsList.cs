@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Windows.Forms;
 
 namespace Appium_Wizard
 {
@@ -220,6 +221,27 @@ namespace Appium_Wizard
             {
                 AndroidMethods.GetInstance().ClearAppData(udid, selectedPackageName);
                 GoogleAnalytics.SendEvent("Android_Clear_App_Data");
+            }
+        }
+
+        private void listView1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if (listView1.FocusedItem.Bounds.Contains(e.Location))
+                {
+                    copyContextMenuStrip.Show(Cursor.Position);
+                }
+            }
+        }
+
+        private void copyPackageNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                string packageName = listView1.SelectedItems[0].SubItems[0].Text;
+                Clipboard.SetText(packageName);
+                GoogleAnalytics.SendEvent("copyPackageNameToolStripMenuItem_Click");
             }
         }
     }

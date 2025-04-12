@@ -39,7 +39,10 @@
             DropDownButton = new Button();
             contextMenuStrip1 = new ContextMenuStrip(components);
             clearAppDataToolStripMenuItem = new ToolStripMenuItem();
+            copyContextMenuStrip = new ContextMenuStrip(components);
+            copyPackageNameToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
+            copyContextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // listView1
@@ -56,6 +59,7 @@
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
             listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
+            listView1.MouseUp += listView1_MouseUp;
             // 
             // columnHeader1
             // 
@@ -127,15 +131,29 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { clearAppDataToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(181, 48);
+            contextMenuStrip1.Size = new Size(154, 26);
             // 
             // clearAppDataToolStripMenuItem
             // 
             clearAppDataToolStripMenuItem.Image = Properties.Resources.clean_code;
             clearAppDataToolStripMenuItem.Name = "clearAppDataToolStripMenuItem";
-            clearAppDataToolStripMenuItem.Size = new Size(180, 22);
+            clearAppDataToolStripMenuItem.Size = new Size(153, 22);
             clearAppDataToolStripMenuItem.Text = "Clear App Data";
             clearAppDataToolStripMenuItem.Click += clearAppDataToolStripMenuItem_Click;
+            // 
+            // copyContextMenuStrip
+            // 
+            copyContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyPackageNameToolStripMenuItem });
+            copyContextMenuStrip.Name = "copyContextMenuStrip";
+            copyContextMenuStrip.Size = new Size(185, 26);
+            // 
+            // copyPackageNameToolStripMenuItem
+            // 
+            copyPackageNameToolStripMenuItem.Image = Properties.Resources.files;
+            copyPackageNameToolStripMenuItem.Name = "copyPackageNameToolStripMenuItem";
+            copyPackageNameToolStripMenuItem.Size = new Size(184, 22);
+            copyPackageNameToolStripMenuItem.Text = "Copy Package Name";
+            copyPackageNameToolStripMenuItem.Click += copyPackageNameToolStripMenuItem_Click;
             // 
             // InstalledAppsList
             // 
@@ -160,6 +178,7 @@
             Load += InstalledAppsList_Load;
             Shown += InstalledAppsList_Shown;
             contextMenuStrip1.ResumeLayout(false);
+            copyContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -175,5 +194,7 @@
         private Button DropDownButton;
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem clearAppDataToolStripMenuItem;
+        private ContextMenuStrip copyContextMenuStrip;
+        private ToolStripMenuItem copyPackageNameToolStripMenuItem;
     }
 }

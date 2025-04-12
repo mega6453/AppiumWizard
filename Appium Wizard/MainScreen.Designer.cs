@@ -41,6 +41,7 @@ namespace Appium_Wizard
             columnHeader5 = new ColumnHeader();
             columnHeader6 = new ColumnHeader();
             columnHeader7 = new ColumnHeader();
+            columnHeader8 = new ColumnHeader();
             contextMenuStrip1 = new ContextMenuStrip(components);
             iOSToolStripMenuItem = new ToolStripMenuItem();
             androidToolStripMenuItem = new ToolStripMenuItem();
@@ -102,6 +103,7 @@ namespace Appium_Wizard
             richTextBox5 = new RichTextBox();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
+            copyDeviceDetailsToolStripMenuItem = new ToolStripMenuItem();
             usePreInstalledWDAToolStripMenuItem = new ToolStripMenuItem();
             panel1 = new Panel();
             capabilityCopyButton = new Button();
@@ -148,7 +150,7 @@ namespace Appium_Wizard
             // 
             // listView1
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7 });
+            listView1.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader2, columnHeader3, columnHeader1, columnHeader5, columnHeader6, columnHeader7, columnHeader8 });
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
             listView1.Location = new Point(21, 80);
@@ -196,6 +198,11 @@ namespace Appium_Wizard
             // 
             columnHeader7.Text = "IPAddress";
             columnHeader7.Width = 0;
+            // 
+            // columnHeader8
+            // 
+            columnHeader8.Text = "Model";
+            columnHeader8.Width = 0;
             // 
             // contextMenuStrip1
             // 
@@ -440,7 +447,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, pluginsToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(255, 30);
+            appiumDocsToolStripMenuItem.Size = new Size(247, 22);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -552,7 +559,7 @@ namespace Appium_Wizard
             otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
             otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
             otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
-            otherDocsToolStripMenuItem.Size = new Size(255, 30);
+            otherDocsToolStripMenuItem.Size = new Size(247, 22);
             otherDocsToolStripMenuItem.Text = "Other Docs";
             // 
             // iOSNativeAppsBundleToolStripMenuItem
@@ -567,7 +574,7 @@ namespace Appium_Wizard
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(255, 30);
+            troubleshootToolStripMenuItem.Size = new Size(247, 22);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
             // 
@@ -575,7 +582,7 @@ namespace Appium_Wizard
             // 
             reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
-            reportAnIssueToolStripMenuItem.Size = new Size(255, 30);
+            reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
@@ -583,7 +590,7 @@ namespace Appium_Wizard
             // 
             openLogsFolderToolstripMenuItem.Image = Properties.Resources.log;
             openLogsFolderToolstripMenuItem.Name = "openLogsFolderToolstripMenuItem";
-            openLogsFolderToolstripMenuItem.Size = new Size(255, 30);
+            openLogsFolderToolstripMenuItem.Size = new Size(247, 22);
             openLogsFolderToolstripMenuItem.Text = "Open Logs folder";
             openLogsFolderToolstripMenuItem.Click += openLogsFolderToolstripMenuItem_Click;
             // 
@@ -591,7 +598,7 @@ namespace Appium_Wizard
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
-            startADiscussionToolStripMenuItem.Size = new Size(255, 30);
+            startADiscussionToolStripMenuItem.Size = new Size(247, 22);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
@@ -599,7 +606,7 @@ namespace Appium_Wizard
             // 
             checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            checkForUpdatesToolStripMenuItem.Size = new Size(255, 30);
+            checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
             checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
             // 
@@ -607,7 +614,7 @@ namespace Appium_Wizard
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(255, 30);
+            aboutToolStripMenuItem.Size = new Size(247, 22);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -732,9 +739,9 @@ namespace Appium_Wizard
             // contextMenuStrip2
             // 
             contextMenuStrip2.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { copyUDIDToolStripMenuItem, usePreInstalledWDAToolStripMenuItem });
+            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { copyUDIDToolStripMenuItem, copyDeviceDetailsToolStripMenuItem, usePreInstalledWDAToolStripMenuItem });
             contextMenuStrip2.Name = "contextMenuStrip2";
-            contextMenuStrip2.Size = new Size(201, 64);
+            contextMenuStrip2.Size = new Size(201, 94);
             contextMenuStrip2.Opening += contextMenuStrip2_Opening;
             // 
             // copyUDIDToolStripMenuItem
@@ -744,6 +751,14 @@ namespace Appium_Wizard
             copyUDIDToolStripMenuItem.Size = new Size(200, 30);
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
+            // 
+            // copyDeviceDetailsToolStripMenuItem
+            // 
+            copyDeviceDetailsToolStripMenuItem.Image = Properties.Resources.files;
+            copyDeviceDetailsToolStripMenuItem.Name = "copyDeviceDetailsToolStripMenuItem";
+            copyDeviceDetailsToolStripMenuItem.Size = new Size(200, 30);
+            copyDeviceDetailsToolStripMenuItem.Text = "Copy Device Details";
+            copyDeviceDetailsToolStripMenuItem.Click += copyDeviceDetailsToolStripMenuItem_Click;
             // 
             // usePreInstalledWDAToolStripMenuItem
             // 
@@ -1039,5 +1054,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem pluginsToolStripMenuItem;
         private ToolStripMenuItem pluginsToolStripMenuItem1;
         private ToolStripMenuItem openLogsFolderToolstripMenuItem;
+        private ToolStripMenuItem copyDeviceDetailsToolStripMenuItem;
+        private ColumnHeader columnHeader8;
     }
 }

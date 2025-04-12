@@ -215,6 +215,8 @@ namespace Appium_Wizard
             ScreenshotToolStripButton.Enabled = true;
             SettingsToolStripButton.Enabled = true;
             MoreToolStripButton.Enabled = true;
+            RecordButton.Enabled = true;
+            objectSpyButton.Enabled = true;
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -267,6 +269,8 @@ namespace Appium_Wizard
             ScreenshotToolStripButton.Enabled = false;
             SettingsToolStripButton.Enabled = false;
             MoreToolStripButton.Enabled = false;
+            RecordButton.Enabled = false;
+            objectSpyButton.Enabled = false;
         }
 
         private async void InitializeWebView()

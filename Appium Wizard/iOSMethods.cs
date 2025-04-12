@@ -2012,6 +2012,34 @@ namespace Appium_Wizard
             return sessionId;
         }
 
+        public static string CreateWDASession(string URL)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                MaxTimeout = -1,
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            var body = @"{""capabilities"":{}}";
+            //var body = $@"{{""capabilities"":{{""mjpegServerPort"":{screenPort},""mjpegScreenshotUrl"": ""http://localhost:{screenPort}""}}}}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            string sessionId = "nosession";
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                try
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    sessionId = (string)jsonObject["value"]["sessionId"];
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return sessionId;
+        }
+
         public static (int, int) GetScreenSize(int proxyPort)
         {
             int width, height;
@@ -2142,6 +2170,10 @@ namespace Appium_Wizard
                 Console.WriteLine(response.Content);
                 dynamic jsonObject = JsonConvert.DeserializeObject(response.Content);
                 string sessionId = jsonObject.sessionId != null ? jsonObject.sessionId : "nosession";
+                if (response.Content.Contains("unknown command") && sessionId.Equals("nosession"))
+                {
+                    sessionId = CreateWDASession(URL);
+                }
                 return sessionId;
             }
             catch (Exception)

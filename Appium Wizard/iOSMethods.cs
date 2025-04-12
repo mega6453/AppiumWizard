@@ -36,15 +36,18 @@ namespace Appium_Wizard
             {
                 if (executable == iOSExecutable.go)
                 {
+                    Logger.Info("GetListOfDevicesUDID - execute with go...");
                     string deviceListString = ExecuteCommand("list", "any", true, 10000);
                     if (deviceListString.Contains("Process did not complete within the allotted time"))
                     {
+                        Logger.Info("GetListOfDevicesUDID - Process did not complete within the allotted time - execute with py...");
                         return GetListOfDevicesUDID(iOSExecutable.py);
                     }
                     else
                     {
                         if (deviceListString.Contains("dial tcp 127.0.0.1:27015: connectex: No connection could be made because the target machine actively refused it"))
                         {
+                            Logger.Info("ITunes not installed");
                             list.Add("ITunes not installed");
                         }
                         else
@@ -55,6 +58,7 @@ namespace Appium_Wizard
                             {
                                 string udid = device.ToString();
                                 list.Add(udid);
+                                Logger.Info("Adding udid to list : "+udid);
                             }
                         }
                         return list;
@@ -62,11 +66,13 @@ namespace Appium_Wizard
                 }
                 else
                 {
+                    Logger.Info("GetListOfDevicesUDID - execute with py...");
                     string deviceListString = ExecuteCommandPy("usbmux list");
                     List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
                     foreach (dynamic device in devices)
                     {
                         list.Add(device.UniqueDeviceID.ToString());
+                        Logger.Info("Adding udid to list : " + device.UniqueDeviceID.ToString());
                     }
                     return list;
                 }
@@ -84,10 +90,12 @@ namespace Appium_Wizard
             {
                 if (executable == iOSExecutable.go)
                 {
+                    Logger.Info("GetDeviceInformation - execute with go...");
                     string output = ExecuteCommand("info", udid, true, 10000);
                     if (output.Contains("Process did not complete within the allotted time")
                         | output.Contains("failed getting info"))
                     {
+                        Logger.Info("GetDeviceInformation - Process did not complete within the allotted time - execute with py...");
                         return GetDeviceInformation(udid, iOSExecutable.py);
                     }
                     else
@@ -98,6 +106,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
+                    Logger.Info("GetDeviceInformation - execute with py...");
                     string output = ExecuteCommandPy("usbmux list");
                     List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
 
@@ -118,8 +127,9 @@ namespace Appium_Wizard
                     return deviceValues;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex, "GetDeviceInformation exception");
                 return deviceValues;
             }
         }
@@ -143,6 +153,7 @@ namespace Appium_Wizard
             {
                 if (executable == iOSExecutable.go)
                 {
+                    Logger.Info("GetListOfInstalledApps - execute with go...");
                     var output = ExecuteCommand("apps --list", udid);
                     string pattern = @"(\w+(\.\w+)*)\s";
                     MatchCollection matches = Regex.Matches(output, pattern);
@@ -159,6 +170,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
+                    Logger.Info("GetListOfInstalledApps - execute with py...");
                     var output = ExecuteCommandPy("apps list -t User", udid);
                     JObject data = JObject.Parse(output);
                     var keys = data.Properties().Select(p => p.Name);
@@ -170,8 +182,9 @@ namespace Appium_Wizard
                     return packageList;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex,"GetListOfInstalledApps - execution..");
                 return packageList;
             }
         }
@@ -180,24 +193,30 @@ namespace Appium_Wizard
         {
             try
             {
+                Logger.Info("GetInstalledAppVersion - "+bundleId);
                 string output = ExecuteCommand("apps --list", udid, true, 10000);
                 string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
                 var match = Regex.Match(output, pattern);
 
                 if (match.Success)
                 {
-                    return match.Groups[1].Value;
+                    string appVersion = match.Groups[1].Value;
+                    Logger.Info("GetInstalledAppVersion - "+ bundleId+" - "+ appVersion);
+                    return appVersion;
                 }
+                Logger.Error("failedToGetVersion");
                 return "failedToGetVersion";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex, "failedToGetVersion");
                 return "failedToGetVersion";
             }
         }
 
         public string GetInstalledWDAVersion(string udid)
         {
+            Logger.Info("GetInstalledWDAVersion");
             return GetInstalledAppVersion(udid, "com.facebook.WebDriverAgentRunner.xctrunner");
         }
 
@@ -1101,6 +1120,7 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "Exception while executing " + "Execute command arguments : " + arguments);
                 Console.WriteLine("An error occurred while executing argument " + arguments + ": " + ex.Message);
                 return "Exception";
             }
@@ -1108,62 +1128,75 @@ namespace Appium_Wizard
 
         public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
-            bool isTunnelRunning = false;
-            if (command.Contains("developer"))
+            try
             {
-                isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
-                if (!isTunnelRunning)
+                Logger.Info("ExecuteCommandPy : " + command);
+                bool isTunnelRunning = false;
+                if (command.Contains("developer"))
                 {
-                    return "tunnel not created";
+                    isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
+                    if (!isTunnelRunning)
+                    {
+                        Logger.Info("tunnel not created");
+                        return "tunnel not created";
+                    }
                 }
-            }
-            Process process = new Process();
-            process.StartInfo.FileName = FilesPath.pymd3FilePath;
-            if (udid == "")
-            {
-                process.StartInfo.Arguments = command;
-            }
-            else
-            {
-                process.StartInfo.Arguments = command + " --udid " + udid;
-            }
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            bool processExited = false;
-            string error = process.StandardError.ReadToEnd();
-            string output = process.StandardOutput.ReadToEnd();
-            string result = output + error;
-            if (timeout == 0)
-            {
-                process.WaitForExit();
-            }
-            else
-            {
-                processExited = iOSProcess.WaitForExit(timeout);
-            }
-            if (timeout != 0 && !processExited)
-            {
-                process.Kill(); // Kill the process if it did not exit within the timeout
-                MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return "Process did not complete within the allotted time.";
-            }
-            result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
-            process.Close();
-            if (closeTunnel)
-            {
-                try
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.pymd3FilePath;
+                if (udid == "")
                 {
-                    iOSAsyncMethods.GetInstance().CloseTunnel();
+                    process.StartInfo.Arguments = command;
                 }
-                catch (Exception)
+                else
                 {
+                    process.StartInfo.Arguments = command + " --udid " + udid;
                 }
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                bool processExited = false;
+                string error = process.StandardError.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
+                Logger.Debug("Execute command output : " + output);
+                Logger.Debug("Execute command error : " + error);
+                string result = output + error;
+                if (timeout == 0)
+                {
+                    process.WaitForExit();
+                }
+                else
+                {
+                    processExited = iOSProcess.WaitForExit(timeout);
+                }
+                if (timeout != 0 && !processExited)
+                {
+                    process.Kill(); // Kill the process if it did not exit within the timeout
+                    MessageBox.Show("Failed to perform action within the given time. Please try again after opening the device.\n\nIf the issue persists, try restarting Appium Wizard/System.", "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Logger.Debug("Process did not complete within the allotted time.");
+                    return "Process did not complete within the allotted time.";
+                }
+                result = Regex.Replace(result, @"\x1B\[[0-9;]*[mK]", string.Empty);
+                process.Close();
+                if (closeTunnel)
+                {
+                    try
+                    {
+                        iOSAsyncMethods.GetInstance().CloseTunnel();                        
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Close tunnel exception");
+                    }
+                }
+                return result;
             }
-            return result;
-
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Exception while executing " + "Execute command arguments : " + command);
+                return "Exception";
+            }
         }
 
         public string GetDeviceModel(string input)
@@ -1783,7 +1816,7 @@ namespace Appium_Wizard
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunning();
-            Logger.Info("isTunnelRunning already : "+isTunnelRunning);
+            Logger.Info("CreateTunnel - isTunnelRunning already : " + isTunnelRunning);
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (isTunnelRunning)
             {
@@ -1814,7 +1847,7 @@ namespace Appium_Wizard
                         catch (InvalidOperationException ex)
                         {
                             commonProgress.Close();
-                            Logger.Error(ex, "Admin Permission denied");
+                            Logger.Error(ex, "CreateTunnel - Admin Permission denied");
                             MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return false;
                         }
@@ -1824,7 +1857,7 @@ namespace Appium_Wizard
                             if (tunnelProcess.HasExited)
                             {
                                 commonProgress.Close();
-                                Logger.Error(errorMessage, "Admin Permission denied");
+                                Logger.Error(errorMessage, "CreateTunnel - Admin Permission denied");
                                 MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return false;
                             }
@@ -1833,12 +1866,13 @@ namespace Appium_Wizard
                         }
                         var processId = tunnelProcess.Id;
                         MainScreen.runningProcesses.Add(processId);
+                        Logger.Info("CreateTunnel processId - "+ processId);
                         commonProgress.Close();
                     }
                     catch (Exception)
                     {
                         commonProgress.Close();
-                        Logger.Error(errorMessage, "Admin Permission denied");
+                        Logger.Error(errorMessage, "CreateTunnel - Admin Permission denied");
                         MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
                     }
@@ -1846,7 +1880,7 @@ namespace Appium_Wizard
                 else
                 {
                     commonProgress.Close();
-                    Logger.Error(errorMessage, "Admin Permission denied");
+                    Logger.Error(errorMessage, "CreateTunnel - Admin Permission denied");
                     MessageBox.Show(errorMessage, "Admin Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     GoogleAnalytics.SendEvent("iOS17_Admin_Cancel");
                     //try
@@ -1866,7 +1900,9 @@ namespace Appium_Wizard
                 }
             }
             commonProgress.Close();
-            return iOSAPIMethods.isTunnelRunning();
+            bool isRunning = iOSAPIMethods.isTunnelRunning();
+            Logger.Info("CreateTunnel isRunning - isRunning");
+            return isRunning;
         }
 
         public bool CreateTunnelGo(bool showProgress = true)

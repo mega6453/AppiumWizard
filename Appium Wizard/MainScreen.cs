@@ -10,7 +10,7 @@ namespace Appium_Wizard
     {
         string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
         public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceConnection, selectedDeviceCapability;
+        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceModel, selectedDeviceConnection, selectedDeviceCapability;
         public static List<int> runningProcesses = new List<int>();
         public static List<int> runningProcessesPortNumbers = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
@@ -302,91 +302,98 @@ namespace Appium_Wizard
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count > 0)
+            try
             {
-                ListViewItem selectedItem = listView1.SelectedItems[0];
-                selectedDeviceName = selectedItem.SubItems[0].Text;
-                selectedDeviceVersion = selectedItem.SubItems[1].Text;
-                selectedOS = selectedItem.SubItems[2].Text;
-                selectedDeviceStatus = selectedItem.SubItems[3].Text;
-                selectedUDID = getDeviceUdidByName(selectedDeviceName);
-                selectedDeviceConnection = selectedItem.SubItems[5].Text;
-                selectedDeviceIP = selectedItem.SubItems[6].Text;
-                Open.Enabled = true;
-                MoreButton.Enabled = true;
-                DeleteDevice.Enabled = true;
-                if (selectedOS.Equals("iOS"))
+                if (listView1.SelectedItems.Count > 0)
                 {
-                    if (iOS_Executor.selectediOSExecutor.Equals("auto"))
+                    ListViewItem selectedItem = listView1.SelectedItems[0];
+                    selectedDeviceName = selectedItem.SubItems[0].Text;
+                    selectedDeviceVersion = selectedItem.SubItems[1].Text;
+                    selectedOS = selectedItem.SubItems[2].Text;
+                    selectedDeviceStatus = selectedItem.SubItems[3].Text;
+                    selectedUDID = getDeviceUdidByName(selectedDeviceName);
+                    selectedDeviceConnection = selectedItem.SubItems[5].Text;
+                    selectedDeviceIP = selectedItem.SubItems.Count > 6 ? selectedItem.SubItems[6].Text : string.Empty;
+                    selectedDeviceModel = selectedItem.SubItems.Count > 7 ? selectedItem.SubItems[7].Text : string.Empty;
+                    Open.Enabled = true;
+                    MoreButton.Enabled = true;
+                    DeleteDevice.Enabled = true;
+                    if (selectedOS.Equals("iOS"))
                     {
-                        if (IsIt17PlusVersion(selectedDeviceVersion)) // >17
+                        if (iOS_Executor.selectediOSExecutor.Equals("auto"))
                         {
-                            //SetiOSTool(false);
-                            //iOSAsyncMethods.is17Plus = true;
+                            if (IsIt17PlusVersion(selectedDeviceVersion)) // >17
+                            {
+                                //SetiOSTool(false);
+                                //iOSAsyncMethods.is17Plus = true;
 
-                            SetiOSTool(true);
-                            iOSAsyncMethods.is17Plus = true;
+                                SetiOSTool(true);
+                                iOSAsyncMethods.is17Plus = true;
+                            }
+                            else // <17
+                            {
+                                SetiOSTool(true);
+                                iOSAsyncMethods.is17Plus = false;
+                            }
                         }
-                        else // <17
+                        else if (iOS_Executor.selectediOSExecutor.Equals("go"))
                         {
-                            SetiOSTool(true);
-                            iOSAsyncMethods.is17Plus = false;
+                            SetiOSTool(true); // use go
+                        }
+                        else
+                        {
+                            SetiOSTool(false); // use py
                         }
                     }
-                    else if (iOS_Executor.selectediOSExecutor.Equals("go"))
+                    if (selectedDeviceStatus.Equals("Online"))
                     {
-                        SetiOSTool(true); // use go
+                        ShowCapability();
+                    }
+                    mandatorymsglabel.Visible = true;
+                    if (selectedDeviceConnection.Equals("Wi-Fi"))
+                    {
+                        mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
                     }
                     else
                     {
-                        SetiOSTool(false); // use py
+                        mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.";
+                    }
+                    if (selectedDeviceStatus.Equals("Offline"))
+                    {
+                        panel1.Visible = false;
+                        capabilityLabel.Visible = false;
+                        Open.Enabled = false;
+                        contextMenuStrip4.Items[0].Enabled = false;
+                        contextMenuStrip4.Items[1].Enabled = false;
+                        contextMenuStrip4.Items[2].Enabled = true; // Refresh
+                        contextMenuStrip4.Items[3].Enabled = false;
+                        contextMenuStrip4.Items[4].Enabled = false;
+                        mandatorymsglabel.Visible = false;
+                    }
+                    else
+                    {
+                        Open.Enabled = true;
+                        foreach (var item in contextMenuStrip4.Items)
+                        {
+                            if (item is ToolStripItem toolStripItem)
+                            {
+                                toolStripItem.Enabled = true;
+                            }
+                        }
                     }
                 }
-                if (selectedDeviceStatus.Equals("Online"))
-                {
-                    ShowCapability();
-                }
-                mandatorymsglabel.Visible = true;
-                if (selectedDeviceConnection.Equals("Wi-Fi"))
-                {
-                    mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.\nDevice connected over Wi-Fi may be slower when compared to USB.";
-                }
                 else
-                {
-                    mandatorymsglabel.Text = "Note : It's mandatory to open the device before starting automation.";
-                }
-                if (selectedDeviceStatus.Equals("Offline"))
                 {
                     panel1.Visible = false;
                     capabilityLabel.Visible = false;
                     Open.Enabled = false;
-                    contextMenuStrip4.Items[0].Enabled = false;
-                    contextMenuStrip4.Items[1].Enabled = false;
-                    contextMenuStrip4.Items[2].Enabled = true; // Refresh
-                    contextMenuStrip4.Items[3].Enabled = false;
-                    contextMenuStrip4.Items[4].Enabled = false;
+                    DeleteDevice.Enabled = false;
+                    MoreButton.Enabled = false;
                     mandatorymsglabel.Visible = false;
                 }
-                else
-                {
-                    Open.Enabled = true;
-                    foreach (var item in contextMenuStrip4.Items)
-                    {
-                        if (item is ToolStripItem toolStripItem)
-                        {
-                            toolStripItem.Enabled = true;
-                        }
-                    }
-                }
             }
-            else
+            catch (Exception)
             {
-                panel1.Visible = false;
-                capabilityLabel.Visible = false;
-                Open.Enabled = false;
-                DeleteDevice.Enabled = false;
-                MoreButton.Enabled = false;
-                mandatorymsglabel.Visible = false;
             }
         }
 
@@ -526,7 +533,7 @@ namespace Appium_Wizard
             }
             if (DeviceName != null | DeviceName != string.Empty)
             {
-                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress };
+                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress, Model};
                 if (listView1.InvokeRequired)
                 {
                     listView1.Invoke(new Action(() => listView1.Items.Add(new ListViewItem(item1))));
@@ -2055,6 +2062,17 @@ namespace Appium_Wizard
         private void openLogsFolderToolstripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("explorer.exe", Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Logs");
+        }
+
+        private void copyDeviceDetailsToolStripMenuItem_Click(object sender, EventArgs e)
+        { 
+            string deviceName = "Device Name - " + selectedDeviceName;
+            string deviceOS = "Device OS - " + selectedOS;
+            string deviceOSVersion = "OS Version - " + selectedDeviceVersion;
+            string deviceModel = "Model - "+selectedDeviceModel;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel;
+            Clipboard.SetText(deviceDetails);
+            GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");
         }
     }
 }

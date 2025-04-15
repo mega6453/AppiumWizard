@@ -121,6 +121,7 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
+            checkBox2 = new CheckBox();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -307,7 +308,7 @@ namespace Appium_Wizard
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(2, 2, 0, 2);
-            menuStrip1.Size = new Size(899, 24);
+            menuStrip1.Size = new Size(1436, 24);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -629,7 +630,7 @@ namespace Appium_Wizard
             tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1004, 626);
+            tabControl1.Size = new Size(1002, 626);
             tabControl1.TabIndex = 11;
             // 
             // tabPage1
@@ -639,7 +640,7 @@ namespace Appium_Wizard
             tabPage1.Margin = new Padding(2);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(2);
-            tabPage1.Size = new Size(996, 598);
+            tabPage1.Size = new Size(994, 598);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
             tabPage1.UseVisualStyleBackColor = true;
@@ -651,7 +652,7 @@ namespace Appium_Wizard
             tabPage2.Margin = new Padding(2);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(2);
-            tabPage2.Size = new Size(996, 598);
+            tabPage2.Size = new Size(994, 598);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
             tabPage2.UseVisualStyleBackColor = true;
@@ -674,7 +675,7 @@ namespace Appium_Wizard
             tabPage3.Margin = new Padding(2);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(2);
-            tabPage3.Size = new Size(996, 598);
+            tabPage3.Size = new Size(994, 598);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
             tabPage3.UseVisualStyleBackColor = true;
@@ -697,7 +698,7 @@ namespace Appium_Wizard
             tabPage4.Margin = new Padding(2);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(2);
-            tabPage4.Size = new Size(996, 598);
+            tabPage4.Size = new Size(994, 598);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
             tabPage4.UseVisualStyleBackColor = true;
@@ -720,7 +721,7 @@ namespace Appium_Wizard
             tabPage5.Margin = new Padding(2);
             tabPage5.Name = "tabPage5";
             tabPage5.Padding = new Padding(2);
-            tabPage5.Size = new Size(996, 598);
+            tabPage5.Size = new Size(994, 598);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";
             tabPage5.UseVisualStyleBackColor = true;
@@ -919,12 +920,26 @@ namespace Appium_Wizard
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
             // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Checked = true;
+            checkBox2.CheckState = CheckState.Checked;
+            checkBox2.Location = new Point(1244, 57);
+            checkBox2.Margin = new Padding(2);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(80, 19);
+            checkBox2.TabIndex = 19;
+            checkBox2.Text = "Show logs";
+            checkBox2.UseVisualStyleBackColor = true;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(899, 421);
+            ClientSize = new Size(1436, 421);
+            Controls.Add(checkBox2);
             Controls.Add(checkBox1);
             Controls.Add(mandatorymsglabel);
             Controls.Add(capabilityLabel);
@@ -1056,5 +1071,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem openLogsFolderToolstripMenuItem;
         private ToolStripMenuItem copyDeviceDetailsToolStripMenuItem;
         private ColumnHeader columnHeader8;
+        private CheckBox checkBox2;
     }
 }

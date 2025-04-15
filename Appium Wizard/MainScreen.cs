@@ -134,7 +134,10 @@ namespace Appium_Wizard
                 int checkBoxY = tabControl1.Top;
 
                 // Set the CheckBox location
-                checkBox1.Location = new System.Drawing.Point(checkBoxX, checkBoxY);
+                checkBox1.Location = new Point(checkBoxX, checkBoxY);
+                checkBox2.Location = new Point(checkBoxX-150, checkBoxY);
+                ToolTip toolTip = new ToolTip();
+                toolTip.SetToolTip(checkBox2,"Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
@@ -154,7 +157,7 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 iOS_Executor.selectediOSExecutor = "auto";
-                iOS_Proxy.selectediOSProxyMethod = "go";
+                iOS_Proxy.selectediOSProxyMethod = "iproxy";
             }
             if (!LoadingScreen.isServerStarted)
             {
@@ -171,63 +174,73 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
-                    try
+                    if (checkBox2.Checked)
                     {
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
+                        try
                         {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[1].Item2);
-                            if (currentWriteTime != lastWriteTime1)
+                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
                             {
-                                lastWriteTime1 = currentWriteTime;
-                                UpdateRichTextbox(1);
+                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[1].Item2);
+                                if (currentWriteTime != lastWriteTime1)
+                                {
+                                    lastWriteTime1 = currentWriteTime;
+                                    UpdateRichTextbox(1);
+                                }
+                            }
+                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
+                            {
+                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[2].Item2);
+                                if (currentWriteTime != lastWriteTime2)
+                                {
+                                    lastWriteTime2 = currentWriteTime;
+                                    UpdateRichTextbox(2);
+                                }
+                            }
+                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
+                            {
+                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[3].Item2);
+                                if (currentWriteTime != lastWriteTime3)
+                                {
+                                    lastWriteTime3 = currentWriteTime;
+                                    UpdateRichTextbox(3);
+                                }
+                            }
+                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
+                            {
+                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[4].Item2);
+                                if (currentWriteTime != lastWriteTime4)
+                                {
+                                    lastWriteTime4 = currentWriteTime;
+                                    UpdateRichTextbox(4);
+                                }
+                            }
+                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
+                            {
+                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[5].Item2);
+                                if (currentWriteTime != lastWriteTime5)
+                                {
+                                    lastWriteTime5 = currentWriteTime;
+                                    UpdateRichTextbox(5);
+                                }
                             }
                         }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
+                        catch (Exception e)
                         {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[2].Item2);
-                            if (currentWriteTime != lastWriteTime2)
-                            {
-                                lastWriteTime2 = currentWriteTime;
-                                UpdateRichTextbox(2);
-                            }
+                            Console.WriteLine(e);
                         }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[3].Item2);
-                            if (currentWriteTime != lastWriteTime3)
-                            {
-                                lastWriteTime3 = currentWriteTime;
-                                UpdateRichTextbox(3);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[4].Item2);
-                            if (currentWriteTime != lastWriteTime4)
-                            {
-                                lastWriteTime4 = currentWriteTime;
-                                UpdateRichTextbox(4);
-                            }
-                        }
-                        if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
-                        {
-                            DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[5].Item2);
-                            if (currentWriteTime != lastWriteTime5)
-                            {
-                                lastWriteTime5 = currentWriteTime;
-                                UpdateRichTextbox(5);
-                            }
-                        }
+
+                        // Replace Thread.Sleep with Task.Delay
+                        await Task.Delay(1000);
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Console.WriteLine(e);
+                        // Optional: Add a small delay when the checkbox is not checked
+                        await Task.Delay(100);
                     }
-                    Thread.Sleep(1000);
                 }
             });
             GoogleAnalytics.SendEvent("MainScreen_Shown");
@@ -595,7 +608,7 @@ namespace Appium_Wizard
                                 status = "Offline";
                             }
                         }
-                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"] };
+                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"], device["Model"] };
                         listView1.Items.Add(new ListViewItem(item1));
                         if (!DeviceInfo.ContainsKey(device["UDID"]))
                         {

@@ -71,7 +71,7 @@ namespace Appium_Wizard
                 }
             }
             Hide();
-            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, "Online", udid, Width, Height, Connection, IPAddress);
+            Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, Model, "Online", udid, Width, Height, Connection, IPAddress);
             mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
             if (OSType.ToLower().Contains("ios"))
             {

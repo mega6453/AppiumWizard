@@ -9,14 +9,14 @@ namespace Appium_Wizard
         static string connectionString = $"Data Source=\"{databaseFilePath}\";Version=3;";
 
 
-        public static void InsertDataIntoDevicesTable(string Name, string OS, string Version, string Status, string UDID, int Width, int Height, string ConnectionType, string IPAddress)
+        public static void InsertDataIntoDevicesTable(string Name, string OS, string Version, string Model, string Status, string UDID, int Width, int Height, string ConnectionType, string IPAddress)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
                 using (SQLiteCommand command = new SQLiteCommand(connection))
                 {
-                    command.CommandText = "INSERT INTO Devices (Name, OS, Version, Status, UDID, Width, Height, Connection, IPAddress) VALUES ('" + Name + "', '" + OS + "', '" + Version + "', '" + Status + "','" + UDID + "', '" + Width + "','" + Height + "','" + ConnectionType + "','" + IPAddress + "')";
+                    command.CommandText = "INSERT INTO Devices (Name, OS, Version, Status, UDID, Width, Height, Connection, IPAddress, Model) VALUES ('" + Name + "', '" + OS + "', '" + Version + "', '" + Status + "','" + UDID + "', '" + Width + "','" + Height + "','" + ConnectionType + "','" + IPAddress + "','" + Model +"')";
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -120,6 +120,7 @@ namespace Appium_Wizard
                             string Height = reader.GetInt32(6).ToString();
                             string Connection = reader.GetString(7);
                             string IPAddress = reader.GetString(8);
+                            string Model = reader.GetString(9);
                             keyValuePairs = new Dictionary<string, string>();
                             keyValuePairs.Add("Name", name.Replace("''", "'"));
                             keyValuePairs.Add("OS", os);
@@ -130,6 +131,7 @@ namespace Appium_Wizard
                             keyValuePairs.Add("Height", Height);
                             keyValuePairs.Add("Connection", Connection);
                             keyValuePairs.Add("IPAddress", IPAddress);
+                            keyValuePairs.Add("Model", Model);
                             listOfDeviceDetails.Add(keyValuePairs);
                         }
                     }

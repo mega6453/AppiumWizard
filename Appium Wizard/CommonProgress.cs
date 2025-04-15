@@ -74,16 +74,22 @@ namespace Appium_Wizard
 
         public new void Close()
         {
-            if (this.InvokeRequired)
+            try
             {
-                this.Invoke((MethodInvoker)delegate
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        base.Close();
+                    });
+                }
+                else
                 {
                     base.Close();
-                });
+                }
             }
-            else
+            catch (Exception)
             {
-                base.Close();
             }
         }
 

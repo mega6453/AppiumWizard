@@ -135,7 +135,7 @@ namespace Appium_Wizard
 
                 // Set the CheckBox location
                 checkBox1.Location = new Point(checkBoxX, checkBoxY);
-                checkBox2.Location = new Point(checkBoxX-100, checkBoxY);
+                checkBox2.Location = new Point(checkBoxX-150, checkBoxY);
                 ToolTip toolTip = new ToolTip();
                 toolTip.SetToolTip(checkBox2,"Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
             }
@@ -157,7 +157,7 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 iOS_Executor.selectediOSExecutor = "auto";
-                iOS_Proxy.selectediOSProxyMethod = "go";
+                iOS_Proxy.selectediOSProxyMethod = "iproxy";
             }
             if (!LoadingScreen.isServerStarted)
             {
@@ -174,7 +174,7 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
@@ -232,7 +232,14 @@ namespace Appium_Wizard
                         {
                             Console.WriteLine(e);
                         }
-                        Thread.Sleep(1000);
+
+                        // Replace Thread.Sleep with Task.Delay
+                        await Task.Delay(1000);
+                    }
+                    else
+                    {
+                        // Optional: Add a small delay when the checkbox is not checked
+                        await Task.Delay(100);
                     }
                 }
             });
@@ -601,7 +608,7 @@ namespace Appium_Wizard
                                 status = "Offline";
                             }
                         }
-                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"] };
+                        string[] item1 = { device["Name"], device["Version"], device["OS"], status, device["UDID"], device["Connection"], device["IPAddress"], device["Model"] };
                         listView1.Items.Add(new ListViewItem(item1));
                         if (!DeviceInfo.ContainsKey(device["UDID"]))
                         {

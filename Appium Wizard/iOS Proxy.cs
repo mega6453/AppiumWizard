@@ -4,7 +4,7 @@
     {
         public string udid;
         List<Dictionary<string, string>> devicesList;
-        public static string selectediOSProxyMethod = "go";
+        public static string selectediOSProxyMethod = "iproxy";
         public iOS_Proxy()
         {
             InitializeComponent();

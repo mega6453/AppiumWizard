@@ -1644,53 +1644,51 @@ namespace Appium_Wizard
                     int count = 1;
                     string sessionId = string.Empty;
                     bool isWDARanAtleaseOnce = false;
-                    while (!process.HasExited)
+                    Logger.Info("process.HasExited? : " + process.HasExited);
+                    if (!string.IsNullOrEmpty(runwdaError))
                     {
-                        if (!string.IsNullOrEmpty(runwdaError))
+                        if (runwdaError.Contains("Process started successfully"))
                         {
-                            if (runwdaError.Contains("Process started successfully"))
+                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                            Logger.Debug("sessionid" + sessionId);
+                            while (sessionId.Equals("nosession") && count <= 6)
                             {
-                                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                                Logger.Debug("sessionid"+sessionId);
-                                while (sessionId.Equals("nosession") && count <= 6)
+                                await Task.Run(async () =>
                                 {
-                                    await Task.Run(async () =>
+                                    //Thread.Sleep(5000);
+                                    await Task.Delay(5000);
+                                    sessionId = iOSAPIMethods.CreateWDASession(port);
+                                    Logger.Debug("sessionid" + sessionId);
+                                    bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
+                                    Logger.Debug("IsWDARunningInAppsList" + IsWDARunningInAppsList);
+                                    if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
                                     {
-                                        //Thread.Sleep(5000);
-                                        await Task.Delay(5000);
-                                        sessionId = iOSAPIMethods.CreateWDASession(port);
-                                        Logger.Debug("sessionid" + sessionId);
-                                        bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
-                                        Logger.Debug("IsWDARunningInAppsList" + IsWDARunningInAppsList);
-                                        if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
+                                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
+                                        isPasscodeRequired = true;
+                                        isWDARanAtleaseOnce = true;
+                                    }
+                                    else if (!IsWDARunningInAppsList)
+                                    {
+                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
+                                        if (isWDARanAtleaseOnce)
                                         {
-                                            commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                            isPasscodeRequired = true;
-                                            isWDARanAtleaseOnce = true;
+                                            commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
                                         }
-                                        else if (!IsWDARunningInAppsList)
-                                        {
-                                            iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                            if (isWDARanAtleaseOnce)
-                                            {
-                                                commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                            }
-                                            isPasscodeRequired = true;
-                                        }
-                                        count++;
-                                    });
-                                }
-                                if (sessionId.Equals("nosession") & isPasscodeRequired)
-                                {
-                                    process.Close();
-                                    return "nosession passcode required";
-                                }
-                                else
-                                {
-                                    process.Close();
-                                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                                    return sessionId;
-                                }
+                                        isPasscodeRequired = true;
+                                    }
+                                    count++;
+                                });
+                            }
+                            if (sessionId.Equals("nosession") & isPasscodeRequired)
+                            {
+                                process.Close();
+                                return "nosession passcode required";
+                            }
+                            else
+                            {
+                                process.Close();
+                                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                                return sessionId;
                             }
                         }
                     }

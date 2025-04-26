@@ -135,9 +135,9 @@ namespace Appium_Wizard
 
                 // Set the CheckBox location
                 checkBox1.Location = new Point(checkBoxX, checkBoxY);
-                checkBox2.Location = new Point(checkBoxX-150, checkBoxY);
+                checkBox2.Location = new Point(checkBoxX - 150, checkBoxY);
                 ToolTip toolTip = new ToolTip();
-                toolTip.SetToolTip(checkBox2,"Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
+                toolTip.SetToolTip(checkBox2, "Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
@@ -174,107 +174,61 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
-            Task.Run(async () =>
-            {
-                while (true)
-                {
-                    if (checkBox2.Checked)
-                    {
-                        try
-                        {
-                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
-                            {
-                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[1].Item2);
-                                if (currentWriteTime != lastWriteTime1)
-                                {
-                                    lastWriteTime1 = currentWriteTime;
-                                    UpdateRichTextbox(1);
-                                }
-                            }
-                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
-                            {
-                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[2].Item2);
-                                if (currentWriteTime != lastWriteTime2)
-                                {
-                                    lastWriteTime2 = currentWriteTime;
-                                    UpdateRichTextbox(2);
-                                }
-                            }
-                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
-                            {
-                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[3].Item2);
-                                if (currentWriteTime != lastWriteTime3)
-                                {
-                                    lastWriteTime3 = currentWriteTime;
-                                    UpdateRichTextbox(3);
-                                }
-                            }
-                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
-                            {
-                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[4].Item2);
-                                if (currentWriteTime != lastWriteTime4)
-                                {
-                                    lastWriteTime4 = currentWriteTime;
-                                    UpdateRichTextbox(4);
-                                }
-                            }
-                            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
-                            {
-                                DateTime currentWriteTime = File.GetLastWriteTime(AppiumServerSetup.portServerNumberAndFilePath[5].Item2);
-                                if (currentWriteTime != lastWriteTime5)
-                                {
-                                    lastWriteTime5 = currentWriteTime;
-                                    UpdateRichTextbox(5);
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-
-                        // Replace Thread.Sleep with Task.Delay
-                        await Task.Delay(1000);
-                    }
-                    else
-                    {
-                        // Optional: Add a small delay when the checkbox is not checked
-                        await Task.Delay(100);
-                    }
-                }
-            });
             GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
-        private void UpdateRichTextbox(int tabNumber)
+        public void UpdateRichTextbox(int tabNumber)
         {
-            using (var fileStream = new FileStream(AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var streamReader = new StreamReader(fileStream))
+            try
             {
-                var fileContent = streamReader.ReadToEnd();
-                if (tabNumber == 1)
+                if (checkBox2.Checked)
                 {
-                    Invoke(new Action(() => richTextBox1.Text = fileContent + "\n\n"));
+                    if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(tabNumber))
+                    {
+                        using (var fileStream = new FileStream(AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (var streamReader = new StreamReader(fileStream))
+                        {
+                            var fileContent = streamReader.ReadToEnd();
+                            if (tabNumber == 1 && richTextBox1.IsHandleCreated)
+                            {
+                                Invoke(new Action(() => richTextBox1.Text = fileContent + "\n\n"));
+                            }
+                            else if (tabNumber == 2 && richTextBox2.IsHandleCreated)
+                            {
+                                Invoke(new Action(() => richTextBox2.Text = fileContent + "\n\n"));
+                            }
+                            else if (tabNumber == 3 && richTextBox3.IsHandleCreated)
+                            {
+                                Invoke(new Action(() => richTextBox3.Text = fileContent + "\n\n"));
+                            }
+                            else if (tabNumber == 4 && richTextBox4.IsHandleCreated)
+                            {
+                                Invoke(new Action(() => richTextBox4.Text = fileContent + "\n\n"));
+                            }
+                            else if (tabNumber == 5 && richTextBox5.IsHandleCreated)
+                            {
+                                Invoke(new Action(() => richTextBox5.Text = fileContent + "\n\n"));
+                            }
+                        }
+                    }
                 }
-                else if (tabNumber == 2)
-                {
-                    Invoke(new Action(() => richTextBox2.Text = fileContent + "\n\n"));
-                }
-                else if (tabNumber == 3)
-                {
-                    Invoke(new Action(() => richTextBox3.Text = fileContent + "\n\n"));
-                }
-                else if (tabNumber == 4)
-                {
-                    Invoke(new Action(() => richTextBox4.Text = fileContent + "\n\n"));
-                }
-                else if (tabNumber == 5)
-                {
-                    Invoke(new Action(() => richTextBox5.Text = fileContent + "\n\n"));
-                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message,"Error in Updating logs",MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
         }
 
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    UpdateRichTextbox(i);
+                }
+            }
+        }
 
         public void UpdateDeviceStatus()
         {
@@ -546,7 +500,7 @@ namespace Appium_Wizard
             }
             if (DeviceName != null | DeviceName != string.Empty)
             {
-                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress, Model};
+                string[] item1 = { DeviceName ?? "", OSVersion, OS, status, udid, connection, IPAddress, Model };
                 if (listView1.InvokeRequired)
                 {
                     listView1.Invoke(new Action(() => listView1.Items.Add(new ListViewItem(item1))));
@@ -2078,11 +2032,11 @@ namespace Appium_Wizard
         }
 
         private void copyDeviceDetailsToolStripMenuItem_Click(object sender, EventArgs e)
-        { 
+        {
             string deviceName = "Device Name - " + selectedDeviceName;
             string deviceOS = "Device OS - " + selectedOS;
             string deviceOSVersion = "OS Version - " + selectedDeviceVersion;
-            string deviceModel = "Model - "+selectedDeviceModel;
+            string deviceModel = "Model - " + selectedDeviceModel;
             string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel;
             Clipboard.SetText(deviceDetails);
             GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");

@@ -84,7 +84,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = mainScreen;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 10);
+            commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 10);
             bool isRunning1 = false;
             bool isRunning2 = false;
             bool isRunning3 = false;
@@ -95,27 +95,27 @@ namespace Appium_Wizard
                 if (port1 != 0)
                 {
                     isRunning1 = serverSetup.IsAppiumServerRunning(port1);
-                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 20);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 20);
                 }
                 if (port2 != 0)
                 {
                     isRunning2 = serverSetup.IsAppiumServerRunning(port2);
-                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 40);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 40);
                 }
                 if (port3 != 0)
                 {
                     isRunning3 = serverSetup.IsAppiumServerRunning(port3);
-                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 60);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 60);
                 }
                 if (port4 != 0)
                 {
                     isRunning4 = serverSetup.IsAppiumServerRunning(port4);
-                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 80);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 80);
                 }
                 if (port5 != 0)
                 {
                     isRunning5 = serverSetup.IsAppiumServerRunning(port5);
-                    commonProgress.UpdateStepLabel("Get Status", "Please wait while Getting Appium server status...", 100);
+                    commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 100);
                 }
             });
 
@@ -195,7 +195,7 @@ namespace Appium_Wizard
             }
             else
             {
-                commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
+                commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
                 await Task.Run(() =>
                 {
                     string command = Database.QueryDataFromServerFinalCommandTable()["Server" + serverNumber];
@@ -213,21 +213,21 @@ namespace Appium_Wizard
                             MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         }
-                        else if (count == 15)
+                        else if (count == 20)
                         {
-                            MessageBox.Show("Timed out after 45 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                             break;
                         }
                     }
                     commonProgress.Invoke((System.Windows.Forms.MethodInvoker)(() =>
                     {
-                        commonProgress.UpdateStepLabel("Start Server", "Please wait while Starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 15 * count);
+                        commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10 * count);
                     }));
                     count++;
-                    if (count == 15)
+                    if (count == 20)
                     {
-                        MessageBox.Show("Timed out after 45 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                         break;
                     }

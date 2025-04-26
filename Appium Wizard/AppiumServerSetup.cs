@@ -41,6 +41,7 @@ namespace Appium_Wizard
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
+            InitializeWatcher(logFilePath,serverNumber);
             if (!Common.IsNodeInstalled())
             {
                 File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n");
@@ -114,7 +115,7 @@ namespace Appium_Wizard
                 using (var streamWriter = new StreamWriter(fileStream))
                 {
                     streamWriter.WriteLine(data);
-                    if (data.Contains("No plugins have been installed."))
+                    if (data.Contains("No plugins have been installed.") | data.Contains("No plugins activated."))
                     {
                         streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                     }
@@ -571,14 +572,69 @@ namespace Appium_Wizard
             }
             return true;
         }
+
+
+        private FileSystemWatcher watcher;
+        private DateTime lastWriteTime;
+        private int tabNumber;
+
+        public void InitializeWatcher(string filePath, int tabNumber)
+        {
+            // Dispose the existing watcher if already initialized
+            DisposeWatcher();
+            this.tabNumber = tabNumber;
+            // Create and configure the FileSystemWatcher
+            watcher = new FileSystemWatcher
+            {
+                Path = Path.GetDirectoryName(filePath),
+                Filter = Path.GetFileName(filePath),
+                NotifyFilter = NotifyFilters.LastWrite
+            };
+
+            // Subscribe to the Changed event
+            watcher.Changed += OnFileChanged;
+
+            // Enable the watcher to start monitoring
+            watcher.EnableRaisingEvents = true;
+
+            // Initialize the last write time
+            lastWriteTime = File.GetLastWriteTime(filePath);
+
+            Console.WriteLine($"Watching file: {filePath}");
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            // Check if the file's last write time has changed
+            DateTime currentWriteTime = File.GetLastWriteTime(e.FullPath);
+            if (currentWriteTime != lastWriteTime)
+            {
+                lastWriteTime = currentWriteTime;
+                MainScreen.main.UpdateRichTextbox(tabNumber);
+                // Add your custom logic here (e.g., update UI, process file, etc.)
+            }
+        }
+
+        public void DisposeWatcher()
+        {
+            if (watcher != null)
+            {
+                watcher.EnableRaisingEvents = false;
+                watcher.Changed -= OnFileChanged; // Unsubscribe from the event
+                watcher.Dispose(); // Dispose the watcher
+                watcher = null; // Clear the reference
+            }
+        }
     }
 
+}
 
+//-----------------------------------------------------------------------------------------------------------------------------------------
 
-    public class ProxyServerManager
+public class ProxyServerManager
     {
-        private const int CheckInterval = 1000; 
-        private const int Timeout =     10000;
+        private const int CheckInterval = 1000;
+        private const int Timeout = 10000;
 
         private bool IsProxyServerReady(string host, int port)
         {
@@ -607,7 +663,5 @@ namespace Appium_Wizard
                 Thread.Sleep(CheckInterval);
                 elapsed += CheckInterval;
             }
-        }
-    }
-
+        }     
 }

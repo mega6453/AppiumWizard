@@ -308,7 +308,7 @@ namespace Appium_Wizard
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(2, 2, 0, 2);
-            menuStrip1.Size = new Size(1436, 24);
+            menuStrip1.Size = new Size(1284, 24);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -932,13 +932,14 @@ namespace Appium_Wizard
             checkBox2.TabIndex = 19;
             checkBox2.Text = "Show logs";
             checkBox2.UseVisualStyleBackColor = true;
+            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
             // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1436, 421);
+            ClientSize = new Size(1284, 421);
             Controls.Add(checkBox2);
             Controls.Add(checkBox1);
             Controls.Add(mandatorymsglabel);

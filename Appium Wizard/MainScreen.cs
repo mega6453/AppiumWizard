@@ -215,7 +215,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message,"Error in Updating logs",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2040,6 +2040,101 @@ namespace Appium_Wizard
             string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel;
             Clipboard.SetText(deviceDetails);
             GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");
+        }
+
+        private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.LinkText))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = e.LinkText,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void richTextBox2_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.LinkText))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = e.LinkText,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void richTextBox3_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.LinkText))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = e.LinkText,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void richTextBox4_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.LinkText))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = e.LinkText,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void richTextBox5_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.LinkText))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = e.LinkText,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }

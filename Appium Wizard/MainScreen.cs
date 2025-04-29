@@ -130,14 +130,14 @@ namespace Appium_Wizard
                 richTextBox4.Size = size;
                 richTextBox5.Size = size;
 
-                int checkBoxX = tabControl1.Right - checkBox1.Width;
+                int checkBoxX = tabControl1.Right - autoScrollCheckBox.Width;
                 int checkBoxY = tabControl1.Top;
 
                 // Set the CheckBox location
-                checkBox1.Location = new Point(checkBoxX, checkBoxY);
-                checkBox2.Location = new Point(checkBoxX - 150, checkBoxY);
+                autoScrollCheckBox.Location = new Point(checkBoxX, checkBoxY);
+                showLogsCheckBox.Location = new Point(checkBoxX - 150, checkBoxY);
                 ToolTip toolTip = new ToolTip();
-                toolTip.SetToolTip(checkBox2, "Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
+                toolTip.SetToolTip(showLogsCheckBox, "Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
@@ -181,7 +181,7 @@ namespace Appium_Wizard
         {
             try
             {
-                if (checkBox2.Checked)
+                if (showLogsCheckBox.Checked)
                 {
                     if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(tabNumber))
                     {
@@ -221,7 +221,7 @@ namespace Appium_Wizard
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox2.Checked)
+            if (showLogsCheckBox.Checked)
             {
                 for (int i = 1; i <= 5; i++)
                 {
@@ -1201,42 +1201,39 @@ namespace Appium_Wizard
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 richTextBox1.SelectionStart = richTextBox1.Text.Length;
                 richTextBox1.ScrollToCaret();
             }
             else
             {
-                richTextBox1.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox1.SelectionStart = richTextBox1.Text.Length;
             }
         }
 
         private void richTextBox2_TextChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 richTextBox2.SelectionStart = richTextBox2.Text.Length;
                 richTextBox2.ScrollToCaret();
             }
             else
             {
-                richTextBox2.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox2.SelectionStart = richTextBox2.Text.Length;
             }
         }
 
         private void richTextBox3_TextChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 richTextBox3.SelectionStart = richTextBox3.Text.Length;
                 richTextBox3.ScrollToCaret();
             }
             else
             {
-                richTextBox3.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox3.SelectionStart = richTextBox3.Text.Length;
             }
         }
@@ -1244,14 +1241,13 @@ namespace Appium_Wizard
 
         private void richTextBox4_TextChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 richTextBox4.SelectionStart = richTextBox4.Text.Length;
                 richTextBox4.ScrollToCaret();
             }
             else
             {
-                richTextBox4.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox4.SelectionStart = richTextBox4.Text.Length;
             }
         }
@@ -1259,14 +1255,13 @@ namespace Appium_Wizard
 
         private void richTextBox5_TextChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 richTextBox5.SelectionStart = richTextBox5.Text.Length;
                 richTextBox5.ScrollToCaret();
             }
             else
             {
-                richTextBox5.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox5.SelectionStart = richTextBox5.Text.Length;
             }
         }
@@ -1301,7 +1296,7 @@ namespace Appium_Wizard
 
         private void AutoScrollCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (autoScrollCheckBox.Checked)
             {
                 GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Checked");
             }

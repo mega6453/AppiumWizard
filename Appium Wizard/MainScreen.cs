@@ -1,4 +1,5 @@
 ﻿using Appium_Wizard.Properties;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Reflection;
@@ -177,40 +178,97 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
-        public void UpdateRichTextbox(int tabNumber)
+        //public void UpdateRichTextbox(int tabNumber, string fileContent)
+        //{
+        //    try
+        //    {
+        //        if (checkBox2.Checked)
+        //        {
+        //            Action updateAction = () =>
+        //            {
+        //                string updatedContent = fileContent + "\n";
+        //                switch (tabNumber)
+        //                {
+        //                    case 1:
+        //                        if (richTextBox1.IsHandleCreated)
+        //                        richTextBox1.AppendText(updatedContent);
+        //                        break;
+        //                    case 2:
+        //                        if (richTextBox2.IsHandleCreated)
+        //                            richTextBox2.Text = updatedContent;
+        //                        break;
+        //                    case 3:
+        //                        if (richTextBox3.IsHandleCreated)
+        //                            richTextBox3.Text = updatedContent;
+        //                        break;
+        //                    case 4:
+        //                        if (richTextBox4.IsHandleCreated)
+        //                            richTextBox4.Text = updatedContent;
+        //                        break;
+        //                    case 5:
+        //                        if (richTextBox5.IsHandleCreated)
+        //                            richTextBox5.Text = updatedContent;
+        //                        break;
+        //                }
+        //            };
+
+        //            // Use BeginInvoke for asynchronous UI updates
+        //            BeginInvoke(updateAction);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
+
+        public void UpdateRichTextbox(int tabNumber, string fileContent)
         {
             try
             {
                 if (checkBox2.Checked)
                 {
-                    if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(tabNumber))
+                    Action updateAction = () =>
                     {
-                        using (var fileStream = new FileStream(AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                        using (var streamReader = new StreamReader(fileStream))
+                        string updatedContent = fileContent + "\n";
+                        RichTextBox targetRichTextBox = null;
+
+                        switch (tabNumber)
                         {
-                            var fileContent = streamReader.ReadToEnd();
-                            if (tabNumber == 1 && richTextBox1.IsHandleCreated)
+                            case 1:
+                                targetRichTextBox = richTextBox1;
+                                break;
+                            case 2:
+                                targetRichTextBox = richTextBox2;
+                                break;
+                            case 3:
+                                targetRichTextBox = richTextBox3;
+                                break;
+                            case 4:
+                                targetRichTextBox = richTextBox4;
+                                break;
+                            case 5:
+                                targetRichTextBox = richTextBox5;
+                                break;
+                        }
+
+                        if (targetRichTextBox != null && targetRichTextBox.IsHandleCreated && !targetRichTextBox.IsDisposed)
+                        {
+                            // Append new content
+                            targetRichTextBox.AppendText(updatedContent);
+
+                            // Check if the text length exceeds 100,000 characters
+                            const int maxLength = 100000;
+                            if (targetRichTextBox.TextLength > maxLength)
                             {
-                                Invoke(new Action(() => richTextBox1.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 2 && richTextBox2.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox2.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 3 && richTextBox3.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox3.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 4 && richTextBox4.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox4.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 5 && richTextBox5.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox5.Text = fileContent + "\n\n"));
+                                // Truncate the text to keep only the last 100,000 characters
+                                targetRichTextBox.Text = targetRichTextBox.Text.Substring(targetRichTextBox.TextLength - maxLength);
                             }
                         }
-                    }
+                    };
+
+                    // Use BeginInvoke for asynchronous UI updates
+                    BeginInvoke(updateAction);
                 }
             }
             catch (Exception e)
@@ -221,13 +279,13 @@ namespace Appium_Wizard
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox2.Checked)
-            {
-                for (int i = 1; i <= 5; i++)
-                {
-                    UpdateRichTextbox(i);
-                }
-            }
+            //if (checkBox2.Checked)
+            //{
+            //    for (int i = 1; i <= 5; i++)
+            //    {
+            //        UpdateRichTextbox(i);
+            //    }
+            //}
         }
 
         public void UpdateDeviceStatus()
@@ -1208,7 +1266,6 @@ namespace Appium_Wizard
             }
             else
             {
-                richTextBox1.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox1.SelectionStart = richTextBox1.Text.Length;
             }
         }
@@ -1222,7 +1279,6 @@ namespace Appium_Wizard
             }
             else
             {
-                richTextBox2.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox2.SelectionStart = richTextBox2.Text.Length;
             }
         }
@@ -1236,7 +1292,6 @@ namespace Appium_Wizard
             }
             else
             {
-                richTextBox3.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox3.SelectionStart = richTextBox3.Text.Length;
             }
         }
@@ -1251,7 +1306,6 @@ namespace Appium_Wizard
             }
             else
             {
-                richTextBox4.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox4.SelectionStart = richTextBox4.Text.Length;
             }
         }
@@ -1266,7 +1320,6 @@ namespace Appium_Wizard
             }
             else
             {
-                richTextBox5.ScrollBars = RichTextBoxScrollBars.Both;
                 richTextBox5.SelectionStart = richTextBox5.Text.Length;
             }
         }

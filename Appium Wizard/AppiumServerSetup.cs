@@ -1,10 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Timers;
+using System.Windows.Forms;
+using Timer = System.Timers.Timer;
 
 namespace Appium_Wizard
 {
@@ -17,9 +22,19 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public static Dictionary<int,int> serverNumberWDAPortNumber = new Dictionary<int, int>();
+        public static Dictionary<int, int> serverNumberWDAPortNumber = new Dictionary<int, int>();
+
+        private ConcurrentQueue<string> logBuffer = new ConcurrentQueue<string>();
+        private Timer logUpdateTimer;
+
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+
+            logUpdateTimer = new Timer(500); // Update every 500 milliseconds (adjust as needed)
+            logUpdateTimer.Elapsed += ProcessLogBuffer;
+            logUpdateTimer.AutoReset = true;
+            logUpdateTimer.Start();
+
             if (!command.Contains("webDriverAgentProxyPort"))
             {
                 command = command + $@" -dc ""{{""""appium:webDriverAgentUrl"""":""""http://localhost:webDriverAgentProxyPort""""}}""";
@@ -41,7 +56,9 @@ namespace Appium_Wizard
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
-            InitializeWatcher(logFilePath,serverNumber);
+            //InitializeWatcher(logFilePath, serverNumber);
+            string logMessage = "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n";
+            AppendLog(logMessage, serverNumber);
             if (!Common.IsNodeInstalled())
             {
                 File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n");
@@ -111,13 +128,16 @@ namespace Appium_Wizard
             if (!string.IsNullOrEmpty(e.Data))
             {
                 string data = Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", "");
+                AppendLog(data, serverNumber);
                 using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 using (var streamWriter = new StreamWriter(fileStream))
                 {
                     streamWriter.WriteLine(data);
                     if (data.Contains("No plugins have been installed.") | data.Contains("No plugins activated."))
                     {
-                        streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
+                        string logMessage = "\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n";
+                        streamWriter.WriteLine(logMessage);
+                        AppendLog(logMessage,serverNumber);
                     }
                 }
                 if (data.Contains("Appium REST http interface listener started"))
@@ -573,10 +593,41 @@ namespace Appium_Wizard
             return true;
         }
 
+        //-------------------------------------------------
 
+        private int tabNumber;
+
+        // Method to queue logs
+        public void AppendLog(string logMessage, int tabNumber)
+        {
+            this.tabNumber = tabNumber;
+            logBuffer.Enqueue(logMessage);
+        }
+
+        // Timer event to process the log buffer and update the RichTextBox
+        private void ProcessLogBuffer(object sender, ElapsedEventArgs e)
+        {
+            if (logBuffer.IsEmpty)
+                return;
+
+            // Accumulate logs from the buffer
+            var sb = new StringBuilder();
+            while (logBuffer.TryDequeue(out var log))
+            {
+                sb.AppendLine(log); // Add each log entry to the StringBuilder
+            }
+
+            // Update the RichTextBox on the UI thread
+            string accumulatedLogs = sb.ToString();
+            if (MainScreen.main != null)
+            {
+                MainScreen.main.UpdateRichTextbox(tabNumber, accumulatedLogs);
+            }
+        }
+
+        //-------------------------------------------------
         private FileSystemWatcher watcher;
         private DateTime lastWriteTime;
-        private int tabNumber;
 
         public void InitializeWatcher(string filePath, int tabNumber)
         {
@@ -610,7 +661,7 @@ namespace Appium_Wizard
             if (currentWriteTime != lastWriteTime)
             {
                 lastWriteTime = currentWriteTime;
-                MainScreen.main.UpdateRichTextbox(tabNumber);
+                //MainScreen.main.UpdateRichTextbox(tabNumber);
                 // Add your custom logic here (e.g., update UI, process file, etc.)
             }
         }
@@ -632,36 +683,36 @@ namespace Appium_Wizard
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
 public class ProxyServerManager
-    {
-        private const int CheckInterval = 1000;
-        private const int Timeout = 10000;
+{
+    private const int CheckInterval = 1000;
+    private const int Timeout = 10000;
 
-        private bool IsProxyServerReady(string host, int port)
+    private bool IsProxyServerReady(string host, int port)
+    {
+        try
         {
-            try
+            using (var client = new TcpClient(host, port))
             {
-                using (var client = new TcpClient(host, port))
-                {
-                    return true;
-                }
-            }
-            catch (SocketException)
-            {
-                return false;
+                return true;
             }
         }
-
-        public void WaitForProxyServer(string host, int port)
+        catch (SocketException)
         {
-            int elapsed = 0;
-            while (!IsProxyServerReady(host, port))
+            return false;
+        }
+    }
+
+    public void WaitForProxyServer(string host, int port)
+    {
+        int elapsed = 0;
+        while (!IsProxyServerReady(host, port))
+        {
+            if (elapsed >= Timeout)
             {
-                if (elapsed >= Timeout)
-                {
-                    MessageBox.Show("iOS Proxy server did not start in time. Try selecting different method or start proxy manually from Tools->iOS Proxy", "Failed to start iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                Thread.Sleep(CheckInterval);
-                elapsed += CheckInterval;
+                MessageBox.Show("iOS Proxy server did not start in time. Try selecting different method or start proxy manually from Tools->iOS Proxy", "Failed to start iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }     
+            Thread.Sleep(CheckInterval);
+            elapsed += CheckInterval;
+        }
+    }
 }

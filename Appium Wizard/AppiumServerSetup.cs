@@ -54,7 +54,9 @@ namespace Appium_Wizard
             }
             string updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             tempFolder = Path.GetTempPath();
-            logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
+            string appiumWizardFolder = Path.Combine(tempFolder, "AppiumWizard");
+            Directory.CreateDirectory(appiumWizardFolder);
+            logFilePath = Path.Combine(appiumWizardFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
             //InitializeWatcher(logFilePath, serverNumber);
             string logMessage = "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n";

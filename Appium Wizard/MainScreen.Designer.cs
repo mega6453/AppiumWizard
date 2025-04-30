@@ -122,6 +122,7 @@ namespace Appium_Wizard
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             checkBox2 = new CheckBox();
+            openLogsButton = new Button();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -627,7 +628,7 @@ namespace Appium_Wizard
             tabControl1.Controls.Add(tabPage3);
             tabControl1.Controls.Add(tabPage4);
             tabControl1.Controls.Add(tabPage5);
-            tabControl1.Location = new Point(434, 54);
+            tabControl1.Location = new Point(433, 57);
             tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -939,12 +940,24 @@ namespace Appium_Wizard
             checkBox2.UseVisualStyleBackColor = true;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
             // 
+            // openLogsButton
+            // 
+            openLogsButton.AutoSize = true;
+            openLogsButton.Location = new Point(971, 51);
+            openLogsButton.Name = "openLogsButton";
+            openLogsButton.Size = new Size(136, 25);
+            openLogsButton.TabIndex = 20;
+            openLogsButton.Text = "Open Logs in Notepad";
+            openLogsButton.UseVisualStyleBackColor = true;
+            openLogsButton.Click += openLogsButton_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1284, 421);
+            Controls.Add(openLogsButton);
             Controls.Add(checkBox2);
             Controls.Add(checkBox1);
             Controls.Add(mandatorymsglabel);
@@ -1078,5 +1091,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem copyDeviceDetailsToolStripMenuItem;
         private ColumnHeader columnHeader8;
         private CheckBox checkBox2;
+        private Button openLogsButton;
     }
 }

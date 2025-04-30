@@ -3,6 +3,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Reflection;
+using System.Windows.Forms;
 using File = System.IO.File;
 
 namespace Appium_Wizard
@@ -273,7 +274,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2187,6 +2188,38 @@ namespace Appium_Wizard
                 {
                     MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        private void openLogsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int tabNumber = tabControl1.SelectedIndex;
+                tabNumber = tabNumber + 1;
+                if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(tabNumber))
+                {
+                    string filePath = AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2;
+                    if (File.Exists(filePath))
+                    {
+                        try
+                        {
+                            Process.Start("notepad.exe", filePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Error opening logs in Notepad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Server logs file not found.", "Error opening logs in Notepad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error opening logs in Notepad", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -49,7 +49,7 @@ namespace Appium_Wizard
             AddDevice = new Button();
             DeleteDevice = new Button();
             richTextBox1 = new RichTextBox();
-            checkBox1 = new CheckBox();
+            autoScrollCheckBox = new CheckBox();
             MoreButton = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -121,7 +121,7 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
-            checkBox2 = new CheckBox();
+            showLogsCheckBox = new CheckBox();
             openLogsButton = new Button();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -274,19 +274,19 @@ namespace Appium_Wizard
             richTextBox1.LinkClicked += richTextBox1_LinkClicked;
             richTextBox1.TextChanged += richTextBox1_TextChanged;
             // 
-            // checkBox1
+            // autoScrollCheckBox
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(1353, 57);
-            checkBox1.Margin = new Padding(2);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(84, 19);
-            checkBox1.TabIndex = 7;
-            checkBox1.Text = "Auto Scroll";
-            checkBox1.UseVisualStyleBackColor = true;
-            checkBox1.CheckedChanged += AutoScrollCheckbox_CheckedChanged;
+            autoScrollCheckBox.AutoSize = true;
+            autoScrollCheckBox.Checked = true;
+            autoScrollCheckBox.CheckState = CheckState.Checked;
+            autoScrollCheckBox.Location = new Point(1353, 57);
+            autoScrollCheckBox.Margin = new Padding(2);
+            autoScrollCheckBox.Name = "autoScrollCheckBox";
+            autoScrollCheckBox.Size = new Size(84, 19);
+            autoScrollCheckBox.TabIndex = 7;
+            autoScrollCheckBox.Text = "Auto Scroll";
+            autoScrollCheckBox.UseVisualStyleBackColor = true;
+            autoScrollCheckBox.CheckedChanged += AutoScrollCheckbox_CheckedChanged;
             // 
             // MoreButton
             // 
@@ -926,19 +926,18 @@ namespace Appium_Wizard
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
             // 
-            // checkBox2
+            // showLogsCheckBox
             // 
-            checkBox2.AutoSize = true;
-            checkBox2.Checked = true;
-            checkBox2.CheckState = CheckState.Checked;
-            checkBox2.Location = new Point(1244, 57);
-            checkBox2.Margin = new Padding(2);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(80, 19);
-            checkBox2.TabIndex = 19;
-            checkBox2.Text = "Show logs";
-            checkBox2.UseVisualStyleBackColor = true;
-            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            showLogsCheckBox.AutoSize = true;
+            showLogsCheckBox.Checked = true;
+            showLogsCheckBox.CheckState = CheckState.Checked;
+            showLogsCheckBox.Location = new Point(1244, 57);
+            showLogsCheckBox.Margin = new Padding(2);
+            showLogsCheckBox.Name = "showLogsCheckBox";
+            showLogsCheckBox.Size = new Size(80, 19);
+            showLogsCheckBox.TabIndex = 19;
+            showLogsCheckBox.Text = "Show logs";
+            showLogsCheckBox.UseVisualStyleBackColor = true;
             // 
             // openLogsButton
             // 
@@ -947,7 +946,7 @@ namespace Appium_Wizard
             openLogsButton.Name = "openLogsButton";
             openLogsButton.Size = new Size(136, 25);
             openLogsButton.TabIndex = 20;
-            openLogsButton.Text = "Open Logs in Notepad";
+            openLogsButton.Text = "Open full logs in Notepad";
             openLogsButton.UseVisualStyleBackColor = true;
             openLogsButton.Click += openLogsButton_Click;
             // 
@@ -958,8 +957,8 @@ namespace Appium_Wizard
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1284, 421);
             Controls.Add(openLogsButton);
-            Controls.Add(checkBox2);
-            Controls.Add(checkBox1);
+            Controls.Add(showLogsCheckBox);
+            Controls.Add(autoScrollCheckBox);
             Controls.Add(mandatorymsglabel);
             Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
@@ -1013,7 +1012,7 @@ namespace Appium_Wizard
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader5;
         private RichTextBox richTextBox1;
-        private CheckBox checkBox1;
+        private CheckBox autoScrollCheckBox;
         private Button MoreButton;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
@@ -1090,7 +1089,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem openLogsFolderToolstripMenuItem;
         private ToolStripMenuItem copyDeviceDetailsToolStripMenuItem;
         private ColumnHeader columnHeader8;
-        private CheckBox checkBox2;
+        private CheckBox showLogsCheckBox;
         private Button openLogsButton;
     }
 }

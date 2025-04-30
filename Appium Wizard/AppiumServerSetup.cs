@@ -626,58 +626,6 @@ namespace Appium_Wizard
                 MainScreen.main.UpdateRichTextbox(tabNumber, accumulatedLogs);
             }
         }
-
-        //-------------------------------------------------
-        private FileSystemWatcher watcher;
-        private DateTime lastWriteTime;
-
-        public void InitializeWatcher(string filePath, int tabNumber)
-        {
-            // Dispose the existing watcher if already initialized
-            DisposeWatcher();
-            this.tabNumber = tabNumber;
-            // Create and configure the FileSystemWatcher
-            watcher = new FileSystemWatcher
-            {
-                Path = Path.GetDirectoryName(filePath),
-                Filter = Path.GetFileName(filePath),
-                NotifyFilter = NotifyFilters.LastWrite
-            };
-
-            // Subscribe to the Changed event
-            watcher.Changed += OnFileChanged;
-
-            // Enable the watcher to start monitoring
-            watcher.EnableRaisingEvents = true;
-
-            // Initialize the last write time
-            lastWriteTime = File.GetLastWriteTime(filePath);
-
-            Console.WriteLine($"Watching file: {filePath}");
-        }
-
-        private void OnFileChanged(object sender, FileSystemEventArgs e)
-        {
-            // Check if the file's last write time has changed
-            DateTime currentWriteTime = File.GetLastWriteTime(e.FullPath);
-            if (currentWriteTime != lastWriteTime)
-            {
-                lastWriteTime = currentWriteTime;
-                //MainScreen.main.UpdateRichTextbox(tabNumber);
-                // Add your custom logic here (e.g., update UI, process file, etc.)
-            }
-        }
-
-        public void DisposeWatcher()
-        {
-            if (watcher != null)
-            {
-                watcher.EnableRaisingEvents = false;
-                watcher.Changed -= OnFileChanged; // Unsubscribe from the event
-                watcher.Dispose(); // Dispose the watcher
-                watcher = null; // Clear the reference
-            }
-        }
     }
 
 }

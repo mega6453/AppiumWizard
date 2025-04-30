@@ -139,16 +139,11 @@ namespace Appium_Wizard
                 autoScrollCheckBox.Location = new Point(checkBoxX, checkBoxY);
                 showLogsCheckBox.Location = new Point(checkBoxX - 150, checkBoxY);
                 ToolTip toolTip = new ToolTip();
-                toolTip.SetToolTip(showLogsCheckBox, "Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
+                toolTip.SetToolTip(showLogsCheckBox, "In case if there's an UI lagging issue, uncheck this checkbox.");
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
-        DateTime lastWriteTime1 = new DateTime();
-        DateTime lastWriteTime2 = new DateTime();
-        DateTime lastWriteTime3 = new DateTime();
-        DateTime lastWriteTime4 = new DateTime();
-        DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
             try
@@ -178,50 +173,6 @@ namespace Appium_Wizard
             }
             GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
-
-        //public void UpdateRichTextbox(int tabNumber, string fileContent)
-        //{
-        //    try
-        //    {
-        //        if (checkBox2.Checked)
-        //        {
-        //            Action updateAction = () =>
-        //            {
-        //                string updatedContent = fileContent + "\n";
-        //                switch (tabNumber)
-        //                {
-        //                    case 1:
-        //                        if (richTextBox1.IsHandleCreated)
-        //                        richTextBox1.AppendText(updatedContent);
-        //                        break;
-        //                    case 2:
-        //                        if (richTextBox2.IsHandleCreated)
-        //                            richTextBox2.Text = updatedContent;
-        //                        break;
-        //                    case 3:
-        //                        if (richTextBox3.IsHandleCreated)
-        //                            richTextBox3.Text = updatedContent;
-        //                        break;
-        //                    case 4:
-        //                        if (richTextBox4.IsHandleCreated)
-        //                            richTextBox4.Text = updatedContent;
-        //                        break;
-        //                    case 5:
-        //                        if (richTextBox5.IsHandleCreated)
-        //                            richTextBox5.Text = updatedContent;
-        //                        break;
-        //                }
-        //            };
-
-        //            // Use BeginInvoke for asynchronous UI updates
-        //            BeginInvoke(updateAction);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
 
         public void UpdateRichTextbox(int tabNumber, string fileContent)
         {
@@ -258,12 +209,16 @@ namespace Appium_Wizard
                             // Append new content
                             targetRichTextBox.AppendText(updatedContent);
 
-                            // Check if the text length exceeds 100,000 characters
-                            const int maxLength = 100000;
-                            if (targetRichTextBox.TextLength > maxLength)
+                            // Check if the number of lines exceeds the maximum allowed
+                            const int maxLines = 1000; // Example: Limit to 1000 lines
+                            int currentLineCount = targetRichTextBox.Lines.Length;
+
+                            if (currentLineCount > maxLines)
                             {
-                                // Truncate the text to keep only the last 100,000 characters
-                                targetRichTextBox.Text = targetRichTextBox.Text.Substring(targetRichTextBox.TextLength - maxLength);
+                                // Truncate the text to keep only the last 1000 lines
+                                string[] lines = targetRichTextBox.Lines;
+                                string truncatedText = string.Join(Environment.NewLine, lines.Skip(currentLineCount - maxLines));
+                                targetRichTextBox.Text = truncatedText;
                             }
                         }
                     };
@@ -277,54 +232,6 @@ namespace Appium_Wizard
                 //MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            if (showLogsCheckBox.Checked)
-            {
-                for (int i = 1; i <= 5; i++)
-                {
-                    UpdateRichTextbox(i);
-                }
-            }
-        }
-
-        public void UpdateDeviceStatus()
-        {
-            listView1.Invoke((System.Windows.Forms.MethodInvoker)delegate
-            {
-                foreach (ListViewItem item in listView1.Items)
-                {
-                    string udidFromList = item.SubItems[4].Text;
-                    string OS = item.SubItems[2].Text;
-                    if (OS.Equals("Android"))
-                    {
-                        var connectedList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
-                        if (connectedList.Contains(udidFromList))
-                        {
-                            item.SubItems[3].Text = "Online";
-                        }
-                        else
-                        {
-                            item.SubItems[3].Text = "Offline";
-                        }
-                    }
-                    else
-                    {
-                        var connectedList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-                        if (connectedList.Contains(udidFromList))
-                        {
-                            item.SubItems[3].Text = "Online";
-                        }
-                        else
-                        {
-                            item.SubItems[3].Text = "Offline";
-                        }
-                    }
-                }
-            });
-        }
-
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {

@@ -2,6 +2,7 @@
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
+using System.Diagnostics.SymbolStore;
 using System.Reflection;
 
 namespace Appium_Wizard
@@ -328,46 +329,100 @@ namespace Appium_Wizard
 
         public void WebView_MouseUp(object sender, MouseEventArgs e)
         {
+            moveToX = e.Location.X;
+            moveToY = e.Location.Y;
             try
             {
-                moveToX = e.Location.X;
-                moveToY = e.Location.Y;
-                if (e.Button == MouseButtons.Left)
+                int swipeThreshold = 50; // Minimum distance in pixels to qualify as a swipe
+
+                // Calculate deltas
+                int deltaX = moveToX - pressX;
+                int deltaY = moveToY - pressY;
+
+                // Check if the movement qualifies as a swipe
+                if (Math.Abs(deltaX) < swipeThreshold && Math.Abs(deltaY) < swipeThreshold)
                 {
-                    TimeSpan pressDuration = DateTime.Now - pressStartTime;
-                    if (pressDuration.TotalMilliseconds < PressThresholdMilliseconds)
+                    if (isAndroid)
                     {
-                        //UpdateStatusLabel("Click - "+"x: "+pressX+" y: "+pressY);
-                        Console.WriteLine("Short press");
-                        if (OSType.Equals("Android"))
+                        AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                        GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                    }
+                    else
+                    {
+                        iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                        GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                    }
+                    return;
+                }
+
+                // Calculate screen-based swipe coordinates
+                int horizontalSwipeStartX = (int)(width * 0.1); // Start swipe at 10% of screen width
+                int horizontalSwipeEndX = (int)(width * 0.9);   // End swipe at 90% of screen width
+                int verticalSwipeStartY = (int)(height * 0.5);  // Start swipe at 50% of screen height
+                int verticalSwipeEndY = (int)(height * 0.9);    // End swipe at 90% of screen height
+                if (Math.Abs(deltaX) > Math.Abs(deltaY))
+                {
+                    int waitDuration = 100;
+                    if (deltaX > 0)
+                    {   // Swipe right
+                        if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
-                            GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                            AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
                         }
                         else
                         {
-                            iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
-                            GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                            iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
                         }
                     }
                     else
                     {
-                        //UpdateStatusLabel("Swipe - from: ("+ pressX+","+pressY+") to: ("+ moveToX + "," + moveToY + ")");
-                        Console.WriteLine("Press and hold");
-                        int waitDuration = 500;
-                        if (OSType.Equals("Android"))
+                        // Swipe left
+                        if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Swipe(udid, pressX, pressY, moveToX, moveToY, waitDuration);
-                            GoogleAnalytics.SendEvent("Press_Hold_Screen", "Android");
+                            AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
-                            GoogleAnalytics.SendEvent("Press_Hold_Screen", "iOS");
+                            iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
                         }
                     }
                 }
-
+                else
+                {
+                    int waitDuration = 1000;
+                    if (deltaY > 0)
+                    {
+                        // Swipe down
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                        }
+                    }
+                    else
+                    {
+                        // Swipe up
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                        }
+                    }
+                }
+                if (isAndroid)
+                {
+                    GoogleAnalytics.SendEvent("SwipeScreen", "Android");
+                }
+                else
+                {
+                    GoogleAnalytics.SendEvent("SwipeScreen", "iOS");
+                }
             }
             catch (Exception)
             {
@@ -895,7 +950,7 @@ namespace Appium_Wizard
             }
             else
             {
-                int startX = width/2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
+                int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
                 iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
             }
         }

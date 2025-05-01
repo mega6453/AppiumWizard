@@ -218,15 +218,8 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
+            screenControlButtons(true);
             GoogleAnalytics.SendEvent("LoadScreen");
-            BackToolStripButton.Enabled = true;
-            ControlCenterToolStripButton.Enabled = true;
-            HomeToolStripButton.Enabled = true;
-            ScreenshotToolStripButton.Enabled = true;
-            SettingsToolStripButton.Enabled = true;
-            MoreToolStripButton.Enabled = true;
-            RecordButton.Enabled = true;
-            objectSpyButton.Enabled = true;
         }
 
         public async void LoadDeviceDisconnected(string udid)
@@ -272,15 +265,21 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
+            screenControlButtons(false);
             GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
-            BackToolStripButton.Enabled = false;
-            ControlCenterToolStripButton.Enabled = false;
-            HomeToolStripButton.Enabled = false;
-            ScreenshotToolStripButton.Enabled = false;
-            SettingsToolStripButton.Enabled = false;
-            MoreToolStripButton.Enabled = false;
-            RecordButton.Enabled = false;
-            objectSpyButton.Enabled = false;
+        }
+
+        private void screenControlButtons(bool enable)
+        {
+            BackToolStripButton.Enabled = enable;
+            ControlCenterToolStripButton.Enabled = enable;
+            HomeToolStripButton.Enabled = enable;
+            ScreenshotToolStripButton.Enabled = enable;
+            SettingsToolStripButton.Enabled = enable;
+            MoreToolStripButton.Enabled = enable;
+            RecordButton.Enabled = enable;
+            objectSpyButton.Enabled = enable;
+            recentAppsToolStripButton.Enabled = enable;
         }
 
         private async void InitializeWebView()
@@ -435,12 +434,12 @@ namespace Appium_Wizard
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.SendText(URL, sessionId, text);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
+                GoogleAnalytics.SendEvent("SendKeys", "iOS");
             }
             else
             {
                 AndroidMethods.GetInstance().SendText(udid, text);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
+                GoogleAnalytics.SendEvent("SendKeys", "Android");
             }
         }
 

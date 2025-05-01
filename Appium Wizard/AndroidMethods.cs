@@ -6,6 +6,8 @@ using System.Management;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Windows.Media.Devices.Core;
+using static System.Windows.Forms.AxHost;
 
 namespace Appium_Wizard
 {
@@ -1051,6 +1053,32 @@ namespace Appium_Wizard
             {
                 return image;
             }
+        }
+
+        public async static void DragDrop(int port, int startX, int startY, int endX, int endY, int speed=1000)
+        {
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/appium/gestures/drag", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                string body = $@"{{""start"":{{""x"":{startX},""y"":{startY}}},""end"":{{""x"":{endX},""y"":{endY}}},""speed"":{speed}}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = await client.ExecuteAsync(request);
+            }
+            catch (Exception)
+            {
+            }            
         }
     }
 }

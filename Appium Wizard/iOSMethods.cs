@@ -413,35 +413,6 @@ namespace Appium_Wizard
                             {
                                 return sessionId;
                             }
-
-                            if (!sessionId.Equals("nosession"))
-                            {
-                                return sessionId;
-                            }
-                            else
-                            {
-                                return sessionId;
-                            }
-
-                            count = 6;
-                            //var progressLabelOriginalColor = progressLabel.ForeColor;
-                            while (sessionId.Equals("nosession") && IsWDARunningInAppsList(udid) && count <= 6 && count > 0)
-                            {
-                                int seconds = 5 * count;
-                                commonProgress.UpdateStepLabel("Open Device", "Please enter Passcode on your iPhone...This popup will close in " + seconds.ToString() + " seconds...");
-                                //progressLabel.Text = "Please enter Passcode on your iPhone...This popup will close in " + seconds.ToString() + " seconds...";
-                                //progressLabel.ForeColor = Color.Red;
-                                //progressLabel.Refresh();
-                                Thread.Sleep(5000);
-                                count--;
-                                //progressLabel.ForeColor = progressLabelOriginalColor;
-                                //progressLabel.Refresh();
-                                sessionId = IsWDARunning(port);
-                                if (sessionId.Equals("nosession"))
-                                {
-                                    sessionId = iOSAPIMethods.CreateWDASession(port);
-                                }
-                            }
                         }
                     }
                 }
@@ -1201,29 +1172,42 @@ namespace Appium_Wizard
 
         public string GetDeviceModel(string input)
         {
-            var filePath = FilesPath.AppleDeviceTypesFilePath;
-            var AppleDeviceTypesRawData = File.ReadAllText(filePath);
-            if (!AppleDeviceTypesRawData.Contains(input))
+            try
             {
-                var url = "https://gist.githubusercontent.com/adamawolf/3048717/raw/1ee7e1a93dff9416f6ff34dd36b0ffbad9b956e9/Apple_mobile_device_types.txt";
-                AppleDeviceTypesRawData = new WebClient().DownloadString(url);
+                var filePath = FilesPath.AppleDeviceTypesFilePath;
+                var AppleDeviceTypesRawData = File.ReadAllText(filePath);
+                if (!AppleDeviceTypesRawData.Contains(input))
+                {
+                    var options = new RestClientOptions("https://gist.githubusercontent.com")
+                    {
+                        Timeout = TimeSpan.FromMilliseconds(-1)
+                    };
+                    var client = new RestClient(options);
+                    var request = new RestRequest("/adamawolf/3048717/raw/005a1f8375bcae4d6f134b8194b05d8a23be9625/Apple_mobile_device_types.txt", Method.Get);
+                    RestResponse response = client.Execute(request);
+                    AppleDeviceTypesRawData = response.Content;
+                }
+                Dictionary<string, string> AppleDeviceTypes = new Dictionary<string, string>();
+                string model;
+                StringReader reader = new StringReader(AppleDeviceTypesRawData);
+                while ((model = reader.ReadLine()) != null)
+                {
+                    try
+                    {
+                        string[] value = model.Split(':');
+                        AppleDeviceTypes.Add(value[0].Trim(), value[1].Trim());
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                };
+                return AppleDeviceTypes[input].Trim();
             }
-            Dictionary<string, string> AppleDeviceTypes = new Dictionary<string, string>();
-            string model;
-            StringReader reader = new StringReader(AppleDeviceTypesRawData);
-            while ((model = reader.ReadLine()) != null)
+            catch (Exception)
             {
-                try
-                {
-                    string[] value = model.Split(':');
-                    AppleDeviceTypes.Add(value[0].Trim(), value[1].Trim());
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-            };
-            return AppleDeviceTypes[input].Trim();
+                return input;
+            }
         }
 
 
@@ -1986,7 +1970,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -2014,7 +1998,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -2043,7 +2027,7 @@ namespace Appium_Wizard
             int width, height;
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/window/size", Method.Get);
@@ -2081,7 +2065,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
@@ -2098,7 +2082,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
@@ -2115,7 +2099,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:"+proxyPort)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/unlock", Method.Post);
@@ -2160,7 +2144,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/sessions", Method.Get);
@@ -2184,7 +2168,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "", Method.Get);
@@ -2240,7 +2224,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
@@ -2255,7 +2239,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
@@ -2270,7 +2254,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                MaxTimeout = -1,
+                Timeout = TimeSpan.FromMilliseconds(-1)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/screenshot", Method.Get);
@@ -2295,7 +2279,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/screenshot", Method.Get);
@@ -2324,7 +2308,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
@@ -2359,7 +2343,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/wda/locked", Method.Get);
@@ -2392,7 +2376,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions(URL)
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);

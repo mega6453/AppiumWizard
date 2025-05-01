@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EnterPassword));
             PasswordTextbox = new TextBox();
-            CancelButton = new Button();
+            cancelButton = new Button();
             label2 = new Label();
             Unlock = new Button();
             NoteForiOSLabel = new Label();
@@ -43,16 +43,16 @@
             PasswordTextbox.Size = new Size(169, 23);
             PasswordTextbox.TabIndex = 1;
             // 
-            // CancelButton
+            // cancelButton
             // 
-            CancelButton.AutoSize = true;
-            CancelButton.Location = new Point(93, 90);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(75, 25);
-            CancelButton.TabIndex = 2;
-            CancelButton.Text = "Cancel";
-            CancelButton.UseVisualStyleBackColor = true;
-            CancelButton.Click += CancelButton_Click;
+            cancelButton.AutoSize = true;
+            cancelButton.Location = new Point(93, 90);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(75, 25);
+            cancelButton.TabIndex = 2;
+            cancelButton.Text = "Cancel";
+            cancelButton.UseVisualStyleBackColor = true;
+            cancelButton.Click += CancelButton_Click;
             // 
             // label2
             // 
@@ -94,7 +94,7 @@
             Controls.Add(NoteForiOSLabel);
             Controls.Add(Unlock);
             Controls.Add(label2);
-            Controls.Add(CancelButton);
+            Controls.Add(cancelButton);
             Controls.Add(PasswordTextbox);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -109,7 +109,7 @@
 
         #endregion
         private TextBox PasswordTextbox;
-        private Button CancelButton;
+        private Button cancelButton;
         private Label label2;
         private Button Unlock;
         private Label NoteForiOSLabel;

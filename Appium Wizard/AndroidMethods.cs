@@ -433,6 +433,11 @@ namespace Appium_Wizard
             ExecuteCommandWithCmd("-s " + udid + " shell cmd statusbar collapse");
         }
 
+        public void ShowRecentApps(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent KEYCODE_APP_SWITCH");
+        }
+
         public void UnlockScreen(string udid, string password)
         {
             ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82");

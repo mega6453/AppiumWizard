@@ -36,18 +36,19 @@
             toolStripSeparator1 = new ToolStripSeparator();
             HomeToolStripButton = new ToolStripButton();
             BackToolStripButton = new ToolStripButton();
+            recentAppsToolStripButton = new ToolStripButton();
             ControlCenterToolStripButton = new ToolStripButton();
             SettingsToolStripButton = new ToolStripButton();
             toolStripSeparator2 = new ToolStripSeparator();
+            RecordButton = new ToolStripButton();
             ScreenshotToolStripButton = new ToolStripButton();
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
-            RecordButton = new ToolStripButton();
+            toolStripSeparator4 = new ToolStripSeparator();
             objectSpyButton = new ToolStripButton();
             toolStrip2 = new ToolStrip();
             statusLabel = new ToolStripLabel();
-            toolStripSeparator4 = new ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             toolStrip2.SuspendLayout();
@@ -75,7 +76,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, HomeToolStripButton, BackToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -127,6 +128,16 @@
             BackToolStripButton.Size = new Size(28, 28);
             BackToolStripButton.Click += BackButton_Click;
             // 
+            // recentAppsToolStripButton
+            // 
+            recentAppsToolStripButton.Alignment = ToolStripItemAlignment.Right;
+            recentAppsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            recentAppsToolStripButton.Image = Properties.Resources.recentApps;
+            recentAppsToolStripButton.ImageTransparentColor = Color.Magenta;
+            recentAppsToolStripButton.Name = "recentAppsToolStripButton";
+            recentAppsToolStripButton.Size = new Size(28, 28);
+            recentAppsToolStripButton.Click += recentAppsToolStripButton_Click;
+            // 
             // ControlCenterToolStripButton
             // 
             ControlCenterToolStripButton.Alignment = ToolStripItemAlignment.Right;
@@ -155,6 +166,16 @@
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(6, 31);
             // 
+            // RecordButton
+            // 
+            RecordButton.Alignment = ToolStripItemAlignment.Right;
+            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            RecordButton.Image = Properties.Resources.record_button;
+            RecordButton.ImageTransparentColor = Color.Magenta;
+            RecordButton.Name = "RecordButton";
+            RecordButton.Size = new Size(28, 28);
+            RecordButton.Click += RecordButton_Click;
+            // 
             // ScreenshotToolStripButton
             // 
             ScreenshotToolStripButton.Alignment = ToolStripItemAlignment.Right;
@@ -178,7 +199,7 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(188, 30);
+            UnlockScreen.Size = new Size(149, 22);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -186,19 +207,15 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(188, 30);
+            manageAppsToolStripMenuItem.Size = new Size(149, 22);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
             // 
-            // RecordButton
+            // toolStripSeparator4
             // 
-            RecordButton.Alignment = ToolStripItemAlignment.Right;
-            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            RecordButton.Image = Properties.Resources.record_button;
-            RecordButton.ImageTransparentColor = Color.Magenta;
-            RecordButton.Name = "RecordButton";
-            RecordButton.Size = new Size(28, 28);
-            RecordButton.Click += RecordButton_Click;
+            toolStripSeparator4.Alignment = ToolStripItemAlignment.Right;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 31);
             // 
             // objectSpyButton
             // 
@@ -233,12 +250,6 @@
             statusLabel.Overflow = ToolStripItemOverflow.Never;
             statusLabel.Size = new Size(0, 22);
             statusLabel.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // toolStripSeparator4
-            // 
-            toolStripSeparator4.Alignment = ToolStripItemAlignment.Right;
-            toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(6, 31);
             // 
             // ScreenControl
             // 
@@ -291,5 +302,6 @@
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripButton objectSpyButton;
         private ToolStripSeparator toolStripSeparator4;
+        private ToolStripButton recentAppsToolStripButton;
     }
 }

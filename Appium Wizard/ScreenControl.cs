@@ -25,6 +25,7 @@ namespace Appium_Wizard
         string canvasFunctionID = string.Empty;
         string color = ColorTranslator.ToHtml(Color.Red);
         int lineWidth = 2;
+        bool isAndroid;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -90,6 +91,14 @@ namespace Appium_Wizard
                 }
             });
             udidScreenControl.Add(udid, this);
+            if (OSType.Equals("Android"))
+            {
+                isAndroid = true;
+            }
+            else
+            {
+                isAndroid = false;
+            }
         }
 
         public void UpdateStatusLabel(ScreenControl screenControl, string actualText)
@@ -874,8 +883,21 @@ namespace Appium_Wizard
 
         private void objectSpyButton_Click(object sender, EventArgs e)
         {
-            Object_Spy object_Spy = new Object_Spy(OSType,proxyPort,width,height);
+            Object_Spy object_Spy = new Object_Spy(OSType, proxyPort, width, height);
             object_Spy.Show();
+        }
+
+        private void recentAppsToolStripButton_Click(object sender, EventArgs e)
+        {
+            if (isAndroid)
+            {
+                AndroidMethods.GetInstance().ShowRecentApps(udid);
+            }
+            else
+            {
+                int startX = width/2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
+                iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
+            }
         }
     }
 }

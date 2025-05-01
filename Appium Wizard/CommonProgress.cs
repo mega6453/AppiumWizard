@@ -37,7 +37,10 @@ namespace Appium_Wizard
                     commonProgressLabel.ForeColor = Color.Black;
                     commonProgressLabel.Text = stepText;
                     commonProgressLabel.Refresh();
-                    progressBar1.Value = progressPercent;
+                    if (!title.Contains("Closing Appium Wizard"))
+                    {
+                        progressBar1.Value = progressPercent;
+                    }
                 });
             }
             else
@@ -46,7 +49,10 @@ namespace Appium_Wizard
                 commonProgressLabel.ForeColor = Color.Black;
                 commonProgressLabel.Text = stepText;
                 commonProgressLabel.Refresh();
-                progressBar1.Value = progressPercent;
+                if (!title.Contains("Closing Appium Wizard"))
+                {
+                    progressBar1.Value = progressPercent;
+                }
             }
         }
 

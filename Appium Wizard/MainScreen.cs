@@ -1865,7 +1865,7 @@ namespace Appium_Wizard
                 CommonProgress commonProgress = new CommonProgress();
                 commonProgress.Owner = this;
                 commonProgress.Show();
-                commonProgress.UpdateStepLabel("Exiting", "Please wait while closing all resources and exiting...");
+                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Please wait while closing all resources and exiting...");
                 List<Form> childFormsToClose = new List<Form>();
                 foreach (var item in runningProcesses)
                 {

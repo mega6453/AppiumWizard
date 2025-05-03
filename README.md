@@ -1,6 +1,8 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mega6453/AppiumWizard/total)
 ![GitHub Release](https://img.shields.io/github/v/release/mega6453/AppiumWizard)
 ![GitHub Repo stars](https://img.shields.io/github/stars/mega6453/AppiumWizard)
+![License: MIT/GPL-3.0](https://img.shields.io/badge/license-MIT%2FGPL--3.0-blue)
+
 
 <p align="center">
   <img src="logo.jpg" alt="Appium Wizard Logo">
@@ -90,6 +92,7 @@ to install it during the first time launch which may take sometime to complete i
 * Innosetup
 
 ## Thanks To
+* [Appium](https://github.com/appium) - Without Appium, there's no Appium Wizard.
 * [danielpaulus](https://github.com/danielpaulus) - For iOS device features in windows.
 * [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS device features in windows. 
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 

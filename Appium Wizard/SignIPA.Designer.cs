@@ -32,7 +32,7 @@
             profilesListComboBox = new ComboBox();
             selectProfileLabel = new Label();
             SignButton = new Button();
-            CancelButton = new Button();
+            cancelButton = new Button();
             OutputPathTextBox = new TextBox();
             OutputPathButton = new Button();
             label5 = new Label();
@@ -81,17 +81,17 @@
             SignButton.UseVisualStyleBackColor = true;
             SignButton.Click += SignButton_Click;
             // 
-            // CancelButton
+            // cancelButton
             // 
-            CancelButton.AutoSize = true;
-            CancelButton.Location = new Point(182, 303);
-            CancelButton.Margin = new Padding(2);
-            CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(78, 25);
-            CancelButton.TabIndex = 28;
-            CancelButton.Text = "Cancel";
-            CancelButton.UseVisualStyleBackColor = true;
-            CancelButton.Click += CancelButton_Click;
+            cancelButton.AutoSize = true;
+            cancelButton.Location = new Point(182, 303);
+            cancelButton.Margin = new Padding(2);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(78, 25);
+            cancelButton.TabIndex = 28;
+            cancelButton.Text = "Cancel";
+            cancelButton.UseVisualStyleBackColor = true;
+            cancelButton.Click += CancelButton_Click;
             // 
             // OutputPathTextBox
             // 
@@ -254,7 +254,7 @@
             Controls.Add(IPAFileButton);
             Controls.Add(label4);
             Controls.Add(SignButton);
-            Controls.Add(CancelButton);
+            Controls.Add(cancelButton);
             Controls.Add(profilesListComboBox);
             Controls.Add(selectProfileLabel);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -277,7 +277,7 @@
         private ComboBox profilesListComboBox;
         private Label selectProfileLabel;
         private Button SignButton;
-        private Button CancelButton;
+        private Button cancelButton;
         private TextBox OutputPathTextBox;
         private Button OutputPathButton;
         private Label label5;

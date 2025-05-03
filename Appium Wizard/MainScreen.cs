@@ -142,11 +142,6 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
-        DateTime lastWriteTime1 = new DateTime();
-        DateTime lastWriteTime2 = new DateTime();
-        DateTime lastWriteTime3 = new DateTime();
-        DateTime lastWriteTime4 = new DateTime();
-        DateTime lastWriteTime5 = new DateTime();
         private void MainScreen_Shown(object sender, EventArgs e)
         {
             try

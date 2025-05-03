@@ -199,7 +199,7 @@ namespace Appium_Wizard
 
 
 
-        private async void FetchScreen()
+        private async Task FetchScreen()
         {
             string messageTitle = "Object Spy - BETA";
             CommonProgress commonProgress = new CommonProgress();
@@ -464,7 +464,7 @@ namespace Appium_Wizard
         private async void refreshButton_Click(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("Object_Spy_Refresh", os);
-            FetchScreen();
+            await FetchScreen();
         }
 
         private List<TreeNode> matchingNodes = new List<TreeNode>();

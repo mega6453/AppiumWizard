@@ -1051,7 +1051,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("https://api.github.com")
                 {
-                    MaxTimeout = -1,
+                    Timeout = TimeSpan.FromMilliseconds(-1)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/repos/mega6453/AppiumWizard/releases/latest", Method.Get);

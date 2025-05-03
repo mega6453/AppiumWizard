@@ -610,7 +610,10 @@ namespace Appium_Wizard
             if (currentWriteTime != lastWriteTime)
             {
                 lastWriteTime = currentWriteTime;
-                MainScreen.main.UpdateRichTextbox(tabNumber);
+                if (MainScreen.main != null)
+                {
+                    MainScreen.main.UpdateRichTextbox(tabNumber);
+                }
                 // Add your custom logic here (e.g., update UI, process file, etc.)
             }
         }

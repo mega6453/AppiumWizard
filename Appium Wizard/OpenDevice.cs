@@ -60,9 +60,8 @@ namespace Appium_Wizard
             }
             if (isScreenServerStarted)
             {
-                commonProgress.UpdateStepLabel(title, "Screen server started...", 100);
-                commonProgress.Close();
-                await ExecuteBackgroundMethod2();
+                commonProgress.UpdateStepLabel(title, "Screen server started...", 90);               
+                ExecuteBackgroundMethod2(commonProgress);
             }
             else
             {
@@ -105,7 +104,7 @@ namespace Appium_Wizard
                         proxyPort = Common.GetFreePort();
                         screenServerPort = Common.GetFreePort();
                     }
-                    commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 50);
+                    commonProgress.UpdateStepLabel(title, "Starting iOS Proxy Server...", 10);
                     if (connectionType.Equals("Wi-Fi"))
                     {
                         Logger.Info("connectionType.Equals(\"Wi-Fi\"), Start Go-iOS Proxy server");
@@ -117,6 +116,7 @@ namespace Appium_Wizard
                         Logger.Info("connectionType NOT Equals(\"Wi-Fi\"), Start iProxy server");
                         iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                     }
+                    commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent already running...", 15);
                     WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
                     if (!WDAsessionId.Equals("nosession"))
                     {
@@ -127,13 +127,13 @@ namespace Appium_Wizard
                             width = screenSize.Item1;
                             height = screenSize.Item2;
                         }
-                        commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                        commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                         isScreenServerStarted = true;
                     }
                     else
                     {
                         bool wdaCheck = false; bool profileCheck = false;
-                        commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...", 10);
+                        commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent installed...", 20);
                         bool isInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
                         if (usePreInstalledWDA)
                         {
@@ -155,7 +155,7 @@ namespace Appium_Wizard
                             //commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
                             wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
                             Logger.Info("isLatestVersionWDAInstalled:"+wdaCheck);
-                            commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign WDA...", 15);
+                            commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign WDA...", 25);
                             profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
                             if (isInstalled && !wdaCheck && !profileCheck) // WDA installed but not latest version and profile not available to sign.
                             {
@@ -172,11 +172,11 @@ namespace Appium_Wizard
                             {
                                 if (usePreInstalledWDA)
                                 {
-                                    commonProgress.UpdateStepLabel(title, "No Pre-Installed WDA(" + MainScreen.UDIDPreInstalledWDA[udid] + ")found. Please wait, while installing WDA...", 20);
+                                    commonProgress.UpdateStepLabel(title, "No Pre-Installed WDA(" + MainScreen.UDIDPreInstalledWDA[udid] + ")found. Please wait, while installing WDA...", 35);
                                 }
                                 else
                                 {
-                                    commonProgress.UpdateStepLabel(title, "Installing WebDriverAgent. Please wait, this may take some time...", 20);
+                                    commonProgress.UpdateStepLabel(title, "Please wait while installing WebDriverAgent, this may take some time...", 35);
                                 }
                                 installedNow = iOSMethods.GetInstance().InstallWDA(udid);
                             }
@@ -194,7 +194,7 @@ namespace Appium_Wizard
                                 var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
                                 width = screenSize.Item1;
                                 height = screenSize.Item2;
-                                commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                                commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                                 isScreenServerStarted = true;
                                 keyValuePairs.Add("proxyPort", proxyPort);
                                 keyValuePairs.Add("screenPort", screenServerPort);
@@ -228,8 +228,8 @@ namespace Appium_Wizard
                                 if (deviceVersion >= version17Plus)
                                 {
                                     Logger.Info("device version >= 17.0.0 , so creating tunnel");
-                                    //commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 35);
-                                    bool isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo();
+                                    commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 50);
+                                    bool isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo(false);
                                     if (isTunnelStarted)
                                     {
                                         Logger.Info("tunnel started");
@@ -265,7 +265,7 @@ namespace Appium_Wizard
                                         }
                                     }
                                 }
-                                commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 40);
+                                commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
                                 if (deviceVersion >= version17Plus)
                                 {
@@ -326,7 +326,7 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unhandled Exception - Try launching Webdriveragent manually and try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    MessageBox.Show("Unhandled Exception - Try launching WebDriverAgent manually and try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (!WDAsessionId.Equals("nosession"))
@@ -336,7 +336,7 @@ namespace Appium_Wizard
                                     var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
                                     width = screenSize.Item1;
                                     height = screenSize.Item2;
-                                    commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                                    commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                                     isScreenServerStarted = true;
                                     keyValuePairs.Add("proxyPort", proxyPort);
                                     keyValuePairs.Add("screenPort", screenServerPort);
@@ -501,7 +501,7 @@ namespace Appium_Wizard
                     }
                     if (isScreenServerStarted)
                     {
-                        commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 95);
+                        commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                         if (!deviceDetails.ContainsKey(udid))
                         {
                             keyValuePairs.Add("proxyPort", proxyPort);
@@ -519,7 +519,7 @@ namespace Appium_Wizard
         }
 
 
-        private async Task ExecuteBackgroundMethod2()
+        private async void ExecuteBackgroundMethod2(CommonProgress commonProgress)
         {
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
@@ -531,6 +531,10 @@ namespace Appium_Wizard
                 screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort);
             }
             screenForm.Name = udid;
+            commonProgress.UpdateStepLabel(title, "Loading the screen...", 95);
+            await screenForm.SetupScreenSharing();
+            commonProgress.UpdateStepLabel(title, "Screen sharing started...", 100);
+            commonProgress.Close();
             screenForm.Show();
         }
     }

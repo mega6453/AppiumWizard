@@ -80,15 +80,19 @@ namespace Appium_Wizard
                     {
                         foreach (string provisioningFile in provisioningFiles)
                         {
-                            string directoryPath = Path.GetDirectoryName(provisioningFile);
+                            string directoryPath = Path.GetDirectoryName(provisioningFile) ?? "empty";
+                            if (directoryPath.Equals("empty"))
+                            {
+                                continue;
+                            }
                             string expiryDateFromPem = ImportProfile.GetExpirationDateFromPemFile(directoryPath + "\\certificate.pem");
                             int expirationDaysFromPem = ImportProfile.ExpirationDays(expiryDateFromPem);
 
                             var provisionDetails = ImportProfile.GetDetailsFromProvisionFile(provisioningFile);
-                            string profileName = provisionDetails["Name"].ToString();
-                            int expirationDaysFromProvisionFile = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString());
-                            string appId = provisionDetails["application-identifier"].ToString();
-                            string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
+                            string profileName = provisionDetails["Name"].ToString() ?? "emptyProfileName";
+                            int expirationDaysFromProvisionFile = ImportProfile.ExpirationDays(provisionDetails["ExpirationDate"].ToString() ?? "emptyExpirationDate");
+                            string appId = provisionDetails["application-identifier"].ToString() ?? "emptyAppId";
+                            string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString() ?? "emptyTeamId";
                             string updatedExpirationDays = string.Empty;
                             try
                             {

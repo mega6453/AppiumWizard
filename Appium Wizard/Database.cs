@@ -174,11 +174,11 @@ namespace Appium_Wizard
                     {
                         while (reader.Read())
                         {
-                            string port1Value = string.IsNullOrEmpty(reader["PortNumber1"]?.ToString()) ? "0" : reader["PortNumber1"].ToString();
-                            string port2Value = string.IsNullOrEmpty(reader["PortNumber2"]?.ToString()) ? "0" : reader["PortNumber2"].ToString();
-                            string port3Value = string.IsNullOrEmpty(reader["PortNumber3"]?.ToString()) ? "0" : reader["PortNumber3"].ToString();
-                            string port4Value = string.IsNullOrEmpty(reader["PortNumber4"]?.ToString()) ? "0" : reader["PortNumber4"].ToString();
-                            string port5Value = string.IsNullOrEmpty(reader["PortNumber5"]?.ToString()) ? "0" : reader["PortNumber5"].ToString();
+                            string port1Value = reader["PortNumber1"]?.ToString() ?? "0";
+                            string port2Value = reader["PortNumber2"]?.ToString() ?? "0";
+                            string port3Value = reader["PortNumber3"]?.ToString() ?? "0";
+                            string port4Value = reader["PortNumber4"]?.ToString() ?? "0";
+                            string port5Value = reader["PortNumber5"]?.ToString() ?? "0";
 
                             result["PortNumber1"] = port1Value;
                             result["PortNumber2"] = port2Value;
@@ -514,7 +514,7 @@ namespace Appium_Wizard
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
                                 string columnName = reader.GetName(i);
-                                string? columnValue = reader.IsDBNull(i) ? null : reader.GetString(i);
+                                string columnValue = reader.IsDBNull(i) ? "" : reader.GetString(i);
                                 output[columnName] = columnValue;
                             }
                         }

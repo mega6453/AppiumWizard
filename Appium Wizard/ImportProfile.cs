@@ -114,15 +114,15 @@ namespace Appium_Wizard
                         });
                         string expiryDateFromPem = GetExpirationDateFromPemFile(folderPath + "certificate.pem");
                         int expirationDaysFromPem = ExpirationDays(expiryDateFromPem);
-                        string profileName = provisionDetails["Name"].ToString();
-                        string expiryDateFromProvision = provisionDetails["ExpirationDate"].ToString();
+                        string profileName = provisionDetails["Name"].ToString() ?? "emptyProfileName";
+                        string expiryDateFromProvision = provisionDetails["ExpirationDate"].ToString() ?? "emptyExpirationDate";
                         DateTimeOffset dateTimeOffset = DateTimeOffset.Parse(expiryDateFromProvision);
                         DateTime dateTimeInUtc = dateTimeOffset.UtcDateTime;
                         string expiryDateFromProvisionInGMT = dateTimeInUtc.ToString("MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
 
                         int expirationDaysFromProvisionFile = ExpirationDays(expiryDateFromProvision);
-                        string appId = provisionDetails["application-identifier"].ToString();
-                        string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString();
+                        string appId = provisionDetails["application-identifier"].ToString() ?? "emptyAppId";
+                        string teamId = provisionDetails["com.apple.developer.team-identifier"].ToString() ?? "emptyTeamId";
 
                         if (expirationDaysFromPem <= 0 & expirationDaysFromProvisionFile <= 0)
                         {

@@ -566,16 +566,20 @@ namespace Appium_Wizard
             return SignIPA(profilePath, IPAFilePath, outputPath, commonProgress, message, newBundleId, newBundleName, newBundleVersion);
         }
 
-        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress = null, string message = "", string newBundleId = "", string newBundleName = "", string newBundleVersion = "")
+        private string SignIPA(string profilePath, string IPAFilePath, string outputPath, CommonProgress commonProgress, string message = "", string newBundleId = "", string newBundleName = "", string newBundleVersion = "")
         {
             try
             {
                 string[] pemFiles = Directory.GetFiles(profilePath, "*.pem");
                 string[] mobileprovisionFiles = Directory.GetFiles(profilePath, "*.mobileprovision");
-                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : null;
-                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : null;
+                string pemFileName = pemFiles.Length > 0 ? Path.GetFileName(pemFiles[0]) : "empty";
+                string mobileprovisionFileName = mobileprovisionFiles.Length > 0 ? Path.GetFileName(mobileprovisionFiles[0]) : "empty";
 
-                // Construct the zsign command with optional parameters
+                if (pemFileName.Equals("empty") | mobileprovisionFileName.Equals("empty"))
+                {
+                    return "Sign_IPA_Failed";
+                }
+
                 string zsignCommand = $"zsign -k \"{pemFileName}\" -m \"{mobileprovisionFileName}\"";
 
                 if (!string.IsNullOrEmpty(newBundleId))
@@ -643,7 +647,7 @@ namespace Appium_Wizard
             }
         }
 
-        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
+        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress, string message = "")
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
@@ -678,7 +682,7 @@ namespace Appium_Wizard
             }
         }
 
-        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress = null, string message = null)
+        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e, CommonProgress commonProgress, string message = "")
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
@@ -774,7 +778,6 @@ namespace Appium_Wizard
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
                 RestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
                 if (response.Content != null)
                 {
                     if (response.Content.Contains("WebDriverAgent is ready to accept commands"))

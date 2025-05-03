@@ -1005,11 +1005,13 @@ namespace Appium_Wizard
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);
                 RestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
-                using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                if (response.Content != null)
                 {
-                    JsonElement root = doc.RootElement;
-                    value = root.GetProperty("value").GetString();
+                    using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                    {
+                        JsonElement root = doc.RootElement;
+                        value = root.GetProperty("value").GetString() ?? "empty";
+                    }
                 }
                 return value;
             }

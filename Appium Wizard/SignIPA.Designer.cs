@@ -261,11 +261,9 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(2);
             MaximizeBox = false;
-            MinimizeBox = false;
             Name = "SignIPA";
-            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Sign IPA";
+            Text = "IPA Signer";
             Load += SignIPA_Load;
             Shown += SignIPA_Shown;
             ResumeLayout(false);

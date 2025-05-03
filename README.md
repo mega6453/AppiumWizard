@@ -1,7 +1,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mega6453/AppiumWizard/total)
 ![GitHub Release](https://img.shields.io/github/v/release/mega6453/AppiumWizard)
-![GitHub Repo stars](https://img.shields.io/github/stars/mega6453/AppiumWizard)
 ![License: MIT/GPL-3.0](https://img.shields.io/badge/license-MIT%2FGPL--3.0-blue)
+![GitHub Repo stars](https://img.shields.io/github/stars/mega6453/AppiumWizard?style=plastic&color=green)
 
 
 <p align="center">

@@ -108,28 +108,17 @@ namespace Appium_Wizard
             {
                 BeginInvoke(new Action(() =>
                 {
-                    string truncatedText = string.Empty;
-                    if (actualText.Length > 45)
-                    {
-                        truncatedText = actualText.Substring(0, 45) + "...";
-                        screenControl.statusLabel.Text = truncatedText;
-                    }
-                    else
-                    {
-                        screenControl.statusLabel.Text = actualText;
-                    }
-                    screenControl.statusLabel.ToolTipText = actualText;
-                    screenControl.toolStrip2.Refresh();
-
+                    toolStripStatusLabel.Text = actualText;
+                    toolStripStatusLabel.ToolTipText = actualText;
                 }));
-
             }
             catch (Exception)
             {
             }
         }
 
-        private void ScreenControl_Load(object sender, EventArgs e)
+
+        public async Task SetupScreenSharing()
         {
             if (MainScreen.alwaysOnTop)
             {
@@ -141,73 +130,78 @@ namespace Appium_Wizard
             }
             AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
 
-            this.ClientSize = new Size(width, height + toolStrip1.Height + toolStrip2.Height);
+            this.ClientSize = new Size(width, height + toolStrip1.Height + statusStrip1.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.Text = deviceName;
+            this.Text = deviceName+"[v"+OSVersion+"]";
             InitializeWebView();
             if (OSType.Equals("iOS"))
             {
                 BackToolStripButton.Visible = false;
             }
             toolStrip1.Refresh();
-            toolStrip2.Refresh();
+            statusStrip1.Refresh();
             Activate();
-            LoadScreen(udid, screenPort);
+
+            // Await the asynchronous LoadScreen method
+            await LoadScreen(udid, screenPort);
         }
 
-        public async void LoadScreen(string udid, int screenPort)
+        public async Task LoadScreen(string udid, int screenPort)
         {
-            //ScreenWebView = webview2[udid];
-            //if (!ScreenWebView.Equals(webview2[udid]))
-            //{
-            //    ScreenWebView = webview2[udid];
-            //}
-
             ScreenWebView = webview2[udid];
             if (Controls.Contains(ScreenWebView))
             {
                 Controls.Remove(ScreenWebView);
                 ScreenWebView = new WebView2();
-                //Controls.Add(ScreenWebView);
                 InitializeWebView();
-                if (!webview2.ContainsKey(udid))
-                {
-                    webview2.Add(udid, ScreenWebView);
-                }
-                else
-                {
-                    webview2[udid] = ScreenWebView;
-                }
+                webview2[udid] = ScreenWebView;
             }
-            string imageUrl = "http://" + IPAddress + ":" + screenPort;
+
+            string imageUrl = $"http://{IPAddress}:{screenPort}";
             int imageWidth = width;
             int imageHeight = height;
             var htmlContent = $@"
-                                <html>
-                                    <head>
-                                        <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate' />
-                                        <meta http-equiv='pragma' content='no-cache' />
-                                        <meta http-equiv='expires' content='0' />
-                                        <style>
-                                            body {{
-                                                margin: 0;
-                                                padding: 0;
-                                            }}
-                                            img {{
-                                                display: block;
-                                                max-width: 100%;
-                                                height: auto;
-                                                margin: 0;
-                                                padding: 0;
-                                            }}
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
-                                    </body>
-                                </html>
-                            ";
+                        <html>
+                            <head>
+                                <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate' />
+                                <meta http-equiv='pragma' content='no-cache' />
+                                <meta http-equiv='expires' content='0' />
+                                <style>
+                                    body {{
+                                        margin: 0;
+                                        padding: 0;
+                                    }}
+                                    img {{
+                                        display: block;
+                                        max-width: 100%;
+                                        height: auto;
+                                        margin: 0;
+                                        padding: 0;
+                                    }}
+                                </style>
+                            </head>
+                            <body>
+                                <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
+                            </body>
+                        </html>
+                    ";
+
             await ScreenWebView.EnsureCoreWebView2Async();
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            ScreenWebView.CoreWebView2.NavigationCompleted += (sender, args) =>
+            {
+                if (args.IsSuccess)
+                {
+                    tcs.TrySetResult(true);
+                }
+                else
+                {
+                    tcs.TrySetException(new Exception($"Navigation failed with error code {args.WebErrorStatus}"));
+                }
+            };
+
             try
             {
                 ScreenWebView.NavigateToString(htmlContent);
@@ -218,6 +212,16 @@ namespace Appium_Wizard
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
             }
+            try
+            {
+                await tcs.Task; // Wait for navigation to complete
+            }
+            catch (Exception)
+            {
+                screenControlButtons(false); 
+                return; 
+            }
+
             screenControlButtons(true);
             GoogleAnalytics.SendEvent("LoadScreen");
         }
@@ -304,7 +308,7 @@ namespace Appium_Wizard
         private void SetWebViewSize(int width, int height)
         {
             ScreenWebView.Width = width;
-            ScreenWebView.Height = height + toolStrip1.Height + toolStrip2.Height;
+            ScreenWebView.Height = height + toolStrip1.Height + statusStrip1.Height;
         }
 
         private void GetMouseCoordinate(object sender, MouseEventArgs e)

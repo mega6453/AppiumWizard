@@ -34,8 +34,8 @@
             AlwaysOnTopToolStripButton = new ToolStripButton();
             toolStripSeparator3 = new ToolStripSeparator();
             toolStripSeparator1 = new ToolStripSeparator();
-            HomeToolStripButton = new ToolStripButton();
             BackToolStripButton = new ToolStripButton();
+            HomeToolStripButton = new ToolStripButton();
             recentAppsToolStripButton = new ToolStripButton();
             ControlCenterToolStripButton = new ToolStripButton();
             SettingsToolStripButton = new ToolStripButton();
@@ -47,11 +47,11 @@
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
             objectSpyButton = new ToolStripButton();
-            toolStrip2 = new ToolStrip();
-            statusLabel = new ToolStripLabel();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
-            toolStrip2.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // ScreenWebView
@@ -107,6 +107,16 @@
             toolStripSeparator1.Name = "toolStripSeparator1";
             toolStripSeparator1.Size = new Size(6, 31);
             // 
+            // BackToolStripButton
+            // 
+            BackToolStripButton.Alignment = ToolStripItemAlignment.Right;
+            BackToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            BackToolStripButton.Image = Properties.Resources.left_arrow;
+            BackToolStripButton.ImageTransparentColor = Color.Magenta;
+            BackToolStripButton.Name = "BackToolStripButton";
+            BackToolStripButton.Size = new Size(28, 28);
+            BackToolStripButton.Click += BackButton_Click;
+            // 
             // HomeToolStripButton
             // 
             HomeToolStripButton.Alignment = ToolStripItemAlignment.Right;
@@ -117,16 +127,6 @@
             HomeToolStripButton.Name = "HomeToolStripButton";
             HomeToolStripButton.Size = new Size(28, 28);
             HomeToolStripButton.Click += HomeButton_Click;
-            // 
-            // BackToolStripButton
-            // 
-            BackToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            BackToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            BackToolStripButton.Image = Properties.Resources.left_arrow;
-            BackToolStripButton.ImageTransparentColor = Color.Magenta;
-            BackToolStripButton.Name = "BackToolStripButton";
-            BackToolStripButton.Size = new Size(28, 28);
-            BackToolStripButton.Click += BackButton_Click;
             // 
             // recentAppsToolStripButton
             // 
@@ -227,36 +227,34 @@
             objectSpyButton.Size = new Size(28, 28);
             objectSpyButton.Click += objectSpyButton_Click;
             // 
-            // toolStrip2
+            // statusStrip1
             // 
-            toolStrip2.Dock = DockStyle.Bottom;
-            toolStrip2.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip2.ImageScalingSize = new Size(24, 24);
-            toolStrip2.Items.AddRange(new ToolStripItem[] { statusLabel });
-            toolStrip2.Location = new Point(0, 321);
-            toolStrip2.Name = "toolStrip2";
-            toolStrip2.RenderMode = ToolStripRenderMode.System;
-            toolStrip2.Size = new Size(398, 25);
-            toolStrip2.TabIndex = 2;
-            toolStrip2.TabStop = true;
-            toolStrip2.Text = "toolStrip2";
+            statusStrip1.BackColor = SystemColors.Control;
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
+            statusStrip1.Location = new Point(0, 324);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.ShowItemToolTips = true;
+            statusStrip1.Size = new Size(398, 22);
+            statusStrip1.TabIndex = 3;
+            statusStrip1.Text = "statusStrip1";
             // 
-            // statusLabel
+            // toolStripStatusLabel
             // 
-            statusLabel.BackgroundImageLayout = ImageLayout.None;
-            statusLabel.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            statusLabel.Font = new Font("Arial Narrow", 9F);
-            statusLabel.Name = "statusLabel";
-            statusLabel.Overflow = ToolStripItemOverflow.Never;
-            statusLabel.Size = new Size(0, 22);
-            statusLabel.TextAlign = ContentAlignment.MiddleLeft;
+            toolStripStatusLabel.AutoToolTip = true;
+            toolStripStatusLabel.BackColor = Color.Transparent;
+            toolStripStatusLabel.BorderStyle = Border3DStyle.Adjust;
+            toolStripStatusLabel.Font = new Font("Arial Narrow", 8F);
+            toolStripStatusLabel.Name = "toolStripStatusLabel";
+            toolStripStatusLabel.Size = new Size(352, 17);
+            toolStripStatusLabel.Spring = true;
+            toolStripStatusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // ScreenControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(398, 377);
-            Controls.Add(toolStrip2);
+            Controls.Add(statusStrip1);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -268,13 +266,12 @@
             Text = "ScreenControl";
             FormClosing += ScreenControl_FormClosing;
             FormClosed += ScreenControl_FormClosed;
-            Load += ScreenControl_Load;
             Shown += ScreenControl_Shown;
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).EndInit();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
-            toolStrip2.ResumeLayout(false);
-            toolStrip2.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -286,8 +283,6 @@
         private ToolStripButton HomeToolStripButton;
         private ToolStripButton AlwaysOnTopToolStripButton;
         private ToolStripButton ControlCenterToolStripButton;
-        private ToolStrip toolStrip2;
-        private ToolStripLabel statusLabel;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripButton BackToolStripButton;
         private ToolStripDropDownButton toolStripDropDownButton1;
@@ -303,5 +298,7 @@
         private ToolStripButton objectSpyButton;
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripButton recentAppsToolStripButton;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel;
     }
 }

@@ -4,6 +4,8 @@ using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Appium_Wizard
 {
@@ -132,7 +134,7 @@ namespace Appium_Wizard
 
             this.ClientSize = new Size(width, height + toolStrip1.Height + statusStrip1.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.Text = deviceName+"[v"+OSVersion+"]";
+            this.Text = deviceName + "[v" + OSVersion + "]";
             InitializeWebView();
             if (OSType.Equals("iOS"))
             {
@@ -218,8 +220,8 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-                screenControlButtons(false); 
-                return; 
+                screenControlButtons(false);
+                return;
             }
 
             screenControlButtons(true);

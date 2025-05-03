@@ -9,13 +9,13 @@ namespace Appium_Wizard
 {
     public partial class MainScreen : Form
     {
-        string udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
-        public static MainScreen main;
-        string selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceModel, selectedDeviceConnection, selectedDeviceCapability;
+        string? udid, DeviceName, OSVersion, OSType, selectedUDID, Model, screenWidth, screenHeight;
+        public static MainScreen? main;
+        string? selectedDeviceName, selectedOS, selectedDeviceStatus, selectedDeviceVersion, selectedDeviceIP, selectedDeviceModel, selectedDeviceConnection, selectedDeviceCapability;
         public static List<int> runningProcesses = new List<int>();
         public static List<int> runningProcessesPortNumbers = new List<int>();
         private int labelStartPosition; bool isUpdateAvailable;
-        string latestVersion;
+        string? latestVersion;
         Dictionary<string, string> releaseInfo = new Dictionary<string, string>();
         public static Dictionary<string, Tuple<string, string>> DeviceInfo = new Dictionary<string, Tuple<string, string>>();
         public static Dictionary<string, int> udidProxyPort = new Dictionary<string, int>();
@@ -1542,7 +1542,7 @@ namespace Appium_Wizard
             }
         }
 
-        private SignIPA signIPA;
+        private SignIPA? signIPA;
         private async void signIPAToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (signIPA == null || signIPA.IsDisposed)

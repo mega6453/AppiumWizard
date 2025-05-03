@@ -7,25 +7,25 @@
             InitializeComponent();
             var result = Database.QueryDataFromNotificationsTable();
 
-            if (result.TryGetValue("DeviceConnected", out string deviceConnectedValue))
+            if (result.TryGetValue("DeviceConnected", out string? deviceConnectedValue))
             {
                 deviceConnectedEnableRadioButton.Checked = deviceConnectedValue == "Enable";
                 deviceConnectedDisableRadioButton.Checked = deviceConnectedValue == "Disable";
             }
 
-            if (result.TryGetValue("DeviceDisconnected", out string deviceDisconnectedValue))
+            if (result.TryGetValue("DeviceDisconnected", out string? deviceDisconnectedValue))
             {
                 DeviceDisconnectedEnableRadioButton.Checked = deviceDisconnectedValue == "Enable";
                 DeviceDisconnectedDisableRadioButton.Checked = deviceDisconnectedValue == "Disable";
             }
 
-            if (result.TryGetValue("Screenshot", out string screenshotValue))
+            if (result.TryGetValue("Screenshot", out string? screenshotValue))
             {
                 ScreenshotEnableRadioButton.Checked = screenshotValue == "Enable";
                 ScreenshotDisableRadioButton.Checked = screenshotValue == "Disable";
             }
 
-            if (result.TryGetValue("ScreenRecording", out string screenRecordingValue))
+            if (result.TryGetValue("ScreenRecording", out string? screenRecordingValue))
             {
                 ScreenRecordingEnableRadioButton.Checked = screenRecordingValue == "Enable";
                 ScreenRecordingDisableRadioButton.Checked = screenRecordingValue == "Disable";

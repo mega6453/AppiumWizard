@@ -1,5 +1,6 @@
 ﻿using Appium_Wizard.Properties;
 using Newtonsoft.Json;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Diagnostics;
 using System.Reflection;
 using File = System.IO.File;
@@ -169,6 +170,10 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
+            for (int i = 1; i <= 5; i++)
+            {
+                UpdateRichTextbox(i);
+            }
             GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
@@ -223,42 +228,6 @@ namespace Appium_Wizard
                     UpdateRichTextbox(i);
                 }
             }
-        }
-
-        public void UpdateDeviceStatus()
-        {
-            listView1.Invoke((System.Windows.Forms.MethodInvoker)delegate
-            {
-                foreach (ListViewItem item in listView1.Items)
-                {
-                    string udidFromList = item.SubItems[4].Text;
-                    string OS = item.SubItems[2].Text;
-                    if (OS.Equals("Android"))
-                    {
-                        var connectedList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
-                        if (connectedList.Contains(udidFromList))
-                        {
-                            item.SubItems[3].Text = "Online";
-                        }
-                        else
-                        {
-                            item.SubItems[3].Text = "Offline";
-                        }
-                    }
-                    else
-                    {
-                        var connectedList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-                        if (connectedList.Contains(udidFromList))
-                        {
-                            item.SubItems[3].Text = "Online";
-                        }
-                        else
-                        {
-                            item.SubItems[3].Text = "Offline";
-                        }
-                    }
-                }
-            });
         }
 
 
@@ -1474,11 +1443,34 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("Refresh_Status");
         }
 
+        private Dictionary<string, InstalledAppsList> installedAppsForms = new Dictionary<string, InstalledAppsList>();
         private async void launchAppToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InstalledAppsList installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
-            await installedAppsList.GetInstalledAppsList(main);
-            installedAppsList.ShowDialog();
+            string deviceKey = selectedUDID;
+            if (!installedAppsForms.ContainsKey(deviceKey) || installedAppsForms[deviceKey].IsDisposed)
+            {
+                InstalledAppsList installedAppsList;
+                if (selectedOS.Equals("Android") && selectedDeviceConnection.Equals("Wi-Fi"))
+                {
+                    installedAppsList = new InstalledAppsList(selectedOS, selectedDeviceIP, selectedDeviceName);
+                }
+                else
+                {
+                    installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
+                }                
+                await installedAppsList.GetInstalledAppsList(this);
+                installedAppsForms[deviceKey] = installedAppsList;
+                installedAppsList.FormClosed += (s, args) => installedAppsForms.Remove(deviceKey);
+                installedAppsList.Show();
+            }
+            else
+            {
+                if (installedAppsForms[deviceKey].WindowState == FormWindowState.Minimized)
+                {
+                    installedAppsForms[deviceKey].WindowState = FormWindowState.Normal;
+                }
+                installedAppsForms[deviceKey].BringToFront();
+            }
         }
 
         private async void takeScreenshotToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1550,27 +1542,40 @@ namespace Appium_Wizard
             }
         }
 
+        private SignIPA signIPA;
         private async void signIPAToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = this;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel("Load Profiles", "Please wait while fetching profiles...");
-            List<string[]> profilesList = new List<string[]>();
-            await Task.Run(() =>
+            if (signIPA == null || signIPA.IsDisposed)
             {
-                profilesList = iOSProfileManagement.FetchProfiles();
-            });
-            commonProgress.Close();
-            if (profilesList.Count == 0)
-            {
-                MessageBox.Show("Provisioning Profiles not found. First Import profile in Tools->iOS Profile Management and then try again.", "Provisioning Profiles not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                GoogleAnalytics.SendEvent("Profiles_Not_Available_Popup");
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel("Load Profiles", "Please wait while fetching profiles...");
+                List<string[]> profilesList = new List<string[]>();
+                await Task.Run(() =>
+                {
+                    profilesList = iOSProfileManagement.FetchProfiles();
+                });
+                commonProgress.Close();
+                if (profilesList.Count == 0)
+                {
+                    MessageBox.Show("Provisioning Profiles not found. First Import profile in Tools->iOS Profile Management and then try again.", "Provisioning Profiles not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GoogleAnalytics.SendEvent("Profiles_Not_Available_Popup");
+                }
+                else
+                {
+                    signIPA = new SignIPA(profilesList);
+                    signIPA.Owner = this;
+                    signIPA.Show();
+                }
             }
             else
             {
-                SignIPA signIPA = new SignIPA(profilesList);
-                signIPA.ShowDialog();
+                if (signIPA.WindowState == FormWindowState.Minimized)
+                {
+                    signIPA.WindowState = FormWindowState.Normal;
+                }
+                signIPA.BringToFront();
             }
         }
 

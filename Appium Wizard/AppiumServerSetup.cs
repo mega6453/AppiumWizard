@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 using RestSharp;
 using System.Diagnostics;
 using System.Net;
@@ -18,6 +19,8 @@ namespace Appium_Wizard
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
         public static Dictionary<int,int> serverNumberWDAPortNumber = new Dictionary<int, int>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
             if (!command.Contains("webDriverAgentProxyPort"))
@@ -580,41 +583,53 @@ namespace Appium_Wizard
 
         public void InitializeWatcher(string filePath, int tabNumber)
         {
-            // Dispose the existing watcher if already initialized
-            DisposeWatcher();
-            this.tabNumber = tabNumber;
-            // Create and configure the FileSystemWatcher
-            watcher = new FileSystemWatcher
+            try
             {
-                Path = Path.GetDirectoryName(filePath),
-                Filter = Path.GetFileName(filePath),
-                NotifyFilter = NotifyFilters.LastWrite
-            };
+                // Dispose the existing watcher if already initialized
+                DisposeWatcher();
+                this.tabNumber = tabNumber;
+                // Create and configure the FileSystemWatcher
+                watcher = new FileSystemWatcher
+                {
+                    Path = Path.GetDirectoryName(filePath),
+                    Filter = Path.GetFileName(filePath),
+                    NotifyFilter = NotifyFilters.LastWrite
+                };
 
-            // Subscribe to the Changed event
-            watcher.Changed += OnFileChanged;
+                // Subscribe to the Changed event
+                watcher.Changed += OnFileChanged;
 
-            // Enable the watcher to start monitoring
-            watcher.EnableRaisingEvents = true;
+                // Enable the watcher to start monitoring
+                watcher.EnableRaisingEvents = true;
 
-            // Initialize the last write time
-            lastWriteTime = File.GetLastWriteTime(filePath);
-
-            Console.WriteLine($"Watching file: {filePath}");
+                // Initialize the last write time
+                lastWriteTime = File.GetLastWriteTime(filePath);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
 
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
-            // Check if the file's last write time has changed
-            DateTime currentWriteTime = File.GetLastWriteTime(e.FullPath);
-            if (currentWriteTime != lastWriteTime)
+            try
             {
-                lastWriteTime = currentWriteTime;
-                if (MainScreen.main != null)
+                // Check if the file's last write time has changed
+                DateTime currentWriteTime = File.GetLastWriteTime(e.FullPath);
+                if (currentWriteTime != lastWriteTime)
                 {
-                    MainScreen.main.UpdateRichTextbox(tabNumber);
+                    lastWriteTime = currentWriteTime;
+                    if (MainScreen.main != null)
+                    {
+                        MainScreen.main.UpdateRichTextbox(tabNumber);
+                    }
+                    // Add your custom logic here (e.g., update UI, process file, etc.)
                 }
-                // Add your custom logic here (e.g., update UI, process file, etc.)
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
         }
 

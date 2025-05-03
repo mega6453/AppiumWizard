@@ -911,13 +911,24 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("RecordButton_Click");
         }
 
-
+        private InstalledAppsList installedAppsListForm;
         private async void manageAppsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("Manage_Apps_Click_ScreenControl");
-            InstalledAppsList installedAppsList = new InstalledAppsList(OSType, udid, deviceName);
-            await installedAppsList.GetInstalledAppsList(this);
-            installedAppsList.ShowDialog();
+            if (installedAppsListForm == null || installedAppsListForm.IsDisposed)
+            {
+                installedAppsListForm = new InstalledAppsList(OSType, udid, deviceName);
+                await installedAppsListForm.GetInstalledAppsList(this);
+                installedAppsListForm.Show();
+            }
+            else
+            {
+                if (installedAppsListForm.WindowState == FormWindowState.Minimized)
+                {
+                    installedAppsListForm.WindowState = FormWindowState.Normal;
+                }
+                installedAppsListForm.BringToFront();
+            }
         }
 
         private void inspectorToolStripMenuItem_Click(object sender, EventArgs e)

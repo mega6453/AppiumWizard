@@ -1,5 +1,6 @@
 ﻿using Appium_Wizard.Properties;
 using Newtonsoft.Json;
+using NLog;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Diagnostics;
 using System.Reflection;
@@ -24,6 +25,7 @@ namespace Appium_Wizard
         public static bool alwaysOnTop;
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
         public MainScreen()
@@ -52,25 +54,13 @@ namespace Appium_Wizard
                     isUpdateAvailable = latestVersionObj > thisAppVersion;
                     if (isUpdateAvailable)
                     {
-                        tableLayoutPanel1.Visible = true;
-                        label1.Text = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
-                        label1.AutoSize = true;
-                        label1.Anchor = AnchorStyles.None;
-                        Button closeButton = new Button();
-                        closeButton.Text = "X";
-                        closeButton.AutoSize = true;
-                        closeButton.FlatStyle = FlatStyle.Flat;
-                        closeButton.FlatAppearance.BorderSize = 0;
-                        tableLayoutPanel1.Width = this.Width - 50;
-                        tableLayoutPanel1.Controls.Add(label1, 0, 0);
-                        tableLayoutPanel1.Controls.Add(closeButton, 1, 0);
-
-                        closeButton.Click += (sender, e) =>
-                        {
-                            Controls.Remove(tableLayoutPanel1);
-                        };
-
-                        Controls.Add(tableLayoutPanel1);
+                        string updateMessage = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
+                        ShowMessage(updateMessage);
+                    }
+                    else
+                    {
+                        string tipMessage = "Note: The app may lag due to frequent appium server log updates. To prevent this, keep the 'Show Logs' checkbox unchecked. Enable it only when you need to view the logs.";
+                        ShowMessage(tipMessage);
                     }
                 }
                 var result = Database.QueryDataFromNotificationsTable();
@@ -143,17 +133,48 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
+        private void ShowMessage(string message)
+        {
+            tableLayoutPanel1.Visible = true;
+            label1.Text = message;
+            label1.AutoSize = true;
+            label1.Anchor = AnchorStyles.None;
+
+            Button closeButton = new Button
+            {
+                Text = "X",
+                AutoSize = true,
+                FlatStyle = FlatStyle.Flat
+            };
+            closeButton.FlatAppearance.BorderSize = 0;
+
+            tableLayoutPanel1.Width = this.Width - 50;
+            tableLayoutPanel1.Controls.Clear(); // Ensure no duplicate controls
+            tableLayoutPanel1.Controls.Add(label1, 0, 0);
+            tableLayoutPanel1.Controls.Add(closeButton, 1, 0);
+
+            closeButton.Click += (sender, e) =>
+            {
+                Controls.Remove(tableLayoutPanel1);
+            };
+
+            Controls.Add(tableLayoutPanel1);
+        }
+
         private void MainScreen_Shown(object sender, EventArgs e)
         {
             try
             {
                 iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
                 iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();
+                Logger.Info("iOS_Executor.selectediOSExecutor - "+ iOS_Executor.selectediOSExecutor);
+                Logger.Info("iOS_Proxy.selectediOSProxyMethod - " + iOS_Proxy.selectediOSProxyMethod);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 iOS_Executor.selectediOSExecutor = "auto";
                 iOS_Proxy.selectediOSProxyMethod = "iproxy";
+                Logger.Error(ex);
             }
             if (!LoadingScreen.isServerStarted)
             {
@@ -215,7 +236,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.Error(e);
             }
         }
 
@@ -323,8 +344,9 @@ namespace Appium_Wizard
                     mandatorymsglabel.Visible = false;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex);
             }
         }
 

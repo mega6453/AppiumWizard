@@ -151,11 +151,14 @@ namespace Appium_Wizard
             {
                 iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
                 iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();
+                Logger.Info("iOS_Executor.selectediOSExecutor - "+ iOS_Executor.selectediOSExecutor);
+                Logger.Info("iOS_Proxy.selectediOSProxyMethod - " + iOS_Proxy.selectediOSProxyMethod);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 iOS_Executor.selectediOSExecutor = "auto";
                 iOS_Proxy.selectediOSProxyMethod = "iproxy";
+                Logger.Error(ex);
             }
             if (!LoadingScreen.isServerStarted)
             {
@@ -325,8 +328,9 @@ namespace Appium_Wizard
                     mandatorymsglabel.Visible = false;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex);
             }
         }
 

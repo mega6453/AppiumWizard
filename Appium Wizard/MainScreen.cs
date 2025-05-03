@@ -1,5 +1,6 @@
 ﻿using Appium_Wizard.Properties;
 using Newtonsoft.Json;
+using NLog;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Diagnostics;
 using System.Reflection;
@@ -24,6 +25,7 @@ namespace Appium_Wizard
         public static bool alwaysOnTop;
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
         public MainScreen()
@@ -215,7 +217,7 @@ namespace Appium_Wizard
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error in Updating logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.Error(e);
             }
         }
 

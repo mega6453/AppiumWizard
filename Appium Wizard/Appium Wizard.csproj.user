@@ -13,6 +13,12 @@
     <Compile Update="Android Wireless.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Codeless Test Runner.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CodeLessTestRunner.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="CommonProgress.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +74,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="SignIPA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="TestRunner.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="TroubleShooter.cs">

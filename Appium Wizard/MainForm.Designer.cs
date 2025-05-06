@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             commandGridView = new DataGridView();
-            propertyGridView = new DataGridView();
-            comboBoxActions = new ComboBox();
             Command = new DataGridViewTextBoxColumn();
-            repeatButton = new Button();
-            runOnceButton = new Button();
+            propertyGridView = new DataGridView();
             Property = new DataGridViewTextBoxColumn();
             Value = new DataGridViewTextBoxColumn();
+            comboBoxActions = new ComboBox();
+            repeatButton = new Button();
+            runOnceButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             SuspendLayout();
@@ -57,6 +57,14 @@
             commandGridView.SelectionChanged += DataGridView1_SelectionChanged;
             commandGridView.UserDeletingRow += DataGridView1_UserDeletingRow;
             // 
+            // Command
+            // 
+            Command.HeaderText = "Command";
+            Command.Name = "Command";
+            Command.ReadOnly = true;
+            Command.SortMode = DataGridViewColumnSortMode.NotSortable;
+            Command.Width = 780;
+            // 
             // propertyGridView
             // 
             propertyGridView.AllowUserToAddRows = false;
@@ -65,12 +73,26 @@
             propertyGridView.BackgroundColor = SystemColors.ControlLight;
             propertyGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             propertyGridView.Columns.AddRange(new DataGridViewColumn[] { Property, Value });
+            propertyGridView.EditMode = DataGridViewEditMode.EditOnEnter;
             propertyGridView.Location = new Point(823, 41);
             propertyGridView.Name = "propertyGridView";
             propertyGridView.RowHeadersVisible = false;
             propertyGridView.Size = new Size(240, 213);
             propertyGridView.TabIndex = 1;
             propertyGridView.CellValueChanged += DataGridView2_CellValueChanged;
+            // 
+            // Property
+            // 
+            Property.HeaderText = "Property";
+            Property.Name = "Property";
+            Property.ReadOnly = true;
+            Property.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Value
+            // 
+            Value.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Value.HeaderText = "Value";
+            Value.Name = "Value";
             // 
             // comboBoxActions
             // 
@@ -82,13 +104,6 @@
             comboBoxActions.Size = new Size(282, 23);
             comboBoxActions.TabIndex = 2;
             comboBoxActions.SelectedIndexChanged += ComboBoxActions_SelectedIndexChanged;
-            // 
-            // Command
-            // 
-            Command.HeaderText = "Command";
-            Command.Name = "Command";
-            Command.ReadOnly = true;
-            Command.Width = 780;
             // 
             // repeatButton
             // 
@@ -109,18 +124,6 @@
             runOnceButton.Text = "Run Once";
             runOnceButton.UseVisualStyleBackColor = true;
             runOnceButton.Click += runOnceButton_Click;
-            // 
-            // Property
-            // 
-            Property.HeaderText = "Property";
-            Property.Name = "Property";
-            Property.ReadOnly = true;
-            // 
-            // Value
-            // 
-            Value.HeaderText = "Value";
-            Value.Name = "Value";
-            Value.Width = 150;
             // 
             // MainForm
             // 
@@ -146,9 +149,9 @@
         private DataGridView commandGridView;
         private DataGridView propertyGridView;
         private ComboBox comboBoxActions;
-        private DataGridViewTextBoxColumn Command;
         private Button repeatButton;
         private Button runOnceButton;
+        private DataGridViewTextBoxColumn Command;
         private DataGridViewTextBoxColumn Property;
         private DataGridViewTextBoxColumn Value;
     }

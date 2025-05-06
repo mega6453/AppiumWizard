@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -15,6 +17,9 @@ namespace Appium_Wizard
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
 
+        //private List<string> deviceNames = new List<string>();
+        private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
+
         public MainForm()
         {
             InitializeComponent();
@@ -22,6 +27,10 @@ namespace Appium_Wizard
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            var devicesList = Database.QueryDataFromDevicesTable();
+            foreach (var device in devicesList) {
+                deviceNames.Add(device["Name"]);
+            }
             comboBoxActions.SelectedItem = "Set Device";
             commandGridView.Columns[0].Width = commandGridView.Width - 5;
             propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
@@ -107,17 +116,67 @@ namespace Appium_Wizard
 
                     // Load properties for the selected action
                     var selectedActionData = actionData[selectedIndex];
+                    string actionName = selectedActionData.Item1; // Assuming Item1 holds the action name
+
                     foreach (var property in selectedActionData.Item2)
                     {
-                        propertyGridView.Rows.Add(property.Key, property.Value);
+                        var row = new DataGridViewRow();
+                        row.CreateCells(propertyGridView);
+
+                        row.Cells[0].Value = property.Key;
+
+                        if (actionName == "Set Device")
+                        {
+                            // Create a ComboBox cell for the value field
+                            var comboBoxCell = new DataGridViewComboBoxCell
+                            {
+                                //DataSource = new List<string> { "Device1", "Device2", "Device3" } // Example values
+                                DataSource = deviceNames // Example values
+                            };
+                            comboBoxCell.Value = property.Value;
+                            row.Cells[1] = comboBoxCell;
+                        }
+                        else
+                        {
+                            // Create a standard TextBox cell for the value field
+                            row.Cells[1].Value = property.Value;
+                        }
+
+                        propertyGridView.Rows.Add(row);
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                // Log or handle exception
+                Console.WriteLine(ex.Message);
             }
         }
+
+        //private void DataGridView1_SelectionChanged(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (commandGridView.SelectedRows.Count > 0)
+        //        {
+        //            int selectedIndex = commandGridView.SelectedRows[0].Index;
+
+        //            // Clear DataGridView2 rows
+        //            propertyGridView.Rows.Clear();
+
+        //            // Load properties for the selected action
+        //            var selectedActionData = actionData[selectedIndex];
+        //            foreach (var property in selectedActionData.Item2)
+        //            {
+        //                    propertyGridView.Rows.Add(property.Key, property.Value);
+        //                }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //    }
+        //}
 
         private void DataGridView2_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {

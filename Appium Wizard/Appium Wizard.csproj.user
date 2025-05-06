@@ -49,6 +49,9 @@
     <Compile Update="LoadingScreen.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="MainScreen.cs">
       <SubType>Form</SubType>
     </Compile>

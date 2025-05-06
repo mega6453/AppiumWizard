@@ -76,7 +76,10 @@ namespace Appium_Wizard
                 {
                     if (dataGridView2Values.ContainsKey(command))
                     {
-                        value = dataGridView2Values[command][property];
+                        if (dataGridView2Values[command].ContainsKey(property))
+                        {
+                            value = dataGridView2Values[command][property];
+                        }
                     }
 
                     // Create a new row
@@ -131,7 +134,7 @@ namespace Appium_Wizard
         //    }
         //}
 
-        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        private void dataGridView1_SelectionChangedOld(object sender, EventArgs e)
         {
             // Check if any row is selected
             if (dataGridView1.SelectedRows.Count > 0)
@@ -158,45 +161,73 @@ namespace Appium_Wizard
             }
         }
 
+        private List<Tuple<string, Dictionary<string, string>>> selectedData = new List<Tuple<string, Dictionary<string, string>>>();
+
+
+
+
+
 
         private Dictionary<string, Dictionary<string, string>> dataGridView2Values = new Dictionary<string, Dictionary<string, string>>();
 
         private void SaveDataGridView2Values()
         {
-            int selectedRowIndex = dataGridView1.SelectedRows[0].Index;
-            string currentCommand = dataGridView1.Rows[selectedRowIndex].Cells[1].Value.ToString();
-            int colonIndex = currentCommand.IndexOf(':');
-            currentCommand = currentCommand.Substring(0, colonIndex + 1);
-
-            if (!string.IsNullOrEmpty(currentCommand))
+            try
             {
-                Dictionary<string, string> values = new Dictionary<string, string>();
+                int selectedRowIndex = dataGridView1.SelectedRows[0].Index;
+                var currentC = dataGridView1.Rows[selectedRowIndex].Cells[1].Value;
+                if (currentC != null)
+                {
+                    string currentCommand = currentC.ToString();
+                    currentCommand = currentCommand.ToString();
+                    int colonIndex = currentCommand.IndexOf(':');
+                    currentCommand = currentCommand.Substring(0, colonIndex + 1);
 
-                foreach (DataGridViewRow row in dataGridView2.Rows)
-                {
-                    if (row.Cells[0].Value != null && row.Cells[1].Value != null)
+                    if (!string.IsNullOrEmpty(currentCommand))
                     {
-                        string key = row.Cells[0].Value.ToString();
-                        string value = row.Cells[1].Value.ToString();
-                        values[key] = value; // Add key-value pair to the inner dictionary
-                    }
-                    else if (row.Cells[0].Value != null)
-                    {
-                        string key = row.Cells[0].Value.ToString();
-                        values[key] = ""; // Add an empty string for null values in cells[1]
-                    }
-                }
+                        Dictionary<string, string> values = new Dictionary<string, string>();
+                        Dictionary<string, string> propertiesValues = new Dictionary<string, string>();
+                        foreach (DataGridViewRow row in dataGridView2.Rows)
+                        {
+                            if (row.Cells[0].Value != null && row.Cells[1].Value != null)
+                            {
+                                string key = row.Cells[0].Value.ToString();
+                                string value = row.Cells[1].Value.ToString();
+                                values[key] = value; // Add key-value pair to the inner dictionary
+                                propertiesValues[key] = value;
 
-                // Save the values to the outer dictionary
-                if (dataGridView2Values.ContainsKey(currentCommand))
-                {
-                    dataGridView2Values[currentCommand] = values;
-                }
-                else
-                {
-                    dataGridView2Values.Add(currentCommand, values);
+                            }
+                            else if (row.Cells[0].Value != null)
+                            {
+                                string key = row.Cells[0].Value.ToString();
+                                values[key] = ""; // Add an empty string for null values in cells[1]
+                            }
+                        }
+
+                        // Save the values to the outer dictionary
+                        if (dataGridView2Values.ContainsKey(currentCommand))
+                        {
+                            dataGridView2Values[currentCommand] = values;
+                        }
+                        else
+                        {
+                            dataGridView2Values.Add(currentCommand, values);
+                        }
+                        Tuple<string, Dictionary<string, string>> dataTuple = new Tuple<string, Dictionary<string, string>>(currentCommand.ToString(), propertiesValues);
+                        selectedData.Add(dataTuple);
+
+                        // Optionally, display or process the collected data
+                        ProcessSelectedData(selectedData);
+                    }
+
                 }
             }
+            catch (Exception)
+            {
+
+            }
+           
+           
         }
 
         private void dataGridView2_CellLeave(object sender, DataGridViewCellEventArgs e)
@@ -206,7 +237,62 @@ namespace Appium_Wizard
 
         private void dataGridView2_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            //SaveDataGridView2Values();
+        }
+
+
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
             SaveDataGridView2Values();
+            //if (dataGridView1.SelectedRows.Count > 0 && dataGridView1.CurrentRow != null)
+            //{
+
+            //    int selectedRowIndex = dataGridView1.SelectedRows[0].Index;
+
+            //    // Get the value from the second column (index 1)
+            //    var gv1Text = dataGridView1.Rows[selectedRowIndex].Cells[1].Value;
+
+            //    if (gv1Text != null)
+            //    {
+            //        Dictionary<string, string> propertiesValues = new Dictionary<string, string>();
+
+            //        foreach (DataGridViewRow row in dataGridView2.Rows)
+            //        {
+            //            if (row.Cells[0].Value != null && row.Cells[1].Value != null)
+            //            {
+            //                string property = row.Cells[0].Value.ToString();
+            //                string value = row.Cells[1].Value.ToString();
+            //                propertiesValues[property] = value;
+            //            }
+            //        }
+
+            //        // Create a tuple and add it to the list
+            //        Tuple<string, Dictionary<string, string>> dataTuple = new Tuple<string, Dictionary<string, string>>(gv1Text.ToString(), propertiesValues);
+            //        selectedData.Add(dataTuple);
+
+            //        // Optionally, display or process the collected data
+            //        ProcessSelectedData(selectedData);
+            //    }
+
+            //}
+        }
+
+
+        private void ProcessSelectedData(List<Tuple<string, Dictionary<string, string>>> data)
+        {
+            // Example: Display the collected data in the console or a message box
+            foreach (var tuple in data)
+            {
+                string gv1Text = tuple.Item1;
+                Dictionary<string, string> propertiesValues = tuple.Item2;
+
+                Console.WriteLine($"GridView1 Text: {gv1Text}");
+                foreach (var kvp in propertiesValues)
+                {
+                    Console.WriteLine($"Property: {kvp.Key}, Value: {kvp.Value}");
+                }
+            }
         }
     }
 }

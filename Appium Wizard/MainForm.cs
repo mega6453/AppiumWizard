@@ -17,8 +17,8 @@ namespace Appium_Wizard
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
 
-        //private List<string> deviceNames = new List<string>();
-        private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
+        private List<string> deviceNames = new List<string>();
+        //private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
 
         public MainForm()
         {
@@ -144,6 +144,7 @@ namespace Appium_Wizard
 
                         propertyGridView.Rows.Add(row);
                     }
+                    ValidateFields(selectedIndex);
                 }
             }
             catch (Exception ex)
@@ -153,30 +154,6 @@ namespace Appium_Wizard
             }
         }
 
-        //private void DataGridView1_SelectionChanged(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        if (commandGridView.SelectedRows.Count > 0)
-        //        {
-        //            int selectedIndex = commandGridView.SelectedRows[0].Index;
-
-        //            // Clear DataGridView2 rows
-        //            propertyGridView.Rows.Clear();
-
-        //            // Load properties for the selected action
-        //            var selectedActionData = actionData[selectedIndex];
-        //            foreach (var property in selectedActionData.Item2)
-        //            {
-        //                    propertyGridView.Rows.Add(property.Key, property.Value);
-        //                }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //    }
-        //}
 
         private void DataGridView2_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
@@ -192,6 +169,22 @@ namespace Appium_Wizard
 
                 // Update the corresponding cell in DataGridView1
                 commandGridView.Rows[selectedIndex].Cells[0].Value = $"{property}: {value}";
+                ValidateFields(selectedIndex);
+            }
+        }
+
+        private void ValidateFields(int selectedIndex)
+        {
+            var selectedActionData = actionData[selectedIndex];
+            bool hasEmptyFields = selectedActionData.Item2.Values.Any(value => string.IsNullOrWhiteSpace(value));
+
+            if (hasEmptyFields)
+            {
+                commandGridView.Rows[selectedIndex].ErrorText = "Some fields are empty.";
+            }
+            else
+            {
+                commandGridView.Rows[selectedIndex].ErrorText = string.Empty;
             }
         }
 

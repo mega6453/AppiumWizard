@@ -50,7 +50,6 @@
             commandGridView.Columns.AddRange(new DataGridViewColumn[] { Command });
             commandGridView.Location = new Point(12, 41);
             commandGridView.Name = "commandGridView";
-            commandGridView.RowHeadersVisible = false;
             commandGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             commandGridView.Size = new Size(788, 332);
             commandGridView.TabIndex = 0;
@@ -59,11 +58,11 @@
             // 
             // Command
             // 
+            Command.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             Command.HeaderText = "Command";
             Command.Name = "Command";
             Command.ReadOnly = true;
             Command.SortMode = DataGridViewColumnSortMode.NotSortable;
-            Command.Width = 780;
             // 
             // propertyGridView
             // 
@@ -151,8 +150,8 @@
         private ComboBox comboBoxActions;
         private Button repeatButton;
         private Button runOnceButton;
-        private DataGridViewTextBoxColumn Command;
         private DataGridViewTextBoxColumn Property;
         private DataGridViewTextBoxColumn Value;
+        private DataGridViewTextBoxColumn Command;
     }
 }

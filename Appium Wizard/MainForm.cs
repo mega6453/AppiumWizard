@@ -20,6 +20,14 @@ namespace Appium_Wizard
             InitializeComponent();
         }
 
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            comboBoxActions.SelectedItem = "Set Device";
+            commandGridView.Columns[0].Width = commandGridView.Width - 5;
+            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
+            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
+        }
+
         private void ComboBoxActions_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedAction = comboBoxActions.SelectedItem.ToString();
@@ -134,14 +142,22 @@ namespace Appium_Wizard
             {
                 // Get the index of the row being deleted
                 int rowIndex = e.Row.Index;
-
-                // Remove the corresponding entry from actionData
-                actionData.RemoveAt(rowIndex);
-
-                // Clear DataGridView2 if the deleted row is selected
-                if (commandGridView.SelectedRows.Count > 0 && commandGridView.SelectedRows[0].Index == rowIndex)
+                // Prevent deletion of the first row
+                if (rowIndex == 0)
                 {
-                    propertyGridView.Rows.Clear();
+                    MessageBox.Show("You cannot delete the default row.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    e.Cancel = true;
+                }
+                else
+                {
+                    // Remove the corresponding entry from actionData
+                    actionData.RemoveAt(rowIndex);
+
+                    // Clear DataGridView2 if the deleted row is selected
+                    if (commandGridView.SelectedRows.Count > 0 && commandGridView.SelectedRows[0].Index == rowIndex)
+                    {
+                        propertyGridView.Rows.Clear();
+                    }
                 }
             }
             catch (Exception ex)
@@ -150,12 +166,6 @@ namespace Appium_Wizard
             }
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            commandGridView.Columns[0].Width = commandGridView.Width - 5;
-            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
-            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
-        }
 
         private void runOnceButton_Click(object sender, EventArgs e)
         {
@@ -198,6 +208,7 @@ namespace Appium_Wizard
                 {
                     case "Click Element":
                         MessageBox.Show(message.ToString(), "Click Element", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                         break;
                     case "Send Text":
                         MessageBox.Show(message.ToString(), "Send Text", MessageBoxButtons.OK, MessageBoxIcon.Information);

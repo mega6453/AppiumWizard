@@ -8,6 +8,7 @@ namespace Appium_Wizard
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
         private Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>(); // Mapping of device names to UDIDs
+        private Dictionary<string, string> deviceNameToOsTypeMap = new Dictionary<string, string>();
         private List<string> deviceNames = new List<string>();
         //private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
         bool isAndroid;
@@ -25,8 +26,11 @@ namespace Appium_Wizard
             {
                 string deviceName = device["Name"];
                 string deviceUdid = device["UDID"];
+                string osType = device["OS"]; // Assuming the database contains an "OS" field
+
                 deviceNames.Add(deviceName);
                 deviceNameToUdidMap[deviceName] = deviceUdid; // Populate the mapping
+                deviceNameToOsTypeMap[deviceName] = osType;   // Populate the OS type mapping
             }
             comboBoxActions.SelectedItem = "Set Device";
             commandGridView.Columns[0].Width = commandGridView.Width - 5;
@@ -169,6 +173,14 @@ namespace Appium_Wizard
                 {
                     selectedDeviceUDID = deviceNameToUdidMap[value]; // Update the selected UDID
                     Console.WriteLine($"Selected Device UDID: {selectedDeviceUDID}"); // For debugging
+
+                    // Update the OS type based on the selected device name
+                    if (deviceNameToOsTypeMap.ContainsKey(value))
+                    {
+                        string osType = deviceNameToOsTypeMap[value];
+                        isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
+                        Console.WriteLine($"Selected OS Type: {osType}, isAndroid: {isAndroid}"); // For debugging
+                    }
                 }
 
                 // Update the corresponding cell in DataGridView1
@@ -317,7 +329,7 @@ namespace Appium_Wizard
                         MessageBox.Show(message.ToString(), "Wait for Element", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
                     case "Set Device":
-                        MessageBox.Show(message.ToString(), "Set Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(isAndroid.ToString(), "Set Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         break;
                     case "Wait for element visible":
                         MessageBox.Show(message.ToString(), "Wait for Element Visible", MessageBoxButtons.OK, MessageBoxIcon.Information);

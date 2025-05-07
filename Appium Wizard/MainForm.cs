@@ -1,14 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Appium_Wizard
@@ -28,7 +19,8 @@ namespace Appium_Wizard
         private void MainForm_Load(object sender, EventArgs e)
         {
             var devicesList = Database.QueryDataFromDevicesTable();
-            foreach (var device in devicesList) {
+            foreach (var device in devicesList)
+            {
                 deviceNames.Add(device["Name"]);
             }
             comboBoxActions.SelectedItem = "Set Device";
@@ -174,6 +166,7 @@ namespace Appium_Wizard
             }
         }
 
+
         private void ValidateFields(int selectedIndex)
         {
             var selectedActionData = actionData[selectedIndex];
@@ -182,10 +175,12 @@ namespace Appium_Wizard
             if (hasEmptyFields)
             {
                 commandGridView.Rows[selectedIndex].ErrorText = "Some fields are empty.";
+                commandGridView.Rows[selectedIndex].DefaultCellStyle.BackColor = Color.LightPink; // Highlight row
             }
             else
             {
                 commandGridView.Rows[selectedIndex].ErrorText = string.Empty;
+                commandGridView.Rows[selectedIndex].DefaultCellStyle.BackColor = Color.White; // Reset row color
             }
         }
 
@@ -222,23 +217,58 @@ namespace Appium_Wizard
 
         private void runOnceButton_Click(object sender, EventArgs e)
         {
-            performActions();
+            var isAnyError = checkIfAnyErrors();
+            if (isAnyError)
+            {
+                MessageBox.Show("Please check the rows with errors and fix it.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                performActions();
+            }
         }
 
         private void repeatButton_Click(object sender, EventArgs e)
         {
-            string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the number of repetitions:", "Repeat Action", "1");
-            if (int.TryParse(input, out int repetitions))
+            var isAnyError = checkIfAnyErrors();
+            if (isAnyError)
             {
-                for (int i = 0; i < repetitions; i++)
-                {
-                    performActions();
-                }
+                MessageBox.Show("Please check the rows with errors and fix it.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                MessageBox.Show("Please enter a valid number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the number of repetitions:", "Repeat Action", "1");
+                if (int.TryParse(input, out int repetitions))
+                {
+                    if (repetitions <= 0)
+                    {
+                        MessageBox.Show("Please enter a valid number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    for (int i = 0; i < repetitions; i++)
+                    {
+                        performActions();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
+        }
+
+
+        private bool checkIfAnyErrors()
+        {
+            foreach (DataGridViewRow row in commandGridView.Rows)
+            {
+                // Check if the row already has an error
+                if (!string.IsNullOrWhiteSpace(row.ErrorText))
+                {
+                    return true; // An error exists
+                }
+            }
+
+            return false; // No errors found
         }
 
         private void performActions()

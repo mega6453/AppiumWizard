@@ -168,7 +168,8 @@ namespace Appium_Wizard
                 actionData[selectedIndex].Item2[property] = value;
 
                 // Update the corresponding cell in DataGridView1
-                commandGridView.Rows[selectedIndex].Cells[0].Value = $"{property}: {value}";
+                //commandGridView.Rows[selectedIndex].Cells[0].Value = $"{property}: {value}";
+                commandGridView.Rows[selectedIndex].Cells[0].Value = FormatActionText(selectedIndex);
                 ValidateFields(selectedIndex);
             }
         }
@@ -302,6 +303,45 @@ namespace Appium_Wizard
                         MessageBox.Show($"Unknown action: {actionType}", "Unknown Action", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         break;
                 }
+            }
+        }
+
+        private string FormatActionText(int actionIndex)
+        {
+            var action = actionData[actionIndex];
+            string actionType = action.Item1;
+            Dictionary<string, string> properties = action.Item2;
+
+            switch (actionType)
+            {
+                case "Click Element":
+                    return $"Click element at {properties["XPath"]}";
+                case "Send Text":
+                    return $"Send text \"{properties["Text to Enter"]}\" to {properties["XPath"]}";
+                case "Wait for Element":
+                    return $"Wait for element at {properties["XPath"]} for {properties["Timeout (ms)"]} ms";
+                case "Set Device":
+                    return $"Set device to {properties["Device Name"]}";
+                case "Wait for element visible":
+                    return $"Wait for element visible at {properties["XPath"]} for {properties["Timeout (ms)"]} ms";
+                case "Wait for element to vanish":
+                    return $"Wait for element to vanish at {properties["XPath"]} for {properties["Timeout (ms)"]} ms";
+                case "Sleep":
+                    return $"Sleep for {properties["Duration (seconds)"]} seconds";
+                case "Install App":
+                    return $"Install app from {properties["App Path"]}";
+                case "Launch App":
+                    return $"Launch app with package {properties["App Package"]} and activity {properties["App Activity"]}";
+                case "Uninstall App":
+                    return $"Uninstall app with package {properties["App Package"]}";
+                case "Execute Script":
+                    return $"Execute script: {properties["Script"]}";
+                case "Take Screenshot":
+                    return $"Take screenshot and save to {properties["Save Path"]}";
+                case "Device Action":
+                    return $"Perform device action \"{properties["Action Name"]}\" with parameters {properties["Parameters"]}";
+                default:
+                    return $"Unknown action: {actionType}";
             }
         }
     }

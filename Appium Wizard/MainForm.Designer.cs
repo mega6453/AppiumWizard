@@ -76,6 +76,7 @@
             propertyGridView.Location = new Point(823, 41);
             propertyGridView.Name = "propertyGridView";
             propertyGridView.RowHeadersVisible = false;
+            propertyGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             propertyGridView.Size = new Size(240, 213);
             propertyGridView.TabIndex = 1;
             propertyGridView.CellValueChanged += DataGridView2_CellValueChanged;

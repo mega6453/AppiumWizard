@@ -238,6 +238,11 @@ namespace Appium_Wizard
             else
             {
                 string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the number of repetitions:", "Repeat Action", "1");
+                if (string.IsNullOrEmpty(input)) // Handle Cancel or empty input
+                {
+                    // User clicked "Cancel" or left the input empty, simply exit the method
+                    return;
+                }
                 if (int.TryParse(input, out int repetitions))
                 {
                     if (repetitions <= 0)

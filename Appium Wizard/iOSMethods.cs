@@ -58,7 +58,7 @@ namespace Appium_Wizard
                             {
                                 string udid = device.ToString();
                                 list.Add(udid);
-                                Logger.Info("Adding udid to list : "+udid);
+                                Logger.Info("Adding udid to list : " + udid);
                             }
                         }
                         return list;
@@ -184,7 +184,7 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                Logger.Error(ex,"GetListOfInstalledApps - execution..");
+                Logger.Error(ex, "GetListOfInstalledApps - execution..");
                 return packageList;
             }
         }
@@ -193,7 +193,7 @@ namespace Appium_Wizard
         {
             try
             {
-                Logger.Info("GetInstalledAppVersion - "+bundleId);
+                Logger.Info("GetInstalledAppVersion - " + bundleId);
                 string output = ExecuteCommand("apps --list", udid, true, 10000);
                 string pattern = $@"{Regex.Escape(bundleId)}\s+[^\s]+\s+([^\s]+)";
                 var match = Regex.Match(output, pattern);
@@ -201,7 +201,7 @@ namespace Appium_Wizard
                 if (match.Success)
                 {
                     string appVersion = match.Groups[1].Value;
-                    Logger.Info("GetInstalledAppVersion - "+ bundleId+" - "+ appVersion);
+                    Logger.Info("GetInstalledAppVersion - " + bundleId + " - " + appVersion);
                     return appVersion;
                 }
                 Logger.Error("failedToGetVersion");
@@ -254,7 +254,7 @@ namespace Appium_Wizard
             }
             if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
             {
-                Logger.Info("MainScreen.UDIDPreInstalledWDA.value : "+ MainScreen.UDIDPreInstalledWDA[udid]);
+                Logger.Info("MainScreen.UDIDPreInstalledWDA.value : " + MainScreen.UDIDPreInstalledWDA[udid]);
                 return installedApps.Contains(MainScreen.UDIDPreInstalledWDA[udid]);
             }
             return false;
@@ -449,7 +449,7 @@ namespace Appium_Wizard
                 iOSAsyncMethods.GetInstance().InstallApp(udid, signedIPA);
                 Thread.Sleep(3000);
                 bool result = iSWDAInstalled(udid);
-                Logger.Info("install wda, result - "+result);
+                Logger.Info("install wda, result - " + result);
                 return result;
             }
         }
@@ -553,7 +553,7 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return "ProfileNotAvailable";
-            }          
+            }
         }
 
 
@@ -1157,7 +1157,7 @@ namespace Appium_Wizard
                 {
                     try
                     {
-                        iOSAsyncMethods.GetInstance().CloseTunnel();                        
+                        iOSAsyncMethods.GetInstance().CloseTunnel();
                     }
                     catch (Exception e)
                     {
@@ -1572,9 +1572,9 @@ namespace Appium_Wizard
             {
                 if (MainScreen.udidProxyPort.ContainsKey(udid))
                 {
-                    Logger.Info("MainScreen.udidProxyPort.ContainsKey(udid)"+udid);
+                    Logger.Info("MainScreen.udidProxyPort.ContainsKey(udid)" + udid);
                     string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    Logger.Info("sessionid:"+sessionId);
+                    Logger.Info("sessionid:" + sessionId);
                     if (!sessionId.Equals("nosession"))
                     {
                         return sessionId;
@@ -1583,7 +1583,7 @@ namespace Appium_Wizard
 
                 if (isGo && !is17Plus)
                 {
-                    Logger.Info("isGo:"+isGo+" and !is17plus:"+!is17Plus);
+                    Logger.Info("isGo:" + isGo + " and !is17plus:" + !is17Plus);
                     // Create a new process
                     Process process = new Process();
 
@@ -1591,7 +1591,7 @@ namespace Appium_Wizard
                     process.StartInfo.FileName = iOSServerFilePath;
                     if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iOSMethods.GetInstance().iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
                     {
-                        Logger.Info("launch "+ MainScreen.UDIDPreInstalledWDA[udid]);
+                        Logger.Info("launch " + MainScreen.UDIDPreInstalledWDA[udid]);
                         process.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
                     }
                     else
@@ -1703,9 +1703,9 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        Logger.Error(runwdaError,"unhandled");
+                        Logger.Error(runwdaError, "unhandled");
                         return "unhandled";
-                    }                    
+                    }
                 }
                 else
                 {
@@ -1851,7 +1851,7 @@ namespace Appium_Wizard
                         }
                         var processId = tunnelProcess.Id;
                         MainScreen.runningProcesses.Add(processId);
-                        Logger.Info("CreateTunnel processId - "+ processId);
+                        Logger.Info("CreateTunnel processId - " + processId);
                         commonProgress.Close();
                     }
                     catch (Exception)
@@ -1900,7 +1900,7 @@ namespace Appium_Wizard
             }
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 10);
             bool isTunnelRunning = iOSAPIMethods.isTunnelRunningGo();
-            Logger.Info("isTunnelRunning already :"+isTunnelRunning);
+            Logger.Info("isTunnelRunning already :" + isTunnelRunning);
             commonProgress.UpdateStepLabel("Creating Tunnel", "Please wait while checking for tunnel running status, This may take few seconds...", 30);
             if (!isTunnelRunning)
             {
@@ -1935,7 +1935,7 @@ namespace Appium_Wizard
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e,"tunnel creation exception");
+                    Logger.Error(e, "tunnel creation exception");
                     commonProgress.Close();
                     return false;
                 }
@@ -2036,7 +2036,7 @@ namespace Appium_Wizard
             var request = new RestRequest("/window/size", Method.Get);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
-            Logger.Info("GetScreenSize response content : "+response.Content);
+            Logger.Info("GetScreenSize response content : " + response.Content);
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 dynamic jsonObj = JsonConvert.DeserializeObject(response.Content);
@@ -2100,7 +2100,7 @@ namespace Appium_Wizard
 
         public static void Unlock(int proxyPort)
         {
-            var options = new RestClientOptions("http://localhost:"+proxyPort)
+            var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
                 Timeout = TimeSpan.FromMilliseconds(-1)
             };
@@ -2317,7 +2317,7 @@ namespace Appium_Wizard
                 var request = new RestRequest("/status", Method.Get);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);
-                Logger.Info("IsWDARunning response content : "+response.Content);
+                Logger.Info("IsWDARunning response content : " + response.Content);
                 if (response.Content != null)
                 {
                     if (response.Content.Contains("WebDriverAgent is ready to accept commands"))
@@ -2396,7 +2396,49 @@ namespace Appium_Wizard
             {
                 return value;
             }
-          
+
+        }
+
+        public static string FindElement(string URL, string XPath)
+        {
+            string elementId = string.Empty;
+            try
+            {
+                string sessionId = GetWDASessionID(URL);
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(-1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+ sessionId + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                string body = $@"{{""value"": ""{XPath}"",""using"": ""xpath""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return elementId;
+        }
+
+        public static bool ClickElement(string URL, string XPath)
+        {
+            string sessionId = GetWDASessionID(URL);
+            string elementId = FindElement(URL,XPath);
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(-1)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/"+ sessionId + "/element/"+ elementId + "/click", Method.Post);
+            RestResponse response = client.Execute(request);
+            return response.StatusCode.Equals(200);
         }
     }
 }

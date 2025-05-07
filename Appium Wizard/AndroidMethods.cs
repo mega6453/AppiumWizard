@@ -1082,5 +1082,10 @@ namespace Appium_Wizard
             {
             }            
         }
+
+        public static string ClickElement()
+        {
+            return "";
+        }
     }
 }

@@ -7,9 +7,11 @@ namespace Appium_Wizard
     public partial class MainForm : Form
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
-
+        private Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>(); // Mapping of device names to UDIDs
         private List<string> deviceNames = new List<string>();
         //private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
+        bool isAndroid;
+        string selectedDeviceUDID;
 
         public MainForm()
         {
@@ -21,7 +23,10 @@ namespace Appium_Wizard
             var devicesList = Database.QueryDataFromDevicesTable();
             foreach (var device in devicesList)
             {
-                deviceNames.Add(device["Name"]);
+                string deviceName = device["Name"];
+                string deviceUdid = device["UDID"];
+                deviceNames.Add(deviceName);
+                deviceNameToUdidMap[deviceName] = deviceUdid; // Populate the mapping
             }
             comboBoxActions.SelectedItem = "Set Device";
             commandGridView.Columns[0].Width = commandGridView.Width - 5;
@@ -117,13 +122,13 @@ namespace Appium_Wizard
 
                         row.Cells[0].Value = property.Key;
 
-                        if (actionName == "Set Device")
+
+                        if (actionName == "Set Device" && property.Key == "Device Name")
                         {
                             // Create a ComboBox cell for the value field
                             var comboBoxCell = new DataGridViewComboBoxCell
                             {
-                                //DataSource = new List<string> { "Device1", "Device2", "Device3" } // Example values
-                                DataSource = deviceNames // Example values
+                                DataSource = deviceNames // Populate with device names
                             };
                             comboBoxCell.Value = property.Value;
                             row.Cells[1] = comboBoxCell;
@@ -158,6 +163,13 @@ namespace Appium_Wizard
                 var property = propertyGridView.Rows[e.RowIndex].Cells[0].Value.ToString();
                 var value = propertyGridView.Rows[e.RowIndex].Cells[1].Value?.ToString() ?? "";
                 actionData[selectedIndex].Item2[property] = value;
+
+                // Check if the property being updated is "Device Name"
+                if (property == "Device Name" && deviceNameToUdidMap.ContainsKey(value))
+                {
+                    selectedDeviceUDID = deviceNameToUdidMap[value]; // Update the selected UDID
+                    Console.WriteLine($"Selected Device UDID: {selectedDeviceUDID}"); // For debugging
+                }
 
                 // Update the corresponding cell in DataGridView1
                 //commandGridView.Rows[selectedIndex].Cells[0].Value = $"{property}: {value}";

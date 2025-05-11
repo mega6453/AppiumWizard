@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Diagnostics;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Security.Policy;
 using System.Text;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Appium_Wizard
 {
@@ -39,10 +41,6 @@ namespace Appium_Wizard
                 deviceNameToUdidMap[deviceName] = deviceUdid; // Populate the mapping
                 deviceNameToOsTypeMap[deviceName] = osType;   // Populate the OS type mapping
             }
-            comboBoxActions.SelectedItem = "Set Device";
-            commandGridView.Columns[0].Width = commandGridView.Width - 5;
-            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
-            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
         }
 
         private void ComboBoxActions_SelectedIndexChanged(object sender, EventArgs e)
@@ -275,10 +273,7 @@ namespace Appium_Wizard
             }
             else
             {
-                //OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                //var isStarted = await openDevice.StartBackgroundTasks();
-
-                selectedUDID = commandGridView.Rows[0].Tag as string;
+                selectedUDID = commandGridView.Rows[0].Tag as string; 
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                 {
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
@@ -316,9 +311,6 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        //OpenDevice openDevice = new OpenDevice(selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP);
-                        //var isStarted = await openDevice.StartBackgroundTasks();
-
                         selectedUDID = commandGridView.Rows[0].Tag as string;
                         if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                         {
@@ -326,14 +318,14 @@ namespace Appium_Wizard
                             URL = "http://127.0.0.1:" + port;
                             for (int i = 0; i < repetitions; i++)
                             {
-                                performActions();
+                                await performActions();
                             }
                         }
                         else
                         {
                             MessageBox.Show("Please open device and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
-                        }                        
+                        }
                     }
                 }
                 else
@@ -358,7 +350,7 @@ namespace Appium_Wizard
             return false; // No errors found
         }
 
-        private async void performActions()
+        private async Task performActions()
         {
             string sessionId = string.Empty;
             if (isAndroid)
@@ -622,5 +614,84 @@ namespace Appium_Wizard
             return false;
         }
 
+        private void loadButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Select .json File";
+            openFileDialog.Filter = "Json Files (*.json)|*.json";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+                LoadScriptFromFile(filePath);
+            }
+        }
+
+
+        public void LoadScriptFromFile(string filePath)
+        {
+            try
+            {
+                // Read the JSON data from the specified file
+                string jsonData = File.ReadAllText(filePath);
+
+                // Deserialize the JSON data back into the actionData list
+                actionData = JsonConvert.DeserializeObject<List<Tuple<string, Dictionary<string, string>>>>(jsonData);
+
+                // Refresh the DataGridView with the loaded data
+                commandGridView.Rows.Clear();
+                foreach (var action in actionData)
+                {
+                    int rowIndex = commandGridView.Rows.Add(action.Item1);
+                    //commandGridView.Rows[rowIndex].Tag = null; // Reset any existing tags
+                    commandGridView.Rows[rowIndex].Cells[0].Value = FormatActionText(rowIndex);
+                }
+
+                //MessageBox.Show("Script loaded successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Json Files (*.json)|*.json";
+                saveFileDialog.Title = "Save Json File";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    SaveScriptToFile(filePath);
+                }
+            }
+        }
+
+        public void SaveScriptToFile(string filePath)
+        {
+            try
+            {
+                // Serialize the actionData list to JSON
+                string jsonData = JsonConvert.SerializeObject(actionData, Formatting.Indented);
+
+                // Write the JSON data to the specified file
+                File.WriteAllText(filePath, jsonData);
+                //MessageBox.Show("Script saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TestRunner_Shown(object sender, EventArgs e)
+        {
+            commandGridView.Columns[0].Width = commandGridView.Width - 5;
+            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
+            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
+            comboBoxActions.SelectedItem = "Set Device";
+            GoogleAnalytics.SendEvent("TestRunner_Shown");
+        }
     }
 }

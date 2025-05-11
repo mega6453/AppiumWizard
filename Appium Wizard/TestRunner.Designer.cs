@@ -39,6 +39,8 @@
             runOnceButton = new Button();
             panel1 = new Panel();
             label1 = new Label();
+            saveButton = new Button();
+            loadButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             panel1.SuspendLayout();
@@ -113,9 +115,10 @@
             // 
             // repeatButton
             // 
+            repeatButton.AutoSize = true;
             repeatButton.Location = new Point(536, 391);
             repeatButton.Name = "repeatButton";
-            repeatButton.Size = new Size(75, 23);
+            repeatButton.Size = new Size(75, 25);
             repeatButton.TabIndex = 4;
             repeatButton.Text = "Repeat";
             repeatButton.UseVisualStyleBackColor = true;
@@ -123,9 +126,10 @@
             // 
             // runOnceButton
             // 
+            runOnceButton.AutoSize = true;
             runOnceButton.Location = new Point(398, 391);
             runOnceButton.Name = "runOnceButton";
-            runOnceButton.Size = new Size(75, 23);
+            runOnceButton.Size = new Size(75, 25);
             runOnceButton.TabIndex = 3;
             runOnceButton.Text = "Run Once";
             runOnceButton.UseVisualStyleBackColor = true;
@@ -149,12 +153,36 @@
             label1.TabIndex = 6;
             label1.Text = "label1";
             // 
+            // saveButton
+            // 
+            saveButton.AutoSize = true;
+            saveButton.Location = new Point(39, 12);
+            saveButton.Name = "saveButton";
+            saveButton.Size = new Size(75, 25);
+            saveButton.TabIndex = 6;
+            saveButton.Text = "Save Script";
+            saveButton.UseVisualStyleBackColor = true;
+            saveButton.Click += saveButton_Click;
+            // 
+            // loadButton
+            // 
+            loadButton.AutoSize = true;
+            loadButton.Location = new Point(133, 11);
+            loadButton.Name = "loadButton";
+            loadButton.Size = new Size(76, 25);
+            loadButton.TabIndex = 7;
+            loadButton.Text = "Load Script";
+            loadButton.UseVisualStyleBackColor = true;
+            loadButton.Click += loadButton_Click;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1075, 424);
+            Controls.Add(loadButton);
+            Controls.Add(saveButton);
             Controls.Add(panel1);
             Controls.Add(repeatButton);
             Controls.Add(runOnceButton);
@@ -167,11 +195,13 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Test Runner";
             Load += MainForm_Load;
+            Shown += TestRunner_Shown;
             ((System.ComponentModel.ISupportInitialize)commandGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -186,5 +216,7 @@
         private DataGridViewTextBoxColumn Command;
         private Panel panel1;
         private Label label1;
+        private Button saveButton;
+        private Button loadButton;
     }
 }

@@ -167,7 +167,7 @@ namespace Appium_Wizard
             {
                 iOS_Executor.selectediOSExecutor = Database.QueryDataFromiOSExecutorTable();
                 iOS_Proxy.selectediOSProxyMethod = Database.QueryDataFromiOSProxyTable();
-                Logger.Info("iOS_Executor.selectediOSExecutor - "+ iOS_Executor.selectediOSExecutor);
+                Logger.Info("iOS_Executor.selectediOSExecutor - " + iOS_Executor.selectediOSExecutor);
                 Logger.Info("iOS_Proxy.selectediOSProxyMethod - " + iOS_Proxy.selectediOSProxyMethod);
             }
             catch (Exception ex)
@@ -1479,7 +1479,7 @@ namespace Appium_Wizard
                 else
                 {
                     installedAppsList = new InstalledAppsList(selectedOS, selectedUDID, selectedDeviceName);
-                }                
+                }
                 await installedAppsList.GetInstalledAppsList(this);
                 installedAppsForms[deviceKey] = installedAppsList;
                 installedAppsList.FormClosed += (s, args) => installedAppsForms.Remove(deviceKey);
@@ -2152,6 +2152,12 @@ namespace Appium_Wizard
                     MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void testRunnerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TestRunner testRunner = new TestRunner();
+            testRunner.Show();
         }
     }
 }

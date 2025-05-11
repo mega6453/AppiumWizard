@@ -29,123 +29,162 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunner));
-            dataGridView1 = new DataGridView();
-            ActionsColumn = new DataGridViewComboBoxColumn();
-            InputColumn = new DataGridViewTextBoxColumn();
-            runOnceButton = new Button();
+            commandGridView = new DataGridView();
+            Command = new DataGridViewTextBoxColumn();
+            propertyGridView = new DataGridView();
+            Property = new DataGridViewTextBoxColumn();
+            Value = new DataGridViewTextBoxColumn();
+            comboBoxActions = new ComboBox();
             repeatButton = new Button();
-            comboBox1 = new ComboBox();
+            runOnceButton = new Button();
+            panel1 = new Panel();
             label1 = new Label();
-            helpButton = new Button();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
-            // dataGridView1
+            // commandGridView
             // 
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { ActionsColumn, InputColumn });
-            dataGridView1.Location = new Point(0, 41);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(902, 372);
-            dataGridView1.TabIndex = 0;
-            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
-            dataGridView1.EditingControlShowing += dataGridView1_EditingControlShowing;
+            commandGridView.AllowUserToAddRows = false;
+            commandGridView.AllowUserToResizeColumns = false;
+            commandGridView.AllowUserToResizeRows = false;
+            commandGridView.BackgroundColor = SystemColors.ControlLight;
+            commandGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            commandGridView.Columns.AddRange(new DataGridViewColumn[] { Command });
+            commandGridView.Location = new Point(12, 41);
+            commandGridView.Name = "commandGridView";
+            commandGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            commandGridView.Size = new Size(668, 332);
+            commandGridView.TabIndex = 0;
+            commandGridView.SelectionChanged += DataGridView1_SelectionChanged;
+            commandGridView.UserDeletingRow += DataGridView1_UserDeletingRow;
             // 
-            // ActionsColumn
+            // Command
             // 
-            ActionsColumn.FillWeight = 5.07614136F;
-            ActionsColumn.HeaderText = "Actions";
-            ActionsColumn.Items.AddRange(new object[] { "Click Element", "Send Text", "Wait for element visible", "Wait for element to vanish", "Wait in seconds" });
-            ActionsColumn.Name = "ActionsColumn";
-            ActionsColumn.Resizable = DataGridViewTriState.True;
-            ActionsColumn.SortMode = DataGridViewColumnSortMode.Automatic;
-            ActionsColumn.Width = 200;
+            Command.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Command.HeaderText = "Command";
+            Command.Name = "Command";
+            Command.ReadOnly = true;
+            Command.SortMode = DataGridViewColumnSortMode.NotSortable;
             // 
-            // InputColumn
+            // propertyGridView
             // 
-            InputColumn.FillWeight = 194.923859F;
-            InputColumn.HeaderText = "Input";
-            InputColumn.Name = "InputColumn";
-            InputColumn.Width = 1000;
+            propertyGridView.AllowUserToAddRows = false;
+            propertyGridView.AllowUserToDeleteRows = false;
+            propertyGridView.AllowUserToResizeColumns = false;
+            propertyGridView.AllowUserToResizeRows = false;
+            propertyGridView.BackgroundColor = SystemColors.ControlLight;
+            propertyGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            propertyGridView.Columns.AddRange(new DataGridViewColumn[] { Property, Value });
+            propertyGridView.EditMode = DataGridViewEditMode.EditOnEnter;
+            propertyGridView.Location = new Point(700, 41);
+            propertyGridView.Name = "propertyGridView";
+            propertyGridView.RowHeadersVisible = false;
+            propertyGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            propertyGridView.Size = new Size(363, 161);
+            propertyGridView.TabIndex = 1;
+            propertyGridView.CellBeginEdit += dataGridView1_CellBeginEdit;
+            propertyGridView.CellValueChanged += DataGridView2_CellValueChanged;
             // 
-            // runOnceButton
+            // Property
             // 
-            runOnceButton.Location = new Point(398, 419);
-            runOnceButton.Name = "runOnceButton";
-            runOnceButton.Size = new Size(75, 23);
-            runOnceButton.TabIndex = 1;
-            runOnceButton.Text = "Run Once";
-            runOnceButton.UseVisualStyleBackColor = true;
-            runOnceButton.Click += runOnceButton_Click;
+            Property.HeaderText = "Property";
+            Property.Name = "Property";
+            Property.ReadOnly = true;
+            Property.SortMode = DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Value
+            // 
+            Value.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Value.HeaderText = "Value";
+            Value.Name = "Value";
+            // 
+            // comboBoxActions
+            // 
+            comboBoxActions.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxActions.FormattingEnabled = true;
+            comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Wait for element visible", "Wait for element to vanish", "Wait in seconds", "Install App", "Launch App", "Kill App", "Uninstall App", "Execute Script", "Take Screenshot", "Device Action" });
+            comboBoxActions.Location = new Point(398, 12);
+            comboBoxActions.Name = "comboBoxActions";
+            comboBoxActions.Size = new Size(282, 23);
+            comboBoxActions.TabIndex = 2;
+            comboBoxActions.SelectedIndexChanged += ComboBoxActions_SelectedIndexChanged;
             // 
             // repeatButton
             // 
-            repeatButton.Location = new Point(536, 419);
+            repeatButton.Location = new Point(536, 391);
             repeatButton.Name = "repeatButton";
             repeatButton.Size = new Size(75, 23);
-            repeatButton.TabIndex = 2;
+            repeatButton.TabIndex = 4;
             repeatButton.Text = "Repeat";
             repeatButton.UseVisualStyleBackColor = true;
             repeatButton.Click += repeatButton_Click;
             // 
-            // comboBox1
+            // runOnceButton
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(133, 12);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(247, 23);
-            comboBox1.TabIndex = 3;
+            runOnceButton.Location = new Point(398, 391);
+            runOnceButton.Name = "runOnceButton";
+            runOnceButton.Size = new Size(75, 23);
+            runOnceButton.TabIndex = 3;
+            runOnceButton.Text = "Run Once";
+            runOnceButton.UseVisualStyleBackColor = true;
+            runOnceButton.Click += runOnceButton_Click;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(label1);
+            panel1.Location = new Point(700, 218);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(363, 155);
+            panel1.TabIndex = 5;
+            panel1.Visible = false;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(40, 15);
+            label1.Location = new Point(3, 19);
             label1.Name = "label1";
-            label1.Size = new Size(76, 15);
-            label1.TabIndex = 4;
-            label1.Text = "Select Device";
-            // 
-            // helpButton
-            // 
-            helpButton.Location = new Point(926, 11);
-            helpButton.Name = "helpButton";
-            helpButton.Size = new Size(75, 23);
-            helpButton.TabIndex = 5;
-            helpButton.Text = "Help";
-            helpButton.UseVisualStyleBackColor = true;
-            helpButton.Click += helpButton_Click;
+            label1.Size = new Size(38, 15);
+            label1.TabIndex = 6;
+            label1.Text = "label1";
             // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1013, 450);
-            Controls.Add(helpButton);
-            Controls.Add(label1);
-            Controls.Add(comboBox1);
+            ClientSize = new Size(1075, 424);
+            Controls.Add(panel1);
             Controls.Add(repeatButton);
             Controls.Add(runOnceButton);
-            Controls.Add(dataGridView1);
+            Controls.Add(comboBoxActions);
+            Controls.Add(propertyGridView);
+            Controls.Add(commandGridView);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "TestRunner";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Test Runner";
-            Load += TestRunner_Load;
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            Load += MainForm_Load;
+            ((System.ComponentModel.ISupportInitialize)commandGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)propertyGridView).EndInit();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
-        private DataGridView dataGridView1;
-        private Button runOnceButton;
+        private DataGridView commandGridView;
+        private DataGridView propertyGridView;
+        private ComboBox comboBoxActions;
         private Button repeatButton;
-        private ComboBox comboBox1;
+        private Button runOnceButton;
+        private DataGridViewTextBoxColumn Property;
+        private DataGridViewTextBoxColumn Value;
+        private DataGridViewTextBoxColumn Command;
+        private Panel panel1;
         private Label label1;
-        private Button helpButton;
-        private DataGridViewComboBoxColumn ActionsColumn;
-        private DataGridViewTextBoxColumn InputColumn;
     }
 }

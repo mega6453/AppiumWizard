@@ -1617,7 +1617,7 @@ namespace Appium_Wizard
                     var processId = process.Id;
                     MainScreen.runningProcesses.Add(processId);
                     //Thread.Sleep(2000);
-                    await Task.Delay(2000);
+                    await Task.Delay(3000);
                     // Begin asynchronous reading of the output/error streams
                     process.BeginErrorReadLine();
                     process.BeginOutputReadLine();
@@ -1632,6 +1632,10 @@ namespace Appium_Wizard
                     string sessionId = string.Empty;
                     bool isWDARanAtleaseOnce = false;
                     Logger.Info("process.HasExited? : " + process.HasExited);
+                    if (!process.HasExited && string.IsNullOrEmpty(runwdaError))
+                    {
+                        await Task.Delay(5000);
+                    }
                     if (!string.IsNullOrEmpty(runwdaError))
                     {
                         if (runwdaError.Contains("Process started successfully"))
@@ -2081,6 +2085,24 @@ namespace Appium_Wizard
             Console.WriteLine(response.Content);
         }
 
+        public static void SendText(string URL, string sessionId, string element, string text)
+        {
+            string elementId = FindElement(URL, element);
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromMilliseconds(-1)
+            };
+            var client = new RestClient(options);
+            //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/value", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            //var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            var body = $@"{{""value"":[""{text}""]}}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
+
         public static void Swipe(string URL, string sessionId, int pressX, int pressY, int moveToX, int moveToY, int waitDuration)
         {
             var options = new RestClientOptions(URL)
@@ -2399,6 +2421,7 @@ namespace Appium_Wizard
 
         }
 
+
         public static string FindElement(string URL, string XPath)
         {
             string elementId = string.Empty;
@@ -2407,10 +2430,10 @@ namespace Appium_Wizard
                 string sessionId = GetWDASessionID(URL);
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest("/session/"+ sessionId + "/element", Method.Post);
+                var request = new RestRequest("/session/" + sessionId + "/element", Method.Post);
                 request.AddHeader("Content-Type", "application/json");
                 string body = $@"{{""value"": ""{XPath}"",""using"": ""xpath""}}";
                 request.AddStringBody(body, DataFormat.Json);
@@ -2421,24 +2444,47 @@ namespace Appium_Wizard
                     elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
             }
             return elementId;
         }
 
-        public static bool ClickElement(string URL, string XPath)
+        public static bool ClickElement(string URL, string sessionId, string XPath)
         {
-            string sessionId = GetWDASessionID(URL);
-            string elementId = FindElement(URL,XPath);
+            //string sessionId = GetWDASessionID(URL);
+            string elementId = FindElement(URL, XPath);
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromSeconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
-            var request = new RestRequest("/session/"+ sessionId + "/element/"+ elementId + "/click", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/click", Method.Post);
             RestResponse response = client.Execute(request);
             return response.StatusCode.Equals(200);
+        }
+
+        public static bool isElementDisplayed(string URL, string sessionId, string XPath)
+        {
+            try
+            {
+                string elementId = FindElement(URL, XPath);
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/displayed", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic jsonObject = JsonConvert.DeserializeObject(response.Content);
+                bool value = jsonObject.value;
+                return value;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

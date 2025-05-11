@@ -21,7 +21,7 @@ namespace Appium_Wizard
         string deviceName, udid, OSType, OSVersion;
         int screenPort, proxyPort;
         public static Dictionary<string, ScreenControl> udidScreenControl = new Dictionary<string, ScreenControl>();
-        Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
+        public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
         string canvasFunction = string.Empty;
@@ -52,7 +52,14 @@ namespace Appium_Wizard
             URL = "http://" + IPAddress + ":" + proxyPort;
             InitializeComponent();
             ScreenWebView = new WebView2();
-            deviceSessionId.Add(udid, session);
+            if (deviceSessionId.ContainsKey(udid))
+            {
+                deviceSessionId[udid] = session;
+            }
+            else
+            {
+                deviceSessionId.Add(udid, session);
+            }
             if (!webview2.ContainsKey(udid))
             {
                 webview2.Add(udid, ScreenWebView);

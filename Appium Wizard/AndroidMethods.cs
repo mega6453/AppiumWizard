@@ -1083,7 +1083,7 @@ namespace Appium_Wizard
             }            
         }
 
-        public static string ClickElement()
+        public static string ClickElement(string element)
         {
             return "";
         }

@@ -41,6 +41,7 @@
             label1 = new Label();
             saveButton = new Button();
             loadButton = new Button();
+            helpButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             panel1.SuspendLayout();
@@ -175,12 +176,23 @@
             loadButton.UseVisualStyleBackColor = true;
             loadButton.Click += loadButton_Click;
             // 
+            // helpButton
+            // 
+            helpButton.Location = new Point(988, 0);
+            helpButton.Name = "helpButton";
+            helpButton.Size = new Size(75, 23);
+            helpButton.TabIndex = 8;
+            helpButton.Text = "Help";
+            helpButton.UseVisualStyleBackColor = true;
+            helpButton.Click += helpButton_Click;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1075, 424);
+            Controls.Add(helpButton);
             Controls.Add(loadButton);
             Controls.Add(saveButton);
             Controls.Add(panel1);
@@ -218,5 +230,6 @@
         private Label label1;
         private Button saveButton;
         private Button loadButton;
+        private Button helpButton;
     }
 }

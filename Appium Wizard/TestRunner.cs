@@ -26,6 +26,17 @@ namespace Appium_Wizard
         public TestRunner()
         {
             InitializeComponent();
+            commandGridView.Columns[0].Width = commandGridView.Width - 5;
+            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
+            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
+
+            // Attach event handlers for row reordering
+            commandGridView.MouseDown += commandGridView_MouseDown;
+            commandGridView.DragOver += commandGridView_DragOver;
+            commandGridView.DragDrop += commandGridView_DragDrop;
+
+            // Enable drag-and-drop for the DataGridView
+            commandGridView.AllowDrop = true;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -273,7 +284,7 @@ namespace Appium_Wizard
             }
             else
             {
-                selectedUDID = commandGridView.Rows[0].Tag as string; 
+                selectedUDID = commandGridView.Rows[0].Tag as string;
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                 {
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
@@ -642,11 +653,22 @@ namespace Appium_Wizard
                 foreach (var action in actionData)
                 {
                     int rowIndex = commandGridView.Rows.Add(action.Item1);
-                    //commandGridView.Rows[rowIndex].Tag = null; // Reset any existing tags
+
+                    // Set the Tag property for UDID if the action is "Set Device"
+                    if (action.Item1 == "Set Device" && action.Item2.ContainsKey("Device Name"))
+                    {
+                        string deviceName = action.Item2["Device Name"];
+                        if (deviceNameToUdidMap.ContainsKey(deviceName))
+                        {
+                            commandGridView.Rows[rowIndex].Tag = deviceNameToUdidMap[deviceName]; // Restore the UDID
+                        }
+                    }
+
+                    // Update the action text
                     commandGridView.Rows[rowIndex].Cells[0].Value = FormatActionText(rowIndex);
                 }
 
-                //MessageBox.Show("Script loaded successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Script loaded successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -687,11 +709,84 @@ namespace Appium_Wizard
 
         private void TestRunner_Shown(object sender, EventArgs e)
         {
-            commandGridView.Columns[0].Width = commandGridView.Width - 5;
-            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
-            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
             comboBoxActions.SelectedItem = "Set Device";
             GoogleAnalytics.SendEvent("TestRunner_Shown");
+        }
+
+
+        // Add these event handlers for row reordering
+        private int rowIndexFromMouseDown;
+        private int rowIndexOfItemUnderMouseToDrop;
+
+        private void commandGridView_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Get the index of the row under the mouse
+            rowIndexFromMouseDown = commandGridView.HitTest(e.X, e.Y).RowIndex;
+
+            if (rowIndexFromMouseDown > 0) // Ensure a valid row is clicked
+            {
+                // Begin drag-and-drop operation
+                commandGridView.DoDragDrop(commandGridView.Rows[rowIndexFromMouseDown], DragDropEffects.Move);
+            }
+        }
+
+        private void commandGridView_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move; // Allow the drag-and-drop operation
+        }
+
+        private void commandGridView_DragDrop(object sender, DragEventArgs e)
+        {
+            // Get the client point where the drop occurred
+            Point clientPoint = commandGridView.PointToClient(new Point(e.X, e.Y));
+            rowIndexOfItemUnderMouseToDrop = commandGridView.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
+
+            if (rowIndexOfItemUnderMouseToDrop > 0 && rowIndexFromMouseDown > 0 && rowIndexFromMouseDown != rowIndexOfItemUnderMouseToDrop)
+            {
+                // Move the row visually in the DataGridView
+                DataGridViewRow rowToMove = commandGridView.Rows[rowIndexFromMouseDown];
+                commandGridView.Rows.RemoveAt(rowIndexFromMouseDown);
+                commandGridView.Rows.Insert(rowIndexOfItemUnderMouseToDrop, rowToMove);
+
+                // Update the actionData list to reflect the new order
+                var actionToMove = actionData[rowIndexFromMouseDown];
+                actionData.RemoveAt(rowIndexFromMouseDown);
+                actionData.Insert(rowIndexOfItemUnderMouseToDrop, actionToMove);
+
+                // Re-select the moved row
+                commandGridView.ClearSelection();
+                commandGridView.Rows[rowIndexOfItemUnderMouseToDrop].Selected = true;
+            }
+        }
+
+        private void helpButton_Click(object sender, EventArgs e)
+        {
+            StringBuilder helpMessage = new StringBuilder();
+            helpMessage.AppendLine("1. Adding Actions:");
+            helpMessage.AppendLine("   - Select an action from the dropdown menu.");
+            helpMessage.AppendLine("   - Fill in the required properties in the property grid.");
+            helpMessage.AppendLine();
+            helpMessage.AppendLine("2. Setting a Device:");
+            helpMessage.AppendLine("   - Choose 'Set Device' from the actions.");
+            helpMessage.AppendLine("   - Select a device name from the dropdown.");
+            helpMessage.AppendLine();
+            helpMessage.AppendLine("3. Saving and Loading Scripts:");
+            helpMessage.AppendLine("   - Use the 'Save' button to save your actions to a JSON file.");
+            helpMessage.AppendLine("   - Use the 'Load' button to load actions from a JSON file.");
+            helpMessage.AppendLine();
+            helpMessage.AppendLine("4. Running Actions:");
+            helpMessage.AppendLine("   - Use 'Run Once' to execute the actions once.");
+            helpMessage.AppendLine("   - Use 'Repeat' to execute the actions multiple times.");
+            helpMessage.AppendLine();
+            helpMessage.AppendLine("5. Reordering Actions:");
+            helpMessage.AppendLine("   - Drag and drop actions to reorder them in the list.");
+            helpMessage.AppendLine();
+            helpMessage.AppendLine("6. Deleting Rows:");
+            helpMessage.AppendLine("   - Select a row in the action list.");
+            helpMessage.AppendLine("   - Press the 'Delete' key to delete the row.");
+            helpMessage.AppendLine("   - Note: The default row (first row) cannot be deleted.");
+
+            MessageBox.Show(helpMessage.ToString(), "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

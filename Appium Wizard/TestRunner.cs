@@ -618,189 +618,6 @@ namespace Appium_Wizard
             });
         }
 
-        //private async Task performActions()
-        //{
-        //    string sessionId = string.Empty;
-        //    if (isAndroid)
-        //    {
-        //        sessionId = AndroidAPIMethods.GetSessionID(port);
-        //    }
-        //    else
-        //    {
-        //        sessionId = iOSAPIMethods.GetWDASessionID(URL);
-        //    }
-        //    if (string.IsNullOrEmpty(sessionId) | string.IsNullOrWhiteSpace(sessionId) | sessionId.Equals("nosession"))
-        //    {
-        //        MessageBox.Show("Please open device and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        return;
-        //    }
-        //    foreach (var action in actionData)
-        //    {
-        //        string actionType = action.Item1;
-        //        Dictionary<string, string> properties = action.Item2;
-
-        //        StringBuilder message = new StringBuilder();
-        //        message.AppendLine($"Action Type: {actionType}");
-        //        message.AppendLine("Properties:");
-
-        //        foreach (var property in properties)
-        //        {
-        //            message.AppendLine($"  {property.Key}: {property.Value}");
-        //        }
-
-        //        switch (actionType)
-        //        {
-        //            case "Click Element":
-        //                if (isAndroid)
-        //                {
-        //                    AndroidAPIMethods.ClickElement(properties["XPath"]);
-        //                }
-        //                else
-        //                {
-        //                    iOSAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
-        //                }
-        //                break;
-        //            case "Send Text":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
-        //                }
-        //                break;
-        //            case "Set Device":
-        //                if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
-        //                {
-        //                    selectedUDID = deviceNameToUdidMap[properties["Device Name"]]; // Update the selected UDID
-        //                    Console.WriteLine($"Selected Device UDID: {selectedUDID}"); // For debugging
-
-        //                    // Update the OS type based on the selected device name
-        //                    if (deviceNameToOsTypeMap.ContainsKey(properties["Device Name"]))
-        //                    {
-        //                        string osType = deviceNameToOsTypeMap[properties["Device Name"]];
-        //                        isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
-        //                        Console.WriteLine($"Selected OS Type: {osType}, isAndroid: {isAndroid}"); // For debugging
-        //                    }
-        //                }
-        //                break;
-        //            case "Wait for element visible":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    int timeout = int.TryParse(properties["Timeout (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-        //                    await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], timeout);
-        //                }
-        //                break;
-        //            case "Wait for element to vanish":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    int timeout = int.TryParse(properties["Timeout (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-        //                    await WaitUntilElementVanished(URL, sessionId, properties["XPath"], timeout);
-        //                }
-        //                break;
-        //            case "Sleep":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    int duration = int.TryParse(properties["Duration (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-        //                    await Task.Delay(duration);
-        //                }
-        //                break;
-        //            case "Install App":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, properties["App Path"]);
-        //                }
-        //                break;
-        //            case "Launch App":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    iOSAPIMethods.LaunchApp(URL, sessionId, properties["App Package"]);
-        //                }
-        //                break;
-        //            case "Kill App":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    iOSAPIMethods.KillApp(URL, sessionId, properties["App Package"]);
-        //                }
-        //                break;
-        //            case "Uninstall App":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    iOSMethods.GetInstance().UninstallApp(selectedUDID, properties["App Package"]);
-        //                }
-        //                break;
-        //            case "Execute Script":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-
-        //                }
-        //                break;
-        //            case "Take Screenshot":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-        //                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
-        //                    string filePath = Path.Combine(downloadPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
-        //                    filePath = "\"" + filePath + "\"";
-        //                    iOSAPIMethods.TakeScreenshot(URL, filePath.Replace("\"", ""));
-        //                }
-        //                break;
-        //            case "Device Action":
-        //                if (isAndroid)
-        //                {
-
-        //                }
-        //                else
-        //                {
-        //                    if (properties["Action"].Equals("Home"))
-        //                    {
-        //                        iOSAPIMethods.GoToHome(port);
-        //                    }
-        //                }
-        //                break;
-        //            default:
-        //                MessageBox.Show($"Unknown Command: {actionType}", "Unknown Command", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //                break;
-        //        }
-        //    }
-        //}
 
         private string FormatActionText(int actionIndex)
         {
@@ -1049,6 +866,28 @@ namespace Appium_Wizard
             helpMessage.AppendLine("   - Note: The default row (first row) cannot be deleted.");
 
             MessageBox.Show(helpMessage.ToString(), "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void TestRunner_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isRunning)
+            {
+                // Show confirmation dialog
+                var result = MessageBox.Show("A test is currently running. Do you want to stop the test and close the form?",
+                                             "Confirm Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    // Stop the test and allow form to close
+                    cancellationTokenSource?.Cancel();
+                    isRunning = false; // Reset the running flag
+                }
+                else
+                {
+                    // Cancel the form closing
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }

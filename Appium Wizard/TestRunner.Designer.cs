@@ -206,6 +206,7 @@
             Name = "TestRunner";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Test Runner";
+            FormClosing += TestRunner_FormClosing;
             Load += MainForm_Load;
             Shown += TestRunner_Shown;
             ((System.ComponentModel.ISupportInitialize)commandGridView).EndInit();

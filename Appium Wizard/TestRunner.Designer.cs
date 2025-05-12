@@ -49,6 +49,7 @@
             // 
             // commandGridView
             // 
+            commandGridView.AllowDrop = true;
             commandGridView.AllowUserToAddRows = false;
             commandGridView.AllowUserToResizeColumns = false;
             commandGridView.AllowUserToResizeRows = false;
@@ -62,6 +63,9 @@
             commandGridView.TabIndex = 0;
             commandGridView.SelectionChanged += DataGridView1_SelectionChanged;
             commandGridView.UserDeletingRow += DataGridView1_UserDeletingRow;
+            commandGridView.DragDrop += commandGridView_DragDrop;
+            commandGridView.DragOver += commandGridView_DragOver;
+            commandGridView.MouseDown += commandGridView_MouseDown;
             // 
             // Command
             // 

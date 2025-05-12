@@ -8,14 +8,17 @@ namespace Appium_Wizard
     public partial class TestRunner : Form
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
-        private Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>(); // Mapping of device names to UDIDs
+        private Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>(); 
         private Dictionary<string, string> deviceNameToOsTypeMap = new Dictionary<string, string>();
         private List<string> deviceNames = new List<string>();
-        //private List<string> deviceNames = new List<string> { "Device1", "Device2", "Device3" };
         bool isAndroid;
-        string selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP;
-        string URL;
+        string? selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP, URL;
         int port;
+        private CancellationTokenSource? cancellationTokenSource;
+        private bool isRunning = false;
+        private string scriptFilePath = string.Empty;
+        private int rowIndexFromMouseDown;
+        private int rowIndexOfItemUnderMouseToDrop;
         // isandroid and selectedeviceudid will have issues when set device is set 2nd time with different device.. need to set these varibales while startin performactions.. 
         public TestRunner()
         {
@@ -23,14 +26,6 @@ namespace Appium_Wizard
             commandGridView.Columns[0].Width = commandGridView.Width - 5;
             propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
             propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
-
-            // Attach event handlers for row reordering
-            commandGridView.MouseDown += commandGridView_MouseDown;
-            commandGridView.DragOver += commandGridView_DragOver;
-            commandGridView.DragDrop += commandGridView_DragDrop;
-
-            // Enable drag-and-drop for the DataGridView
-            commandGridView.AllowDrop = true;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -265,9 +260,6 @@ namespace Appium_Wizard
             return false; // No errors found
         }
 
-        private CancellationTokenSource cancellationTokenSource;
-        private bool isRunning = false;
-
         private async void runOnceButton_Click(object sender, EventArgs e)
         {
             if (isRunning)
@@ -452,7 +444,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Send Text":
-                            UpdateScreenControl("Send Text "+ properties["Text to Enter"]+ " to " + properties["XPath"]);
+                            UpdateScreenControl("Send Text " + properties["Text to Enter"] + " to " + properties["XPath"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -463,7 +455,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Set Device":
-                            UpdateScreenControl("Set Device - "+ properties["Device Name"]);
+                            UpdateScreenControl("Set Device - " + properties["Device Name"]);
                             if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
                             {
                                 selectedUDID = deviceNameToUdidMap[properties["Device Name"]]; // Update the selected UDID
@@ -479,7 +471,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Wait for element visible":
-                            UpdateScreenControl("Wait for element visible - "+ properties["XPath"]);
+                            UpdateScreenControl("Wait for element visible - " + properties["XPath"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -515,7 +507,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Install App":
-                            UpdateScreenControl("Install App "+ properties["App Path"]);
+                            UpdateScreenControl("Install App " + properties["App Path"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -714,7 +706,6 @@ namespace Appium_Wizard
             }
         }
 
-        private string scriptFilePath = string.Empty;
         public void LoadScriptFromFile(string filePath)
         {
             try
@@ -796,10 +787,6 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("TestRunner_Shown");
         }
 
-
-        // Add these event handlers for row reordering
-        private int rowIndexFromMouseDown;
-        private int rowIndexOfItemUnderMouseToDrop;
 
         private void commandGridView_MouseDown(object sender, MouseEventArgs e)
         {
@@ -911,7 +898,7 @@ namespace Appium_Wizard
 
         private void saveButton_MouseHover(object sender, EventArgs e)
         {
-            filePathToolTip.SetToolTip(saveButton,scriptFilePath);
+            filePathToolTip.SetToolTip(saveButton, scriptFilePath);
         }
     }
 }

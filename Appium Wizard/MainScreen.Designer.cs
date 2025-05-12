@@ -402,6 +402,7 @@ namespace Appium_Wizard
             // 
             // testRunnerToolStripMenuItem
             // 
+            testRunnerToolStripMenuItem.Image = Properties.Resources.runner;
             testRunnerToolStripMenuItem.Name = "testRunnerToolStripMenuItem";
             testRunnerToolStripMenuItem.Size = new Size(211, 30);
             testRunnerToolStripMenuItem.Text = "Test Runner";
@@ -418,7 +419,7 @@ namespace Appium_Wizard
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(152, 22);
+            notificationsToolStripMenuItem.Size = new Size(188, 30);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
@@ -427,7 +428,7 @@ namespace Appium_Wizard
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
+            alwaysOnTopToolStripMenuItem.Size = new Size(188, 30);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 

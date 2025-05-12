@@ -140,6 +140,7 @@ to install it during the first time launch which may take sometime to complete i
 * <a href="https://www.flaticon.com/free-icons/plugin" title="plugin icons">Plugin icons created by prettycons - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/log" title="log icons">Log icons created by juicy_fish - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/square" title="square icons">Square icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/seo-and-web" title="seo and web icons">Seo and web icons created by RaftelDesign - Flaticon</a>
 
 ## NOTE
 Appium Wizard is in it's early stage of development. So,expect 

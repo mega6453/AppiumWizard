@@ -650,7 +650,7 @@ namespace Appium_Wizard
                 case "Execute Script":
                     return $"Execute script: {properties["Script"]}";
                 case "Take Screenshot":
-                    return $"Take screenshot and save to {properties["Save Path"]}";
+                    return $"Take screenshot and save to Downloads folder";
                 case "Device Action":
                     return $"Perform device action : \"{properties["Action"]}\"";
                 default:
@@ -718,7 +718,7 @@ namespace Appium_Wizard
             }
         }
 
-
+        private string scriptFilePath = string.Empty;
         public void LoadScriptFromFile(string filePath)
         {
             try
@@ -748,6 +748,7 @@ namespace Appium_Wizard
                     // Update the action text
                     commandGridView.Rows[rowIndex].Cells[0].Value = FormatActionText(rowIndex);
                 }
+                scriptFilePath = filePath;
             }
             catch (Exception ex)
             {
@@ -756,16 +757,23 @@ namespace Appium_Wizard
         }
         private void saveButton_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            if (string.IsNullOrEmpty(scriptFilePath))
             {
-                saveFileDialog.Filter = "Json Files (*.json)|*.json";
-                saveFileDialog.Title = "Save Json File";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                 {
-                    string filePath = saveFileDialog.FileName;
-                    SaveScriptToFile(filePath);
+                    saveFileDialog.Filter = "Json Files (*.json)|*.json";
+                    saveFileDialog.Title = "Save Json File";
+
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = saveFileDialog.FileName;
+                        SaveScriptToFile(filePath);
+                    }
                 }
+            }
+            else
+            {
+                SaveScriptToFile(scriptFilePath);
             }
         }
 
@@ -778,7 +786,7 @@ namespace Appium_Wizard
 
                 // Write the JSON data to the specified file
                 File.WriteAllText(filePath, jsonData);
-                //MessageBox.Show("Script saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                scriptFilePath = filePath;
             }
             catch (Exception ex)
             {
@@ -888,6 +896,26 @@ namespace Appium_Wizard
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void saveAsButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Json Files (*.json)|*.json";
+                saveFileDialog.Title = "Save Json File";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    SaveScriptToFile(filePath);
+                }
+            }
+        }
+
+        private void saveButton_MouseHover(object sender, EventArgs e)
+        {
+            filePathToolTip.SetToolTip(saveButton,scriptFilePath);
         }
     }
 }

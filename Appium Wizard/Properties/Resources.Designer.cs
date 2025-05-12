@@ -413,6 +413,16 @@ namespace Appium_Wizard.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap runner {
+            get {
+                object obj = ResourceManager.GetObject("runner", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap screenshot {
             get {
                 object obj = ResourceManager.GetObject("screenshot", resourceCulture);

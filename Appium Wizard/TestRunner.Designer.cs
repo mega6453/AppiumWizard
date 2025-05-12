@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunner));
             commandGridView = new DataGridView();
             Command = new DataGridViewTextBoxColumn();
@@ -42,6 +43,8 @@
             saveButton = new Button();
             loadButton = new Button();
             helpButton = new Button();
+            saveAsButton = new Button();
+            filePathToolTip = new ToolTip(components);
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             panel1.SuspendLayout();
@@ -164,11 +167,12 @@
             saveButton.Text = "Save Script";
             saveButton.UseVisualStyleBackColor = true;
             saveButton.Click += saveButton_Click;
+            saveButton.MouseHover += saveButton_MouseHover;
             // 
             // loadButton
             // 
             loadButton.AutoSize = true;
-            loadButton.Location = new Point(133, 11);
+            loadButton.Location = new Point(201, 12);
             loadButton.Name = "loadButton";
             loadButton.Size = new Size(76, 25);
             loadButton.TabIndex = 7;
@@ -178,7 +182,7 @@
             // 
             // helpButton
             // 
-            helpButton.Location = new Point(988, 0);
+            helpButton.Location = new Point(988, 3);
             helpButton.Name = "helpButton";
             helpButton.Size = new Size(75, 23);
             helpButton.TabIndex = 8;
@@ -186,12 +190,24 @@
             helpButton.UseVisualStyleBackColor = true;
             helpButton.Click += helpButton_Click;
             // 
+            // saveAsButton
+            // 
+            saveAsButton.AutoSize = true;
+            saveAsButton.Location = new Point(120, 12);
+            saveAsButton.Name = "saveAsButton";
+            saveAsButton.Size = new Size(75, 25);
+            saveAsButton.TabIndex = 9;
+            saveAsButton.Text = "Save As";
+            saveAsButton.UseVisualStyleBackColor = true;
+            saveAsButton.Click += saveAsButton_Click;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1075, 424);
+            Controls.Add(saveAsButton);
             Controls.Add(helpButton);
             Controls.Add(loadButton);
             Controls.Add(saveButton);
@@ -232,5 +248,7 @@
         private Button saveButton;
         private Button loadButton;
         private Button helpButton;
+        private Button saveAsButton;
+        private ToolTip filePathToolTip;
     }
 }

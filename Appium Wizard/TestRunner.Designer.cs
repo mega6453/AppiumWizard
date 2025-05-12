@@ -38,8 +38,6 @@
             comboBoxActions = new ComboBox();
             repeatButton = new Button();
             runOnceButton = new Button();
-            panel1 = new Panel();
-            label1 = new Label();
             saveButton = new Button();
             loadButton = new Button();
             helpButton = new Button();
@@ -47,7 +45,6 @@
             filePathToolTip = new ToolTip(components);
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
-            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // commandGridView
@@ -110,7 +107,7 @@
             // 
             comboBoxActions.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxActions.FormattingEnabled = true;
-            comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Wait for element visible", "Wait for element to vanish", "Wait in seconds", "Install App", "Launch App", "Kill App", "Uninstall App", "Execute Script", "Take Screenshot", "Device Action" });
+            comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Wait for element visible", "Wait for element to vanish", "Sleep", "Install App", "Launch App", "Kill App", "Uninstall App", "Execute Script", "Take Screenshot", "Device Action" });
             comboBoxActions.Location = new Point(398, 12);
             comboBoxActions.Name = "comboBoxActions";
             comboBoxActions.Size = new Size(282, 23);
@@ -138,24 +135,6 @@
             runOnceButton.Text = "Run Once";
             runOnceButton.UseVisualStyleBackColor = true;
             runOnceButton.Click += runOnceButton_Click;
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(label1);
-            panel1.Location = new Point(700, 218);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(363, 155);
-            panel1.TabIndex = 5;
-            panel1.Visible = false;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(3, 19);
-            label1.Name = "label1";
-            label1.Size = new Size(38, 15);
-            label1.TabIndex = 6;
-            label1.Text = "label1";
             // 
             // saveButton
             // 
@@ -211,7 +190,6 @@
             Controls.Add(helpButton);
             Controls.Add(loadButton);
             Controls.Add(saveButton);
-            Controls.Add(panel1);
             Controls.Add(repeatButton);
             Controls.Add(runOnceButton);
             Controls.Add(comboBoxActions);
@@ -227,8 +205,6 @@
             Shown += TestRunner_Shown;
             ((System.ComponentModel.ISupportInitialize)commandGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).EndInit();
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -243,8 +219,6 @@
         private DataGridViewTextBoxColumn Property;
         private DataGridViewTextBoxColumn Value;
         private DataGridViewTextBoxColumn Command;
-        private Panel panel1;
-        private Label label1;
         private Button saveButton;
         private Button loadButton;
         private Button helpButton;

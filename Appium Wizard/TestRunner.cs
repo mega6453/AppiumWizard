@@ -1,13 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Diagnostics;
-using System.IO;
-using System.Security.Policy;
 using System.Text;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Appium_Wizard
 {
@@ -193,25 +187,6 @@ namespace Appium_Wizard
                 {
                     commandGridView.Rows[0].Tag = deviceNameToUdidMap[value];
                 }
-
-
-                // Check if the property being updated is "Device Name"
-                //if (property == "Device Name" && deviceNameToUdidMap.ContainsKey(value))
-                //{
-                //    selectedUDID = deviceNameToUdidMap[value]; // Update the selected UDID
-                //    Console.WriteLine($"Selected Device UDID: {selectedUDID}"); // For debugging
-
-                //    // Update the OS type based on the selected device name
-                //    if (deviceNameToOsTypeMap.ContainsKey(value))
-                //    {
-                //        string osType = deviceNameToOsTypeMap[value];
-                //        isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
-                //        Console.WriteLine($"Selected OS Type: {osType}, isAndroid: {isAndroid}"); // For debugging
-                //    }
-                //}
-
-                // Update the corresponding cell in DataGridView1
-                //commandGridView.Rows[selectedIndex].Cells[0].Value = $"{property}: {value}";
                 commandGridView.Rows[selectedIndex].Cells[0].Value = FormatActionText(selectedIndex);
                 ValidateFields(selectedIndex);
             }
@@ -462,10 +437,11 @@ namespace Appium_Wizard
                     {
                         message.AppendLine($"  {property.Key}: {property.Value}");
                     }
-
+                    UpdateScreenControl("");
                     switch (actionType)
                     {
                         case "Click Element":
+                            UpdateScreenControl("Click " + properties["XPath"]);
                             if (isAndroid)
                             {
                                 AndroidAPIMethods.ClickElement(properties["XPath"]);
@@ -476,6 +452,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Send Text":
+                            UpdateScreenControl("Send Text "+ properties["Text to Enter"]+ " to " + properties["XPath"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -486,6 +463,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Set Device":
+                            UpdateScreenControl("Set Device - "+ properties["Device Name"]);
                             if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
                             {
                                 selectedUDID = deviceNameToUdidMap[properties["Device Name"]]; // Update the selected UDID
@@ -501,6 +479,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Wait for element visible":
+                            UpdateScreenControl("Wait for element visible - "+ properties["XPath"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -512,6 +491,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Wait for element to vanish":
+                            UpdateScreenControl("Wait for element to vanish - " + properties["XPath"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -523,6 +503,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Sleep":
+                            UpdateScreenControl("Sleep " + properties["Duration (ms)"] + " ms");
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -534,6 +515,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Install App":
+                            UpdateScreenControl("Install App "+ properties["App Path"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -544,6 +526,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Launch App":
+                            UpdateScreenControl("Launch App " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -554,6 +537,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Kill App":
+                            UpdateScreenControl("Kill App " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -564,6 +548,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Uninstall App":
+                            UpdateScreenControl("Uninstall App " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -584,6 +569,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Take Screenshot":
+                            UpdateScreenControl("Take Screenshot");
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -598,6 +584,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Device Action":
+                            UpdateScreenControl("Device Action : " + properties["Action"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -615,9 +602,18 @@ namespace Appium_Wizard
                             break;
                     }
                 }
+                UpdateScreenControl("");
             });
         }
 
+        public void UpdateScreenControl(string statusText)
+        {
+            if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
+            {
+                var screenControl = ScreenControl.udidScreenControl[selectedUDID];
+                screenControl.UpdateStatusLabel(screenControl, statusText);
+            }
+        }
 
         private string FormatActionText(int actionIndex)
         {

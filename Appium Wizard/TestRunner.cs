@@ -86,9 +86,6 @@ namespace Appium_Wizard
                 case "Uninstall App":
                     properties.Add("App Package", "");
                     break;
-                case "Execute Script":
-                    properties.Add("Script", "");
-                    break;
                 case "Take Screenshot":
                     break;
                 case "Device Action":
@@ -550,16 +547,6 @@ namespace Appium_Wizard
                                 iOSMethods.GetInstance().UninstallApp(selectedUDID, properties["App Package"]);
                             }
                             break;
-                        case "Execute Script":
-                            if (isAndroid)
-                            {
-                                // Android-specific implementation
-                            }
-                            else
-                            {
-                                // iOS-specific implementation
-                            }
-                            break;
                         case "Take Screenshot":
                             UpdateScreenControl("Take Screenshot and Save in Downloads");
                             if (isAndroid)
@@ -647,8 +634,6 @@ namespace Appium_Wizard
                     return $"Kill app with package {properties["App Package"]}";
                 case "Uninstall App":
                     return $"Uninstall app with package {properties["App Package"]}";
-                case "Execute Script":
-                    return $"Execute script: {properties["Script"]}";
                 case "Take Screenshot":
                     return $"Take screenshot and save to Downloads folder";
                 case "Device Action":
@@ -736,7 +721,8 @@ namespace Appium_Wizard
                 {
                     int rowIndex = commandGridView.Rows.Add(); // Add a new row
                     commandGridView.Rows[rowIndex].Cells[1].Value = action.Item1; // Set the value in column 1
-                    actionActiveStates.Add(false);
+                    commandGridView.Rows[rowIndex].Cells[0].Value = true;
+                    actionActiveStates.Add(true);
 
                     if (action.Item1 == "Set Device" && action.Item2.ContainsKey("Device Name"))
                     {

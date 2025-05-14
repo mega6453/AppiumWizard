@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "7.3.0";
-        public const string ReleaseNotes = "Screen control improvements";
+        public const string VersionNumber = "8.0.0";
+        public const string ReleaseNotes = "Test Runner";
     }
 }

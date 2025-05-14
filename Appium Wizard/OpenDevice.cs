@@ -79,7 +79,7 @@ namespace Appium_Wizard
         {
             bool usePreInstalledWDA = MainScreen.UDIDPreInstalledWDA.ContainsKey(udid);
             Logger.Info("usePreInstalledWDA : " + usePreInstalledWDA);
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
                 if (!deviceList.Contains(udid))
@@ -267,6 +267,7 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
+                                await Task.Delay(5000);
                                 if (deviceVersion >= version17Plus)
                                 {
                                     if (output.Contains("tunnel not created"))

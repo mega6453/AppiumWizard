@@ -18,7 +18,7 @@ namespace Appium_Wizard
         //public static Dictionary<int,bool> appiumServerRunningList = new Dictionary<int,bool>();
         public static Dictionary<int, Tuple<int, string>> portServerNumberAndFilePath = new Dictionary<int, Tuple<int, string>>();
         public static bool UpdateStatusInScreenFlag = true;
-        public static Dictionary<int,int> serverNumberWDAPortNumber = new Dictionary<int, int>();
+        public static Dictionary<int, int> serverNumberWDAPortNumber = new Dictionary<int, int>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
@@ -44,7 +44,7 @@ namespace Appium_Wizard
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t\t\t------------------------------Starting Appium Server------------------------------\n\n");
-            InitializeWatcher(logFilePath,serverNumber);
+            InitializeWatcher(logFilePath, serverNumber);
             if (!Common.IsNodeInstalled())
             {
                 File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n");
@@ -121,6 +121,14 @@ namespace Appium_Wizard
                     if (data.Contains("No plugins have been installed.") | data.Contains("No plugins activated."))
                     {
                         streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
+                        if (MainScreen.main != null)
+                        {
+                            Task.Run(async () =>
+                            {
+                                await Task.Delay(TimeSpan.FromSeconds(5));
+                                MainScreen.main.UpdateShowLogsCheckbox(false);
+                            });
+                        }
                     }
                 }
                 if (data.Contains("Appium REST http interface listener started"))
@@ -650,36 +658,36 @@ namespace Appium_Wizard
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
 public class ProxyServerManager
-    {
-        private const int CheckInterval = 1000;
-        private const int Timeout = 10000;
+{
+    private const int CheckInterval = 1000;
+    private const int Timeout = 10000;
 
-        private bool IsProxyServerReady(string host, int port)
+    private bool IsProxyServerReady(string host, int port)
+    {
+        try
         {
-            try
+            using (var client = new TcpClient(host, port))
             {
-                using (var client = new TcpClient(host, port))
-                {
-                    return true;
-                }
-            }
-            catch (SocketException)
-            {
-                return false;
+                return true;
             }
         }
-
-        public void WaitForProxyServer(string host, int port)
+        catch (SocketException)
         {
-            int elapsed = 0;
-            while (!IsProxyServerReady(host, port))
+            return false;
+        }
+    }
+
+    public void WaitForProxyServer(string host, int port)
+    {
+        int elapsed = 0;
+        while (!IsProxyServerReady(host, port))
+        {
+            if (elapsed >= Timeout)
             {
-                if (elapsed >= Timeout)
-                {
-                    MessageBox.Show("iOS Proxy server did not start in time. Try selecting different method or start proxy manually from Tools->iOS Proxy", "Failed to start iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                Thread.Sleep(CheckInterval);
-                elapsed += CheckInterval;
+                MessageBox.Show("iOS Proxy server did not start in time. Try selecting different method or start proxy manually from Tools->iOS Proxy", "Failed to start iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }     
+            Thread.Sleep(CheckInterval);
+            elapsed += CheckInterval;
+        }
+    }
 }

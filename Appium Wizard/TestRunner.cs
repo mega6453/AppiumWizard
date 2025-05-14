@@ -8,7 +8,7 @@ namespace Appium_Wizard
     public partial class TestRunner : Form
     {
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
-        private Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>(); 
+        private static Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>();
         private Dictionary<string, string> deviceNameToOsTypeMap = new Dictionary<string, string>();
         private List<string> deviceNames = new List<string>();
         bool isAndroid;
@@ -23,7 +23,7 @@ namespace Appium_Wizard
         public TestRunner()
         {
             InitializeComponent();
-            commandGridView.Columns[0].Width = commandGridView.Width - 5;
+            commandGridView.Columns[1].Width = commandGridView.Width - 5;
             propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
             propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
         }
@@ -43,6 +43,7 @@ namespace Appium_Wizard
             }
         }
 
+        private List<bool> actionActiveStates = new List<bool>();
         private void ComboBoxActions_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedAction = comboBoxActions.SelectedItem.ToString();
@@ -97,13 +98,16 @@ namespace Appium_Wizard
 
             // Add the action and its properties to the data list
             actionData.Add(new Tuple<string, Dictionary<string, string>>(selectedAction, properties));
+            actionActiveStates.Add(false);
 
             // Add the action to DataGridView1
-            int rowIndex = commandGridView.Rows.Add(selectedAction);
+            int rowIndex = commandGridView.Rows.Add(); // Add a new row
+            commandGridView.Rows[rowIndex].Cells[1].Value = selectedAction; // Set the value in column 1
             commandGridView.ClearSelection();
             DataGridViewRow newRow = commandGridView.Rows[rowIndex];
             // Highlight the newly created row
             newRow.Selected = true;
+            newRow.Cells[0].Value = true;
         }
 
         private void DataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -182,7 +186,7 @@ namespace Appium_Wizard
                 {
                     commandGridView.Rows[0].Tag = deviceNameToUdidMap[value];
                 }
-                commandGridView.Rows[selectedIndex].Cells[0].Value = FormatActionText(selectedIndex);
+                commandGridView.Rows[selectedIndex].Cells[1].Value = FormatActionText(selectedIndex);
                 ValidateFields(selectedIndex);
             }
         }
@@ -221,7 +225,7 @@ namespace Appium_Wizard
                 {
                     // Remove the corresponding entry from actionData
                     actionData.RemoveAt(rowIndex);
-
+                    actionActiveStates.RemoveAt(rowIndex);
                     // Clear DataGridView2 if the deleted row is selected
                     if (commandGridView.SelectedRows.Count > 0 && commandGridView.SelectedRows[0].Index == rowIndex)
                     {
@@ -234,6 +238,7 @@ namespace Appium_Wizard
                 MessageBox.Show($"Error while deleting row: {ex.Message}");
             }
         }
+
         private void dataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             var comboBoxCell = propertyGridView[e.ColumnIndex, e.RowIndex] as DataGridViewComboBoxCell;
@@ -269,6 +274,7 @@ namespace Appium_Wizard
                 runOnceButton.Text = "Run Once";
                 repeatButton.Enabled = true;
                 isRunning = false;
+                UpdateScreenControl("");
                 return;
             }
 
@@ -287,10 +293,11 @@ namespace Appium_Wizard
                     runOnceButton.Text = "Run Once";
                     repeatButton.Enabled = true;
                     isRunning = false;
+                    UpdateScreenControl("");
                     return;
                 }
-
                 selectedUDID = commandGridView.Rows[0].Tag as string;
+                selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                 {
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
@@ -299,10 +306,11 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    MessageBox.Show("Please open device and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     runOnceButton.Text = "Run Once";
                     repeatButton.Enabled = true;
                     isRunning = false;
+                    UpdateScreenControl("");
                     return;
                 }
             }
@@ -315,6 +323,7 @@ namespace Appium_Wizard
                 runOnceButton.Text = "Run Once";
                 repeatButton.Enabled = true;
                 isRunning = false;
+                UpdateScreenControl("");
             }
         }
 
@@ -327,6 +336,7 @@ namespace Appium_Wizard
                 repeatButton.Text = "Repeat";
                 runOnceButton.Enabled = true;
                 isRunning = false;
+                UpdateScreenControl("");
                 return;
             }
 
@@ -345,6 +355,7 @@ namespace Appium_Wizard
                     repeatButton.Text = "Repeat";
                     runOnceButton.Enabled = true;
                     isRunning = false;
+                    UpdateScreenControl("");
                     return;
                 }
                 string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the number of repetitions:", "Repeat Action", "1");
@@ -363,6 +374,7 @@ namespace Appium_Wizard
                     else
                     {
                         selectedUDID = commandGridView.Rows[0].Tag as string;
+                        selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                         if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                         {
                             port = ScreenControl.devicePorts[selectedUDID].Item2;
@@ -374,10 +386,11 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            MessageBox.Show("Please open device and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Please open the device "+ selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             repeatButton.Text = "Repeat";
                             runOnceButton.Enabled = true;
                             isRunning = false;
+                            UpdateScreenControl("");
                             return;
                         }
                     }
@@ -414,21 +427,15 @@ namespace Appium_Wizard
                     return;
                 }
 
-                foreach (var action in actionData)
+                for (int i = 0; i < actionData.Count; i++)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!actionActiveStates[i]) continue; // Skip inactive actions
 
+                    var action = actionData[i];
                     string actionType = action.Item1;
                     Dictionary<string, string> properties = action.Item2;
 
-                    StringBuilder message = new StringBuilder();
-                    message.AppendLine($"Action Type: {actionType}");
-                    message.AppendLine("Properties:");
-
-                    foreach (var property in properties)
-                    {
-                        message.AppendLine($"  {property.Key}: {property.Value}");
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
                     UpdateScreenControl("");
                     switch (actionType)
                     {
@@ -471,40 +478,33 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Wait for element visible":
-                            UpdateScreenControl("Wait for element visible - " + properties["XPath"]);
+                            int visibleTimeout = int.TryParse(properties["Timeout (ms)"], out var visibleParsedTimeout) ? visibleParsedTimeout : 0;
+                            UpdateScreenControl("Wait for element visible - " + properties["XPath"] + " - "+ visibleTimeout);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
                             }
                             else
                             {
-                                int timeout = int.TryParse(properties["Timeout (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-                                await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], timeout, cancellationToken);
+                                await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], visibleTimeout, cancellationToken);
                             }
                             break;
                         case "Wait for element to vanish":
-                            UpdateScreenControl("Wait for element to vanish - " + properties["XPath"]);
+                            int vanishTimeout = int.TryParse(properties["Timeout (ms)"], out var vanishParsedTimeout) ? vanishParsedTimeout : 0;
+                            UpdateScreenControl("Wait for element to vanish - " + properties["XPath"] + " - " + vanishTimeout);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
                             }
                             else
                             {
-                                int timeout = int.TryParse(properties["Timeout (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-                                await WaitUntilElementVanished(URL, sessionId, properties["XPath"], timeout, cancellationToken);
+                                await WaitUntilElementVanished(URL, sessionId, properties["XPath"], vanishTimeout, cancellationToken);
                             }
                             break;
                         case "Sleep":
                             UpdateScreenControl("Sleep " + properties["Duration (ms)"] + " ms");
-                            if (isAndroid)
-                            {
-                                // Android-specific implementation
-                            }
-                            else
-                            {
-                                int duration = int.TryParse(properties["Duration (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
-                                await Task.Delay(duration, cancellationToken);
-                            }
+                            int duration = int.TryParse(properties["Duration (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
+                            await Task.Delay(duration, cancellationToken);
                             break;
                         case "Install App":
                             UpdateScreenControl("Install App " + properties["App Path"]);
@@ -561,7 +561,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Take Screenshot":
-                            UpdateScreenControl("Take Screenshot");
+                            UpdateScreenControl("Take Screenshot and Save in Downloads");
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -596,6 +596,18 @@ namespace Appium_Wizard
                 }
                 UpdateScreenControl("");
             });
+        }
+
+        static string GetDeviceNameByUdid(string udid)
+        {
+            foreach (var kvp in deviceNameToUdidMap)
+            {
+                if (kvp.Value == udid)
+                {
+                    return kvp.Key;
+                }
+            }
+            return ""; // Return null if UDID not found
         }
 
         public void UpdateScreenControl(string statusText)
@@ -718,11 +730,14 @@ namespace Appium_Wizard
 
                 // Refresh the DataGridView with the loaded data
                 commandGridView.Rows.Clear();
+                actionActiveStates.Clear();
+
                 foreach (var action in actionData)
                 {
-                    int rowIndex = commandGridView.Rows.Add(action.Item1);
+                    int rowIndex = commandGridView.Rows.Add(); // Add a new row
+                    commandGridView.Rows[rowIndex].Cells[1].Value = action.Item1; // Set the value in column 1
+                    actionActiveStates.Add(false);
 
-                    // Set the Tag property for UDID if the action is "Set Device"
                     if (action.Item1 == "Set Device" && action.Item2.ContainsKey("Device Name"))
                     {
                         string deviceName = action.Item2["Device Name"];
@@ -733,7 +748,7 @@ namespace Appium_Wizard
                     }
 
                     // Update the action text
-                    commandGridView.Rows[rowIndex].Cells[0].Value = FormatActionText(rowIndex);
+                    commandGridView.Rows[rowIndex].Cells[1].Value = FormatActionText(rowIndex);
                 }
                 scriptFilePath = filePath;
             }
@@ -790,10 +805,13 @@ namespace Appium_Wizard
 
         private void commandGridView_MouseDown(object sender, MouseEventArgs e)
         {
-            // Get the index of the row under the mouse
-            rowIndexFromMouseDown = commandGridView.HitTest(e.X, e.Y).RowIndex;
+            // Get the index of the row and column under the mouse
+            var hitTestInfo = commandGridView.HitTest(e.X, e.Y);
+            rowIndexFromMouseDown = hitTestInfo.RowIndex;
+            int columnIndexFromMouseDown = hitTestInfo.ColumnIndex;
 
-            if (rowIndexFromMouseDown > 0) // Ensure a valid row is clicked
+            // Ensure a valid row is clicked and the column is not the checkbox column (index 0)
+            if (rowIndexFromMouseDown > 0 && columnIndexFromMouseDown != 0)
             {
                 // Begin drag-and-drop operation
                 commandGridView.DoDragDrop(commandGridView.Rows[rowIndexFromMouseDown], DragDropEffects.Move);
@@ -807,25 +825,28 @@ namespace Appium_Wizard
 
         private void commandGridView_DragDrop(object sender, DragEventArgs e)
         {
-            // Get the client point where the drop occurred
             Point clientPoint = commandGridView.PointToClient(new Point(e.X, e.Y));
-            rowIndexOfItemUnderMouseToDrop = commandGridView.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
+            int targetIndex = commandGridView.HitTest(clientPoint.X, clientPoint.Y).RowIndex;
 
-            if (rowIndexOfItemUnderMouseToDrop > 0 && rowIndexFromMouseDown > 0 && rowIndexFromMouseDown != rowIndexOfItemUnderMouseToDrop)
+            if (targetIndex >= 0 && rowIndexFromMouseDown >= 0 && rowIndexFromMouseDown != targetIndex)
             {
                 // Move the row visually in the DataGridView
                 DataGridViewRow rowToMove = commandGridView.Rows[rowIndexFromMouseDown];
                 commandGridView.Rows.RemoveAt(rowIndexFromMouseDown);
-                commandGridView.Rows.Insert(rowIndexOfItemUnderMouseToDrop, rowToMove);
+                commandGridView.Rows.Insert(targetIndex, rowToMove);
 
-                // Update the actionData list to reflect the new order
+                // Reorder the actionData and actionActiveStates lists
                 var actionToMove = actionData[rowIndexFromMouseDown];
                 actionData.RemoveAt(rowIndexFromMouseDown);
-                actionData.Insert(rowIndexOfItemUnderMouseToDrop, actionToMove);
+                actionData.Insert(targetIndex, actionToMove);
+
+                var stateToMove = actionActiveStates[rowIndexFromMouseDown];
+                actionActiveStates.RemoveAt(rowIndexFromMouseDown);
+                actionActiveStates.Insert(targetIndex, stateToMove);
 
                 // Re-select the moved row
                 commandGridView.ClearSelection();
-                commandGridView.Rows[rowIndexOfItemUnderMouseToDrop].Selected = true;
+                commandGridView.Rows[targetIndex].Selected = true;
             }
         }
 
@@ -899,6 +920,19 @@ namespace Appium_Wizard
         private void saveButton_MouseHover(object sender, EventArgs e)
         {
             filePathToolTip.SetToolTip(saveButton, scriptFilePath);
+        }
+
+        private void commandGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            // Check if the changed cell is in the checkbox column
+            if (e.ColumnIndex == 0 && e.RowIndex >= 0 && e.RowIndex < actionActiveStates.Count)
+            {
+                DataGridViewRow row = commandGridView.Rows[e.RowIndex];
+                bool isChecked = Convert.ToBoolean(row.Cells[0].Value);
+
+                // Update the active state
+                actionActiveStates[e.RowIndex] = isChecked;
+            }
         }
     }
 }

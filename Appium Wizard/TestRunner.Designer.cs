@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunner));
             commandGridView = new DataGridView();
+            checkboxColumn = new DataGridViewCheckBoxColumn();
             Command = new DataGridViewTextBoxColumn();
             propertyGridView = new DataGridView();
             Property = new DataGridViewTextBoxColumn();
@@ -55,17 +56,25 @@
             commandGridView.AllowUserToResizeRows = false;
             commandGridView.BackgroundColor = SystemColors.ControlLight;
             commandGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            commandGridView.Columns.AddRange(new DataGridViewColumn[] { Command });
+            commandGridView.Columns.AddRange(new DataGridViewColumn[] { checkboxColumn, Command });
             commandGridView.Location = new Point(12, 41);
             commandGridView.Name = "commandGridView";
             commandGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             commandGridView.Size = new Size(668, 332);
             commandGridView.TabIndex = 0;
+            commandGridView.CellValueChanged += commandGridView_CellValueChanged;
             commandGridView.SelectionChanged += DataGridView1_SelectionChanged;
             commandGridView.UserDeletingRow += DataGridView1_UserDeletingRow;
             commandGridView.DragDrop += commandGridView_DragDrop;
             commandGridView.DragOver += commandGridView_DragOver;
             commandGridView.MouseDown += commandGridView_MouseDown;
+            // 
+            // checkboxColumn
+            // 
+            checkboxColumn.HeaderText = "Check";
+            checkboxColumn.Name = "checkboxColumn";
+            checkboxColumn.Resizable = DataGridViewTriState.False;
+            checkboxColumn.Width = 50;
             // 
             // Command
             // 
@@ -222,11 +231,12 @@
         private Button runOnceButton;
         private DataGridViewTextBoxColumn Property;
         private DataGridViewTextBoxColumn Value;
-        private DataGridViewTextBoxColumn Command;
         private Button saveButton;
         private Button loadButton;
         private Button helpButton;
         private Button saveAsButton;
         private ToolTip filePathToolTip;
+        private DataGridViewCheckBoxColumn checkboxColumn;
+        private DataGridViewTextBoxColumn Command;
     }
 }

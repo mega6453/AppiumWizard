@@ -267,7 +267,10 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
-                                await Task.Delay(5000);
+                                if (!iOSMethods.GetInstance().isImageMounted(udid))
+                                {
+                                    iOSMethods.GetInstance().MountImage(udid);
+                                }
                                 if (deviceVersion >= version17Plus)
                                 {
                                     if (output.Contains("tunnel not created"))
@@ -293,7 +296,7 @@ namespace Appium_Wizard
                                     return;
                                 }
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.", 70);
-                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort).GetAwaiter().GetResult();
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
                                 Logger.Info("WDAsessionId:"+ WDAsessionId);
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {

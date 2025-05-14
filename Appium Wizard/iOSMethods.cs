@@ -152,7 +152,7 @@ namespace Appium_Wizard
                 if (executable == iOSExecutable.go)
                 {
                     Logger.Info("GetListOfInstalledApps - execute with go...");
-                    var output = ExecuteCommand("apps --list", udid);
+                    var output = ExecuteCommand("apps --list", udid,true,10000);
                     string pattern = @"(\w+(\.\w+)*)\s";
                     MatchCollection matches = Regex.Matches(output, pattern);
 
@@ -1564,7 +1564,7 @@ namespace Appium_Wizard
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public async Task<string> RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
+        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             try
             {
@@ -1650,7 +1650,7 @@ namespace Appium_Wizard
                 //{
                 //    return "Enable Developer Mode";
                 //}
-                iOSMethods.GetInstance().GoToHomeScreen(udid);
+                //iOSMethods.GetInstance().GoToHomeScreen(udid);
                 return sessionId;
             }
             catch (Exception)

@@ -44,6 +44,7 @@
             helpButton = new Button();
             saveAsButton = new Button();
             filePathToolTip = new ToolTip(components);
+            label5 = new Label();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             SuspendLayout();
@@ -193,12 +194,25 @@
             saveAsButton.UseVisualStyleBackColor = true;
             saveAsButton.Click += saveAsButton_Click;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            label5.ForeColor = Color.IndianRed;
+            label5.Location = new Point(700, 206);
+            label5.Margin = new Padding(2, 0, 2, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(364, 30);
+            label5.TabIndex = 11;
+            label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN VALUES, \r\nSO MAKE SURE YOU ARE ENTERING VALID VALUES.";
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1075, 424);
+            Controls.Add(label5);
             Controls.Add(saveAsButton);
             Controls.Add(helpButton);
             Controls.Add(loadButton);
@@ -238,5 +252,6 @@
         private ToolTip filePathToolTip;
         private DataGridViewCheckBoxColumn checkboxColumn;
         private DataGridViewTextBoxColumn Command;
+        private Label label5;
     }
 }

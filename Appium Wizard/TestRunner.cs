@@ -95,7 +95,7 @@ namespace Appium_Wizard
 
             // Add the action and its properties to the data list
             actionData.Add(new Tuple<string, Dictionary<string, string>>(selectedAction, properties));
-            actionActiveStates.Add(false);
+            actionActiveStates.Add(true);
 
             // Add the action to DataGridView1
             int rowIndex = commandGridView.Rows.Add(); // Add a new row
@@ -293,6 +293,7 @@ namespace Appium_Wizard
                     UpdateScreenControl("");
                     return;
                 }
+                GoogleAnalytics.SendEvent("RunOnce_TestRunner");
                 selectedUDID = commandGridView.Rows[0].Tag as string;
                 selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
@@ -370,6 +371,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        GoogleAnalytics.SendEvent("Repeat_TestRunner",repetitions.ToString());
                         selectedUDID = commandGridView.Rows[0].Tag as string;
                         selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                         if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
@@ -599,10 +601,16 @@ namespace Appium_Wizard
 
         public void UpdateScreenControl(string statusText)
         {
-            if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
+            try
             {
-                var screenControl = ScreenControl.udidScreenControl[selectedUDID];
-                screenControl.UpdateStatusLabel(screenControl, statusText);
+                if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
+                {
+                    var screenControl = ScreenControl.udidScreenControl[selectedUDID];
+                    screenControl.UpdateStatusLabel(screenControl, statusText);
+                }
+            }
+            catch (Exception)
+            {
             }
         }
 
@@ -701,6 +709,7 @@ namespace Appium_Wizard
                 string filePath = openFileDialog.FileName;
                 LoadScriptFromFile(filePath);
             }
+            GoogleAnalytics.SendEvent("Load Script");
         }
 
         public void LoadScriptFromFile(string filePath)
@@ -763,6 +772,7 @@ namespace Appium_Wizard
             {
                 SaveScriptToFile(scriptFilePath);
             }
+            GoogleAnalytics.SendEvent("Save Script");
         }
 
         public void SaveScriptToFile(string filePath)
@@ -834,6 +844,7 @@ namespace Appium_Wizard
                 commandGridView.ClearSelection();
                 commandGridView.Rows[targetIndex].Selected = true;
             }
+            GoogleAnalytics.SendEvent("DragDropRows_TestRunner");
         }
 
         private void helpButton_Click(object sender, EventArgs e)

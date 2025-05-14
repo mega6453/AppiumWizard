@@ -99,7 +99,7 @@
             propertyGridView.Name = "propertyGridView";
             propertyGridView.RowHeadersVisible = false;
             propertyGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            propertyGridView.Size = new Size(363, 161);
+            propertyGridView.Size = new Size(402, 161);
             propertyGridView.TabIndex = 1;
             propertyGridView.CellBeginEdit += dataGridView1_CellBeginEdit;
             propertyGridView.CellValueChanged += DataGridView2_CellValueChanged;
@@ -175,9 +175,10 @@
             // 
             // helpButton
             // 
-            helpButton.Location = new Point(988, 3);
+            helpButton.AutoSize = true;
+            helpButton.Location = new Point(1027, 5);
             helpButton.Name = "helpButton";
-            helpButton.Size = new Size(75, 23);
+            helpButton.Size = new Size(75, 25);
             helpButton.TabIndex = 8;
             helpButton.Text = "Help";
             helpButton.UseVisualStyleBackColor = true;
@@ -211,7 +212,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1075, 424);
+            ClientSize = new Size(1114, 424);
             Controls.Add(label5);
             Controls.Add(saveAsButton);
             Controls.Add(helpButton);

@@ -300,6 +300,7 @@ namespace Appium_Wizard
             MoreButton.Text = "More...";
             MoreButton.UseVisualStyleBackColor = true;
             MoreButton.Click += MoreButton_Click;
+            MoreButton.MouseHover += MoreButton_MouseHover;
             // 
             // menuStrip1
             // 

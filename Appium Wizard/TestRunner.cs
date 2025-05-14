@@ -24,8 +24,8 @@ namespace Appium_Wizard
         {
             InitializeComponent();
             commandGridView.Columns[1].Width = commandGridView.Width - 5;
-            propertyGridView.Columns[0].Width = (propertyGridView.Width / 2) - 5;
-            propertyGridView.Columns[1].Width = (propertyGridView.Width / 2);
+            propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.3);
+            propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.7);
         }
 
         private void MainForm_Load(object sender, EventArgs e)

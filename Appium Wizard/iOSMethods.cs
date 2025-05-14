@@ -4,9 +4,7 @@ using NLog;
 using RestSharp;
 using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Management;
 using System.Net;
-using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -154,7 +152,7 @@ namespace Appium_Wizard
                 if (executable == iOSExecutable.go)
                 {
                     Logger.Info("GetListOfInstalledApps - execute with go...");
-                    var output = ExecuteCommand("apps --list", udid);
+                    var output = ExecuteCommand("apps --list", udid,true,10000);
                     string pattern = @"(\w+(\.\w+)*)\s";
                     MatchCollection matches = Regex.Matches(output, pattern);
 
@@ -1566,7 +1564,7 @@ namespace Appium_Wizard
         }
 
         string runwdaOutput = "", runwdaError = "";
-        public async Task<string> RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
+        public string RunWebDriverAgent(CommonProgress commonProgress, string udid, int port)
         {
             try
             {
@@ -1580,143 +1578,8 @@ namespace Appium_Wizard
                         return sessionId;
                     }
                 }
-
-                if (isGo && !is17Plus)
-                {
-                    Logger.Info("isGo:" + isGo + " and !is17plus:" + !is17Plus);
-                    // Create a new process
-                    Process process = new Process();
-
-                    // Configure the process
-                    process.StartInfo.FileName = iOSServerFilePath;
-                    if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iOSMethods.GetInstance().iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
-                    {
-                        Logger.Info("launch " + MainScreen.UDIDPreInstalledWDA[udid]);
-                        process.StartInfo.Arguments = "launch " + MainScreen.UDIDPreInstalledWDA[udid] + " --udid=" + udid;
-                    }
-                    else
-                    {
-                        Logger.Info("runwda");
-                        process.StartInfo.Arguments = "runwda --udid=" + udid;
-                    }
-                    //process.StartInfo.Arguments = "runwda --udid=" + udid;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.RedirectStandardError = true;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.EnableRaisingEvents = true;
-
-                    // Register event handlers for error and output data received
-                    //process.ErrorDataReceived += Process_ErrorDataReceived;
-                    //process.OutputDataReceived += Process_OutputDataReceived;
-                    process.ErrorDataReceived += (sender, e) => Process_ErrorDataReceived(sender, e, port);
-                    process.OutputDataReceived += (sender, e) => Process_OutputDataReceived(sender, e, port);
-
-                    // Start the process
-                    process.Start();
-                    var processId = process.Id;
-                    MainScreen.runningProcesses.Add(processId);
-                    //Thread.Sleep(2000);
-                    await Task.Delay(3000);
-                    // Begin asynchronous reading of the output/error streams
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
-
-                    // Wait for the process to exit
-                    //process.WaitForExit();
-
-                    // Clean up resources
-                    //process.Close();
-                    bool isPasscodeRequired = false;
-                    int count = 1;
-                    string sessionId = string.Empty;
-                    bool isWDARanAtleaseOnce = false;
-                    Logger.Info("process.HasExited? : " + process.HasExited);
-                    if (!process.HasExited && string.IsNullOrEmpty(runwdaError))
-                    {
-                        await Task.Delay(5000);
-                    }
-                    if (!string.IsNullOrEmpty(runwdaError))
-                    {
-                        if (runwdaError.Contains("Process started successfully"))
-                        {
-                            sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                            Logger.Debug("sessionid" + sessionId);
-                            while (sessionId.Equals("nosession") && count <= 6)
-                            {
-                                await Task.Run(async () =>
-                                {
-                                    //Thread.Sleep(5000);
-                                    await Task.Delay(5000);
-                                    sessionId = iOSAPIMethods.CreateWDASession(port);
-                                    Logger.Debug("sessionid" + sessionId);
-                                    bool IsWDARunningInAppsList = iOSMethods.GetInstance().IsWDARunningInAppsList(udid);
-                                    Logger.Debug("IsWDARunningInAppsList" + IsWDARunningInAppsList);
-                                    if (sessionId.Equals("nosession") & IsWDARunningInAppsList)
-                                    {
-                                        commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                        isPasscodeRequired = true;
-                                        isWDARanAtleaseOnce = true;
-                                    }
-                                    else if (!IsWDARunningInAppsList)
-                                    {
-                                        iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
-                                        if (isWDARanAtleaseOnce)
-                                        {
-                                            commonProgress.UpdateStepLabel("Please DON'T CANCEL the XCTest passcode request. Enter passcode on your iPhone to continue...Retrying in 5 seconds...\nRetry " + count + "/6.");
-                                        }
-                                        isPasscodeRequired = true;
-                                    }
-                                    count++;
-                                });
-                            }
-                            if (sessionId.Equals("nosession") & isPasscodeRequired)
-                            {
-                                process.Close();
-                                return "nosession passcode required";
-                            }
-                            else
-                            {
-                                process.Close();
-                                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                                return sessionId;
-                            }
-                        }
-                    }
-                    Logger.Error("runwdaError:" + runwdaError);
-                    if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
-                    {
-                        return "Enable Developer Mode";
-                    }
-                    if (runwdaError.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure with reason:'PasswordProtected'"))
-                    {
-                        return "Password Protected";
-                    }
-                    if (runwdaError.Contains("Timed out while enabling automation mode"))
-                    {
-                        return "Timed out";
-                    }
-                    //if (runwdaError.Contains("WDA process ended unexpectedly"))
-                    //{
-                    //    return RunWebDriverAgentQuick(commonProgress,udid,port);
-                    //}
-                    sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                    if (!sessionId.Equals("nosession"))
-                    {
-                        return sessionId;
-                    }
-                    else
-                    {
-                        Logger.Error(runwdaError, "unhandled");
-                        return "unhandled";
-                    }
-                }
-                else
-                {
-                    Logger.Info("RunWebDriverAgentQuick");
-                    return RunWebDriverAgentQuick(commonProgress, udid, port);
-                }
-
+                Logger.Info("RunWebDriverAgentQuick");
+                return RunWebDriverAgentQuick(commonProgress, udid, port);
             }
             catch (Exception e)
             {
@@ -1787,7 +1650,7 @@ namespace Appium_Wizard
                 //{
                 //    return "Enable Developer Mode";
                 //}
-                iOSMethods.GetInstance().GoToHomeScreen(udid);
+                //iOSMethods.GetInstance().GoToHomeScreen(udid);
                 return sessionId;
             }
             catch (Exception)

@@ -45,6 +45,7 @@
             saveAsButton = new Button();
             filePathToolTip = new ToolTip(components);
             label5 = new Label();
+            repeatCountLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             SuspendLayout();
@@ -60,8 +61,9 @@
             commandGridView.Columns.AddRange(new DataGridViewColumn[] { checkboxColumn, Command });
             commandGridView.Location = new Point(12, 41);
             commandGridView.Name = "commandGridView";
+            commandGridView.RowHeadersVisible = false;
             commandGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            commandGridView.Size = new Size(668, 332);
+            commandGridView.Size = new Size(632, 332);
             commandGridView.TabIndex = 0;
             commandGridView.CellValueChanged += commandGridView_CellValueChanged;
             commandGridView.SelectionChanged += DataGridView1_SelectionChanged;
@@ -72,7 +74,7 @@
             // 
             // checkboxColumn
             // 
-            checkboxColumn.HeaderText = "Check";
+            checkboxColumn.HeaderText = "Y/N";
             checkboxColumn.Name = "checkboxColumn";
             checkboxColumn.Resizable = DataGridViewTriState.False;
             checkboxColumn.Width = 50;
@@ -95,11 +97,11 @@
             propertyGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             propertyGridView.Columns.AddRange(new DataGridViewColumn[] { Property, Value });
             propertyGridView.EditMode = DataGridViewEditMode.EditOnEnter;
-            propertyGridView.Location = new Point(700, 41);
+            propertyGridView.Location = new Point(663, 41);
             propertyGridView.Name = "propertyGridView";
             propertyGridView.RowHeadersVisible = false;
             propertyGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            propertyGridView.Size = new Size(402, 161);
+            propertyGridView.Size = new Size(439, 161);
             propertyGridView.TabIndex = 1;
             propertyGridView.CellBeginEdit += dataGridView1_CellBeginEdit;
             propertyGridView.CellValueChanged += DataGridView2_CellValueChanged;
@@ -122,16 +124,16 @@
             comboBoxActions.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxActions.FormattingEnabled = true;
             comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Send Text With Random Values", "Wait for element visible", "Wait for element to vanish", "Sleep", "Install App", "Launch App", "Kill App", "Uninstall App", "Take Screenshot", "Device Action" });
-            comboBoxActions.Location = new Point(398, 12);
+            comboBoxActions.Location = new Point(439, 14);
             comboBoxActions.Name = "comboBoxActions";
-            comboBoxActions.Size = new Size(282, 23);
+            comboBoxActions.Size = new Size(205, 23);
             comboBoxActions.TabIndex = 2;
             comboBoxActions.SelectedIndexChanged += ComboBoxActions_SelectedIndexChanged;
             // 
             // repeatButton
             // 
             repeatButton.AutoSize = true;
-            repeatButton.Location = new Point(536, 391);
+            repeatButton.Location = new Point(490, 387);
             repeatButton.Name = "repeatButton";
             repeatButton.Size = new Size(75, 25);
             repeatButton.TabIndex = 4;
@@ -142,7 +144,7 @@
             // runOnceButton
             // 
             runOnceButton.AutoSize = true;
-            runOnceButton.Location = new Point(398, 391);
+            runOnceButton.Location = new Point(399, 387);
             runOnceButton.Name = "runOnceButton";
             runOnceButton.Size = new Size(75, 25);
             runOnceButton.TabIndex = 3;
@@ -153,7 +155,7 @@
             // saveButton
             // 
             saveButton.AutoSize = true;
-            saveButton.Location = new Point(39, 12);
+            saveButton.Location = new Point(13, 12);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 25);
             saveButton.TabIndex = 6;
@@ -165,7 +167,7 @@
             // loadButton
             // 
             loadButton.AutoSize = true;
-            loadButton.Location = new Point(201, 12);
+            loadButton.Location = new Point(175, 12);
             loadButton.Name = "loadButton";
             loadButton.Size = new Size(76, 25);
             loadButton.TabIndex = 7;
@@ -187,7 +189,7 @@
             // saveAsButton
             // 
             saveAsButton.AutoSize = true;
-            saveAsButton.Location = new Point(120, 12);
+            saveAsButton.Location = new Point(94, 12);
             saveAsButton.Name = "saveAsButton";
             saveAsButton.Size = new Size(75, 25);
             saveAsButton.TabIndex = 9;
@@ -200,12 +202,20 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label5.ForeColor = Color.IndianRed;
-            label5.Location = new Point(700, 206);
+            label5.Location = new Point(663, 205);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new Size(364, 30);
             label5.TabIndex = 11;
             label5.Text = "NOTE : THERE IS NO VALIDATION DONE ON THE GIVEN VALUES, \r\nSO MAKE SURE YOU ARE ENTERING VALID VALUES.";
+            // 
+            // repeatCountLabel
+            // 
+            repeatCountLabel.AutoSize = true;
+            repeatCountLabel.Location = new Point(582, 392);
+            repeatCountLabel.Name = "repeatCountLabel";
+            repeatCountLabel.Size = new Size(0, 15);
+            repeatCountLabel.TabIndex = 12;
             // 
             // TestRunner
             // 
@@ -213,6 +223,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 424);
+            Controls.Add(repeatCountLabel);
             Controls.Add(label5);
             Controls.Add(saveAsButton);
             Controls.Add(helpButton);
@@ -254,5 +265,7 @@
         private DataGridViewCheckBoxColumn checkboxColumn;
         private DataGridViewTextBoxColumn Command;
         private Label label5;
+        private Label label1;
+        private Label repeatCountLabel;
     }
 }

@@ -23,9 +23,10 @@ namespace Appium_Wizard
         public TestRunner()
         {
             InitializeComponent();
-            commandGridView.Columns[1].Width = commandGridView.Width - 5;
-            propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.3);
-            propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.7);
+            commandGridView.Columns[0].Width = (int)(commandGridView.Width * 0.05);
+            commandGridView.Columns[1].Width = (int)(commandGridView.Width * 0.95);
+            propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.4);
+            propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.6);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -54,15 +55,18 @@ namespace Appium_Wizard
             {
                 case "Click Element":
                     properties.Add("XPath", "");
+                    properties.Add("Wait For Element Visible (ms)", "5000");
                     break;
                 case "Send Text":
                     properties.Add("XPath", "");
                     properties.Add("Text to Enter", "");
+                    properties.Add("Wait For Element Visible (ms)", "5000");
                     break;
                 case "Send Text With Random Values":
                     properties.Add("XPath", "");
                     properties.Add("Text Type", "Random Number");
                     properties.Add("Number of digits/characters", "");
+                    properties.Add("Wait For Element Visible (ms)", "5000");
                     break;
                 case "Set Device":
                     properties.Add("Device Name", "");
@@ -463,9 +467,11 @@ namespace Appium_Wizard
                         {
                             port = ScreenControl.devicePorts[selectedUDID].Item2;
                             URL = "http://127.0.0.1:" + port;
-                            for (int i = 0; i < repetitions; i++)
+                            repeatCountLabel.Text = $"0/{repetitions}";
+                            for (int i = 1; i <= repetitions; i++)
                             {
                                 await performActions(cancellationTokenSource.Token);
+                                repeatCountLabel.Text = $"{i}/{repetitions}";
                             }
                         }
                         else
@@ -528,7 +534,9 @@ namespace Appium_Wizard
                     switch (actionType)
                     {
                         case "Click Element":
-                            UpdateScreenControl("Click " + properties["XPath"]);
+                            int clickTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var clickParsedTimeout) ? clickParsedTimeout : 0;
+                            UpdateScreenControl("Click " + properties["XPath"] + " | timeout:" + clickTimeout);
+                            await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], clickTimeout, cancellationToken);
                             if (isAndroid)
                             {
                                 AndroidAPIMethods.ClickElement(properties["XPath"]);
@@ -539,7 +547,9 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Send Text":
-                            UpdateScreenControl("Send Text " + properties["Text to Enter"] + " to " + properties["XPath"]);
+                            int sendTextTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var sendTextParsedTimeout) ? sendTextParsedTimeout : 0;
+                            UpdateScreenControl("Send Text " + properties["Text to Enter"] + " to " + properties["XPath"] + " | timeout:" + sendTextTimeout);
+                            await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextTimeout, cancellationToken);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -552,7 +562,7 @@ namespace Appium_Wizard
                         case "Send Text With Random Values":
                             string textType = properties["Text Type"];
                             string textToEnter;
-
+                            int sendTextRandomValuesTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var sendTextRandomParsedTimeout) ? sendTextRandomParsedTimeout : 0;
                             if (textType == "Random Number")
                             {
                                 if (properties.TryGetValue("Number of digits/characters", out string numDigitsStr) && int.TryParse(numDigitsStr, out int numDigits))
@@ -594,8 +604,8 @@ namespace Appium_Wizard
                             {
                                 textToEnter = properties["Text to Enter"];
                             }
-
-                            UpdateScreenControl($"Send Text \"{textToEnter}\" to {properties["XPath"]}");
+                            UpdateScreenControl("Send Random Text to " + properties["XPath"] + " | timeout:" + sendTextRandomValuesTimeout);
+                            await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextRandomValuesTimeout, cancellationToken);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -653,7 +663,7 @@ namespace Appium_Wizard
                             await Task.Delay(duration, cancellationToken);
                             break;
                         case "Install App":
-                            UpdateScreenControl("Install App " + properties["App Path"]);
+                            UpdateScreenControl("Install App : " + properties["App Path"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -664,7 +674,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Launch App":
-                            UpdateScreenControl("Launch App " + properties["App Package"]);
+                            UpdateScreenControl("Launch App : " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -675,7 +685,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Kill App":
-                            UpdateScreenControl("Kill App " + properties["App Package"]);
+                            UpdateScreenControl("Kill App : " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -686,7 +696,7 @@ namespace Appium_Wizard
                             }
                             break;
                         case "Uninstall App":
-                            UpdateScreenControl("Uninstall App " + properties["App Package"]);
+                            UpdateScreenControl("Uninstall App : " + properties["App Package"]);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -770,21 +780,11 @@ namespace Appium_Wizard
             switch (actionType)
             {
                 case "Send Text":
-                    return $"Send text \"{properties["Text to Enter"]}\" to {properties["XPath"]}";
+                    return $"Send text \"{properties["Text to Enter"]}\" to {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Send Text With Random Values":
-                    if (properties.TryGetValue("Text Type", out string textType))
-                    {
-                        string textKey = textType == "Random Number" ? "Number of Digits" : "Text to Enter";
-                        if (properties.TryGetValue(textKey, out string textValue))
-                        {
-                            return textType == "Random Number"
-                                ? $"Send random number with {textValue} digits to {properties["XPath"]}"
-                                : $"Send text \"{textValue}\" to {properties["XPath"]}";
-                        }
-                    }
-                    return "Send Text action properties are incomplete.";
+                    return $"Send \"{properties["Text Type"]}\" with \"{properties["Number of digits/characters"]}\" digits/characters to \"{properties["XPath"]}\" , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Click Element":
-                    return $"Click element at {properties["XPath"]}";
+                    return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Set Device":
                     return $"Set device to {properties["Device Name"]}";
                 case "Wait for element visible":

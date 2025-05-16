@@ -121,7 +121,7 @@
             // 
             comboBoxActions.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxActions.FormattingEnabled = true;
-            comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Wait for element visible", "Wait for element to vanish", "Sleep", "Install App", "Launch App", "Kill App", "Uninstall App", "Take Screenshot", "Device Action" });
+            comboBoxActions.Items.AddRange(new object[] { "Set Device", "Click Element", "Send Text", "Send Text With Random Values", "Wait for element visible", "Wait for element to vanish", "Sleep", "Install App", "Launch App", "Kill App", "Uninstall App", "Take Screenshot", "Device Action" });
             comboBoxActions.Location = new Point(398, 12);
             comboBoxActions.Name = "comboBoxActions";
             comboBoxActions.Size = new Size(282, 23);

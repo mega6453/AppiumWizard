@@ -59,6 +59,11 @@ namespace Appium_Wizard
                     properties.Add("XPath", "");
                     properties.Add("Text to Enter", "");
                     break;
+                case "Send Text With Random Values":
+                    properties.Add("XPath", "");
+                    properties.Add("Text Type", "Random Number");
+                    properties.Add("Number of digits/characters", "");
+                    break;
                 case "Set Device":
                     properties.Add("Device Name", "");
                     break;
@@ -129,7 +134,28 @@ namespace Appium_Wizard
 
                         row.Cells[0].Value = property.Key;
 
+                        if (actionName == "Send Text With Random Values" && property.Key == "Text Type")
+                        {
+                            // Create a ComboBox cell for the "Text Type" field
+                            var comboBoxCell = new DataGridViewComboBoxCell
+                            {
+                                DataSource = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" }, // Dropdown options
+                                Value = property.Value // Default value
+                            };
 
+                            // Validate the value to ensure it matches one of the dropdown options
+                            if (comboBoxCell.DataSource is List<string> dataSource && !dataSource.Contains(comboBoxCell.Value))
+                            {
+                                comboBoxCell.Value = dataSource.FirstOrDefault(); // Set to the first valid option if invalid
+                            }
+
+                            row.Cells[1] = comboBoxCell;
+                        }
+                        else if (actionName == "Send Text With Random Values" && property.Key == "Number of digits/characters")
+                        {
+                            // Create a standard TextBox cell for "Number of digits/characters"
+                            row.Cells[1].Value = property.Value;
+                        }
                         if (actionName == "Set Device" && property.Key == "Device Name")
                         {
                             // Create a ComboBox cell for the value field
@@ -183,11 +209,70 @@ namespace Appium_Wizard
                 {
                     commandGridView.Rows[0].Tag = deviceNameToUdidMap[value];
                 }
+
+                if (property == "Text Type")
+                {
+                    var validOptions = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" };
+
+                    // Validate the new value
+                    if (!validOptions.Contains(value))
+                    {
+                        MessageBox.Show($"Invalid value for Text Type: {value}", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // No need to update the key; we keep the original key ("Number of digits/characters")
+                    // The value of "Number of digits/characters" will be used for all Text Types
+                }
+
+
                 commandGridView.Rows[selectedIndex].Cells[1].Value = FormatActionText(selectedIndex);
                 ValidateFields(selectedIndex);
             }
         }
 
+        private void RefreshPropertyGrid(int selectedIndex)
+        {
+            propertyGridView.Rows.Clear();
+
+            var selectedActionData = actionData[selectedIndex];
+            string actionName = selectedActionData.Item1;
+
+            foreach (var property in selectedActionData.Item2)
+            {
+                var row = new DataGridViewRow();
+                row.CreateCells(propertyGridView);
+
+                row.Cells[0].Value = property.Key;
+
+                if (actionName == "Send Text With Random Values" && property.Key == "Text Type")
+                {
+                    var comboBoxCell = new DataGridViewComboBoxCell
+                    {
+                        DataSource = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" }, // Dropdown options
+                        Value = property.Value // Ensure this value matches one of the dropdown options
+                    };
+
+                    // Validate the value to prevent the exception
+                    if (!comboBoxCell.Items.Contains(comboBoxCell.Value))
+                    {
+                        comboBoxCell.Value = comboBoxCell.Items[0]; // Set to the first valid option if invalid
+                    }
+
+                    row.Cells[1] = comboBoxCell;
+                }
+                else if (actionName == "Send Text With Random Values")
+                {
+                    row.Cells[1].Value = property.Value;
+                }
+                else
+                {
+                    row.Cells[1].Value = property.Value;
+                }
+
+                propertyGridView.Rows.Add(row);
+            }
+        }
 
         private void ValidateFields(int selectedIndex)
         {
@@ -407,6 +492,8 @@ namespace Appium_Wizard
             }
         }
 
+        HashSet<int> usedRandomNumbers = new HashSet<int>(); // Track used random numbers
+
         private async Task performActions(CancellationToken cancellationToken)
         {
             await Task.Run(async () =>
@@ -422,9 +509,11 @@ namespace Appium_Wizard
                 }
                 if (string.IsNullOrEmpty(sessionId) || string.IsNullOrWhiteSpace(sessionId) || sessionId.Equals("nosession"))
                 {
-                    MessageBox.Show("Please open device and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+
+                Random random = new Random(); // Random number generator
 
                 for (int i = 0; i < actionData.Count; i++)
                 {
@@ -460,6 +549,64 @@ namespace Appium_Wizard
                                 iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
                             break;
+                        case "Send Text With Random Values":
+                            string textType = properties["Text Type"];
+                            string textToEnter;
+
+                            if (textType == "Random Number")
+                            {
+                                if (properties.TryGetValue("Number of digits/characters", out string numDigitsStr) && int.TryParse(numDigitsStr, out int numDigits))
+                                {
+                                    textToEnter = random.Next((int)Math.Pow(10, numDigits - 1), (int)Math.Pow(10, numDigits)).ToString();
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Invalid number of digits for random number generation.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                            }
+                            else if (textType == "Random Alphabets")
+                            {
+                                if (properties.TryGetValue("Number of digits/characters", out string numCharsStr) && int.TryParse(numCharsStr, out int numChars))
+                                {
+                                    textToEnter = new string(Enumerable.Range(0, numChars).Select(_ => (char)random.Next('A', 'Z' + 1)).ToArray());
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Invalid number of characters for random alphabet generation.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                            }
+                            else if (textType == "Random Alphanumeric")
+                            {
+                                if (properties.TryGetValue("Number of digits/characters", out string numCharsStr) && int.TryParse(numCharsStr, out int numChars))
+                                {
+                                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                                    textToEnter = new string(Enumerable.Range(0, numChars).Select(_ => chars[random.Next(chars.Length)]).ToArray());
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Invalid number of characters for random alphanumeric generation.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                textToEnter = properties["Text to Enter"];
+                            }
+
+                            UpdateScreenControl($"Send Text \"{textToEnter}\" to {properties["XPath"]}");
+                            if (isAndroid)
+                            {
+                                // Android-specific implementation
+                            }
+                            else
+                            {
+                                iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
+                            }
+                            break;
+
+
                         case "Set Device":
                             UpdateScreenControl("Set Device - " + properties["Device Name"]);
                             if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
@@ -622,10 +769,22 @@ namespace Appium_Wizard
 
             switch (actionType)
             {
-                case "Click Element":
-                    return $"Click element at {properties["XPath"]}";
                 case "Send Text":
                     return $"Send text \"{properties["Text to Enter"]}\" to {properties["XPath"]}";
+                case "Send Text With Random Values":
+                    if (properties.TryGetValue("Text Type", out string textType))
+                    {
+                        string textKey = textType == "Random Number" ? "Number of Digits" : "Text to Enter";
+                        if (properties.TryGetValue(textKey, out string textValue))
+                        {
+                            return textType == "Random Number"
+                                ? $"Send random number with {textValue} digits to {properties["XPath"]}"
+                                : $"Send text \"{textValue}\" to {properties["XPath"]}";
+                        }
+                    }
+                    return "Send Text action properties are incomplete.";
+                case "Click Element":
+                    return $"Click element at {properties["XPath"]}";
                 case "Set Device":
                     return $"Set device to {properties["Device Name"]}";
                 case "Wait for element visible":
@@ -633,7 +792,7 @@ namespace Appium_Wizard
                 case "Wait for element to vanish":
                     return $"Wait for element to vanish at {properties["XPath"]} for {properties["Timeout (ms)"]} ms";
                 case "Sleep":
-                    return $"Sleep for {properties["Duration (ms)"]} milli seconds";
+                    return $"Sleep for {properties["Duration (ms)"]} milliseconds";
                 case "Install App":
                     return $"Install app from {properties["App Path"]}";
                 case "Launch App":
@@ -645,7 +804,7 @@ namespace Appium_Wizard
                 case "Take Screenshot":
                     return $"Take screenshot and save to Downloads folder";
                 case "Device Action":
-                    return $"Perform device action : \"{properties["Action"]}\"";
+                    return $"Perform device action: \"{properties["Action"]}\"";
                 default:
                     return $"{actionType}: \"{properties["Action"]}\"";
             }

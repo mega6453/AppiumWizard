@@ -46,6 +46,7 @@
             filePathToolTip = new ToolTip(components);
             label5 = new Label();
             repeatCountLabel = new Label();
+            openReportButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             SuspendLayout();
@@ -217,12 +218,24 @@
             repeatCountLabel.Size = new Size(0, 15);
             repeatCountLabel.TabIndex = 12;
             // 
+            // openReportButton
+            // 
+            openReportButton.AutoSize = true;
+            openReportButton.Location = new Point(273, 13);
+            openReportButton.Name = "openReportButton";
+            openReportButton.Size = new Size(84, 25);
+            openReportButton.TabIndex = 13;
+            openReportButton.Text = "Open Report";
+            openReportButton.UseVisualStyleBackColor = true;
+            openReportButton.Click += openReportButton_Click;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 424);
+            Controls.Add(openReportButton);
             Controls.Add(repeatCountLabel);
             Controls.Add(label5);
             Controls.Add(saveAsButton);
@@ -267,5 +280,6 @@
         private Label label5;
         private Label label1;
         private Label repeatCountLabel;
+        private Button openReportButton;
     }
 }

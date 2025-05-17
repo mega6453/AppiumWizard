@@ -1948,7 +1948,7 @@ namespace Appium_Wizard
             Console.WriteLine(response.Content);
         }
 
-        public static void SendText(string URL, string sessionId, string element, string text)
+        public static string SendText(string URL, string sessionId, string element, string text)
         {
             string elementId = FindElement(URL, element);
             var options = new RestClientOptions(URL)
@@ -1964,6 +1964,7 @@ namespace Appium_Wizard
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static void Swipe(string URL, string sessionId, int pressX, int pressY, int moveToX, int moveToY, int waitDuration)
@@ -1995,7 +1996,7 @@ namespace Appium_Wizard
             Console.WriteLine(response.Content);
         }
 
-        public static void GoToHome(int proxyPort)
+        public static string GoToHome(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
@@ -2007,6 +2008,7 @@ namespace Appium_Wizard
             request.AddParameter("text/plain", body, ParameterType.RequestBody);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static void OpenControlCenter(string URL, string sessionId, int screenWidth, int screenHeight)
@@ -2120,7 +2122,7 @@ namespace Appium_Wizard
             request.AddParameter("text/plain", body, ParameterType.RequestBody);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
-            return response.Content;
+            return response.StatusDescription;
         }
 
         public static string KillApp(string URL, string sessionId, string bundleId)
@@ -2138,7 +2140,7 @@ namespace Appium_Wizard
             return response.Content;
         }
 
-        public static void TakeScreenshot(string URL, string filePath)
+        public static string TakeScreenshot(string URL, string filePath)
         {
             var options = new RestClientOptions(URL)
             {
@@ -2158,6 +2160,7 @@ namespace Appium_Wizard
                 Image image = Image.FromStream(ms);
                 image.Save(filePath, ImageFormat.Png);
             }
+            return response.StatusDescription;
         }
 
         public static Image TakeScreenshot(string URL)
@@ -2314,7 +2317,7 @@ namespace Appium_Wizard
             return elementId;
         }
 
-        public static bool ClickElement(string URL, string sessionId, string XPath)
+        public static string ClickElement(string URL, string sessionId, string XPath)
         {
             //string sessionId = GetWDASessionID(URL);
             string elementId = FindElement(URL, XPath);
@@ -2325,7 +2328,7 @@ namespace Appium_Wizard
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/click", Method.Post);
             RestResponse response = client.Execute(request);
-            return response.StatusCode.Equals(200);
+            return response.StatusDescription;
         }
 
         public static bool isElementDisplayed(string URL, string sessionId, string XPath)

@@ -19,6 +19,8 @@ namespace Appium_Wizard
         private string scriptFilePath = string.Empty;
         private int rowIndexFromMouseDown;
         private int rowIndexOfItemUnderMouseToDrop;
+        string htmlReportPath;
+
         // isandroid and selectedeviceudid will have issues when set device is set 2nd time with different device.. need to set these varibales while startin performactions.. 
         public TestRunner()
         {
@@ -384,11 +386,15 @@ namespace Appium_Wizard
                 }
                 GoogleAnalytics.SendEvent("RunOnce_TestRunner");
                 selectedUDID = commandGridView.Rows[0].Tag as string;
-                selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                 {
+                    selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
                     URL = "http://127.0.0.1:" + port;
+                    string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+                    string filePath = Path.Combine(downloadPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                    htmlReportPath = filePath;
                     await performActions(cancellationTokenSource.Token);
                 }
                 else
@@ -460,13 +466,19 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        GoogleAnalytics.SendEvent("Repeat_TestRunner",repetitions.ToString());
+                        GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
                         selectedUDID = commandGridView.Rows[0].Tag as string;
-                        selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                         if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                         {
+                            selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                             port = ScreenControl.devicePorts[selectedUDID].Item2;
                             URL = "http://127.0.0.1:" + port;
+
+                            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+                            string filePath = Path.Combine(downloadPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                            htmlReportPath = filePath;
+
                             repeatCountLabel.Text = $"0/{repetitions}";
                             for (int i = 1; i <= repetitions; i++)
                             {
@@ -476,7 +488,7 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            MessageBox.Show("Please open the device "+ selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             repeatButton.Text = "Repeat";
                             runOnceButton.Enabled = true;
                             isRunning = false;
@@ -499,11 +511,11 @@ namespace Appium_Wizard
         }
 
         HashSet<int> usedRandomNumbers = new HashSet<int>(); // Track used random numbers
-
         private async Task performActions(CancellationToken cancellationToken)
         {
             await Task.Run(async () =>
             {
+                CreateHtmlReport();
                 string sessionId = string.Empty;
                 if (isAndroid)
                 {
@@ -535,30 +547,39 @@ namespace Appium_Wizard
                     {
                         case "Click Element":
                             int clickTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var clickParsedTimeout) ? clickParsedTimeout : 0;
-                            UpdateScreenControl("Click " + properties["XPath"] + " | timeout:" + clickTimeout);
+                            string clickCommand = "Click " + properties["XPath"] + " | timeout:" + clickTimeout;
+                            UpdateScreenControl(clickCommand);
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], clickTimeout, cancellationToken);
+                            string clickResponse;
                             if (isAndroid)
                             {
-                                AndroidAPIMethods.ClickElement(properties["XPath"]);
+                                clickResponse = AndroidAPIMethods.ClickElement(properties["XPath"]);
                             }
                             else
                             {
-                                iOSAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
+                                clickResponse = iOSAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
                             }
+                            AppendToHtmlReport(clickCommand, clickResponse);
                             break;
+
                         case "Send Text":
                             int sendTextTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var sendTextParsedTimeout) ? sendTextParsedTimeout : 0;
-                            UpdateScreenControl("Send Text " + properties["Text to Enter"] + " to " + properties["XPath"] + " | timeout:" + sendTextTimeout);
+                            string sendTextCommand = "Send Text " + properties["Text to Enter"] + " to " + properties["XPath"] + " | timeout:" + sendTextTimeout;
+                            UpdateScreenControl(sendTextCommand);
+                            string sendTextResponse;
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextTimeout, cancellationToken);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
+                                sendTextResponse = "";
                             }
                             else
                             {
-                                iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
+                                sendTextResponse = iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
+                            AppendToHtmlReport(sendTextCommand, sendTextResponse);
                             break;
+
                         case "Send Text With Random Values":
                             string textType = properties["Text Type"];
                             string textToEnter;
@@ -567,7 +588,16 @@ namespace Appium_Wizard
                             {
                                 if (properties.TryGetValue("Number of digits/characters", out string numDigitsStr) && int.TryParse(numDigitsStr, out int numDigits))
                                 {
-                                    textToEnter = random.Next((int)Math.Pow(10, numDigits - 1), (int)Math.Pow(10, numDigits)).ToString();
+                                    if (numDigits <= 0 || numDigits > 9)
+                                    {
+                                        MessageBox.Show("Number of digits must be between 1 and 9 in \"Send Text With Random Values\" row", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
+
+                                    int minValue = (int)Math.Pow(10, numDigits - 1);
+                                    int maxValue = (int)Math.Pow(10, numDigits) - 1;
+
+                                    textToEnter = random.Next(minValue, maxValue + 1).ToString();
                                 }
                                 else
                                 {
@@ -604,21 +634,25 @@ namespace Appium_Wizard
                             {
                                 textToEnter = properties["Text to Enter"];
                             }
-                            UpdateScreenControl("Send Random Text to " + properties["XPath"] + " | timeout:" + sendTextRandomValuesTimeout);
+                            string sendTextRandomValuesCommand = "Send Random Text to " + properties["XPath"] + " | timeout:" + sendTextRandomValuesTimeout;
+                            string sendTextRandomValuesResponse;
+                            UpdateScreenControl(sendTextRandomValuesCommand);
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextRandomValuesTimeout, cancellationToken);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
+                                sendTextRandomValuesResponse = "";
                             }
                             else
                             {
-                                iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
+                                sendTextRandomValuesResponse = iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
                             }
+                            AppendToHtmlReport(sendTextRandomValuesCommand, sendTextRandomValuesResponse);
                             break;
 
-
                         case "Set Device":
-                            UpdateScreenControl("Set Device - " + properties["Device Name"]);
+                            string SetDeviceCommand = "Set Device - " + properties["Device Name"];
+                            UpdateScreenControl(SetDeviceCommand);
                             if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
                             {
                                 selectedUDID = deviceNameToUdidMap[properties["Device Name"]]; // Update the selected UDID
@@ -632,38 +666,36 @@ namespace Appium_Wizard
                                     Console.WriteLine($"Selected OS Type: {osType}, isAndroid: {isAndroid}"); // For debugging
                                 }
                             }
+                            AppendToHtmlReport(SetDeviceCommand, "OK");
                             break;
+
                         case "Wait for element visible":
                             int visibleTimeout = int.TryParse(properties["Timeout (ms)"], out var visibleParsedTimeout) ? visibleParsedTimeout : 0;
-                            UpdateScreenControl("Wait for element visible - " + properties["XPath"] + " - "+ visibleTimeout);
-                            if (isAndroid)
-                            {
-                                // Android-specific implementation
-                            }
-                            else
-                            {
-                                await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], visibleTimeout, cancellationToken);
-                            }
+                            string waitForElementVisibleCommand = "Wait for element visible - " + properties["XPath"] + " - " + visibleTimeout;
+                            UpdateScreenControl(waitForElementVisibleCommand);
+                            bool waitForElementVisibleResult = await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], visibleTimeout, cancellationToken);
+                            AppendToHtmlReport(waitForElementVisibleCommand, waitForElementVisibleResult.ToString());
                             break;
+
                         case "Wait for element to vanish":
                             int vanishTimeout = int.TryParse(properties["Timeout (ms)"], out var vanishParsedTimeout) ? vanishParsedTimeout : 0;
-                            UpdateScreenControl("Wait for element to vanish - " + properties["XPath"] + " - " + vanishTimeout);
-                            if (isAndroid)
-                            {
-                                // Android-specific implementation
-                            }
-                            else
-                            {
-                                await WaitUntilElementVanished(URL, sessionId, properties["XPath"], vanishTimeout, cancellationToken);
-                            }
+                            string waitForElementVanishCommand = "Wait for element to vanish - " + properties["XPath"] + " - " + vanishTimeout;
+                            UpdateScreenControl(waitForElementVanishCommand);
+                            bool waitForElementVanishResult = await WaitUntilElementVanished(URL, sessionId, properties["XPath"], vanishTimeout, cancellationToken);
+                            AppendToHtmlReport(waitForElementVanishCommand, waitForElementVanishResult.ToString());
                             break;
+
                         case "Sleep":
-                            UpdateScreenControl("Sleep " + properties["Duration (ms)"] + " ms");
+                            string SleepCommand = "Sleep " + properties["Duration (ms)"] + " ms";
+                            UpdateScreenControl(SleepCommand);
                             int duration = int.TryParse(properties["Duration (ms)"], out var parsedTimeout) ? parsedTimeout : 0;
                             await Task.Delay(duration, cancellationToken);
+                            AppendToHtmlReport(SleepCommand, "-");
                             break;
+
                         case "Install App":
-                            UpdateScreenControl("Install App : " + properties["App Path"]);
+                            string InstallAppCommand = "Install App : " + properties["App Path"];
+                            UpdateScreenControl(InstallAppCommand);
                             if (isAndroid)
                             {
                                 // Android-specific implementation
@@ -672,75 +704,98 @@ namespace Appium_Wizard
                             {
                                 iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, properties["App Path"]);
                             }
+                            AppendToHtmlReport(InstallAppCommand,"-");
                             break;
+
                         case "Launch App":
-                            UpdateScreenControl("Launch App : " + properties["App Package"]);
+                            string LaunchAppCommand = "Launch App : " + properties["App Package"];
+                            UpdateScreenControl(LaunchAppCommand);
+                            string LaunchAppResult;
                             if (isAndroid)
                             {
-                                // Android-specific implementation
+                                LaunchAppResult = "";
                             }
                             else
                             {
-                                iOSAPIMethods.LaunchApp(URL, sessionId, properties["App Package"]);
+                                LaunchAppResult = iOSAPIMethods.LaunchApp(URL, sessionId, properties["App Package"]);
                             }
+                            AppendToHtmlReport(LaunchAppCommand, LaunchAppResult);
                             break;
+
                         case "Kill App":
-                            UpdateScreenControl("Kill App : " + properties["App Package"]);
+                            string KillAppCommand = "Kill App : " + properties["App Package"];
+                            UpdateScreenControl(KillAppCommand);
+                            string KillAppResult;
                             if (isAndroid)
                             {
-                                // Android-specific implementation
+                                KillAppResult = "";
                             }
                             else
                             {
-                                iOSAPIMethods.KillApp(URL, sessionId, properties["App Package"]);
+                                KillAppResult = iOSAPIMethods.KillApp(URL, sessionId, properties["App Package"]);
                             }
+                            AppendToHtmlReport(KillAppCommand, KillAppResult);
                             break;
+
                         case "Uninstall App":
-                            UpdateScreenControl("Uninstall App : " + properties["App Package"]);
+                            string UninstallAppCommand = "Uninstall App : " + properties["App Package"];
+                            UpdateScreenControl(UninstallAppCommand);
                             if (isAndroid)
                             {
-                                // Android-specific implementation
                             }
                             else
                             {
                                 iOSMethods.GetInstance().UninstallApp(selectedUDID, properties["App Package"]);
                             }
+                            AppendToHtmlReport(UninstallAppCommand, "-");
                             break;
+
                         case "Take Screenshot":
-                            UpdateScreenControl("Take Screenshot and Save in Downloads");
+                            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+                            string filePath = Path.Combine(downloadPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
+                            //filePath = "\"" + filePath + "\"";
+                            string TakeScreenshotCommand = "Take Screenshot and Save in Downloads";
+                            UpdateScreenControl(TakeScreenshotCommand);
+                            string TakeScreenshotStatusDescription;
                             if (isAndroid)
                             {
-                                // Android-specific implementation
+                                TakeScreenshotStatusDescription = "";
                             }
                             else
                             {
-                                string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-                                string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
-                                string filePath = Path.Combine(downloadPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
-                                filePath = "\"" + filePath + "\"";
-                                iOSAPIMethods.TakeScreenshot(URL, filePath.Replace("\"", ""));
+                                TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, filePath);
+                                //iOSAPIMethods.TakeScreenshot(URL, filePath.Replace("\"", ""));
                             }
+                            AppendToHtmlReport(TakeScreenshotCommand,TakeScreenshotStatusDescription);
                             break;
+
                         case "Device Action":
-                            UpdateScreenControl("Device Action : " + properties["Action"]);
+                            string DeviceActionCommand = "Device Action : " + properties["Action"];
+                            UpdateScreenControl(DeviceActionCommand);
+                            string DeviceActionResult;
                             if (isAndroid)
                             {
-                                // Android-specific implementation
+                                DeviceActionResult = "";
                             }
                             else
                             {
                                 if (properties["Action"].Equals("Home"))
                                 {
-                                    iOSAPIMethods.GoToHome(port);
+                                    DeviceActionResult = iOSAPIMethods.GoToHome(port);
                                 }
+                                DeviceActionResult = "";
                             }
+                            AppendToHtmlReport(DeviceActionCommand,DeviceActionResult);
                             break;
+
                         default:
                             MessageBox.Show($"Unknown Command: {actionType}", "Unknown Command", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             break;
                     }
                 }
                 UpdateScreenControl("");
+                FinalizeHtmlReport();
             });
         }
 
@@ -1088,6 +1143,80 @@ namespace Appium_Wizard
 
                 // Update the active state
                 actionActiveStates[e.RowIndex] = isChecked;
+            }
+        }
+        private void CreateHtmlReport()
+        {
+            string htmlContent = $@"
+                             <!DOCTYPE html>
+                             <html>
+                             <head>
+                                 <title>{selectedDeviceName} - Appium Wizard Test Runner Execution Report</title>
+                                 <style>
+                                     body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                                     table {{ border-collapse: collapse; width: 100%; }}
+                                     th, td {{ border: 1px solid #ddd; padding: 8px; }}
+                                     th {{ background-color: #f4f4f4; }}
+                                     .success {{ color: green; }}
+                                     .error {{ color: red; }}
+                                     h1 {{ text-align: center; }}
+                                 </style>
+                             </head>
+                             <body>
+                                 <h1>Appium Wizard Test Runner Execution Report </h1>
+                                 <h2>Device : {selectedDeviceName}({selectedUDID}) </h2>
+                                 <table>
+                                     <thead>
+                                         <tr>
+                                             <th>Timestamp</th>
+                                             <th>Command</th>
+                                             <th>Status Description</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                             ";
+
+            File.WriteAllText(htmlReportPath, htmlContent);
+        }
+
+        private void AppendToHtmlReport(string command, string output)
+        {
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string row = $@"
+                        <tr>
+                            <td>{timestamp}</td>
+                            <td>{command}</td>
+                            <td>{output}</td>
+                        </tr>
+                ";
+
+            File.AppendAllText(htmlReportPath, row);
+        }
+
+        private void FinalizeHtmlReport()
+        {
+            string closingTags = @"
+                                </tbody>
+                            </table>
+                        </body>
+                        </html>
+                        ";
+            File.AppendAllText(htmlReportPath, closingTags);
+        }
+
+        private void openReportButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(htmlReportPath))
+            {
+                MessageBox.Show("Please run a test and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = htmlReportPath,
+                    UseShellExecute = true
+                });
             }
         }
     }

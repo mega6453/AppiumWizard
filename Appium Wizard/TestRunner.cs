@@ -32,7 +32,7 @@ namespace Appium_Wizard
             commandGridView.Columns[1].Width = (int)(commandGridView.Width * 0.95);
             propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.4);
             propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.6);
-            reportsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppiumWizardReports");
+            reportsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appium-Wizard-Reports");
             if (!Directory.Exists(reportsFolderPath))
             {
                 Directory.CreateDirectory(reportsFolderPath);
@@ -405,7 +405,7 @@ namespace Appium_Wizard
                 {
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
                     URL = "http://127.0.0.1:" + port;
-                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                     string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                     htmlReportPath = filePath;
                     CreateHtmlReport();
@@ -494,7 +494,7 @@ namespace Appium_Wizard
                             port = ScreenControl.devicePorts[selectedUDID].Item2;
                             URL = "http://127.0.0.1:" + port;
 
-                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                             string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                             htmlReportPath = filePath;
                             CreateHtmlReport();
@@ -769,23 +769,20 @@ namespace Appium_Wizard
                             break;
 
                         case "Take Screenshot":
-                            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
-                            string filePath = Path.Combine(downloadPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
-                            //filePath = "\"" + filePath + "\"";
-                            string TakeScreenshotCommand = "Take Screenshot and Save in Downloads";
+                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                            string screenshotFilePath = Path.Combine(reportsFolderPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
+                            string TakeScreenshotCommand = "Take Screenshot";
                             UpdateScreenControl(TakeScreenshotCommand);
                             string TakeScreenshotStatusDescription = "-";
                             if (isAndroid)
                             {
-                                TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, filePath);
+                                TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, screenshotFilePath);
                             }
                             else
                             {
-                                TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, filePath);
-                                //iOSAPIMethods.TakeScreenshot(URL, filePath.Replace("\"", ""));
+                                TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, screenshotFilePath);
                             }
-                            AppendToHtmlReport(TakeScreenshotCommand, TakeScreenshotStatusDescription);
+                            AppendToHtmlReport(TakeScreenshotCommand, TakeScreenshotStatusDescription, screenshotFilePath);
                             break;
 
                         case "Device Action":
@@ -881,7 +878,7 @@ namespace Appium_Wizard
                 case "Uninstall App":
                     return $"Uninstall app with package {properties["App Package"]}";
                 case "Take Screenshot":
-                    return $"Take screenshot";
+                    return $"Take screenshot and attach it to report";
                 case "Device Action":
                     return $"Perform device action: \"{properties["Action"]}\"";
                 default:
@@ -1211,16 +1208,24 @@ namespace Appium_Wizard
             File.WriteAllText(htmlReportPath, htmlContent);
         }
 
-        private void AppendToHtmlReport(string command, string output)
+        private void AppendToHtmlReport(string command, string output, string? screenshotPath = null)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string screenshotHtml = string.Empty;
+
+            if (!string.IsNullOrEmpty(screenshotPath))
+            {
+                string relativePath = Path.GetFileName(screenshotPath);
+                screenshotHtml = $@"<br><a href='{relativePath}' target='_blank'><img src='{relativePath}' alt='Screenshot' style='max-width: 300px; max-height: 300px;'/></a>";
+            }
+
             string row = $@"
-                        <tr>
-                            <td>{timestamp}</td>
-                            <td>{command}</td>
-                            <td>{output}</td>
-                        </tr>
-                ";
+                            <tr>
+                                <td>{timestamp}</td>
+                                <td>{command}</td>
+                                <td>{output}{screenshotHtml}</td>
+                            </tr>
+                        ";
 
             File.AppendAllText(htmlReportPath, row);
         }

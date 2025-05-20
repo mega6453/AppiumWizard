@@ -42,13 +42,21 @@
             saveButton = new Button();
             loadButton = new Button();
             helpButton = new Button();
-            saveAsButton = new Button();
             filePathToolTip = new ToolTip(components);
             label5 = new Label();
             repeatCountLabel = new Label();
             openReportButton = new Button();
+            DropDownButton = new Button();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            openReportFolderToolStripMenuItem = new ToolStripMenuItem();
+            saveDownButton = new Button();
+            contextMenuStrip2 = new ContextMenuStrip(components);
+            saveAsToolStripMenuItem = new ToolStripMenuItem();
+            newButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
+            contextMenuStrip1.SuspendLayout();
+            contextMenuStrip2.SuspendLayout();
             SuspendLayout();
             // 
             // commandGridView
@@ -156,7 +164,7 @@
             // saveButton
             // 
             saveButton.AutoSize = true;
-            saveButton.Location = new Point(13, 12);
+            saveButton.Location = new Point(93, 12);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 25);
             saveButton.TabIndex = 6;
@@ -168,7 +176,7 @@
             // loadButton
             // 
             loadButton.AutoSize = true;
-            loadButton.Location = new Point(175, 12);
+            loadButton.Location = new Point(206, 12);
             loadButton.Name = "loadButton";
             loadButton.Size = new Size(76, 25);
             loadButton.TabIndex = 7;
@@ -186,17 +194,6 @@
             helpButton.Text = "Help";
             helpButton.UseVisualStyleBackColor = true;
             helpButton.Click += helpButton_Click;
-            // 
-            // saveAsButton
-            // 
-            saveAsButton.AutoSize = true;
-            saveAsButton.Location = new Point(94, 12);
-            saveAsButton.Name = "saveAsButton";
-            saveAsButton.Size = new Size(75, 25);
-            saveAsButton.TabIndex = 9;
-            saveAsButton.Text = "Save As";
-            saveAsButton.UseVisualStyleBackColor = true;
-            saveAsButton.Click += saveAsButton_Click;
             // 
             // label5
             // 
@@ -221,7 +218,7 @@
             // openReportButton
             // 
             openReportButton.AutoSize = true;
-            openReportButton.Location = new Point(273, 13);
+            openReportButton.Location = new Point(288, 12);
             openReportButton.Name = "openReportButton";
             openReportButton.Size = new Size(84, 25);
             openReportButton.TabIndex = 13;
@@ -229,16 +226,77 @@
             openReportButton.UseVisualStyleBackColor = true;
             openReportButton.Click += openReportButton_Click;
             // 
+            // DropDownButton
+            // 
+            DropDownButton.AutoSize = true;
+            DropDownButton.Location = new Point(374, 12);
+            DropDownButton.Name = "DropDownButton";
+            DropDownButton.Size = new Size(27, 25);
+            DropDownButton.TabIndex = 14;
+            DropDownButton.Text = "▼";
+            DropDownButton.UseVisualStyleBackColor = true;
+            DropDownButton.Click += DropDownButton_Click;
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { openReportFolderToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(181, 26);
+            // 
+            // openReportFolderToolStripMenuItem
+            // 
+            openReportFolderToolStripMenuItem.Name = "openReportFolderToolStripMenuItem";
+            openReportFolderToolStripMenuItem.Size = new Size(180, 22);
+            openReportFolderToolStripMenuItem.Text = "Open Reports folder";
+            openReportFolderToolStripMenuItem.Click += openReportFolderToolStripMenuItem_Click;
+            // 
+            // saveDownButton
+            // 
+            saveDownButton.AutoSize = true;
+            saveDownButton.Location = new Point(171, 12);
+            saveDownButton.Name = "saveDownButton";
+            saveDownButton.Size = new Size(27, 25);
+            saveDownButton.TabIndex = 15;
+            saveDownButton.Text = "▼";
+            saveDownButton.UseVisualStyleBackColor = true;
+            saveDownButton.Click += button1_Click;
+            // 
+            // contextMenuStrip2
+            // 
+            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { saveAsToolStripMenuItem });
+            contextMenuStrip2.Name = "contextMenuStrip2";
+            contextMenuStrip2.Size = new Size(115, 26);
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            saveAsToolStripMenuItem.Size = new Size(114, 22);
+            saveAsToolStripMenuItem.Text = "Save As";
+            saveAsToolStripMenuItem.Click += saveAsToolStripMenuItem_Click;
+            // 
+            // newButton
+            // 
+            newButton.AutoSize = true;
+            newButton.Location = new Point(12, 12);
+            newButton.Name = "newButton";
+            newButton.Size = new Size(75, 25);
+            newButton.TabIndex = 16;
+            newButton.Text = "New";
+            newButton.UseVisualStyleBackColor = true;
+            newButton.Click += newButton_Click;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 424);
+            Controls.Add(newButton);
+            Controls.Add(saveDownButton);
+            Controls.Add(DropDownButton);
             Controls.Add(openReportButton);
             Controls.Add(repeatCountLabel);
             Controls.Add(label5);
-            Controls.Add(saveAsButton);
             Controls.Add(helpButton);
             Controls.Add(loadButton);
             Controls.Add(saveButton);
@@ -257,6 +315,8 @@
             Shown += TestRunner_Shown;
             ((System.ComponentModel.ISupportInitialize)commandGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).EndInit();
+            contextMenuStrip1.ResumeLayout(false);
+            contextMenuStrip2.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -281,5 +341,12 @@
         private Label label1;
         private Label repeatCountLabel;
         private Button openReportButton;
+        private Button DropDownButton;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem openReportFolderToolStripMenuItem;
+        private Button saveDownButton;
+        private ContextMenuStrip contextMenuStrip2;
+        private ToolStripMenuItem saveAsToolStripMenuItem;
+        private Button newButton;
     }
 }

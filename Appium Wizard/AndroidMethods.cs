@@ -1,11 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Management;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Windows.Media.Devices.Core;
 using static System.Windows.Forms.AxHost;
 
@@ -243,7 +247,9 @@ namespace Appium_Wizard
 
         public bool InstallApp(string udid, string path)
         {
-            var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");
+            path = path.Replace("\"", "");
+            path = "\"" + path + "\"";
+            var output = ExecuteCommand($"-s {udid} install {path}");
             Logger.Info("install app - " + path);
             Logger.Info("install app output :"+output);
             return output.Contains("Success");
@@ -1034,7 +1040,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
@@ -1057,6 +1063,43 @@ namespace Appium_Wizard
             }
         }
 
+        public static string TakeScreenshot(int port, string filePath)
+        {
+            Image image = null;
+            try
+            {
+                string sessionId = GetSessionID(port);
+                if (sessionId.Equals("nosession"))
+                {
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+                }
+                var options = new RestClientOptions("http://localhost:" + port)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+                string jsonString = response.Content;
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    image = Image.FromStream(ms);
+                    image.Save(filePath, ImageFormat.Png);
+                }
+                return response.StatusDescription;
+            }
+            catch (Exception)
+            {
+                return "Exception";
+            }
+        }
+
         public async static void DragDrop(int port, int startX, int startY, int endX, int endY, int speed=1000)
         {
             try
@@ -1069,7 +1112,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/"+sessionId+"/appium/gestures/drag", Method.Post);
@@ -1083,9 +1126,91 @@ namespace Appium_Wizard
             }            
         }
 
-        public static string ClickElement(string element)
+        public static string FindElement(string URL, string sessionId, string XPath)
         {
-            return "";
+            string elementId = string.Empty;
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                //string body = $@"{{""value"": ""{XPath}"",""using"": ""xpath""}}";
+                string body = $@"{{""strategy"":""xpath"",""selector"":""{XPath}""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return elementId;
+        }
+
+        public static string ClickElement(string URL, string sessionId, string XPath)
+        {
+            string elementId = FindElement(URL, sessionId, XPath);
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/click", Method.Post);
+            RestResponse response = client.Execute(request);
+            return response.StatusDescription;
+        }
+
+        public static string SendText(string URL, string sessionId, string XPath, string text)
+        {
+            string elementId = FindElement(URL, sessionId, XPath);
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/value", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            string[] valueArray = text.ToCharArray().Select(c => c.ToString()).ToArray();
+            string body = $@"{{
+                                ""text"":""{text}"",
+                                ""replace"":false,
+                                ""value"":{Newtonsoft.Json.JsonConvert.SerializeObject(valueArray)}
+                            }}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.StatusDescription;
+        }
+
+        public static bool isElementDisplayed(string URL, string sessionId, string XPath)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                var body = $@"{{""strategy"":""xpath"",""selector"":""{XPath}""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                return response.StatusCode.Equals(HttpStatusCode.OK); ;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

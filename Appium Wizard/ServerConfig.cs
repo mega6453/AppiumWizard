@@ -189,6 +189,18 @@ namespace Appium_Wizard
             if (result)
             {
                 statusLabel.Text = "Not Running";
+                //var result = MessageBox.Show("Port " + LoadingScreen.appiumPort + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\nDo you want to kill that process and start appium server in that port? ", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                //if (result == DialogResult.Yes)
+                //{
+                //    Common.KillProcessByPortNumber(LoadingScreen.appiumPort);
+                //    AppiumServerSetup serverSetup = new AppiumServerSetup();
+                //    serverSetup.StartAppiumServer(LoadingScreen.appiumPort, 1, "appium --port " + LoadingScreen.appiumPort + " --allow-cors --allow-insecure=adb_shell");
+                //}
+                //else
+                //{
+                //    ServerConfig serverConfig = new ServerConfig();
+                //    serverConfig.ShowDialog();
+                //}
                 MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(portNumber).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //MessageBox.Show("Failed to start Server on port " + portNumber + ".\nPlease try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendEvent("StartServer_Port_Busy");

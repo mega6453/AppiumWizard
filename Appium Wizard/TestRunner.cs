@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Diagnostics;
+using System.Diagnostics.SymbolStore;
 using System.Text;
 
 namespace Appium_Wizard
@@ -10,6 +11,7 @@ namespace Appium_Wizard
         private List<Tuple<string, Dictionary<string, string>>> actionData = new List<Tuple<string, Dictionary<string, string>>>();
         private static Dictionary<string, string> deviceNameToUdidMap = new Dictionary<string, string>();
         private Dictionary<string, string> deviceNameToOsTypeMap = new Dictionary<string, string>();
+        private Dictionary<string, string> deviceUDIDToOsTypeMap = new Dictionary<string, string>();
         private List<string> deviceNames = new List<string>();
         bool isAndroid;
         string? selectedUDID, selectedOS, selectedDeviceVersion, selectedDeviceName, selectedDeviceConnection, selectedDeviceIP, URL;
@@ -20,6 +22,7 @@ namespace Appium_Wizard
         private int rowIndexFromMouseDown;
         private int rowIndexOfItemUnderMouseToDrop;
         string htmlReportPath;
+        string reportsFolderPath;
 
         // isandroid and selectedeviceudid will have issues when set device is set 2nd time with different device.. need to set these varibales while startin performactions.. 
         public TestRunner()
@@ -29,6 +32,11 @@ namespace Appium_Wizard
             commandGridView.Columns[1].Width = (int)(commandGridView.Width * 0.95);
             propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.4);
             propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.6);
+            reportsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppiumWizardReports");
+            if (!Directory.Exists(reportsFolderPath))
+            {
+                Directory.CreateDirectory(reportsFolderPath);
+            }
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -43,6 +51,7 @@ namespace Appium_Wizard
                 deviceNames.Add(deviceName);
                 deviceNameToUdidMap[deviceName] = deviceUdid; // Populate the mapping
                 deviceNameToOsTypeMap[deviceName] = osType;   // Populate the OS type mapping
+                deviceUDIDToOsTypeMap[deviceUdid] = osType;
             }
         }
 
@@ -88,8 +97,7 @@ namespace Appium_Wizard
                     properties.Add("App Path", "");
                     break;
                 case "Launch App":
-                    properties.Add("App Package", "");
-                    properties.Add("App Activity", "");
+                    properties.Add("App BundleId(iOS)/Activity(Android)", "");
                     break;
                 case "Kill App":
                     properties.Add("App Package", "");
@@ -344,7 +352,7 @@ namespace Appium_Wizard
             foreach (DataGridViewRow row in commandGridView.Rows)
             {
                 // Check if the row already has an error
-                if (!string.IsNullOrWhiteSpace(row.ErrorText))
+                if (!string.IsNullOrWhiteSpace(row.ErrorText) && row.Cells[0].Value is bool cellValue && cellValue)
                 {
                     return true; // An error exists
                 }
@@ -386,15 +394,20 @@ namespace Appium_Wizard
                 }
                 GoogleAnalytics.SendEvent("RunOnce_TestRunner");
                 selectedUDID = commandGridView.Rows[0].Tag as string;
+                selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
+                if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
+                {
+                    string osType = deviceUDIDToOsTypeMap[selectedUDID];
+                    isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
+                }
                 if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                 {
-                    selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                     port = ScreenControl.devicePorts[selectedUDID].Item2;
                     URL = "http://127.0.0.1:" + port;
-                    string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
                     string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
-                    string filePath = Path.Combine(downloadPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                    string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                     htmlReportPath = filePath;
+                    CreateHtmlReport();
                     await performActions(cancellationTokenSource.Token);
                 }
                 else
@@ -468,17 +481,21 @@ namespace Appium_Wizard
                     {
                         GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
                         selectedUDID = commandGridView.Rows[0].Tag as string;
+                        selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
+                        if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
+                        {
+                            string osType = deviceUDIDToOsTypeMap[selectedUDID];
+                            isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
+                        }
                         if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
                         {
-                            selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
                             port = ScreenControl.devicePorts[selectedUDID].Item2;
                             URL = "http://127.0.0.1:" + port;
 
-                            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
                             string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
-                            string filePath = Path.Combine(downloadPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                            string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                             htmlReportPath = filePath;
-
+                            CreateHtmlReport();
                             repeatCountLabel.Text = $"0/{repetitions}";
                             for (int i = 1; i <= repetitions; i++)
                             {
@@ -515,7 +532,6 @@ namespace Appium_Wizard
         {
             await Task.Run(async () =>
             {
-                CreateHtmlReport();
                 string sessionId = string.Empty;
                 if (isAndroid)
                 {
@@ -553,7 +569,7 @@ namespace Appium_Wizard
                             string clickResponse;
                             if (isAndroid)
                             {
-                                clickResponse = AndroidAPIMethods.ClickElement(properties["XPath"]);
+                                clickResponse = AndroidAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
                             }
                             else
                             {
@@ -570,8 +586,7 @@ namespace Appium_Wizard
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextTimeout, cancellationToken);
                             if (isAndroid)
                             {
-                                // Android-specific implementation
-                                sendTextResponse = "";
+                                sendTextResponse = AndroidAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
                             else
                             {
@@ -640,8 +655,7 @@ namespace Appium_Wizard
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextRandomValuesTimeout, cancellationToken);
                             if (isAndroid)
                             {
-                                // Android-specific implementation
-                                sendTextRandomValuesResponse = "";
+                                sendTextRandomValuesResponse = AndroidAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
                             }
                             else
                             {
@@ -694,41 +708,42 @@ namespace Appium_Wizard
                             break;
 
                         case "Install App":
-                            string InstallAppCommand = "Install App : " + properties["App Path"];
+                            string InstallAppCommand = "Install App: " + properties["App Path"];
                             UpdateScreenControl(InstallAppCommand);
+                            string appPath = properties["App Path"];
                             if (isAndroid)
                             {
-                                // Android-specific implementation
+                                AndroidMethods.GetInstance().InstallApp(selectedUDID, appPath); // not working
                             }
                             else
                             {
-                                iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, properties["App Path"]);
+                                iOSAsyncMethods.GetInstance().InstallApp(selectedUDID, appPath);
                             }
-                            AppendToHtmlReport(InstallAppCommand,"-");
+                            AppendToHtmlReport(InstallAppCommand, "-");
                             break;
 
                         case "Launch App":
-                            string LaunchAppCommand = "Launch App : " + properties["App Package"];
+                            string LaunchAppCommand = "Launch App: " + properties["App BundleId(iOS)/Activity(Android)"];
                             UpdateScreenControl(LaunchAppCommand);
-                            string LaunchAppResult;
+                            string LaunchAppResult = "-";
                             if (isAndroid)
                             {
-                                LaunchAppResult = "";
+                                AndroidMethods.GetInstance().LaunchApp(selectedUDID, properties["App BundleId(iOS)/Activity(Android)"]);
                             }
                             else
                             {
-                                LaunchAppResult = iOSAPIMethods.LaunchApp(URL, sessionId, properties["App Package"]);
+                                LaunchAppResult = iOSAPIMethods.LaunchApp(URL, sessionId, properties["App BundleId(iOS)/Activity(Android)"]);
                             }
                             AppendToHtmlReport(LaunchAppCommand, LaunchAppResult);
                             break;
 
                         case "Kill App":
-                            string KillAppCommand = "Kill App : " + properties["App Package"];
+                            string KillAppCommand = "Kill App: " + properties["App Package"];
                             UpdateScreenControl(KillAppCommand);
-                            string KillAppResult;
+                            string KillAppResult = "-";
                             if (isAndroid)
                             {
-                                KillAppResult = "";
+                                AndroidMethods.GetInstance().KillApp(selectedUDID, properties["App Package"]);
                             }
                             else
                             {
@@ -738,10 +753,11 @@ namespace Appium_Wizard
                             break;
 
                         case "Uninstall App":
-                            string UninstallAppCommand = "Uninstall App : " + properties["App Package"];
+                            string UninstallAppCommand = "Uninstall App: " + properties["App Package"];
                             UpdateScreenControl(UninstallAppCommand);
                             if (isAndroid)
                             {
+                                AndroidMethods.GetInstance().UnInstallApp(selectedUDID, properties["App Package"]);
                             }
                             else
                             {
@@ -757,26 +773,33 @@ namespace Appium_Wizard
                             //filePath = "\"" + filePath + "\"";
                             string TakeScreenshotCommand = "Take Screenshot and Save in Downloads";
                             UpdateScreenControl(TakeScreenshotCommand);
-                            string TakeScreenshotStatusDescription;
+                            string TakeScreenshotStatusDescription = "-";
                             if (isAndroid)
                             {
-                                TakeScreenshotStatusDescription = "";
+                                TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, filePath);
                             }
                             else
                             {
                                 TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, filePath);
                                 //iOSAPIMethods.TakeScreenshot(URL, filePath.Replace("\"", ""));
                             }
-                            AppendToHtmlReport(TakeScreenshotCommand,TakeScreenshotStatusDescription);
+                            AppendToHtmlReport(TakeScreenshotCommand, TakeScreenshotStatusDescription);
                             break;
 
                         case "Device Action":
-                            string DeviceActionCommand = "Device Action : " + properties["Action"];
+                            string DeviceActionCommand = "Device Action: " + properties["Action"];
                             UpdateScreenControl(DeviceActionCommand);
-                            string DeviceActionResult;
+                            string DeviceActionResult = "-";
                             if (isAndroid)
                             {
-                                DeviceActionResult = "";
+                                if (properties["Action"].Equals("Home"))
+                                {
+                                    AndroidMethods.GetInstance().GoToHome(selectedUDID);
+                                }
+                                else if (properties["Action"].Equals("Back"))
+                                {
+                                    AndroidMethods.GetInstance().Back(selectedUDID);
+                                }
                             }
                             else
                             {
@@ -784,9 +807,8 @@ namespace Appium_Wizard
                                 {
                                     DeviceActionResult = iOSAPIMethods.GoToHome(port);
                                 }
-                                DeviceActionResult = "";
                             }
-                            AppendToHtmlReport(DeviceActionCommand,DeviceActionResult);
+                            AppendToHtmlReport(DeviceActionCommand, DeviceActionResult);
                             break;
 
                         default:
@@ -851,13 +873,13 @@ namespace Appium_Wizard
                 case "Install App":
                     return $"Install app from {properties["App Path"]}";
                 case "Launch App":
-                    return $"Launch app with package {properties["App Package"]} and activity {properties["App Activity"]}";
+                    return $"Launch app with BundleId/Activity {properties["App BundleId(iOS)/Activity(Android)"]}";
                 case "Kill App":
                     return $"Kill app with package {properties["App Package"]}";
                 case "Uninstall App":
                     return $"Uninstall app with package {properties["App Package"]}";
                 case "Take Screenshot":
-                    return $"Take screenshot and save to Downloads folder";
+                    return $"Take screenshot";
                 case "Device Action":
                     return $"Perform device action: \"{properties["Action"]}\"";
                 default:
@@ -874,14 +896,22 @@ namespace Appium_Wizard
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Call the API asynchronously
-                if (await Task.Run(() => iOSAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                if (isAndroid)
                 {
-                    // Stop the loop if the API returns true
-                    return true;
+                    if (await Task.Run(() => AndroidAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                    {
+                        // Stop the loop if the API returns true
+                        return true;
+                    }
                 }
-
-                // Add a small delay to avoid tight looping (optional)
+                else
+                {
+                    if (await Task.Run(() => iOSAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                    {
+                        // Stop the loop if the API returns true
+                        return true;
+                    }
+                }
                 await Task.Delay(100); // 100 milliseconds
             }
 
@@ -898,14 +928,20 @@ namespace Appium_Wizard
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Call the API asynchronously
-                if (!await Task.Run(() => iOSAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                if (isAndroid)
                 {
-                    // Stop the loop if the API returns false, meaning the element has vanished
-                    return true;
+                    if (!await Task.Run(() => AndroidAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                    {
+                        return true;
+                    }
                 }
-
-                // Add a small delay to avoid tight looping (optional)
+                else
+                {
+                    if (!await Task.Run(() => iOSAPIMethods.isElementDisplayed(url, sessionId, xPath)))
+                    {
+                        return true;
+                    }
+                }
                 await Task.Delay(100); // 100 milliseconds
             }
 
@@ -968,23 +1004,30 @@ namespace Appium_Wizard
         }
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(scriptFilePath))
+            try
             {
-                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                if (string.IsNullOrEmpty(scriptFilePath))
                 {
-                    saveFileDialog.Filter = "Json Files (*.json)|*.json";
-                    saveFileDialog.Title = "Save Json File";
-
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                     {
-                        string filePath = saveFileDialog.FileName;
-                        SaveScriptToFile(filePath);
+                        saveFileDialog.Filter = "Json Files (*.json)|*.json";
+                        saveFileDialog.Title = "Save Json File";
+
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string filePath = saveFileDialog.FileName;
+                            SaveScriptToFile(filePath);
+                        }
                     }
                 }
+                else
+                {
+                    SaveScriptToFile(scriptFilePath);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                SaveScriptToFile(scriptFilePath);
+                MessageBox.Show(ex.Message, "Error saving report", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             GoogleAnalytics.SendEvent("Save Script");
         }
@@ -1113,20 +1156,6 @@ namespace Appium_Wizard
             }
         }
 
-        private void saveAsButton_Click(object sender, EventArgs e)
-        {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Filter = "Json Files (*.json)|*.json";
-                saveFileDialog.Title = "Save Json File";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string filePath = saveFileDialog.FileName;
-                    SaveScriptToFile(filePath);
-                }
-            }
-        }
 
         private void saveButton_MouseHover(object sender, EventArgs e)
         {
@@ -1206,17 +1235,95 @@ namespace Appium_Wizard
 
         private void openReportButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(htmlReportPath))
+            try
             {
-                MessageBox.Show("Please run a test and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                Process.Start(new ProcessStartInfo
+                if (string.IsNullOrEmpty(htmlReportPath))
                 {
-                    FileName = htmlReportPath,
-                    UseShellExecute = true
-                });
+                    MessageBox.Show("Please run a test and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = htmlReportPath,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error opening report", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void DropDownButton_Click(object sender, EventArgs e)
+        {
+            Point screenPoint = DropDownButton.PointToScreen(new Point(0, DropDownButton.Height));
+            contextMenuStrip1.Show(screenPoint);
+        }
+
+        private void openReportFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!Directory.Exists(reportsFolderPath))
+                {
+                    Directory.CreateDirectory(reportsFolderPath);
+                }
+                Process.Start("explorer.exe", reportsFolderPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error opening reports folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Filter = "Json Files (*.json)|*.json";
+                    saveFileDialog.Title = "Save Json File";
+
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string filePath = saveFileDialog.FileName;
+                        SaveScriptToFile(filePath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error saving report", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Point screenPoint = saveDownButton.PointToScreen(new Point(0, saveDownButton.Height));
+            contextMenuStrip2.Show(screenPoint);
+        }
+
+        private void newButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DialogResult result = MessageBox.Show("This action will close this runner and open a new one. Please make sure to save the script if you need in future. Do you want to open new one?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                // Check the user's response
+                if (result == DialogResult.Yes)
+                {
+                    // If the user clicks "Yes", open the new form and close the current one
+                    TestRunner testRunner = new TestRunner();
+                    testRunner.Show();
+                    this.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error opening new runner", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

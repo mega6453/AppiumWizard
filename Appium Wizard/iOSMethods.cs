@@ -152,7 +152,7 @@ namespace Appium_Wizard
                 if (executable == iOSExecutable.go)
                 {
                     Logger.Info("GetListOfInstalledApps - execute with go...");
-                    var output = ExecuteCommand("apps --list", udid,true,10000);
+                    var output = ExecuteCommand("apps --list", udid, true, 10000);
                     string pattern = @"(\w+(\.\w+)*)\s";
                     MatchCollection matches = Regex.Matches(output, pattern);
 
@@ -1840,7 +1840,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -1868,7 +1868,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -1897,7 +1897,7 @@ namespace Appium_Wizard
             int width, height;
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/window/size", Method.Get);
@@ -1935,7 +1935,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
@@ -1950,10 +1950,10 @@ namespace Appium_Wizard
 
         public static string SendText(string URL, string sessionId, string element, string text)
         {
-            string elementId = FindElement(URL, element);
+            string elementId = FindElement(URL, sessionId, element);
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
@@ -1971,7 +1971,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
@@ -1988,7 +1988,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/unlock", Method.Post);
@@ -2000,7 +2000,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromSeconds(2)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/homescreen", Method.Post);
@@ -2034,7 +2034,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/sessions", Method.Get);
@@ -2058,7 +2058,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "", Method.Get);
@@ -2114,7 +2114,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
@@ -2129,7 +2129,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
@@ -2144,7 +2144,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/screenshot", Method.Get);
@@ -2170,7 +2170,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/screenshot", Method.Get);
@@ -2199,7 +2199,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
@@ -2234,7 +2234,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/wda/locked", Method.Get);
@@ -2267,7 +2267,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);
@@ -2288,12 +2288,12 @@ namespace Appium_Wizard
         }
 
 
-        public static string FindElement(string URL, string XPath)
+        public static string FindElement(string URL, string sessionId, string XPath)
         {
             string elementId = string.Empty;
             try
             {
-                string sessionId = GetWDASessionID(URL);
+                //string sessionId = GetWDASessionID(URL);
                 var options = new RestClientOptions(URL)
                 {
                     Timeout = TimeSpan.FromSeconds(30)
@@ -2320,7 +2320,7 @@ namespace Appium_Wizard
         public static string ClickElement(string URL, string sessionId, string XPath)
         {
             //string sessionId = GetWDASessionID(URL);
-            string elementId = FindElement(URL, XPath);
+            string elementId = FindElement(URL, sessionId, XPath);
             var options = new RestClientOptions(URL)
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -2335,7 +2335,7 @@ namespace Appium_Wizard
         {
             try
             {
-                string elementId = FindElement(URL, XPath);
+                string elementId = FindElement(URL, sessionId, XPath);
                 var options = new RestClientOptions(URL)
                 {
                     Timeout = TimeSpan.FromSeconds(30)

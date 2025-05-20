@@ -53,10 +53,13 @@
             contextMenuStrip2 = new ContextMenuStrip(components);
             saveAsToolStripMenuItem = new ToolStripMenuItem();
             newButton = new Button();
+            propertyInfo = new Label();
+            panel1 = new Panel();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             contextMenuStrip1.SuspendLayout();
             contextMenuStrip2.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // commandGridView
@@ -200,7 +203,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label5.ForeColor = Color.IndianRed;
-            label5.Location = new Point(663, 205);
+            label5.Location = new Point(663, 342);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new Size(364, 30);
@@ -285,6 +288,23 @@
             newButton.UseVisualStyleBackColor = true;
             newButton.Click += newButton_Click;
             // 
+            // propertyInfo
+            // 
+            propertyInfo.Dock = DockStyle.Fill;
+            propertyInfo.Location = new Point(0, 0);
+            propertyInfo.Name = "propertyInfo";
+            propertyInfo.Size = new Size(437, 133);
+            propertyInfo.TabIndex = 17;
+            // 
+            // panel1
+            // 
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(propertyInfo);
+            panel1.Location = new Point(663, 205);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(439, 135);
+            panel1.TabIndex = 18;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -305,6 +325,7 @@
             Controls.Add(comboBoxActions);
             Controls.Add(propertyGridView);
             Controls.Add(commandGridView);
+            Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "TestRunner";
@@ -317,6 +338,7 @@
             ((System.ComponentModel.ISupportInitialize)propertyGridView).EndInit();
             contextMenuStrip1.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -348,5 +370,7 @@
         private ContextMenuStrip contextMenuStrip2;
         private ToolStripMenuItem saveAsToolStripMenuItem;
         private Button newButton;
+        private Label propertyInfo;
+        private Panel panel1;
     }
 }

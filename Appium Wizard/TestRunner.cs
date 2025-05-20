@@ -2,6 +2,7 @@
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
+using System.Reflection;
 using System.Text;
 
 namespace Appium_Wizard
@@ -140,7 +141,7 @@ namespace Appium_Wizard
                     // Load properties for the selected action
                     var selectedActionData = actionData[selectedIndex];
                     string actionName = selectedActionData.Item1; // Assuming Item1 holds the action name
-
+                    StringBuilder propertyInfoBuilder = new StringBuilder();
                     foreach (var property in selectedActionData.Item2)
                     {
                         var row = new DataGridViewRow();
@@ -196,7 +197,16 @@ namespace Appium_Wizard
                         }
 
                         propertyGridView.Rows.Add(row);
+
+                        // Append property description to the label text
+                        if (propertyDescriptions.ContainsKey(property.Key))
+                        {
+                            propertyInfoBuilder.AppendLine($"{property.Key}: {propertyDescriptions[property.Key]}");
+                            propertyInfoBuilder.AppendLine();
+                        }
                     }
+                    // Update the propertyInfo label with the constructed information
+                    propertyInfo.Text = propertyInfoBuilder.ToString();
                     ValidateFields(selectedIndex);
                 }
             }
@@ -395,7 +405,7 @@ namespace Appium_Wizard
                 GoogleAnalytics.SendEvent("RunOnce_TestRunner");
                 selectedUDID = commandGridView.Rows[0].Tag as string;
                 selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
-                Text = "Test Runner - "+selectedDeviceName;
+                Text = "Test Runner - " + selectedDeviceName;
                 if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
                 {
                     string osType = deviceUDIDToOsTypeMap[selectedUDID];
@@ -1336,5 +1346,22 @@ namespace Appium_Wizard
                 MessageBox.Show(ex.Message, "Error opening new runner", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+        private Dictionary<string, string> propertyDescriptions = new Dictionary<string, string>
+            {
+                { "XPath", "Provide the XPath of the element you want to interact with." },
+                { "Wait For Element Visible (ms)", "Timeout in milliseconds to wait for the element to become visible." },
+                { "Text to Enter", "The text to input into the specified element." },
+                { "Text Type", "Specify the type of random text: Random Number, Random Alphabets, or Random Alphanumeric." },
+                { "Number of digits/characters", "Specify the number of digits or characters for random text generation." },
+                { "Device Name", "Select the device name from the dropdown list." },
+                { "Timeout (ms)", "Timeout in milliseconds to wait for the element to become visible or vanish." },
+                { "Duration (ms)", "Duration in milliseconds to pause execution." },
+                { "App Path", "Provide the file path of the app to be installed." },
+                { "App BundleId(iOS)/Activity(Android)", "Provide the bundle ID (iOS) or activity name (Android) of the app to be launched." },
+                { "App Package", "Provide the package name of the app to be killed or uninstalled." },
+                { "Action", "Specify the device action to perform: Home or Back." }
+            };
     }
 }

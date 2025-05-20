@@ -141,6 +141,13 @@ namespace Appium_Wizard
                     statusText = "address already in use";
                     serverStarted = false;
                 }
+                else if (data.Contains("Welcome to Appium"))
+                {
+                    if (MainScreen.main != null)
+                    {
+                        MainScreen.main.UpdateShowLogsCheckbox(true);
+                    }
+                }
 
                 try
                 {

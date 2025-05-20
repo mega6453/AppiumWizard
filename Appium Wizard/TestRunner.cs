@@ -395,6 +395,7 @@ namespace Appium_Wizard
                 GoogleAnalytics.SendEvent("RunOnce_TestRunner");
                 selectedUDID = commandGridView.Rows[0].Tag as string;
                 selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
+                Text = "Test Runner - "+selectedDeviceName;
                 if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
                 {
                     string osType = deviceUDIDToOsTypeMap[selectedUDID];
@@ -482,6 +483,7 @@ namespace Appium_Wizard
                         GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
                         selectedUDID = commandGridView.Rows[0].Tag as string;
                         selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
+                        Text = "Test Runner - " + selectedDeviceName;
                         if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
                         {
                             string osType = deviceUDIDToOsTypeMap[selectedUDID];
@@ -1139,11 +1141,12 @@ namespace Appium_Wizard
             if (isRunning)
             {
                 // Show confirmation dialog
-                var result = MessageBox.Show("A test is currently running. Do you want to stop the test and close the form?",
+                var result = MessageBox.Show("A test is currently running. Do you want to stop the test and close the runner?",
                                              "Confirm Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
                 if (result == DialogResult.Yes)
                 {
+                    UpdateScreenControl("");
                     // Stop the test and allow form to close
                     cancellationTokenSource?.Cancel();
                     isRunning = false; // Reset the running flag
@@ -1310,15 +1313,17 @@ namespace Appium_Wizard
         {
             try
             {
-                DialogResult result = MessageBox.Show("This action will close this runner and open a new one. Please make sure to save the script if you need in future. Do you want to open new one?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                // Check the user's response
-                if (result == DialogResult.Yes)
+                DialogResult newResult = MessageBox.Show("Do you want to open a new runner in this same window?\n\nYes - will close this runner and open a new one. Please make sure to save the script if you need in future.\n\nNo - Keeps this runner window open and opens a new runner in separate window.\n\n Cancel - Just close this confirmation popup.", "Confirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                if (newResult == DialogResult.Yes)
                 {
-                    // If the user clicks "Yes", open the new form and close the current one
                     TestRunner testRunner = new TestRunner();
                     testRunner.Show();
                     this.Close();
+                }
+                else if (newResult == DialogResult.No)
+                {
+                    TestRunner testRunner = new TestRunner();
+                    testRunner.Show();
                 }
             }
             catch (Exception ex)

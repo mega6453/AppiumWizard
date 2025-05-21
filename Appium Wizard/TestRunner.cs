@@ -1266,6 +1266,7 @@ namespace Appium_Wizard
             {
                 MessageBox.Show(ex.Message, "Error opening report", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("openReportButton_Click");
         }
 
         private void DropDownButton_Click(object sender, EventArgs e)
@@ -1288,6 +1289,7 @@ namespace Appium_Wizard
             {
                 MessageBox.Show(ex.Message, "Error opening reports folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("openReportFolderToolStripMenuItem_Click");
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1310,6 +1312,7 @@ namespace Appium_Wizard
             {
                 MessageBox.Show(ex.Message, "Error saving report", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("saveAsToolStripMenuItem_Click");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -1339,6 +1342,7 @@ namespace Appium_Wizard
             {
                 MessageBox.Show(ex.Message, "Error opening new runner", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            GoogleAnalytics.SendEvent("newButton_Click");
         }
 
 

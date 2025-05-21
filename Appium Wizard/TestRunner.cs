@@ -243,7 +243,7 @@ namespace Appium_Wizard
                 actionData[selectedIndex].Item2[property] = value;
                 if (property == "Device Name")
                 {
-                    commandGridView.Rows[0].Tag = deviceNameToUdidMap[value];
+                    commandGridView.Rows[selectedIndex].Tag = deviceNameToUdidMap[value];
                 }
 
                 if (property == "Text Type")
@@ -415,33 +415,12 @@ namespace Appium_Wizard
                     return;
                 }
                 GoogleAnalytics.SendEvent("RunOnce_TestRunner");
-                selectedUDID = commandGridView.Rows[0].Tag as string;
-                selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
-                Text = "Test Runner - " + selectedDeviceName;
-                if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
-                {
-                    string osType = deviceUDIDToOsTypeMap[selectedUDID];
-                    isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
-                }
-                if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
-                {
-                    port = ScreenControl.devicePorts[selectedUDID].Item2;
-                    URL = "http://127.0.0.1:" + port;
-                    string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
-                    string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
-                    htmlReportPath = filePath;
-                    CreateHtmlReport();
-                    await performActions(cancellationTokenSource.Token);
-                }
-                else
-                {
-                    MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    runOnceButton.Text = "Run Once";
-                    repeatButton.Enabled = true;
-                    isRunning = false;
-                    UpdateScreenControl("");
-                    return;
-                }
+                string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                htmlReportPath = filePath;
+                CreateHtmlReport();
+                await performActions(cancellationTokenSource.Token);
+                FinalizeHtmlReport();
             }
             catch (OperationCanceledException)
             {
@@ -456,6 +435,7 @@ namespace Appium_Wizard
             }
         }
 
+        bool erroShown = false;
         private async void repeatButton_Click(object sender, EventArgs e)
         {
             if (isRunning)
@@ -503,39 +483,21 @@ namespace Appium_Wizard
                     else
                     {
                         GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
-                        selectedUDID = commandGridView.Rows[0].Tag as string;
-                        selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
-                        Text = "Test Runner - " + selectedDeviceName;
-                        if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
+                        string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                        string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                        htmlReportPath = filePath;
+                        CreateHtmlReport(repetitions);
+                        repeatCountLabel.Text = $"0/{repetitions}";
+                        for (int i = 1; i <= repetitions; i++)
                         {
-                            string osType = deviceUDIDToOsTypeMap[selectedUDID];
-                            isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
-                        }
-                        if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
-                        {
-                            port = ScreenControl.devicePorts[selectedUDID].Item2;
-                            URL = "http://127.0.0.1:" + port;
-
-                            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
-                            string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
-                            htmlReportPath = filePath;
-                            CreateHtmlReport();
-                            repeatCountLabel.Text = $"0/{repetitions}";
-                            for (int i = 1; i <= repetitions; i++)
+                            if (!erroShown)
                             {
                                 await performActions(cancellationTokenSource.Token);
                                 repeatCountLabel.Text = $"{i}/{repetitions}";
                             }
                         }
-                        else
-                        {
-                            MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            repeatButton.Text = "Repeat";
-                            runOnceButton.Enabled = true;
-                            isRunning = false;
-                            UpdateScreenControl("");
-                            return;
-                        }
+                        erroShown = false;
+                        FinalizeHtmlReport();
                     }
                 }
             }
@@ -548,6 +510,7 @@ namespace Appium_Wizard
                 repeatButton.Text = "Repeat";
                 runOnceButton.Enabled = true;
                 isRunning = false;
+                UpdateScreenControl("");
             }
         }
 
@@ -557,20 +520,6 @@ namespace Appium_Wizard
             await Task.Run(async () =>
             {
                 string sessionId = string.Empty;
-                if (isAndroid)
-                {
-                    sessionId = AndroidAPIMethods.GetSessionID(port);
-                }
-                else
-                {
-                    sessionId = iOSAPIMethods.GetWDASessionID(URL);
-                }
-                if (string.IsNullOrEmpty(sessionId) || string.IsNullOrWhiteSpace(sessionId) || sessionId.Equals("nosession"))
-                {
-                    MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
                 Random random = new Random(); // Random number generator
 
                 for (int i = 0; i < actionData.Count; i++)
@@ -580,6 +529,43 @@ namespace Appium_Wizard
                     var action = actionData[i];
                     string actionType = action.Item1;
                     Dictionary<string, string> properties = action.Item2;
+
+                    if (actionType == "Set Device")
+                    {
+                        selectedUDID = commandGridView.Rows[i].Tag as string; // Get UDID from the current "Set Device" row
+                        selectedDeviceName = GetDeviceNameByUdid(selectedUDID);
+                        //Text = "Test Runner - " + selectedDeviceName;
+                        if (deviceUDIDToOsTypeMap.ContainsKey(selectedUDID))
+                        {
+                            string osType = deviceUDIDToOsTypeMap[selectedUDID];
+                            isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
+                        }
+                        if (ScreenControl.devicePorts.ContainsKey(selectedUDID))
+                        {
+                            port = ScreenControl.devicePorts[selectedUDID].Item2;
+                            URL = "http://127.0.0.1:" + port;
+                            if (isAndroid)
+                            {
+                                sessionId = AndroidAPIMethods.GetSessionID(port);
+                            }
+                            else
+                            {
+                                sessionId = iOSAPIMethods.GetWDASessionID(URL);
+                            }
+                            if (string.IsNullOrEmpty(sessionId) || string.IsNullOrWhiteSpace(sessionId) || sessionId.Equals("nosession"))
+                            {
+                                erroShown = true;
+                                MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            erroShown = true;
+                            MessageBox.Show("Please open the device " + selectedDeviceName + " from Main screen and then try running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
 
                     cancellationToken.ThrowIfCancellationRequested();
                     UpdateScreenControl("");
@@ -694,14 +680,11 @@ namespace Appium_Wizard
                             if (deviceNameToUdidMap.ContainsKey(properties["Device Name"]))
                             {
                                 selectedUDID = deviceNameToUdidMap[properties["Device Name"]]; // Update the selected UDID
-                                Console.WriteLine($"Selected Device UDID: {selectedUDID}"); // For debugging
-
                                 // Update the OS type based on the selected device name
                                 if (deviceNameToOsTypeMap.ContainsKey(properties["Device Name"]))
                                 {
                                     string osType = deviceNameToOsTypeMap[properties["Device Name"]];
                                     isAndroid = osType.Equals("Android", StringComparison.OrdinalIgnoreCase);
-                                    Console.WriteLine($"Selected OS Type: {osType}, isAndroid: {isAndroid}"); // For debugging
                                 }
                             }
                             AppendToHtmlReport(SetDeviceCommand, "OK");
@@ -838,7 +821,6 @@ namespace Appium_Wizard
                     }
                 }
                 UpdateScreenControl("");
-                FinalizeHtmlReport();
             });
         }
 
@@ -1196,13 +1178,14 @@ namespace Appium_Wizard
                 actionActiveStates[e.RowIndex] = isChecked;
             }
         }
-        private void CreateHtmlReport()
+
+        private void CreateHtmlReport(int repetitions=1)
         {
             string htmlContent = $@"
                              <!DOCTYPE html>
                              <html>
                              <head>
-                                 <title>{selectedDeviceName} - Appium Wizard Test Runner Execution Report</title>
+                                 <title>Appium Wizard Test Runner Execution Report</title>
                                  <style>
                                      body {{ font-family: Arial, sans-serif; margin: 20px; }}
                                      table {{ border-collapse: collapse; width: 100%; }}
@@ -1214,8 +1197,7 @@ namespace Appium_Wizard
                                  </style>
                              </head>
                              <body>
-                                 <h1>Appium Wizard Test Runner Execution Report </h1>
-                                 <h2>Device : {selectedDeviceName}({selectedUDID}) </h2>
+                                 <h1>Appium Wizard Test Runner Execution Report - {repetitions} run(s)</h1>
                                  <table>
                                      <thead>
                                          <tr>

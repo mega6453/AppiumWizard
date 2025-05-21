@@ -107,6 +107,7 @@ namespace Appium_Wizard
                     properties.Add("App Package", "");
                     break;
                 case "Take Screenshot":
+                    // No properties
                     break;
                 case "Device Action":
                     properties.Add("Action", "");
@@ -119,7 +120,14 @@ namespace Appium_Wizard
 
             // Add the action to DataGridView1
             int rowIndex = commandGridView.Rows.Add(); // Add a new row
-            commandGridView.Rows[rowIndex].Cells[1].Value = selectedAction; // Set the value in column 1
+            if (selectedAction == "Take Screenshot")
+            {
+                commandGridView.Rows[rowIndex].Cells[1].Value = "Take Screenshot and attach it to report";
+            }
+            else
+            {
+                commandGridView.Rows[rowIndex].Cells[1].Value = selectedAction; // Set the value in column 1
+            }
             commandGridView.ClearSelection();
             DataGridViewRow newRow = commandGridView.Rows[rowIndex];
             // Highlight the newly created row
@@ -189,7 +197,7 @@ namespace Appium_Wizard
                             comboBoxCell.DataSource = items;
                             comboBoxCell.Value = property.Value;
                             row.Cells[1] = comboBoxCell;
-                        }
+                        } 
                         else
                         {
                             // Create a standard TextBox cell for the value field
@@ -208,6 +216,10 @@ namespace Appium_Wizard
                     // Update the propertyInfo label with the constructed information
                     propertyInfo.Text = propertyInfoBuilder.ToString();
                     ValidateFields(selectedIndex);
+                    if (actionName == "Take Screenshot")
+                    {
+                        propertyInfo.Text = "Take Screenshot and attach it to report";
+                    }
                 }
             }
             catch (Exception ex)
@@ -1358,10 +1370,10 @@ namespace Appium_Wizard
                 { "Device Name", "Select the device name from the dropdown list." },
                 { "Timeout (ms)", "Timeout in milliseconds to wait for the element to become visible or vanish." },
                 { "Duration (ms)", "Duration in milliseconds to pause execution." },
-                { "App Path", "Provide the file path of the app to be installed." },
-                { "App BundleId(iOS)/Activity(Android)", "Provide the bundle ID (iOS) or activity name (Android) of the app to be launched." },
+                { "App Path", "Provide the file path of the app to be installed. APK for android and IPA for iOS." },
+                { "App BundleId(iOS)/Activity(Android)", "Provide the bundle ID for iOS app, Activity name for the Android app to be launched." },
                 { "App Package", "Provide the package name of the app to be killed or uninstalled." },
-                { "Action", "Specify the device action to perform: Home or Back." }
+                { "Action", "Specify the device action to perform: Home or Back.\n\nNote: Not all operations supported in all OS." }
             };
     }
 }

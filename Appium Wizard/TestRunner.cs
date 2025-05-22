@@ -68,6 +68,10 @@ namespace Appium_Wizard
                 case "Click Element":
                     properties.Add("XPath", "");
                     properties.Add("Wait For Element Visible (ms)", "5000");
+                    break; 
+                case "Click on coordinates":
+                    properties.Add("X", "");
+                    properties.Add("Y", "");
                     break;
                 case "Send Text":
                     properties.Add("XPath", "");
@@ -588,6 +592,23 @@ namespace Appium_Wizard
                             AppendToHtmlReport(clickCommand, clickResponse);
                             break;
 
+                        case "Click on coordinates":
+                            int xCoord = int.Parse(properties["X"]); // Convert X to int
+                            int yCoord = int.Parse(properties["Y"]); // Convert Y to int
+                            string clickCoordCommand = $"Click at coordinates X={xCoord},Y={yCoord}";
+                            UpdateScreenControl(clickCoordCommand);
+                            string clickCoordResponse = "-";
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().Tap(selectedUDID, xCoord, yCoord);
+                            }
+                            else
+                            {
+                                clickCoordResponse = iOSAPIMethods.Tap(URL, sessionId, xCoord, yCoord);
+                            }
+                            AppendToHtmlReport(clickCoordCommand, clickCoordResponse);
+                            break;
+
                         case "Send Text":
                             int sendTextTimeout = int.TryParse(properties["Wait For Element Visible (ms)"], out var sendTextParsedTimeout) ? sendTextParsedTimeout : 0;
                             string sendTextCommand = "Send Text " + properties["Text to Enter"] + " to " + properties["XPath"] + " | timeout:" + sendTextTimeout;
@@ -864,7 +885,9 @@ namespace Appium_Wizard
                 case "Send Text With Random Values":
                     return $"Send \"{properties["Text Type"]}\" with \"{properties["Number of digits/characters"]}\" digits/characters to \"{properties["XPath"]}\" , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Click Element":
-                    return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
+                    return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms."; 
+                case "Click on coordinates":
+                    return $"Click at coordinates X={properties["X"]},Y={properties["Y"]}";
                 case "Set Device":
                     return $"Set device to {properties["Device Name"]}";
                 case "Wait for element visible":
@@ -1359,7 +1382,9 @@ namespace Appium_Wizard
                 { "App Path", "Provide the file path of the app to be installed. APK for android and IPA for iOS." },
                 { "App BundleId(iOS)/Activity(Android)", "Provide the bundle ID for iOS app, Activity name for the Android app to be launched." },
                 { "App Package", "Provide the package name of the app to be killed or uninstalled." },
-                { "Action", "Specify the device action to perform: Home or Back.\n\nNote: Not all operations supported in all OS." }
+                { "Action", "Specify the device action to perform.\n\nNote: Not all operations supported in all OS." },
+                { "X", "Enter the X Coordinate for the click location" },
+                { "Y", "Enter the Y Coordinate for the click location" }
             };
     }
 }

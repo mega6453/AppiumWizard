@@ -1917,7 +1917,7 @@ namespace Appium_Wizard
             return (width, height);
         }
 
-        public static void Tap(string URL, string sessionId, int pressX, int pressY)
+        public static string Tap(string URL, string sessionId, int pressX, int pressY)
         {
             var options = new RestClientOptions(URL);
             var client = new RestClient(options);
@@ -1929,6 +1929,7 @@ namespace Appium_Wizard
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static void SendText(string URL, string sessionId, string text)

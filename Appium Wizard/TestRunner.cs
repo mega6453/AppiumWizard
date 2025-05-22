@@ -84,6 +84,9 @@ namespace Appium_Wizard
                     properties.Add("Number of digits/characters", "");
                     properties.Add("Wait For Element Visible (ms)", "5000");
                     break;
+                case "Send Text Without Element":
+                    properties.Add("Text to Enter", "");
+                    break;
                 case "Set Device":
                     properties.Add("Device Name", "");
                     break;
@@ -626,6 +629,21 @@ namespace Appium_Wizard
                             AppendToHtmlReport(sendTextCommand, sendTextResponse);
                             break;
 
+                        case "Send Text Without Element":
+                            string sendTextWithoutElementCommand = "Send Text " + properties["Text to Enter"] + " to the clicked textbox";
+                            UpdateScreenControl(sendTextWithoutElementCommand);
+                            string sendTextWithoutElementResponse = "-";
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().SendText(selectedUDID, properties["Text to Enter"]);
+                            }
+                            else
+                            {
+                                sendTextWithoutElementResponse = iOSAPIMethods.SendText(URL, sessionId, properties["Text to Enter"]);
+                            }
+                            AppendToHtmlReport(sendTextWithoutElementCommand, sendTextWithoutElementResponse);
+                            break;
+
                         case "Send Text With Random Values":
                             string textType = properties["Text Type"];
                             string textToEnter;
@@ -884,6 +902,8 @@ namespace Appium_Wizard
                     return $"Send text \"{properties["Text to Enter"]}\" to {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Send Text With Random Values":
                     return $"Send \"{properties["Text Type"]}\" with \"{properties["Number of digits/characters"]}\" digits/characters to \"{properties["XPath"]}\" , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
+                case "Send Text Without Element":
+                    return $"Send text \"{properties["Text to Enter"]}\" to the clicked textbox.";
                 case "Click Element":
                     return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms."; 
                 case "Click on coordinates":
@@ -1373,7 +1393,7 @@ namespace Appium_Wizard
             {
                 { "XPath", "Provide the XPath of the element you want to interact with." },
                 { "Wait For Element Visible (ms)", "Timeout in milliseconds to wait for the element to become visible." },
-                { "Text to Enter", "The text to input into the specified element." },
+                { "Text to Enter", "The text to input into the specified element or to the selected textbox." },
                 { "Text Type", "Specify the type of random text: Random Number, Random Alphabets, or Random Alphanumeric." },
                 { "Number of digits/characters", "Specify the number of digits or characters for random text generation." },
                 { "Device Name", "Select the device name from the dropdown list." },

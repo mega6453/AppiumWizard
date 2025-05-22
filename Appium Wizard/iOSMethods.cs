@@ -1932,7 +1932,7 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
-        public static void SendText(string URL, string sessionId, string text)
+        public static string SendText(string URL, string sessionId, string text)
         {
             var options = new RestClientOptions(URL)
             {
@@ -1947,6 +1947,7 @@ namespace Appium_Wizard
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static string SendText(string URL, string sessionId, string element, string text)

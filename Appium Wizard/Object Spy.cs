@@ -209,21 +209,26 @@ namespace Appium_Wizard
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
 
-            // Start both tasks in parallel
-            Task screenshotTask = Task.Run(() =>
+            if (isAndroid)
             {
-                if (isAndroid)
-                {
-                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
-                }
-                else
-                {
-                    screenshot = iOSAPIMethods.TakeScreenshot(url);
-                }
-            });
+                screenshot = AndroidAPIMethods.TakeScreenshot(port);
+            }
+            else
+            {
+                screenshot = iOSAPIMethods.TakeScreenshot(url);
+            }
+            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
 
-            Task xmlContentTask = Task.Run(() =>
+            if (screenshot == null)
             {
+                commonProgress.Close();
+                MessageBox.Show("Failed to retrieve screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+            else
+            {
+                pictureBox1.Image = screenshot;
                 if (isAndroid)
                 {
                     xmlContent = AndroidAPIMethods.GetPageSource(port);
@@ -232,45 +237,25 @@ namespace Appium_Wizard
                 {
                     xmlContent = iOSAPIMethods.GetPageSource(port);
                 }
-            });
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 75);
+                if (xmlContent.Equals("empty"))
+                {
+                    commonProgress.Close();
+                    MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 85);
+                // Load XML content into the tree view
+                await Task.Run(() =>
+                {
+                    LoadXmlToTreeView(xmlContent);
+                });
 
-            // Await both tasks to complete
-            await Task.WhenAll(screenshotTask, xmlContentTask);
-
-            // Update progress after tasks complete
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
-
-            // Check if screenshot was successfully retrieved
-            if (screenshot == null)
-            {
-                commonProgress.Close();
-                MessageBox.Show("Failed to retrieve screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
-                return;
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 95);
+                listView1.Items.Clear();
+                treeView1.ExpandAll();
             }
-
-            pictureBox1.Image = screenshot;
-
-            // Check if XML content was successfully retrieved
-            if (xmlContent.Equals("empty"))
-            {
-                commonProgress.Close();
-                MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
-                return;
-            }
-
-            // Load XML content into the tree view
-            await Task.Run(() =>
-            {
-                LoadXmlToTreeView(xmlContent);
-            });
-
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
-            listView1.Items.Clear();
-            treeView1.ExpandAll();
-
-            // Close the progress dialog
             commonProgress.Close();
         }
 

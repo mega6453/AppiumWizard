@@ -29,7 +29,7 @@ namespace Appium_Wizard
 
         private async void Object_Spy_Load(object sender, EventArgs e)
         {
-            FetchScreen();
+            await FetchScreen();
         }
 
 
@@ -300,6 +300,7 @@ namespace Appium_Wizard
                 commonProgress.Close();
                 MessageBox.Show("Failed to retreive screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
+                return;
             }
             else
             {
@@ -321,14 +322,15 @@ namespace Appium_Wizard
                     commonProgress.Close();
                     MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
+                    return;
                 }
-                else
-                {
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
+                // Load XML content into the tree view
                     await Task.Run(() =>
                     {
                         LoadXmlToTreeView(xmlContent);
                     });
-                    commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
+            }
                     listView1.Items.Clear();
                     treeView1.ExpandAll();
                 }

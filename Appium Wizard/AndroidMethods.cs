@@ -1006,7 +1006,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromMilliseconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);

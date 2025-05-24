@@ -296,6 +296,7 @@ namespace Appium_Wizard
             RecordButton.Enabled = enable;
             objectSpyButton.Enabled = enable;
             recentAppsToolStripButton.Enabled = enable;
+            RecordAndStopRecordingSteps.Enabled = enable;
         }
 
         private async void InitializeWebView()
@@ -351,7 +352,7 @@ namespace Appium_Wizard
         }
 
 
-        public void WebView_MouseUp(object sender, MouseEventArgs e)
+        public async void WebView_MouseUp(object sender, MouseEventArgs e)
         {
             moveToX = e.Location.X;
             moveToY = e.Location.Y;
@@ -368,12 +369,18 @@ namespace Appium_Wizard
                 {
                     if (isAndroid)
                     {
-                        AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                        await Task.Run(() =>
+                        {
+                            AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                        });
                         GoogleAnalytics.SendEvent("Tap_Screen", "Android");
                     }
                     else
                     {
-                        iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                        await Task.Run(() =>
+                        {
+                            iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                        });
                         GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
                     }
                     return;
@@ -391,11 +398,17 @@ namespace Appium_Wizard
                     {   // Swipe right
                         if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
+                            });
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
+                            });
                         }
                     }
                     else
@@ -403,11 +416,17 @@ namespace Appium_Wizard
                         // Swipe left
                         if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
+                            });
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
+                            });
                         }
                     }
                 }
@@ -419,11 +438,17 @@ namespace Appium_Wizard
                         // Swipe down
                         if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                            });
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
+                            });
                         }
                     }
                     else
@@ -431,11 +456,17 @@ namespace Appium_Wizard
                         // Swipe up
                         if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                            });
                         }
                         else
                         {
-                            iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
+                            });
                         }
                     }
                 }
@@ -453,7 +484,7 @@ namespace Appium_Wizard
             }
         }
 
-        public void SendKeys(object sender, KeyPressEventArgs e)
+        public async void SendKeys(object sender, KeyPressEventArgs e)
         {
             string text = e.KeyChar.ToString();
             if (isRecordingSteps)
@@ -466,12 +497,18 @@ namespace Appium_Wizard
             }
             if (OSType.Equals("iOS"))
             {
-                iOSAPIMethods.SendText(URL, sessionId, text);
+                await Task.Run(() =>
+                {
+                    iOSAPIMethods.SendText(URL, sessionId, text);
+                });
                 GoogleAnalytics.SendEvent("SendKeys", "iOS");
             }
             else
             {
-                AndroidMethods.GetInstance().SendText(udid, text);
+                await Task.Run(() =>
+                {
+                    AndroidMethods.GetInstance().SendText(udid, text);
+                });
                 GoogleAnalytics.SendEvent("SendKeys", "Android");
             }
         }
@@ -562,22 +599,43 @@ namespace Appium_Wizard
             }
         }
 
-        private void HomeButton_Click(object sender, EventArgs e)
+        private async void HomeButton_Click(object sender, EventArgs e)
         {
-            if (OSType.Equals("iOS"))
+            if (isRecordingSteps)
             {
-                iOSAPIMethods.GoToHome(proxyPort);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "iOS");
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Home",
+                });
             }
-            else
+
+            await Task.Run(() =>
             {
-                AndroidMethods.GetInstance().GoToHome(udid);
-                GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, "Android");
-            }
+                if (OSType.Equals("iOS"))
+                {
+                    iOSAPIMethods.GoToHome(proxyPort);
+                    GoogleAnalytics.SendEvent("HomeButton_Click", "iOS");
+                }
+                else
+                {
+                    AndroidMethods.GetInstance().GoToHome(udid);
+                    GoogleAnalytics.SendEvent("HomeButton_Click", "Android");
+                }
+            });
         }
-        private void BackButton_Click(object sender, EventArgs e)
+        private async void BackButton_Click(object sender, EventArgs e)
         {
-            AndroidMethods.GetInstance().Back(udid);
+            if (isRecordingSteps)
+            {
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Back",
+                });
+            }
+            await Task.Run(() =>
+            {
+                AndroidMethods.GetInstance().Back(udid);
+            });
             GoogleAnalytics.SendEvent("BackButton_Click");
         }
         private void AlwaysOnTop_Click(object sender, EventArgs e)
@@ -589,40 +647,43 @@ namespace Appium_Wizard
         }
 
         bool isControlCenterOpen = false;
-        private void controlCenter_Click(object sender, EventArgs e)
+        private async void controlCenter_Click(object sender, EventArgs e)
         {
-            if (OSType.Equals("iOS"))
+            await Task.Run(() =>
             {
-                if (isControlCenterOpen == false)
+                if (OSType.Equals("iOS"))
                 {
-                    iOSAPIMethods.OpenControlCenter(URL, sessionId, width, height);
-                    //controlCenter.Text = "Close Control Center";
-                    isControlCenterOpen = true;
+                    if (isControlCenterOpen == false)
+                    {
+                        iOSAPIMethods.OpenControlCenter(URL, sessionId, width, height);
+                        //controlCenter.Text = "Close Control Center";
+                        isControlCenterOpen = true;
+                    }
+                    else
+                    {
+                        iOSAPIMethods.CloseControlCenter(URL, sessionId, width);
+                        //controlCenter.Text = "Open Control Center";
+                        isControlCenterOpen = false;
+                    }
+                    GoogleAnalytics.SendEvent("controlCenter_Click", "iOS");
                 }
                 else
                 {
-                    iOSAPIMethods.CloseControlCenter(URL, sessionId, width);
-                    //controlCenter.Text = "Open Control Center";
-                    isControlCenterOpen = false;
+                    if (isControlCenterOpen == false)
+                    {
+                        AndroidMethods.GetInstance().OpenNotification(udid);
+                        //controlCenter.Text = "Close Control Center";
+                        isControlCenterOpen = true;
+                    }
+                    else
+                    {
+                        AndroidMethods.GetInstance().CloseNotification(udid);
+                        //controlCenter.Text = "Open Control Center";
+                        isControlCenterOpen = false;
+                    }
+                    GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
                 }
-                GoogleAnalytics.SendEvent("controlCenter_Click", "iOS");
-            }
-            else
-            {
-                if (isControlCenterOpen == false)
-                {
-                    AndroidMethods.GetInstance().OpenNotification(udid);
-                    //controlCenter.Text = "Close Control Center";
-                    isControlCenterOpen = true;
-                }
-                else
-                {
-                    AndroidMethods.GetInstance().CloseNotification(udid);
-                    //controlCenter.Text = "Open Control Center";
-                    isControlCenterOpen = false;
-                }
-                GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
-            }
+            });
         }
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
@@ -865,19 +926,22 @@ namespace Appium_Wizard
             //}
         }
 
-        private void SettingsToolStripButton_Click(object sender, EventArgs e)
+        private async void SettingsToolStripButton_Click(object sender, EventArgs e)
         {
-            if (OSType.Equals("Android"))
+            await Task.Run(() =>
             {
-                AndroidMethods.GetInstance().LaunchSettings(udid);
-                GoogleAnalytics.SendEvent("Android_SettingsToolStripButton_Click");
-            }
-            else
-            {
-                string url = "http://localhost:" + proxyPort;
-                iOSAPIMethods.LaunchApp(url, sessionId, "com.apple.Preferences");
-                GoogleAnalytics.SendEvent("iOS_SettingsToolStripButton_Click");
-            }
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().LaunchSettings(udid);
+                    GoogleAnalytics.SendEvent("Android_SettingsToolStripButton_Click");
+                }
+                else
+                {
+                    string url = "http://localhost:" + proxyPort;
+                    iOSAPIMethods.LaunchApp(url, sessionId, "com.apple.Preferences");
+                    GoogleAnalytics.SendEvent("iOS_SettingsToolStripButton_Click");
+                }
+            });
         }
 
         private void UnlockScreen_Click(object sender, EventArgs e)
@@ -887,16 +951,16 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
-        bool isRecording = false;
+        bool isRecordingScreen = false;
         private DateTime recordingStartTime;
         private const int MinimumRecordingDuration = 30;
         private async void RecordButton_Click(object sender, EventArgs e)
         {
-            if (!isRecording)
+            if (!isRecordingScreen)
             {
                 RecordButton.Image = Resources.record_inprogress;
                 recordingStartTime = DateTime.Now;
-                isRecording = true;
+                isRecordingScreen = true;
 
                 try
                 {
@@ -915,7 +979,7 @@ namespace Appium_Wizard
                 if (recordingDuration.TotalSeconds >= MinimumRecordingDuration)
                 {
                     RecordButton.Enabled = false;
-                    isRecording = false;
+                    isRecordingScreen = false;
                     try
                     {
                         Common common = new Common();
@@ -985,17 +1049,20 @@ namespace Appium_Wizard
             object_Spy.Show();
         }
 
-        private void recentAppsToolStripButton_Click(object sender, EventArgs e)
+        private async void recentAppsToolStripButton_Click(object sender, EventArgs e)
         {
-            if (isAndroid)
+            await Task.Run(() =>
             {
-                AndroidMethods.GetInstance().ShowRecentApps(udid);
-            }
-            else
-            {
-                int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
-                iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
-            }
+                if (isAndroid)
+                {
+                    AndroidMethods.GetInstance().ShowRecentApps(udid);
+                }
+                else
+                {
+                    int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
+                    iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
+                }
+            });
         }
 
         private void SaveRecordedStepsToJson(string filePath)
@@ -1031,6 +1098,20 @@ namespace Appium_Wizard
                             item["Item2"] = new Dictionary<string, object>
                                             {
                                                 { "Text to Enter", action.Text }
+                                            };
+                            break;
+                        case "Home":
+                            item["Item1"] = "Device Action";
+                            item["Item2"] = new Dictionary<string, object>
+                                            {
+                                                { "Action", "Home" }
+                                            };
+                            break;
+                        case "Back":
+                            item["Item1"] = "Device Action";
+                            item["Item2"] = new Dictionary<string, object>
+                                            {
+                                                { "Action", "Back" }
                                             };
                             break;
 
@@ -1071,7 +1152,7 @@ namespace Appium_Wizard
                 MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
+            playStepsToolStripMenuItem.Enabled = false;
             await Task.Run(() =>
             {
                 foreach (var action in recordedActions)
@@ -1099,12 +1180,31 @@ namespace Appium_Wizard
                                 iOSAPIMethods.SendText(URL, sessionId, action.Text);
                             }
                             break;
+
+                        case "Home":
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().GoToHome(udid);
+                            }
+                            else
+                            {
+                                iOSAPIMethods.GoToHome(proxyPort);
+                            }
+                            break;
+
+                        case "Back":
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().Back(udid);
+                            }
+                            break;
                     }
 
                     //await Task.Delay(500); // Add delay between actions
                 }
             });
             MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            playStepsToolStripMenuItem.Enabled = true;
         }
 
         private void RecordAndStopRecordingSteps_ButtonClick(object sender, EventArgs e)
@@ -1128,7 +1228,7 @@ namespace Appium_Wizard
                     MessageBox.Show("Recording steps have stopped. But no actions performed on the screen. So, nothing to save or play.", "Record Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                var result = MessageBox.Show("Recording steps have stopped. You can press the play button on this screen to execute the recorded steps any number of times until you close this screen. If you want to execute it in the future(with Tools->Test Runner), you can save it.\n\nDo you want to save the script ? ", "Record Steps", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var result = MessageBox.Show("Recording steps have stopped. You can press the play steps button to execute the recorded steps any number of times until you close this screen. If you want to execute it in the future(with Tools->Test Runner), you can save it.\n\nDo you want to save the script ? ", "Record Steps", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     using (SaveFileDialog saveFileDialog = new SaveFileDialog())

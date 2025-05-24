@@ -343,6 +343,16 @@ namespace Appium_Wizard.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap play {
+            get {
+                object obj = ResourceManager.GetObject("play", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap plug_in {
             get {
                 object obj = ResourceManager.GetObject("plug_in", resourceCulture);
@@ -356,6 +366,16 @@ namespace Appium_Wizard.Properties {
         internal static System.Drawing.Bitmap proxy {
             get {
                 object obj = ResourceManager.GetObject("proxy", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap readme {
+            get {
+                object obj = ResourceManager.GetObject("readme", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -396,6 +416,26 @@ namespace Appium_Wizard.Properties {
         internal static System.Drawing.Bitmap record_inprogress {
             get {
                 object obj = ResourceManager.GetObject("record_inprogress", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RecordSteps {
+            get {
+                object obj = ResourceManager.GetObject("RecordSteps", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RecordStepsGif {
+            get {
+                object obj = ResourceManager.GetObject("RecordStepsGif", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

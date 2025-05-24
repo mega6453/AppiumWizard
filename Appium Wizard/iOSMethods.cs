@@ -436,9 +436,9 @@ namespace Appium_Wizard
         {
             string WDAPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\wda.ipa";
             string signedIPA = SignIPA(udid, WDAPath);
-            if (signedIPA.Equals("notsigned"))
+            if (signedIPA.Equals("notsigned") | signedIPA.Equals("Sign_IPA_Failed"))
             {
-                Logger.Info("InstallWDA, notsigned");
+                Logger.Info("InstallWDA - "+signedIPA);
                 return false;
             }
             else

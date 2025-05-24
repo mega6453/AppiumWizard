@@ -168,6 +168,7 @@ namespace Appium_Wizard
                             keyValuePairs = new Dictionary<object, object>();
                             bool installedNow = false;
                             bool isRunning = false;
+                            bool installationTried = false;
                             if (!wdaCheck)
                             {
                                 if (usePreInstalledWDA)
@@ -179,6 +180,14 @@ namespace Appium_Wizard
                                     commonProgress.UpdateStepLabel(title, "Please wait while installing WebDriverAgent, this may take some time...", 35);
                                 }
                                 installedNow = iOSMethods.GetInstance().InstallWDA(udid);
+                                installationTried = true;
+                            }
+                            if (!installedNow && installationTried)
+                            {
+                                commonProgress.Close();
+                                isScreenServerStarted = false;
+                                MessageBox.Show("Unable to Install WebDriverAgentRunner. Go to Tools->iOS profile management -> Delete all the profiles, add again and then try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             if (installedNow)
                             {

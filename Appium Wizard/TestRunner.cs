@@ -33,7 +33,7 @@ namespace Appium_Wizard
             commandGridView.Columns[1].Width = (int)(commandGridView.Width * 0.95);
             propertyGridView.Columns[0].Width = (int)(propertyGridView.Width * 0.4);
             propertyGridView.Columns[1].Width = (int)(propertyGridView.Width * 0.6);
-            reportsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appium-Wizard-Reports");
+            reportsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @"Appium Wizard\Test-Runner-Reports");
             if (!Directory.Exists(reportsFolderPath))
             {
                 Directory.CreateDirectory(reportsFolderPath);

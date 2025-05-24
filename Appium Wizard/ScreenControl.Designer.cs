@@ -47,6 +47,9 @@
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
             objectSpyButton = new ToolStripButton();
+            RecordAndStopRecordingSteps = new ToolStripSplitButton();
+            playStepsToolStripMenuItem = new ToolStripMenuItem();
+            readMeToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -63,7 +66,7 @@
             ScreenWebView.Location = new Point(0, 0);
             ScreenWebView.Margin = new Padding(2);
             ScreenWebView.Name = "ScreenWebView";
-            ScreenWebView.Size = new Size(398, 346);
+            ScreenWebView.Size = new Size(452, 346);
             ScreenWebView.TabIndex = 0;
             ScreenWebView.ZoomFactor = 1D;
             ScreenWebView.KeyPress += SendKeys;
@@ -76,12 +79,12 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton, RecordAndStopRecordingSteps });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.RenderMode = ToolStripRenderMode.System;
-            toolStrip1.Size = new Size(398, 31);
+            toolStrip1.Size = new Size(452, 31);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -174,6 +177,7 @@
             RecordButton.ImageTransparentColor = Color.Magenta;
             RecordButton.Name = "RecordButton";
             RecordButton.Size = new Size(28, 28);
+            RecordButton.ToolTipText = "Record Screen";
             RecordButton.Click += RecordButton_Click;
             // 
             // ScreenshotToolStripButton
@@ -227,6 +231,34 @@
             objectSpyButton.Size = new Size(28, 28);
             objectSpyButton.Click += objectSpyButton_Click;
             // 
+            // RecordAndStopRecordingSteps
+            // 
+            RecordAndStopRecordingSteps.Alignment = ToolStripItemAlignment.Right;
+            RecordAndStopRecordingSteps.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            RecordAndStopRecordingSteps.DropDownItems.AddRange(new ToolStripItem[] { playStepsToolStripMenuItem, readMeToolStripMenuItem });
+            RecordAndStopRecordingSteps.Image = Properties.Resources.RecordSteps;
+            RecordAndStopRecordingSteps.ImageTransparentColor = Color.Magenta;
+            RecordAndStopRecordingSteps.Name = "RecordAndStopRecordingSteps";
+            RecordAndStopRecordingSteps.Size = new Size(40, 28);
+            RecordAndStopRecordingSteps.ToolTipText = "Record and Playback";
+            RecordAndStopRecordingSteps.ButtonClick += RecordAndStopRecordingSteps_ButtonClick;
+            // 
+            // playStepsToolStripMenuItem
+            // 
+            playStepsToolStripMenuItem.Image = Properties.Resources.play;
+            playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
+            playStepsToolStripMenuItem.Size = new Size(188, 30);
+            playStepsToolStripMenuItem.Text = "Play Steps";
+            playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
+            // 
+            // readMeToolStripMenuItem
+            // 
+            readMeToolStripMenuItem.Image = Properties.Resources.readme;
+            readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
+            readMeToolStripMenuItem.Size = new Size(188, 30);
+            readMeToolStripMenuItem.Text = "Read me";
+            readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
+            // 
             // statusStrip1
             // 
             statusStrip1.BackColor = SystemColors.Control;
@@ -234,7 +266,7 @@
             statusStrip1.Location = new Point(0, 324);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.ShowItemToolTips = true;
-            statusStrip1.Size = new Size(398, 22);
+            statusStrip1.Size = new Size(452, 22);
             statusStrip1.TabIndex = 3;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -245,7 +277,7 @@
             toolStripStatusLabel.BorderStyle = Border3DStyle.Adjust;
             toolStripStatusLabel.Font = new Font("Arial Narrow", 8F);
             toolStripStatusLabel.Name = "toolStripStatusLabel";
-            toolStripStatusLabel.Size = new Size(352, 17);
+            toolStripStatusLabel.Size = new Size(437, 17);
             toolStripStatusLabel.Spring = true;
             toolStripStatusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -253,7 +285,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(398, 377);
+            ClientSize = new Size(452, 377);
             Controls.Add(statusStrip1);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
@@ -300,5 +332,8 @@
         private ToolStripButton recentAppsToolStripButton;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
+        private ToolStripSplitButton RecordAndStopRecordingSteps;
+        private ToolStripMenuItem playStepsToolStripMenuItem;
+        private ToolStripMenuItem readMeToolStripMenuItem;
     }
 }

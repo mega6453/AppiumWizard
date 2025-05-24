@@ -4,6 +4,7 @@ using Microsoft.Web.WebView2.WinForms;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -29,6 +30,8 @@ namespace Appium_Wizard
         string color = ColorTranslator.ToHtml(Color.Red);
         int lineWidth = 2;
         bool isAndroid;
+        private List<ScreenAction> recordedActions = new List<ScreenAction>();
+        private bool isRecordingSteps = false;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
         {
             this.OSType = os;
@@ -335,6 +338,15 @@ namespace Appium_Wizard
                 pressStartTime = DateTime.Now;
                 pressX = pressStartPoint.X;
                 pressY = pressStartPoint.Y;
+                if (isRecordingSteps)
+                {
+                    recordedActions.Add(new ScreenAction
+                    {
+                        ActionType = "Click on coordinates",
+                        X = pressX,
+                        Y = pressY
+                    });
+                }
             }
         }
 
@@ -444,6 +456,14 @@ namespace Appium_Wizard
         public void SendKeys(object sender, KeyPressEventArgs e)
         {
             string text = e.KeyChar.ToString();
+            if (isRecordingSteps)
+            {
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Send Text Without Element",
+                    Text = text
+                });
+            }
             if (OSType.Equals("iOS"))
             {
                 iOSAPIMethods.SendText(URL, sessionId, text);
@@ -977,5 +997,180 @@ namespace Appium_Wizard
                 iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
             }
         }
+
+        private void SaveRecordedStepsToJson(string filePath)
+        {
+            try
+            {
+                // Transform the recorded actions into the desired format
+                var formattedActions = recordedActions.Select(action =>
+                {
+                    var item = new Dictionary<string, object>();
+
+                    switch (action.ActionType)
+                    {
+                        case "Set Device":
+                            item["Item1"] = "Set Device";
+                            item["Item2"] = new Dictionary<string, object>
+                                    {
+                                        { "Device Name", deviceName }
+                                    };
+                            break;
+
+                        case "Click on coordinates":
+                            item["Item1"] = "Click on coordinates";
+                            item["Item2"] = new Dictionary<string, object>
+                                            {
+                                                { "X", action.X},
+                                                { "Y", action.Y}
+                                            };
+                            break;
+
+                        case "Send Text Without Element":
+                            item["Item1"] = "Send Text Without Element";
+                            item["Item2"] = new Dictionary<string, object>
+                                            {
+                                                { "Text to Enter", action.Text }
+                                            };
+                            break;
+
+                        default:
+                            item["Item1"] = "Unknown Action";
+                            item["Item2"] = new Dictionary<string, object>();
+                            break;
+                    }
+
+                    return item;
+                }).ToList();
+
+                // Serialize the formatted actions to JSON
+                string json = JsonSerializer.Serialize(formattedActions, new JsonSerializerOptions { WriteIndented = true });
+
+                // Save the JSON to a file
+                //string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                //string filePath = Path.Combine(scriptPath, $"StepsRecorder_{deviceName}_{timestamp}.json");
+                File.WriteAllText(filePath, json);
+
+                MessageBox.Show($"Steps saved to {filePath}", "Save Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to save steps: {ex.Message}", "Save Steps Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void playStepsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                MessageBox.Show("Recording is in progress. Please stop the recording and then play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (recordedActions.Count <= 1)
+            {
+                MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            await Task.Run(() =>
+            {
+                foreach (var action in recordedActions)
+                {
+                    switch (action.ActionType)
+                    {
+                        case "Click on coordinates":
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().Tap(udid, action.X, action.Y);
+                            }
+                            else
+                            {
+                                iOSAPIMethods.Tap(URL, sessionId, action.X, action.Y);
+                            }
+                            break;
+
+                        case "Send Text Without Element":
+                            if (isAndroid)
+                            {
+                                AndroidMethods.GetInstance().SendText(udid, action.Text);
+                            }
+                            else
+                            {
+                                iOSAPIMethods.SendText(URL, sessionId, action.Text);
+                            }
+                            break;
+                    }
+
+                    //await Task.Delay(500); // Add delay between actions
+                }
+            });
+            MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void RecordAndStopRecordingSteps_ButtonClick(object sender, EventArgs e)
+        {
+            isRecordingSteps = !isRecordingSteps;
+            if (isRecordingSteps)
+            {
+                RecordAndStopRecordingSteps.Image = Resources.RecordStepsGif;
+                recordedActions.Clear();
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Set Device",
+                });
+                MessageBox.Show("Recording steps started.", "Record Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                RecordAndStopRecordingSteps.Image = Resources.RecordSteps;
+                if (recordedActions.Count <= 1)
+                {
+                    MessageBox.Show("Recording steps have stopped. But no actions performed on the screen. So, nothing to save or play.", "Record Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                var result = MessageBox.Show("Recording steps have stopped. You can press the play button on this screen to execute the recorded steps any number of times until you close this screen. If you want to execute it in the future(with Tools->Test Runner), you can save it.\n\nDo you want to save the script ? ", "Record Steps", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                    {
+                        saveFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+                        saveFileDialog.Title = "Save Recorded Steps";
+                        saveFileDialog.DefaultExt = "json";
+                        saveFileDialog.AddExtension = true;
+                        string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                        saveFileDialog.FileName = $"StepsRecorder_{deviceName}_{timestamp}.json";
+
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            // Call the method to save recorded steps and pass the selected file path
+                            SaveRecordedStepsToJson(saveFileDialog.FileName);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void readMeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string message = @"Record and Playback Feature:
+
+                                - This feature allows you to capture your interactions with the mobile device and replay them later.
+                                
+                                - You can play the recorded steps by clicking Play steps, until this window closed.                                
+
+                                - You can save the steps as a script and use them later in the Test Runner feature which is available under Tools.
+
+                                - It's ideal for automating repetitive tasks and testing workflows efficiently.";
+
+            MessageBox.Show(message, "Record and Playback - Read Me", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
+    public class ScreenAction
+    {
+        public string ActionType { get; set; } // "tap", "swipe", "sendkeys"
+        public int X { get; set; }
+        public int Y { get; set; }
+        public string Text { get; set; } // For send keys
     }
 }

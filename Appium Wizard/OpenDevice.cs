@@ -276,6 +276,13 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
+                                if (output.Contains("MountImage: failed to get signature from Apple"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Mounting image failed. Please check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
                                 if (!iOSMethods.GetInstance().isImageMounted(udid))
                                 {
                                     iOSMethods.GetInstance().MountImage(udid);

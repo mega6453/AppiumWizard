@@ -140,7 +140,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1003, 486);
+            label1.Location = new Point(1003, 484);
             label1.Name = "label1";
             label1.Size = new Size(12, 15);
             label1.TabIndex = 7;
@@ -149,7 +149,7 @@
             // TotalElementCount
             // 
             TotalElementCount.AutoSize = true;
-            TotalElementCount.Location = new Point(1011, 486);
+            TotalElementCount.Location = new Point(1011, 484);
             TotalElementCount.Name = "TotalElementCount";
             TotalElementCount.Size = new Size(12, 15);
             TotalElementCount.TabIndex = 8;

@@ -208,15 +208,16 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 20);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
-
-            if (isAndroid)
-            {
-                screenshot = AndroidAPIMethods.TakeScreenshot(port);
-            }
-            else
-            {
-                screenshot = iOSAPIMethods.TakeScreenshot(url);
-            }
+            await Task.Run(() => {
+                if (isAndroid)
+                {
+                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
+                }
+                else
+                {
+                    screenshot = iOSAPIMethods.TakeScreenshot(url);
+                }
+            });
             commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
 
             if (screenshot == null)
@@ -229,14 +230,17 @@ namespace Appium_Wizard
             else
             {
                 pictureBox1.Image = screenshot;
-                if (isAndroid)
-                {
-                    xmlContent = AndroidAPIMethods.GetPageSource(port);
-                }
-                else
-                {
-                    xmlContent = iOSAPIMethods.GetPageSource(port);
-                }
+                await Task.Run(() => {
+                    if (isAndroid)
+                    {
+                        xmlContent = AndroidAPIMethods.GetPageSource(port);
+                    }
+                    else
+                    {
+                        xmlContent = iOSAPIMethods.GetPageSource(port);
+                    }
+                });
+
                 commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 75);
                 if (xmlContent.Equals("empty"))
                 {

@@ -479,10 +479,24 @@ namespace Appium_Wizard
                 xmlDoc.LoadXml(xmlContent);
 
                 string filterText = filterTextbox.Text;
+
+                // Check if the filterText is empty or whitespace
+                if (string.IsNullOrWhiteSpace(filterText))
+                {
+                    // Clear the matching nodes and UI
+                    matchingNodes.Clear();
+                    currentIndex = -1;
+                    filterTextbox.ForeColor = Color.Black;
+                    TotalElementCount.Text = "0";
+                    elementNumberTextbox.Text = "0";
+                    return;
+                }
+
                 if (filterText.Contains("'"))
                 {
                     filterText = filterText.Replace("='", "=\"").Replace("']", "\"]");
                 }
+
                 XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterText);
 
                 matchingNodes.Clear();
@@ -514,19 +528,14 @@ namespace Appium_Wizard
                 {
                     filterTextbox.ForeColor = Color.Red;
                     TotalElementCount.Text = "0";
+                    elementNumberTextbox.Text = "0";
                 }
             }
-            catch (XPathException ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message);
                 filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
-            }
-            catch (XmlException ex)
-            {
-                MessageBox.Show(ex.Message);
-                filterTextbox.ForeColor = Color.Red;
-                TotalElementCount.Text = "0";
+                elementNumberTextbox.Text = "0";
             }
         }
 
@@ -626,6 +635,13 @@ namespace Appium_Wizard
         {
             if (int.TryParse(elementNumberTextbox.Text, out int elementNumber))
             {
+                if (elementNumber == 0)
+                {
+                    // Special case: 0 is valid, but no element corresponds to it
+                    elementNumberTextbox.ForeColor = Color.Black;
+                    return;
+                }
+
                 // Convert to zero-based index
                 int index = elementNumber - 1;
 
@@ -964,39 +980,32 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("Object_Spy_Shown", os);
         }
 
-        //private void helpButton_Click(object sender, EventArgs e)
-        //{
-        //    string message = "Right click on an element/property in the image/tree/list view to get the xpath." +
-        //                     " \n\nList view(Properities list) xpath is more stable than image/tree view in this release. Select multiple properties to get the combined xpath. "+
-        //                     " \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
-        //    MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
-        //}
         private void helpButton_Click(object sender, EventArgs e)
         {
             string message = @"
-This tool helps you inspect UI elements and generate XPath expressions for automation.
+                This tool helps you inspect UI elements and generate XPath expressions for automation.
 
-How to use:
-1. **Image View**: Right-click on an element in the screenshot to copy its XPath or add it to the filter.
-    - Hover over the image to see the coordinates of your cursor.
-    - Click on an element to highlight it and view its details.
+                How to use:
+                1. Image View: Right-click on an element in the screenshot to copy its XPath or add it to the filter.
+                    - Hover over the image to see the coordinates of your cursor.
+                    - Click on an element to highlight it and view its details.
 
-2. **Tree View**: Right-click on a node in the tree structure to copy its XPath or add it to the filter.
-    - The tree displays the XML structure of the page source.
-    - Selecting a node will highlight the corresponding element in the image.
+                2. Tree View: Right-click on a node in the tree structure to copy its XPath or add it to the filter.
+                    - The tree displays the XML structure of the page source.
+                    - Selecting a node will highlight the corresponding element in the image.
 
-3. **List View**: Select one or more properties from the list to generate and copy a stable XPath.
-    - Combine multiple properties for a more specific XPath.
+                3. List View: Select one or more properties from the list to generate and copy a stable XPath.
+                    - Combine multiple properties for a more specific XPath.
 
-4. **Filter Textbox**: Use XPath expressions to filter elements.
-    - Type an XPath query in the filter textbox to locate elements.
-    - Matching nodes will be highlighted in the tree view.
+                4. Filter Textbox: Use XPath expressions to filter elements.
+                    - Type an XPath query in the filter textbox to locate elements.
+                    - Matching nodes will be highlighted in the tree view.
 
-5. **Navigation**: Use 'Next' and 'Previous' buttons to navigate through matching elements.
-    - The total count of matching elements is displayed.
+                5. Navigation: Use 'Next' and 'Previous' buttons to navigate through matching elements.
+                    - The total count of matching elements is displayed.
 
-Note:
-- This feature is in Beta. If you encounter any issues, please report them on the GitHub page.";
+                Note:
+                - This feature is in Beta. If you encounter any issues, please report them on the GitHub page.";
 
             MessageBox.Show(message, "Object Spy - BETA", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

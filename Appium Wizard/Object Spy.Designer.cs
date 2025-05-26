@@ -254,7 +254,6 @@
             coordLabel.Name = "coordLabel";
             coordLabel.Size = new Size(0, 15);
             coordLabel.TabIndex = 14;
-            coordLabel.Visible = false;
             // 
             // helpButton
             // 

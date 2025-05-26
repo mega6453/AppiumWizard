@@ -512,13 +512,15 @@ namespace Appium_Wizard
                     TotalElementCount.Text = "0";
                 }
             }
-            catch (XPathException)
+            catch (XPathException ex)
             {
+                MessageBox.Show(ex.Message);
                 filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
             }
-            catch (XmlException)
+            catch (XmlException ex)
             {
+                MessageBox.Show(ex.Message);
                 filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
             }
@@ -779,147 +781,83 @@ namespace Appium_Wizard
             }
         }
 
-        private string GenerateUniqueXPath(XmlNode node)
+        public static string GenerateUniqueXPath(XmlNode node)
         {
             try
             {
-                List<string> preferredAttributes = new List<string>();
-                if (node.Attributes != null)
+
+                // Start with the base XPath using the node name
+                string baseXPath = $"//{node.Name}";
+
+                // Relevant attributes to consider for XPath generation
+                string[] importantAttributes = { 
+                                                // Android attributes
+                                                "resource-id",
+                                                "text",
+                                                "content-desc",
+                                                "class",    
+                                                // iOS attributes
+                                                "name",
+                                                "label",
+                                                "value",
+                                                "type"
+                                            };
+
+                // Step 1: Test each attribute individually
+                foreach (string attributeName in importantAttributes)
                 {
-                    // Iterate over each attribute in the node
-                    foreach (XmlAttribute attribute in node.Attributes)
+                    if (node.Attributes[attributeName] != null)
                     {
-                        // Add the attribute name to the list
-                        preferredAttributes.Add(attribute.Name);
-                    }
-                }
-                // List of attributes to consider for creating a unique XPath
-                //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+                        string testXPath = $"{baseXPath}[@{attributeName}=\"{node.Attributes[attributeName].Value}\"]";
+                        XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);
 
-                preferredAttributes.Remove("index");
-                preferredAttributes.Remove("x");
-                preferredAttributes.Remove("y");
-                preferredAttributes.Remove("width");
-                preferredAttributes.Remove("height");
-                // Start with the node name
-                //string xpath = "//" + node.Name;
-                string xpath = "//*";
-                int attCount = preferredAttributes.Count;
-                int counter = 1;
-                foreach (string attr in preferredAttributes)
-                {
-                    if (node.Attributes[attr] != null)
-                    {
-                        string escapedValue = node.Attributes[attr].Value.Replace("'", "&apos;");
-                        string singleAttributeXPath = $"{xpath}[@{attr}='{escapedValue}']";
-                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-                        //string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
-                        //XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-                        if (nodes.Count == 1)
+                        // If the XPath with this single attribute is unique, return it
+                        if (matchingNodes.Count == 1)
                         {
-                            return singleAttributeXPath;
+                            return testXPath;
                         }
-                        if (attCount == counter)
-                        {
-                            int index = 1;
-                            foreach (XmlNode sibling in nodes)
-                            {
-                                if (sibling == node)
-                                {
-                                    xpath = $"({xpath})[{index}]";
-                                    return xpath;
-                                }
-                                index++;
-                            }
-                        }
-                        counter++;
-                    }
-                }
 
-
-                // Check each preferred attribute
-                foreach (string attr in preferredAttributes)
-                {
-                    if (node.Attributes[attr] != null)
-                    {
-                        xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
-
-                        // Check if this XPath is unique
-                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
-                        if (nodes.Count == 1)
+                        // If multiple nodes match, skip further combinations and go to indexing
+                        if (matchingNodes.Count > 1)
                         {
-                            return xpath;
-                        }
-                        else
-                        {
-                            // If not unique, wrap in parentheses and append index
-                            int index = 1;
-                            foreach (XmlNode sibling in nodes)
-                            {
-                                if (sibling == node)
-                                {
-                                    xpath = $"({xpath})[{index}]";
-                                    return xpath;
-                                }
-                                index++;
-                            }
+                            return AddIndexToXPath(testXPath, matchingNodes, node);
                         }
                     }
                 }
 
-                // If no preferred attributes are found, check for inner text
-                if (!string.IsNullOrWhiteSpace(node.InnerText))
+                // Step 2: Incrementally combine attributes (skipped if Step 1 detects multiple matches)
+                var attributeConditions = new System.Text.StringBuilder();
+                foreach (string attributeName in importantAttributes)
                 {
-                    xpath += $"[text()='{node.InnerText.Trim()}']";
-
-                    // Check if this XPath is unique
-                    XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
-                    if (nodes.Count == 1)
+                    if (node.Attributes[attributeName] != null)
                     {
-                        return xpath;
-                    }
-                    else
-                    {
-                        // If not unique, wrap in parentheses and append index
-                        int index = 1;
-                        foreach (XmlNode sibling in nodes)
+                        if (attributeConditions.Length > 0)
                         {
-                            if (sibling == node)
-                            {
-                                xpath = $"({xpath})[{index}]";
-                                return xpath;
-                            }
-                            index++;
+                            attributeConditions.Append(" and ");
+                        }
+                        attributeConditions.Append($"@{attributeName}=\"{node.Attributes[attributeName].Value}\"");
+
+                        string testXPath = $"{baseXPath}[{attributeConditions}]";
+                        XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);
+
+                        // If the XPath with the combined attributes is unique, return it
+                        if (matchingNodes.Count == 1)
+                        {
+                            return testXPath;
+                        }
+
+                        // If multiple nodes match, skip further combinations and go to indexing
+                        if (matchingNodes.Count > 1)
+                        {
+                            return AddIndexToXPath(testXPath, matchingNodes, node);
                         }
                     }
                 }
 
-                // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
-                while (node.ParentNode != null)
-                {
-                    XmlNode parentNode = node.ParentNode;
-                    int index = 1;
-
-                    // Count the index of the node among its siblings with the same name
-                    foreach (XmlNode sibling in parentNode.ChildNodes)
-                    {
-                        if (sibling == node)
-                        {
-                            break;
-                        }
-                        if (sibling.Name == node.Name)
-                        {
-                            index++;
-                        }
-                    }
-
-                    // Wrap the XPath in parentheses and append the index
-                    xpath = $"/{parentNode.Name}/({node.Name})[{index}]" + xpath;
-
-                    // Move to the parent node
-                    node = parentNode;
-                }
-                return xpath;
+                // Step 3: Add indexing to the final XPath
+                string finalXPath = $"{baseXPath}[{attributeConditions}]";
+                XmlNodeList finalMatchingNodes = node.OwnerDocument.SelectNodes(finalXPath);
+                return AddIndexToXPath(finalXPath, finalMatchingNodes, node);
             }
             catch (Exception)
             {
@@ -927,6 +865,19 @@ namespace Appium_Wizard
             }
         }
 
+        private static string AddIndexToXPath(string xpath, XmlNodeList matchingNodes, XmlNode targetNode)
+        {
+            int index = 1;
+            foreach (XmlNode matchingNode in matchingNodes)
+            {
+                if (matchingNode == targetNode)
+                {
+                    return $"({xpath})[{index}]";
+                }
+                index++;
+            }
+            return xpath; // Fallback (shouldn't happen if indexing is applied correctly)
+        }
 
         private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1009,12 +960,41 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("Object_Spy_Shown", os);
         }
 
+        //private void helpButton_Click(object sender, EventArgs e)
+        //{
+        //    string message = "Right click on an element/property in the image/tree/list view to get the xpath." +
+        //                     " \n\nList view(Properities list) xpath is more stable than image/tree view in this release. Select multiple properties to get the combined xpath. "+
+        //                     " \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
+        //    MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
+        //}
         private void helpButton_Click(object sender, EventArgs e)
         {
-            string message = "Right click on an element/property in the image/tree/list view to get the xpath." +
-                             " \n\nList view(Properities list) xpath is more stable than image/tree view in this release. Select multiple properties to get the combined xpath. "+
-                             " \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
-            MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            string message = @"
+This tool helps you inspect UI elements and generate XPath expressions for automation.
+
+How to use:
+1. **Image View**: Right-click on an element in the screenshot to copy its XPath or add it to the filter.
+    - Hover over the image to see the coordinates of your cursor.
+    - Click on an element to highlight it and view its details.
+
+2. **Tree View**: Right-click on a node in the tree structure to copy its XPath or add it to the filter.
+    - The tree displays the XML structure of the page source.
+    - Selecting a node will highlight the corresponding element in the image.
+
+3. **List View**: Select one or more properties from the list to generate and copy a stable XPath.
+    - Combine multiple properties for a more specific XPath.
+
+4. **Filter Textbox**: Use XPath expressions to filter elements.
+    - Type an XPath query in the filter textbox to locate elements.
+    - Matching nodes will be highlighted in the tree view.
+
+5. **Navigation**: Use 'Next' and 'Previous' buttons to navigate through matching elements.
+    - The total count of matching elements is displayed.
+
+Note:
+- This feature is in Beta. If you encounter any issues, please report them on the GitHub page.";
+
+            MessageBox.Show(message, "Object Spy - BETA", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

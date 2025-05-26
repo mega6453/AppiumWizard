@@ -132,6 +132,7 @@
             elementNumberTextbox.BorderStyle = BorderStyle.None;
             elementNumberTextbox.Location = new Point(976, 485);
             elementNumberTextbox.Name = "elementNumberTextbox";
+            elementNumberTextbox.RightToLeft = RightToLeft.Yes;
             elementNumberTextbox.Size = new Size(26, 16);
             elementNumberTextbox.TabIndex = 6;
             elementNumberTextbox.TextChanged += elementNumberTextbox_TextChanged;

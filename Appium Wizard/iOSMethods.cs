@@ -2276,18 +2276,49 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetPageSource(int port)
+        public static string GetPageSource(int port, string sessionId = "")
         {
             string value = "empty";
             try
             {
                 string URL = "http://localhost:" + port;
-                string sessionId = GetWDASessionID(URL);
-                if (sessionId.Equals("nosession"))
+                if (string.IsNullOrEmpty(sessionId))
                 {
-                    CreateWDASession(port);
                     sessionId = GetWDASessionID(URL);
                 }
+
+                // Attempt to get the page source with the provided or new sessionId
+                value = AttemptGetPageSource(URL, sessionId);
+
+                // If the value indicates an invalid session, create a new session and retry
+                if (value == "Invalid session")
+                {
+                    Console.WriteLine("Session is invalid. Creating a new session...");
+                    CreateWDASession(port);
+                    sessionId = GetWDASessionID(URL);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = AttemptGetPageSource(URL, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                return "Exception while getting page source : " + ex.Message;
+            }
+        }
+
+        private static string AttemptGetPageSource(string URL, string sessionId)
+        {
+            try
+            {
                 var options = new RestClientOptions(URL)
                 {
                     Timeout = TimeSpan.FromSeconds(10)
@@ -2295,21 +2326,24 @@ namespace Appium_Wizard
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);
                 RestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
+
+                if (!response.IsSuccessful || response.Content.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return "Invalid session";
+                }
+
                 using (JsonDocument doc = JsonDocument.Parse(response.Content))
                 {
                     JsonElement root = doc.RootElement;
-                    value = root.GetProperty("value").GetString();
+                    return root.GetProperty("value").GetString();
                 }
-                return value;
             }
-            catch (Exception ex)
+            catch
             {
-                return "Exception : " + ex.Message;
+                return "Invalid session";
             }
-
         }
-
 
         public static string FindElement(string URL, string sessionId, string XPath)
         {

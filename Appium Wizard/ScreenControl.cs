@@ -1045,7 +1045,7 @@ namespace Appium_Wizard
 
         private void objectSpyButton_Click(object sender, EventArgs e)
         {
-            Object_Spy object_Spy = new Object_Spy(OSType, proxyPort, width, height);
+            Object_Spy object_Spy = new Object_Spy(OSType, proxyPort, width, height, sessionId);
             object_Spy.Show();
         }
 

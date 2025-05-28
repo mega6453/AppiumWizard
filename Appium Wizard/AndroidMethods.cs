@@ -993,59 +993,141 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetPageSource(int port)
+        public static string GetPageSource(int port, string sessionId="")
         {
             string value = "empty";
             try
             {
-                string sessionId = GetSessionID(port);
-                if (sessionId.Equals("nosession"))
+                string URL = "http://localhost:" + port;
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = GetSessionID(port);
+                }
+
+                // Attempt to get the page source with the retrieved session ID
+                value = AttemptGetPageSource(URL, sessionId);
+
+                // If the value indicates an invalid session, create a new session and retry
+                if (value == "Invalid session")
                 {
                     CreateSession(port);
                     sessionId = GetSessionID(port);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = AttemptGetPageSource(URL, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
                 }
-                var options = new RestClientOptions("http://localhost:" + port)
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                return "Exception while getting page source : " + ex.Message;
+            }
+        }
+
+        // Helper method to attempt to get the page source
+        private static string AttemptGetPageSource(string URL, string sessionId)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(10)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);
                 RestResponse response = client.Execute(request);
+
+                if (!response.IsSuccessful || response.Content.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return "Invalid session";
+                }
+
                 if (response.Content != null)
                 {
                     using (JsonDocument doc = JsonDocument.Parse(response.Content))
                     {
                         JsonElement root = doc.RootElement;
-                        value = root.GetProperty("value").GetString() ?? "empty";
+                        return root.GetProperty("value").GetString() ?? "empty";
                     }
                 }
-                return value;
+
+                return "empty";
             }
-            catch (Exception)
+            catch
             {
-                return value;
+                return "Invalid session";
             }
         }
 
-        public static Image TakeScreenshot(int port)
+        public static Image TakeScreenshotWithSessionId(int port, string sessionId = "")
         {
             Image image = null;
             try
             {
-                string sessionId = GetSessionID(port);
-                if (sessionId.Equals("nosession"))
+                string URL = "http://localhost:" + port;
+
+                // If sessionId is not provided or invalid, get a new session ID
+                if (string.IsNullOrEmpty(sessionId))
                 {
-                    CreateSession(port);
                     sessionId = GetSessionID(port);
                 }
-                var options = new RestClientOptions("http://localhost:" + port)
+
+                // Attempt to take a screenshot with the provided or new sessionId
+                image = AttemptTakeScreenshot(URL, sessionId);
+
+                // If the image is null, it indicates an invalid session, create a new session and retry
+                if (image == null)
+                {
+                    Console.WriteLine("Session is invalid. Creating a new session...");
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        image = AttemptTakeScreenshot(URL, sessionId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to create a new session.");
+                    }
+                }
+
+                return image;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return image;
+            }
+        }
+
+        private static Image AttemptTakeScreenshot(string URL, string sessionId)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
                 {
                     Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
                 RestResponse response = client.Execute(request);
+
                 string jsonString = response.Content;
+
+                if (!response.IsSuccessful || jsonString.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return null;
+                }
 
                 JsonDocument doc = JsonDocument.Parse(jsonString);
                 string base64String = doc.RootElement.GetProperty("value").GetString();
@@ -1053,13 +1135,12 @@ namespace Appium_Wizard
                 byte[] imageBytes = Convert.FromBase64String(base64String);
                 using (MemoryStream ms = new MemoryStream(imageBytes))
                 {
-                    image = Image.FromStream(ms);
-                    return image;
+                    return Image.FromStream(ms);
                 }
             }
-            catch (Exception)
+            catch
             {
-                return image;
+                return null;
             }
         }
 

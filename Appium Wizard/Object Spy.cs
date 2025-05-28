@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using NLog;
+using System.Xml;
 using System.Xml.XPath;
 
 namespace Appium_Wizard
@@ -9,13 +10,17 @@ namespace Appium_Wizard
         Image screenshot;
         string xmlContent;
         bool isAndroid;
-        string os;
-        public Object_Spy(string os, int port, int width, int height)
+        string os, sessionId;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+
+        public Object_Spy(string os, int port, int width, int height, string sessionId)
         {
             this.os = os;
             this.port = port;
             this.width = width;
             this.height = height;
+            this.sessionId = sessionId;
             InitializeComponent();
             if (os.Equals("Android"))
             {
@@ -109,33 +114,70 @@ namespace Appium_Wizard
             return r;
         }
 
+        //private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
+        //{
+        //    if (node == null) return null;
+
+        //    // Check all children first to find the deepest matching node
+        //    XmlNode mostSpecificNode = null;
+        //    foreach (XmlNode childNode in node.ChildNodes)
+        //    {
+        //        XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
+        //        if (foundNode != null)
+        //        {
+        //            mostSpecificNode = foundNode;
+        //            break; // Exit the loop as soon as a node is found
+        //        }
+        //    }
+
+        //    // If no more specific child node contains the point, check the current node
+        //    if (mostSpecificNode == null && IsPointInElementBounds(node, x, y))
+        //    //if (IsPointInElementBounds(node, x, y))
+        //    {
+        //        Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
+        //        return node;
+        //    }
+
+        //    return mostSpecificNode;
+        //}
+
         private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
         {
             if (node == null) return null;
 
-            // Check all children first to find the deepest matching node
-            XmlNode mostSpecificNode = null;
+            XmlNode bestMatch = null;
+            int smallestArea = int.MaxValue;
+
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
                 if (foundNode != null)
                 {
-                    mostSpecificNode = foundNode;
-                    break; // Exit the loop as soon as a node is found
+                    int area = GetArea(foundNode);
+                    if (area < smallestArea)
+                    {
+                        bestMatch = foundNode;
+                        smallestArea = area;
+                    }
                 }
             }
 
-            // If no more specific child node contains the point, check the current node
-            if (mostSpecificNode == null && IsPointInElementBounds(node, x, y))
-            //if (IsPointInElementBounds(node, x, y))
+            if (bestMatch == null && IsPointInElementBounds(node, x, y))
             {
-                Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
                 return node;
             }
 
-            return mostSpecificNode;
+            return bestMatch;
         }
 
+        private int GetArea(XmlNode node)
+        {
+            int.TryParse(node.Attributes["x"]?.Value, out int x);
+            int.TryParse(node.Attributes["y"]?.Value, out int y);
+            int.TryParse(node.Attributes["width"]?.Value, out int width);
+            int.TryParse(node.Attributes["height"]?.Value, out int height);
+            return width * height;
+        }
 
         private bool IsPointInElementBounds(XmlNode node, int x, int y)
         {
@@ -211,7 +253,7 @@ namespace Appium_Wizard
             await Task.Run(() => {
                 if (isAndroid)
                 {
-                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
+                    screenshot = AndroidAPIMethods.TakeScreenshotWithSessionId(port, sessionId);
                 }
                 else
                 {
@@ -233,17 +275,18 @@ namespace Appium_Wizard
                 await Task.Run(() => {
                     if (isAndroid)
                     {
-                        xmlContent = AndroidAPIMethods.GetPageSource(port);
+                        xmlContent = AndroidAPIMethods.GetPageSource(port, sessionId);
                     }
                     else
                     {
-                        xmlContent = iOSAPIMethods.GetPageSource(port);
+                        xmlContent = iOSAPIMethods.GetPageSource(port, sessionId);
                     }
                 });
 
                 commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 75);
-                if (xmlContent.Equals("empty"))
+                if (xmlContent.Equals("Invalid session") | xmlContent.Equals("empty") | xmlContent.Contains("Exception while getting page source") | xmlContent.Contains("Failed to create a new session."))
                 {
+                    Logger.Info("xmlContent : "+xmlContent);
                     commonProgress.Close();
                     MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
@@ -546,13 +589,28 @@ namespace Appium_Wizard
                 if (currentIndex >= 0 && currentIndex < matchingNodes.Count)
                 {
                     TreeNode currentNode = matchingNodes[currentIndex];
-                    treeView1.SelectedNode = currentNode;
-                    treeView1.SelectedNode.EnsureVisible();
+
+                    // Ensure the UI update happens on the correct thread
+                    if (treeView1.InvokeRequired)
+                    {
+                        treeView1.Invoke(new Action(() =>
+                        {
+                            treeView1.SelectedNode = currentNode;
+                            treeView1.SelectedNode.EnsureVisible();
+                        }));
+                    }
+                    else
+                    {
+                        treeView1.SelectedNode = currentNode;
+                        treeView1.SelectedNode.EnsureVisible();
+                    }
+
                     elementNumberTextbox.Text = (currentIndex + 1).ToString();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error in HighlightCurrentNode: {ex.Message}");
             }
         }
 
@@ -560,7 +618,10 @@ namespace Appium_Wizard
         {
             if (matchingNodes.Count > 0)
             {
+                // Increment index and wrap around if necessary
                 currentIndex = (currentIndex + 1) % matchingNodes.Count;
+
+                // Ensure the UI updates correctly
                 HighlightCurrentNode();
             }
         }
@@ -569,13 +630,13 @@ namespace Appium_Wizard
         {
             if (matchingNodes.Count > 0)
             {
+                // Decrement index and wrap around if necessary
                 currentIndex = (currentIndex - 1 + matchingNodes.Count) % matchingNodes.Count;
+
+                // Ensure the UI updates correctly
                 HighlightCurrentNode();
             }
         }
-
-        // Ensure your FindTreeNodeByXmlNode and AreNodesEquivalent methods are defined as before
-
 
         private TreeNode FindTreeNodeByXmlNode(TreeNodeCollection nodes, XmlNode xmlNode)
         {

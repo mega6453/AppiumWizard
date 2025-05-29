@@ -533,9 +533,17 @@ namespace Appium_Wizard
                     elementNumberTextbox.Text = "0";
                     return;
                 }
-
-                filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
-                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                XmlNodeList selectedXmlNodes;
+                try
+                {
+                     selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                }
+                catch (Exception ex)
+                {
+                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
+                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                }
+               
 
                 matchingNodes.Clear();
                 currentIndex = -1;

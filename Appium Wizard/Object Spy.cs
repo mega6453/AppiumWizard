@@ -1,6 +1,5 @@
 ﻿using NLog;
 using System.Xml;
-using System.Xml.XPath;
 
 namespace Appium_Wizard
 {
@@ -535,11 +534,7 @@ namespace Appium_Wizard
                     return;
                 }
 
-                if (filterText.Contains("'"))
-                {
-                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]");
-                }
-
+                filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
                 XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterText);
 
                 matchingNodes.Clear();

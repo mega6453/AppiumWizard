@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using NLog;
 using System.Diagnostics;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
 {
@@ -23,7 +24,7 @@ namespace Appium_Wizard
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+        private Timer uncheckTimer; private Timer highlightTimer;
 
         public MainScreen()
         {
@@ -38,6 +39,13 @@ namespace Appium_Wizard
             {
                 releaseInfo = Common.GetLatestReleaseInfo();
             }
+            uncheckTimer = new Timer();
+            uncheckTimer.Interval = 5000;
+            uncheckTimer.Tick += UncheckTimer_Tick;
+
+            highlightTimer = new Timer();
+            highlightTimer.Interval = 2000; // Highlight duration in milliseconds
+            highlightTimer.Tick += HighlightTimer_Tick;
         }
         private void onFormLoad(object sender, EventArgs e)
         {
@@ -56,7 +64,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        string tipMessage = "Note: The app may lag due to frequent appium server log updates. To prevent this, keep the 'Show Logs' checkbox unchecked. Enable it only when you need to view the logs.";
+                        string tipMessage = "Note: The app may lag due to frequent appium server log updates. To prevent this, the 'Show Logs' checkbox will be unchecked automatically after 5 seconds from enabling it.";
                         ShowMessage(tipMessage);
                     }
                 }
@@ -245,7 +253,36 @@ namespace Appium_Wizard
                 {
                     UpdateRichTextbox(i);
                 }
+                uncheckTimer.Start();
             }
+            else
+            {
+                uncheckTimer.Stop();
+            }
+        }
+
+        private void UncheckTimer_Tick(object sender, EventArgs e)
+        {
+            // Stop the timer
+            uncheckTimer.Stop();
+
+            // Uncheck the checkbox
+            showLogsCheckBox.Checked = false;
+            // Highlight the checkbox
+            showLogsCheckBox.BackColor = Color.Yellow;
+            showLogsCheckBox.ForeColor = Color.Red;
+
+            // Start the highlight timer
+            highlightTimer.Start();
+        }
+        private void HighlightTimer_Tick(object sender, EventArgs e)
+        {
+            // Revert the checkbox appearance
+            showLogsCheckBox.BackColor = SystemColors.ControlLightLight;
+            showLogsCheckBox.ForeColor = SystemColors.ControlText;
+
+            // Stop the highlight timer
+            highlightTimer.Stop();
         }
 
         public void UpdateShowLogsCheckbox(bool enable)

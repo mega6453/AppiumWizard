@@ -365,7 +365,7 @@ namespace Appium_Wizard
             // 
             inspectorToolStripMenuItem1.Image = Properties.Resources.inspector;
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
-            inspectorToolStripMenuItem1.Size = new Size(211, 30);
+            inspectorToolStripMenuItem1.Size = new Size(203, 22);
             inspectorToolStripMenuItem1.Text = "Inspector";
             inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem_Click;
             // 
@@ -373,7 +373,7 @@ namespace Appium_Wizard
             // 
             iOSProfileManagementToolStripMenuItem.Image = Properties.Resources.management;
             iOSProfileManagementToolStripMenuItem.Name = "iOSProfileManagementToolStripMenuItem";
-            iOSProfileManagementToolStripMenuItem.Size = new Size(211, 30);
+            iOSProfileManagementToolStripMenuItem.Size = new Size(203, 22);
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
@@ -381,7 +381,7 @@ namespace Appium_Wizard
             // 
             iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(211, 30);
+            iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
@@ -389,7 +389,7 @@ namespace Appium_Wizard
             // 
             iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
             iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
-            iOSProxyToolStripMenuItem.Size = new Size(211, 30);
+            iOSProxyToolStripMenuItem.Size = new Size(203, 22);
             iOSProxyToolStripMenuItem.Text = "iOS Proxy";
             iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
             // 
@@ -397,7 +397,7 @@ namespace Appium_Wizard
             // 
             signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
             signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
-            signIPAToolStripMenuItem.Size = new Size(211, 30);
+            signIPAToolStripMenuItem.Size = new Size(203, 22);
             signIPAToolStripMenuItem.Text = "IPA Signer";
             signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
             // 
@@ -405,7 +405,7 @@ namespace Appium_Wizard
             // 
             testRunnerToolStripMenuItem.Image = Properties.Resources.runner;
             testRunnerToolStripMenuItem.Name = "testRunnerToolStripMenuItem";
-            testRunnerToolStripMenuItem.Size = new Size(211, 30);
+            testRunnerToolStripMenuItem.Size = new Size(203, 22);
             testRunnerToolStripMenuItem.Text = "Test Runner";
             testRunnerToolStripMenuItem.Click += testRunnerToolStripMenuItem_Click;
             // 
@@ -420,7 +420,7 @@ namespace Appium_Wizard
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(188, 30);
+            notificationsToolStripMenuItem.Size = new Size(152, 22);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
@@ -429,7 +429,7 @@ namespace Appium_Wizard
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(188, 30);
+            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 

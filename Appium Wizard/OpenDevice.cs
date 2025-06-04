@@ -32,41 +32,53 @@ namespace Appium_Wizard
 
         public (int, int) getDeviceScreenSize(string udid)
         {
-            var devicesList = Database.QueryDataFromDevicesTable();
-            foreach (var dictionary in devicesList)
+            try
             {
-                if (dictionary["UDID"].Equals(udid))
+                var devicesList = Database.QueryDataFromDevicesTable();
+                foreach (var dictionary in devicesList)
                 {
-                    int Width = int.Parse(dictionary["Width"]);
-                    int Height = int.Parse(dictionary["Height"]);
-                    return (Width, Height);
+                    if (dictionary["UDID"].Equals(udid))
+                    {
+                        int Width = int.Parse(dictionary["Width"]);
+                        int Height = int.Parse(dictionary["Height"]);
+                        return (Width, Height);
+                    }
                 }
             }
+            catch (Exception)
+            {
+            }           
             return (0, 0);
         }
 
         public async Task<bool> StartBackgroundTasks()
         {
-            commonProgress.Owner = MainScreen.main;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel(title, "Initializing...", 5);
-            if (OSType.Equals("Android"))
+            try
             {
-                await ExecuteAndroid();
+                commonProgress.Owner = MainScreen.main;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel(title, "Initializing...", 5);
+                if (OSType.Equals("Android"))
+                {
+                    await ExecuteAndroid();
+                }
+                else
+                {
+                    await ExecuteiOSBackgroundMethod();
+                }
+                if (isScreenServerStarted)
+                {
+                    commonProgress.UpdateStepLabel(title, "Screen server started...", 90);
+                    ExecuteBackgroundMethod2(commonProgress);
+                }
+                else
+                {
+                    commonProgress.Close();
+                    // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception)
             {
-                await ExecuteiOSBackgroundMethod();
-            }
-            if (isScreenServerStarted)
-            {
-                commonProgress.UpdateStepLabel(title, "Screen server started...", 90);               
-                ExecuteBackgroundMethod2(commonProgress);
-            }
-            else
-            {
-                commonProgress.Close();
-                // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return isScreenServerStarted;
         }
@@ -79,17 +91,17 @@ namespace Appium_Wizard
         {
             bool usePreInstalledWDA = MainScreen.UDIDPreInstalledWDA.ContainsKey(udid);
             Logger.Info("usePreInstalledWDA : " + usePreInstalledWDA);
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
-                var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-                if (!deviceList.Contains(udid))
-                {
-                    MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    isScreenServerStarted = false;
-                    return;
-                }
                 try
                 {
+                    var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                    if (!deviceList.Contains(udid))
+                    {
+                        MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isScreenServerStarted = false;
+                        return;
+                    }
                     if (deviceDetails.ContainsKey(udid))
                     {
                         Logger.Info("deviceDetails.ContainsKey : "+udid);

@@ -7,12 +7,14 @@ namespace Appium_Wizard
     public partial class Server_Settings : Form
     {
         int portNumber;
+        public static string logLevelFromDB = string.Empty;
         public static string finalCommandFromDB = string.Empty;
         public static string argsCommandFromDB = string.Empty;
         public static string capsCommandFromDB = string.Empty;
         public static string serverCLICommand = string.Empty;
         public static string finalCommand = string.Empty;
         string serverNumber = string.Empty;
+        private bool isFormInitialized = false;
         public Server_Settings(string serverNumber, int portNumber)
         {
             this.serverNumber = serverNumber;
@@ -53,6 +55,11 @@ namespace Appium_Wizard
             {
                 capsCommandFromDB = Database.QueryDataFromServerCapsTable()[serverNumber];
             }
+            if (Database.QueryDataFromlogLevelTable().ContainsKey(serverNumber))
+            {
+                logLevelFromDB = Database.QueryDataFromlogLevelTable()[serverNumber];
+                SelectRadioButtonBasedOnValue(logLevelFromDB);
+            }
             ServerArgsRichTextBox.Text = argsCommandFromDB;
             DefaultCapabilitiesRichTextBox.Text = capsCommandFromDB;
 
@@ -67,6 +74,28 @@ namespace Appium_Wizard
                 finalCommandFromDB = finalCommandFromDB + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
             }
             FinalCommandRichTextBox.Text = finalCommandFromDB.Replace("\n", string.Empty);
+            isFormInitialized = true;
+        }
+
+        private void SelectRadioButtonBasedOnValue(string value)
+        {
+            switch (value)
+            {
+                case "info":
+                    infoRadioButton.Checked = true;
+                    break;
+                case "error":
+                    errorRadioButton.Checked = true;
+                    break;
+                case "debug":
+                    debugRadioButton.Checked = true;
+                    break;
+                default:
+                    infoRadioButton.Checked = true;
+                    errorRadioButton.Checked = false;
+                    debugRadioButton.Checked = false;
+                    break;
+            }
         }
 
         private void ServerArgs_TextChanged(object sender, EventArgs e)
@@ -119,9 +148,34 @@ namespace Appium_Wizard
             Database.UpdateDataIntoServerArgsTable(serverNumber, serverArgsText);
             Database.UpdateDataIntoServerCapsTable(serverNumber, DefaultCapabilitiesRichTextBox.Text);
             Database.UpdateDataIntoServerFinalCommandTable(serverNumber, finalCommand);
+            UpdateLogLevel(serverNumber);
             MessageBox.Show("Please Stop and Start the Server to use the updated command.", "Restart Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             GoogleAnalytics.SendEvent("applyButton_Click");
             this.Close();
+        }
+        private void UpdateLogLevel(string serverNumber)
+        {
+            string selectedValue = null;
+            if (infoRadioButton.Checked)
+            {
+                selectedValue = infoRadioButton.Text;
+            }
+            else if (errorRadioButton.Checked)
+            {
+                selectedValue = errorRadioButton.Text;
+            }
+            else if (debugRadioButton.Checked)
+            {
+                selectedValue = debugRadioButton.Text;
+            }
+            if (selectedValue != null)
+            {
+                Database.UpdateDataIntoLogLevelTable(serverNumber, selectedValue);
+            }
+            else
+            {
+                MessageBox.Show("Please select a log level.");
+            }
         }
 
         private void resetButton_Click(object sender, EventArgs e)
@@ -191,6 +245,22 @@ namespace Appium_Wizard
             Point screenPoint = DefaultCapsLinkLabel.PointToScreen(new Point(0, DefaultCapsLinkLabel.Height));
             contextMenuStrip1.Show(screenPoint);
             GoogleAnalytics.SendEvent("DefaultCapsLinkLabel_LinkClicked");
+        }
+
+        private void debugRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isFormInitialized && debugRadioButton.Checked)
+            {
+                MessageBox.Show("Setting log-level as \"Debug\" may cause the appium wizard to lag due to frequent appium server log updates.\n\n Set to \"Debug\" only if necessary; otherwise, set to \"Error\" or \"Info\".","Log-level = Debug",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+            }
+        }
+
+        private void errorRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isFormInitialized && errorRadioButton.Checked)
+            {
+                MessageBox.Show("Setting the log level to \"Error\" may restrict detailed information required for debugging issues, as only critical errors will be displayed. You may not even see the Server starting logs.", "Log-level = Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }

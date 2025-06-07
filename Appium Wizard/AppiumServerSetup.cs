@@ -31,6 +31,11 @@ namespace Appium_Wizard
             {
                 command = command + " --port " + appiumPort;
             }
+            string logLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
+            if (!command.Contains("--log-level"))
+            {
+                command = command + " --log-level " + logLevel;
+            }
             int webDriverAgentProxyPort = Common.GetFreePort();
             if (serverNumberWDAPortNumber.ContainsKey(serverNumber))
             {
@@ -92,6 +97,39 @@ namespace Appium_Wizard
                 int processId = appiumServerProcess.Id;
                 MainScreen.runningProcesses.Add(processId);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
+                if (logLevel.Equals("error"))
+                {
+                    int count = 1;
+                    Task.Run(() => {
+                        while (!serverStarted)
+                        {
+                            bool isRunning = IsAppiumServerRunning(appiumPort);
+                            if (isRunning)
+                            {
+                                serverStarted = true;
+                                using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                                using (var streamWriter = new StreamWriter(fileStream))
+                                {
+                                    streamWriter.WriteLine("Appium Server Running in Port : " + appiumPort + "\n");
+                                    streamWriter.WriteLine("Appium command : " + updatedCommand + "\n");
+                                    streamWriter.WriteLine("Log level set to error - So only error logs will be displayed.");
+                                    streamWriter.WriteLine("\n\n\t\t\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
+                                }
+                            }
+                            if (MainScreen.main != null)
+                            {
+                                MainScreen.main.UpdateShowLogsCheckbox(true);
+                                MainScreen.main.UpdateRichTextbox(serverNumber);
+                            }
+                            count++;
+                            if (count == 20)
+                            {
+                                break;
+                            }
+                            Task.Delay(3000);
+                        }
+                    });
+                }                   
             }
             catch (Exception ex)
             {
@@ -108,8 +146,8 @@ namespace Appium_Wizard
         Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
         string proxiedUDID = "";
-        private static DateTime lastExecutionTime = DateTime.MinValue;
-        private void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
+        private DateTime lastExecutionTime = DateTime.MinValue;
+        public void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             if (!string.IsNullOrEmpty(e.Data))
             {

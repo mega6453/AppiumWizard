@@ -652,5 +652,54 @@ namespace Appium_Wizard
             }
             return udidsAndBundleIds;
         }
+
+        
+        public static Dictionary<string, string> QueryDataFromlogLevelTable()
+        {
+            string defaultLogLevel = "info";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM LogLevel", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var Server1 = reader.IsDBNull(0) ? defaultLogLevel : reader.GetString(0);
+                            var Server2 = reader.IsDBNull(1) ? defaultLogLevel : reader.GetString(1);
+                            var Server3 = reader.IsDBNull(2) ? defaultLogLevel : reader.GetString(2);
+                            var Server4 = reader.IsDBNull(3) ? defaultLogLevel : reader.GetString(3);
+                            var Server5 = reader.IsDBNull(4) ? defaultLogLevel : reader.GetString(4);
+
+                            result["Server1"] = Server1;
+                            result["Server2"] = Server2;
+                            result["Server3"] = Server3;
+                            result["Server4"] = Server4;
+                            result["Server5"] = Server5;
+                        }
+                    }
+                }
+                connection.Close();
+                return result;
+            }
+        }
+
+        public static void UpdateDataIntoLogLevelTable(string serverNumber, string logLevel)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE LogLevel SET ('" + serverNumber + "') = ('" + logLevel + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
     }
 }

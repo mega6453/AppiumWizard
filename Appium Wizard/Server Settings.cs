@@ -251,7 +251,7 @@ namespace Appium_Wizard
         {
             if (isFormInitialized && debugRadioButton.Checked)
             {
-                MessageBox.Show("Setting log-level as \"Debug\" may cause the appium wizard to lag due to frequent appium server log updates.\n\n Set to \"Debug\" only if necessary; otherwise, set to \"Error\" or \"Info\".","Log-level = Debug",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Setting log-level as 'Debug' may cause the appium wizard to lag due to frequent appium server log updates.\n\n Set to 'Debug' only if necessary; otherwise, set to 'Error' or 'Info'.","Log level - Debug",MessageBoxButtons.OK,MessageBoxIcon.Warning);
             }
         }
 
@@ -259,7 +259,7 @@ namespace Appium_Wizard
         {
             if (isFormInitialized && errorRadioButton.Checked)
             {
-                MessageBox.Show("Setting the log level to \"Error\" may restrict detailed information required for debugging issues, as only critical errors will be displayed. You may not even see the Server starting logs.", "Log-level = Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Setting the log level to 'Error' will only show critical issues.", "Log level - Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

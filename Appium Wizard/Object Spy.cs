@@ -892,7 +892,7 @@ namespace Appium_Wizard
                 {
                     if (node.Attributes[attributeName] != null)
                     {
-                        string testXPath = $"{baseXPath}[@{attributeName}=\"{node.Attributes[attributeName].Value}\"]";
+                        string testXPath = $"{baseXPath}[@{attributeName}='{node.Attributes[attributeName].Value}']";
                         XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);
 
                         // If the XPath with this single attribute is unique, return it
@@ -919,7 +919,7 @@ namespace Appium_Wizard
                         {
                             attributeConditions.Append(" and ");
                         }
-                        attributeConditions.Append($"@{attributeName}=\"{node.Attributes[attributeName].Value}\"");
+                        attributeConditions.Append($"@{attributeName}='{node.Attributes[attributeName].Value}'");
 
                         string testXPath = $"{baseXPath}[{attributeConditions}]";
                         XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);

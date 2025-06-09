@@ -25,7 +25,6 @@ namespace Appium_Wizard
         string htmlReportPath;
         string reportsFolderPath;
 
-        // isandroid and selectedeviceudid will have issues when set device is set 2nd time with different device.. need to set these varibales while startin performactions.. 
         public TestRunner()
         {
             InitializeComponent();
@@ -68,7 +67,7 @@ namespace Appium_Wizard
                 case "Click Element":
                     properties.Add("XPath", "");
                     properties.Add("Wait For Element Visible (ms)", "5000");
-                    break; 
+                    break;
                 case "Click on coordinates":
                     properties.Add("X", "");
                     properties.Add("Y", "");
@@ -204,7 +203,7 @@ namespace Appium_Wizard
                             comboBoxCell.DataSource = items;
                             comboBoxCell.Value = property.Value;
                             row.Cells[1] = comboBoxCell;
-                        } 
+                        }
                         else
                         {
                             // Create a standard TextBox cell for the value field
@@ -586,11 +585,11 @@ namespace Appium_Wizard
                             string clickResponse;
                             if (isAndroid)
                             {
-                                clickResponse = AndroidAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
+                                clickResponse = AndroidAPIMethods.ClickElement(selectedUDID, URL, sessionId, properties["XPath"]);
                             }
                             else
                             {
-                                clickResponse = iOSAPIMethods.ClickElement(URL, sessionId, properties["XPath"]);
+                                clickResponse = iOSAPIMethods.ClickElement(selectedUDID, URL, sessionId, properties["XPath"]);
                             }
                             AppendToHtmlReport(clickCommand, clickResponse);
                             break;
@@ -620,11 +619,11 @@ namespace Appium_Wizard
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextTimeout, cancellationToken);
                             if (isAndroid)
                             {
-                                sendTextResponse = AndroidAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
+                                sendTextResponse = AndroidAPIMethods.SendText(selectedUDID, URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
                             else
                             {
-                                sendTextResponse = iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], properties["Text to Enter"]);
+                                sendTextResponse = iOSAPIMethods.SendText(selectedUDID,URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
                             AppendToHtmlReport(sendTextCommand, sendTextResponse);
                             break;
@@ -704,11 +703,11 @@ namespace Appium_Wizard
                             await WaitUntilElementDisplayed(URL, sessionId, properties["XPath"], sendTextRandomValuesTimeout, cancellationToken);
                             if (isAndroid)
                             {
-                                sendTextRandomValuesResponse = AndroidAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
+                                sendTextRandomValuesResponse = AndroidAPIMethods.SendText(selectedUDID, URL, sessionId, properties["XPath"], textToEnter);
                             }
                             else
                             {
-                                sendTextRandomValuesResponse = iOSAPIMethods.SendText(URL, sessionId, properties["XPath"], textToEnter);
+                                sendTextRandomValuesResponse = iOSAPIMethods.SendText(selectedUDID, URL, sessionId, properties["XPath"], textToEnter);
                             }
                             AppendToHtmlReport(sendTextRandomValuesCommand, sendTextRandomValuesResponse);
                             break;
@@ -879,6 +878,14 @@ namespace Appium_Wizard
         {
             try
             {
+                if (currentExecution.InvokeRequired)
+                {
+                    currentExecution.Invoke(new Action(() => currentExecution.Text = statusText));
+                }
+                else
+                {
+                    currentExecution.Text = statusText;
+                }
                 if (ScreenControl.udidScreenControl.ContainsKey(selectedUDID))
                 {
                     var screenControl = ScreenControl.udidScreenControl[selectedUDID];
@@ -905,7 +912,7 @@ namespace Appium_Wizard
                 case "Send Text Without Element":
                     return $"Send text \"{properties["Text to Enter"]}\" to the clicked textbox.";
                 case "Click Element":
-                    return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms."; 
+                    return $"Click element at {properties["XPath"]} , timeout: {properties["Wait For Element Visible (ms)"]} ms.";
                 case "Click on coordinates":
                     return $"Click at coordinates X={properties["X"]},Y={properties["Y"]}";
                 case "Set Device":
@@ -1222,7 +1229,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void CreateHtmlReport(int repetitions=1)
+        private void CreateHtmlReport(int repetitions = 1)
         {
             string htmlContent = $@"
                              <!DOCTYPE html>

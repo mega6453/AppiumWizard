@@ -438,7 +438,7 @@ namespace Appium_Wizard
             string signedIPA = SignIPA(udid, WDAPath);
             if (signedIPA.Equals("notsigned") | signedIPA.Equals("Sign_IPA_Failed"))
             {
-                Logger.Info("InstallWDA - "+signedIPA);
+                Logger.Info("InstallWDA - " + signedIPA);
                 return false;
             }
             else
@@ -1950,9 +1950,10 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
-        public static string SendText(string URL, string sessionId, string element, string text)
+        public static string SendText(string udid, string URL, string sessionId, string element, string text)
         {
             string elementId = FindElement(URL, sessionId, element);
+            GetElementRectAndDraw(udid, URL, sessionId, elementId, "rectangle");
             var options = new RestClientOptions(URL)
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -2152,7 +2153,7 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                return "Exception : " +ex.Message;
+                return "Exception : " + ex.Message;
             }
         }
 
@@ -2374,11 +2375,12 @@ namespace Appium_Wizard
             return elementId;
         }
 
-        public static string ClickElement(string URL, string sessionId, string XPath)
+        public static string ClickElement(string udid, string URL, string sessionId, string XPath)
         {
             try
             {
                 string elementId = FindElement(URL, sessionId, XPath);
+                GetElementRectAndDraw(udid,URL,sessionId,elementId,"dot");
                 var options = new RestClientOptions(URL)
                 {
                     Timeout = TimeSpan.FromSeconds(30)
@@ -2414,6 +2416,39 @@ namespace Appium_Wizard
             {
                 return false;
             }
+        }
+
+        public static void GetElementRectAndDraw(string udid, string URL, string sessionId, string elementId, string draw)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic data = JsonConvert.DeserializeObject(response.Content);
+                int x = Convert.ToInt32(data.value.x);
+                int y = Convert.ToInt32(data.value.y);
+                int width = Convert.ToInt32(data.value.width);
+                int height = Convert.ToInt32(data.value.height);
+                ScreenControl screenControl = ScreenControl.udidScreenControl[udid];
+                if (draw == "dot")
+                {
+                    int updatedX = x + (width / 2);
+                    int updatedY = y + (height / 2);
+                    screenControl.DrawDot(screenControl, updatedX, updatedY);
+                }
+                else
+                {
+                    screenControl.DrawRectangle(screenControl, x, y, width, height);
+                }
+            }
+            catch (Exception)
+            {
+            }          
         }
     }
 }

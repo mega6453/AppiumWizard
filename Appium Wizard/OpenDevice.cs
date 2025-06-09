@@ -9,7 +9,7 @@ namespace Appium_Wizard
         public string WDAsessionId = "", UIAutomatorSessionId = "", URL;
         int width, height, proxyPort, screenServerPort;
         public string IPAddress = "localhost";
-        string deviceName, udid, OSType, OSVersion, connectionType;
+        string deviceName, udid, OSType, OSVersion, connectionType, deviceModel;
         bool isScreenServerStarted = false;
         string title;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -21,6 +21,7 @@ namespace Appium_Wizard
             this.OSVersion = selectedVersion;
             this.connectionType = connectionType;
             var screeSize = getDeviceScreenSize(udid);
+            this.deviceModel = getDeviceModel(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
             title = "Opening " + deviceName;
@@ -50,6 +51,26 @@ namespace Appium_Wizard
             }           
             return (0, 0);
         }
+
+        public string getDeviceModel(string udid)
+        {
+            try
+            {
+                var devicesList = Database.QueryDataFromDevicesTable();
+                foreach (var dictionary in devicesList)
+                {
+                    if (dictionary["UDID"].Equals(udid))
+                    {
+                        return dictionary["Model"].ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return "";
+        }
+
 
         public async Task<bool> StartBackgroundTasks()
         {
@@ -556,11 +577,11 @@ namespace Appium_Wizard
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
             }
             else
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel);
             }
             screenForm.Name = udid;
             commonProgress.UpdateStepLabel(title, "Loading the screen...", 95);

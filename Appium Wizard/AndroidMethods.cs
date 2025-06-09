@@ -1236,9 +1236,10 @@ namespace Appium_Wizard
             return elementId;
         }
 
-        public static string ClickElement(string URL, string sessionId, string XPath)
+        public static string ClickElement(string udid, string URL, string sessionId, string XPath)
         {
             string elementId = FindElement(URL, sessionId, XPath);
+            GetElementRectAndDraw(udid, URL, sessionId, elementId, "dot");
             var options = new RestClientOptions(URL)
             {
                 Timeout = TimeSpan.FromSeconds(10)
@@ -1249,9 +1250,10 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
-        public static string SendText(string URL, string sessionId, string XPath, string text)
+        public static string SendText(string udid, string URL, string sessionId, string XPath, string text)
         {
             string elementId = FindElement(URL, sessionId, XPath);
+            GetElementRectAndDraw(udid,URL,sessionId,elementId,"rect");
             var options = new RestClientOptions(URL)
             {
                 Timeout = TimeSpan.FromSeconds(10)
@@ -1263,7 +1265,7 @@ namespace Appium_Wizard
             string body = $@"{{
                                 ""text"":""{text}"",
                                 ""replace"":false,
-                                ""value"":{Newtonsoft.Json.JsonConvert.SerializeObject(valueArray)}
+                                ""value"":{JsonConvert.SerializeObject(valueArray)}
                             }}";
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
@@ -1291,6 +1293,57 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        static Dictionary<string,int> udidScreenDensity = new Dictionary<string,int>();
+        public static void GetElementRectAndDraw(string udid, string URL, string sessionId, string elementId, string draw)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic data = JsonConvert.DeserializeObject(response.Content);
+                int x = Convert.ToInt32(data.value.x);
+                int y = Convert.ToInt32(data.value.y);
+                int width = Convert.ToInt32(data.value.width);
+                int height = Convert.ToInt32(data.value.height);
+                ScreenControl screenControl = ScreenControl.udidScreenControl[udid];
+                int screenDensity = 0;
+                if (udidScreenDensity.ContainsKey(udid))
+                {
+                    screenDensity = udidScreenDensity[udid];
+                }
+                else
+                {
+                    screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    udidScreenDensity.Add(udid, screenDensity);
+                }
+                if (screenDensity != 0)
+                {
+                    x = (int)(x / (screenDensity / 160f));
+                    y = (int)(y / (screenDensity / 160f));
+                    width = (int)(width / (screenDensity / 160f));
+                    height = (int)(height / (screenDensity / 160f));
+                }
+                if (draw == "dot")
+                {
+                    int updatedX = x + (width / 2);
+                    int updatedY = y + (height / 2);
+                    screenControl.DrawDot(screenControl, updatedX, updatedY);
+                }
+                else
+                {
+                    screenControl.DrawRectangle(screenControl, x, y, width, height);
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

@@ -55,11 +55,15 @@
             newButton = new Button();
             propertyInfo = new Label();
             panel1 = new Panel();
+            panel2 = new Panel();
+            currentExecution = new Label();
+            label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             contextMenuStrip1.SuspendLayout();
             contextMenuStrip2.SuspendLayout();
             panel1.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
             // 
             // commandGridView
@@ -145,7 +149,7 @@
             // repeatButton
             // 
             repeatButton.AutoSize = true;
-            repeatButton.Location = new Point(490, 387);
+            repeatButton.Location = new Point(486, 437);
             repeatButton.Name = "repeatButton";
             repeatButton.Size = new Size(75, 25);
             repeatButton.TabIndex = 4;
@@ -156,7 +160,7 @@
             // runOnceButton
             // 
             runOnceButton.AutoSize = true;
-            runOnceButton.Location = new Point(399, 387);
+            runOnceButton.Location = new Point(395, 437);
             runOnceButton.Name = "runOnceButton";
             runOnceButton.Size = new Size(75, 25);
             runOnceButton.TabIndex = 3;
@@ -305,12 +309,39 @@
             panel1.Size = new Size(439, 135);
             panel1.TabIndex = 18;
             // 
+            // panel2
+            // 
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Controls.Add(currentExecution);
+            panel2.Location = new Point(12, 392);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(632, 35);
+            panel2.TabIndex = 19;
+            // 
+            // currentExecution
+            // 
+            currentExecution.AutoSize = true;
+            currentExecution.Location = new Point(3, 10);
+            currentExecution.Name = "currentExecution";
+            currentExecution.Size = new Size(0, 15);
+            currentExecution.TabIndex = 1;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 376);
+            label2.Name = "label2";
+            label2.Size = new Size(94, 15);
+            label2.TabIndex = 0;
+            label2.Text = "Execution Status";
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1114, 424);
+            ClientSize = new Size(1114, 474);
+            Controls.Add(label2);
             Controls.Add(newButton);
             Controls.Add(saveDownButton);
             Controls.Add(DropDownButton);
@@ -326,6 +357,7 @@
             Controls.Add(propertyGridView);
             Controls.Add(commandGridView);
             Controls.Add(panel1);
+            Controls.Add(panel2);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "TestRunner";
@@ -339,6 +371,8 @@
             contextMenuStrip1.ResumeLayout(false);
             contextMenuStrip2.ResumeLayout(false);
             panel1.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -372,5 +406,8 @@
         private Button newButton;
         private Label propertyInfo;
         private Panel panel1;
+        private Panel panel2;
+        private Label currentExecution;
+        private Label label2;
     }
 }

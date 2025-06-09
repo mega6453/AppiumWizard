@@ -2108,7 +2108,8 @@ namespace Appium_Wizard
             string deviceOS = "Device OS - " + selectedOS;
             string deviceOSVersion = "OS Version - " + selectedDeviceVersion;
             string deviceModel = "Model - " + selectedDeviceModel;
-            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel;
+            string udid = "UDID - " + selectedUDID;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
             Clipboard.SetText(deviceDetails);
             GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");
         }

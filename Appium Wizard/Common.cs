@@ -133,39 +133,44 @@ namespace Appium_Wizard
 
         public static (int, string) RunNetstatAndFindProcessByPort(int portNumber)
         {
-            Process netstatProcess = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
+                Process netstatProcess = new Process
                 {
-                    FileName = "cmd.exe",
-                    Arguments = "/C netstat -ano | findstr \"LISTENING\" | findstr \":" + portNumber,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/C netstat -ano | findstr \"LISTENING\" | findstr \":" + portNumber,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                netstatProcess.Start();
+                string netstatOutput = netstatProcess.StandardOutput.ReadToEnd();
+                netstatProcess.WaitForExit();
+
+                Regex regex = new Regex(@"\sLISTENING\s+(\d+)");
+                Match match = regex.Match(netstatOutput);
+
+                if (match.Success)
+                {
+                    string processIdStr = match.Groups[1].Value;
+                    int processId = int.Parse(processIdStr);
+                    Process process = Process.GetProcessById(processId);
+                    return (process.Id, process.ProcessName);
                 }
-            };
-
-            netstatProcess.Start();
-            string netstatOutput = netstatProcess.StandardOutput.ReadToEnd();
-            netstatProcess.WaitForExit();
-
-            Regex regex = new Regex(@"\sLISTENING\s+(\d+)");
-            Match match = regex.Match(netstatOutput);
-
-            if (match.Success)
-            {
-                string processIdStr = match.Groups[1].Value;
-                int processId = int.Parse(processIdStr);
-                Process process = Process.GetProcessById(processId);
-                Console.WriteLine($"Process Name: {process.ProcessName}, Process ID: {process.Id}");
-                return (process.Id, process.ProcessName);
+                else
+                {
+                    Console.WriteLine("No process ID found in the netstat output.");
+                    return (0, "");
+                }
             }
-            else
+            catch (Exception)
             {
-                Console.WriteLine("No process ID found in the netstat output.");
                 return (0, "");
             }
-
         }
 
         public static void KillProcessById(int processId)

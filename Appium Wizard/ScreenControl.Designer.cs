@@ -45,6 +45,12 @@
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
+            infoToolStripMenuItem1 = new ToolStripMenuItem();
+            infoToolStripMenuItem = new ToolStripMenuItem();
+            copyProxyPortToolStripMenuItem1 = new ToolStripMenuItem();
+            copyScreenPortToolStripMenuItem1 = new ToolStripMenuItem();
+            copySessionIDToolStripMenuItem1 = new ToolStripMenuItem();
+            copySessionURLToolStripMenuItem1 = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
             objectSpyButton = new ToolStripButton();
             RecordAndStopRecordingSteps = new ToolStripSplitButton();
@@ -200,7 +206,7 @@
             // MoreToolStripButton
             // 
             MoreToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem });
+            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem, infoToolStripMenuItem1, infoToolStripMenuItem });
             MoreToolStripButton.Image = Properties.Resources.ellipsis;
             MoreToolStripButton.ImageTransparentColor = Color.Magenta;
             MoreToolStripButton.Name = "MoreToolStripButton";
@@ -222,6 +228,48 @@
             manageAppsToolStripMenuItem.Size = new Size(188, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
+            // 
+            // infoToolStripMenuItem1
+            // 
+            infoToolStripMenuItem1.Name = "infoToolStripMenuItem1";
+            infoToolStripMenuItem1.Size = new Size(188, 30);
+            infoToolStripMenuItem1.Text = "Copy Device Info";
+            infoToolStripMenuItem1.Click += infoToolStripMenuItem1_Click;
+            // 
+            // infoToolStripMenuItem
+            // 
+            infoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyProxyPortToolStripMenuItem1, copyScreenPortToolStripMenuItem1, copySessionIDToolStripMenuItem1, copySessionURLToolStripMenuItem1 });
+            infoToolStripMenuItem.Name = "infoToolStripMenuItem";
+            infoToolStripMenuItem.Size = new Size(188, 30);
+            infoToolStripMenuItem.Text = "Other Info";
+            // 
+            // copyProxyPortToolStripMenuItem1
+            // 
+            copyProxyPortToolStripMenuItem1.Name = "copyProxyPortToolStripMenuItem1";
+            copyProxyPortToolStripMenuItem1.Size = new Size(168, 22);
+            copyProxyPortToolStripMenuItem1.Text = "Copy Proxy Port";
+            copyProxyPortToolStripMenuItem1.Click += copyProxyPortToolStripMenuItem_Click;
+            // 
+            // copyScreenPortToolStripMenuItem1
+            // 
+            copyScreenPortToolStripMenuItem1.Name = "copyScreenPortToolStripMenuItem1";
+            copyScreenPortToolStripMenuItem1.Size = new Size(168, 22);
+            copyScreenPortToolStripMenuItem1.Text = "Copy Screen Port";
+            copyScreenPortToolStripMenuItem1.Click += copyScreenPortToolStripMenuItem_Click;
+            // 
+            // copySessionIDToolStripMenuItem1
+            // 
+            copySessionIDToolStripMenuItem1.Name = "copySessionIDToolStripMenuItem1";
+            copySessionIDToolStripMenuItem1.Size = new Size(168, 22);
+            copySessionIDToolStripMenuItem1.Text = "Copy Session ID";
+            copySessionIDToolStripMenuItem1.Click += copySessionIDToolStripMenuItem_Click;
+            // 
+            // copySessionURLToolStripMenuItem1
+            // 
+            copySessionURLToolStripMenuItem1.Name = "copySessionURLToolStripMenuItem1";
+            copySessionURLToolStripMenuItem1.Size = new Size(168, 22);
+            copySessionURLToolStripMenuItem1.Text = "Copy Session URL";
+            copySessionURLToolStripMenuItem1.Click += copySessionURLToolStripMenuItem_Click;
             // 
             // toolStripSeparator4
             // 
@@ -256,7 +304,7 @@
             // 
             playStepsToolStripMenuItem.Image = Properties.Resources.play;
             playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
-            playStepsToolStripMenuItem.Size = new Size(188, 30);
+            playStepsToolStripMenuItem.Size = new Size(127, 22);
             playStepsToolStripMenuItem.Text = "Play Steps";
             playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
             // 
@@ -264,7 +312,7 @@
             // 
             readMeToolStripMenuItem.Image = Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
-            readMeToolStripMenuItem.Size = new Size(188, 30);
+            readMeToolStripMenuItem.Size = new Size(127, 22);
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
@@ -344,5 +392,11 @@
         private ToolStripSplitButton RecordAndStopRecordingSteps;
         private ToolStripMenuItem playStepsToolStripMenuItem;
         private ToolStripMenuItem readMeToolStripMenuItem;
+        private ToolStripMenuItem infoToolStripMenuItem;
+        private ToolStripMenuItem infoToolStripMenuItem1;
+        private ToolStripMenuItem copyProxyPortToolStripMenuItem1;
+        private ToolStripMenuItem copyScreenPortToolStripMenuItem1;
+        private ToolStripMenuItem copySessionIDToolStripMenuItem1;
+        private ToolStripMenuItem copySessionURLToolStripMenuItem1;
     }
 }

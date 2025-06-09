@@ -19,7 +19,7 @@ namespace Appium_Wizard
         private DateTime pressStartTime;
         private const int PressThresholdMilliseconds = 500;
         public string IPAddress = "127.0.0.1";
-        string deviceName, udid, OSType, OSVersion;
+        string deviceName, udid, OSType, OSVersion, deviceModel;
         int screenPort, proxyPort;
         public static Dictionary<string, ScreenControl> udidScreenControl = new Dictionary<string, ScreenControl>();
         public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
@@ -32,7 +32,7 @@ namespace Appium_Wizard
         bool isAndroid;
         private List<ScreenAction> recordedActions = new List<ScreenAction>();
         private bool isRecordingSteps = false;
-        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort)
+        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
             this.OSVersion = Version;
@@ -41,6 +41,7 @@ namespace Appium_Wizard
             this.height = height;
             sessionId = session;
             tempSessionId = session;
+            this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
             this.proxyPort = proxyPort;
             this.screenPort = screenPort;
@@ -1263,6 +1264,37 @@ namespace Appium_Wizard
                                 - It's ideal for automating repetitive tasks and testing workflows efficiently.";
 
             MessageBox.Show(message, "Record and Playback - Read Me", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void copyProxyPortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(proxyPort.ToString());
+        }
+
+        private void copyScreenPortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(screenPort.ToString());
+        }
+
+        private void copySessionIDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(sessionId);
+        }
+
+        private void copySessionURLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(URL + "/session/" + sessionId);
+        }
+
+        private void infoToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            string deviceName = "Device Name - " + this.deviceName;
+            string deviceOS = "Device OS - " + OSType;
+            string deviceOSVersion = "OS Version - " + OSVersion;
+            string deviceModel = "Model - " + this.deviceModel;
+            string udid = "UDID - " + this.udid;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
+            Clipboard.SetText(deviceDetails);
         }
     }
 

@@ -123,6 +123,7 @@ namespace Appium_Wizard
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             showLogsCheckBox = new CheckBox();
+            openLogsButton = new Button();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -641,8 +642,9 @@ namespace Appium_Wizard
             tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1002, 626);
+            tabControl1.Size = new Size(1002, 588);
             tabControl1.TabIndex = 11;
+            tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
             // tabPage1
             // 
@@ -651,7 +653,7 @@ namespace Appium_Wizard
             tabPage1.Margin = new Padding(2);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(2);
-            tabPage1.Size = new Size(994, 598);
+            tabPage1.Size = new Size(994, 560);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
             tabPage1.UseVisualStyleBackColor = true;
@@ -663,7 +665,7 @@ namespace Appium_Wizard
             tabPage2.Margin = new Padding(2);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(2);
-            tabPage2.Size = new Size(994, 598);
+            tabPage2.Size = new Size(994, 560);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
             tabPage2.UseVisualStyleBackColor = true;
@@ -674,7 +676,7 @@ namespace Appium_Wizard
             richTextBox2.Margin = new Padding(2);
             richTextBox2.Name = "richTextBox2";
             richTextBox2.ReadOnly = true;
-            richTextBox2.Size = new Size(524, 277);
+            richTextBox2.Size = new Size(734, 277);
             richTextBox2.TabIndex = 0;
             richTextBox2.Text = resources.GetString("richTextBox2.Text");
             richTextBox2.LinkClicked += richTextBox2_LinkClicked;
@@ -687,7 +689,7 @@ namespace Appium_Wizard
             tabPage3.Margin = new Padding(2);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(2);
-            tabPage3.Size = new Size(994, 598);
+            tabPage3.Size = new Size(994, 560);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
             tabPage3.UseVisualStyleBackColor = true;
@@ -698,7 +700,7 @@ namespace Appium_Wizard
             richTextBox3.Margin = new Padding(2);
             richTextBox3.Name = "richTextBox3";
             richTextBox3.ReadOnly = true;
-            richTextBox3.Size = new Size(524, 276);
+            richTextBox3.Size = new Size(732, 276);
             richTextBox3.TabIndex = 0;
             richTextBox3.Text = resources.GetString("richTextBox3.Text");
             richTextBox3.LinkClicked += richTextBox3_LinkClicked;
@@ -711,7 +713,7 @@ namespace Appium_Wizard
             tabPage4.Margin = new Padding(2);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(2);
-            tabPage4.Size = new Size(994, 598);
+            tabPage4.Size = new Size(994, 560);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
             tabPage4.UseVisualStyleBackColor = true;
@@ -722,7 +724,7 @@ namespace Appium_Wizard
             richTextBox4.Margin = new Padding(2);
             richTextBox4.Name = "richTextBox4";
             richTextBox4.ReadOnly = true;
-            richTextBox4.Size = new Size(524, 276);
+            richTextBox4.Size = new Size(732, 276);
             richTextBox4.TabIndex = 0;
             richTextBox4.Text = resources.GetString("richTextBox4.Text");
             richTextBox4.LinkClicked += richTextBox4_LinkClicked;
@@ -735,7 +737,7 @@ namespace Appium_Wizard
             tabPage5.Margin = new Padding(2);
             tabPage5.Name = "tabPage5";
             tabPage5.Padding = new Padding(2);
-            tabPage5.Size = new Size(994, 598);
+            tabPage5.Size = new Size(994, 560);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";
             tabPage5.UseVisualStyleBackColor = true;
@@ -746,7 +748,7 @@ namespace Appium_Wizard
             richTextBox5.Margin = new Padding(2);
             richTextBox5.Name = "richTextBox5";
             richTextBox5.ReadOnly = true;
-            richTextBox5.Size = new Size(524, 277);
+            richTextBox5.Size = new Size(745, 277);
             richTextBox5.TabIndex = 0;
             richTextBox5.Text = resources.GetString("richTextBox5.Text");
             richTextBox5.LinkClicked += richTextBox5_LinkClicked;
@@ -949,12 +951,25 @@ namespace Appium_Wizard
             showLogsCheckBox.UseVisualStyleBackColor = true;
             showLogsCheckBox.CheckedChanged += checkBox2_CheckedChanged;
             // 
+            // openLogsButton
+            // 
+            openLogsButton.AutoSize = true;
+            openLogsButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            openLogsButton.Location = new Point(916, 51);
+            openLogsButton.Name = "openLogsButton";
+            openLogsButton.Size = new Size(150, 25);
+            openLogsButton.TabIndex = 20;
+            openLogsButton.Text = "Open live logs in Browser";
+            openLogsButton.UseVisualStyleBackColor = true;
+            openLogsButton.Click += openLogsButton_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1284, 421);
+            Controls.Add(openLogsButton);
             Controls.Add(showLogsCheckBox);
             Controls.Add(autoScrollCheckBox);
             Controls.Add(mandatorymsglabel);
@@ -1089,5 +1104,6 @@ namespace Appium_Wizard
         private ColumnHeader columnHeader8;
         private CheckBox showLogsCheckBox;
         private ToolStripMenuItem testRunnerToolStripMenuItem;
+        private Button openLogsButton;
     }
 }

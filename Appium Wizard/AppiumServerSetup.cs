@@ -163,7 +163,7 @@ namespace Appium_Wizard
                         {
                             Task.Run(async () =>
                             {
-                                await Task.Delay(TimeSpan.FromSeconds(5));
+                                await Task.Delay(TimeSpan.FromSeconds(10));
                                 MainScreen.main.UpdateShowLogsCheckbox(false);
                             });
                         }
@@ -427,6 +427,13 @@ namespace Appium_Wizard
             {
                 try
                 {
+                    if (MainScreen.main != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            MainScreen.main.UpdateShowLogsCheckbox(true);
+                        });
+                    }
                     Process process = listOfProcess[port].Item1;
                     Common.KillProcessByPortNumber(port);
                     process.CloseMainWindow();

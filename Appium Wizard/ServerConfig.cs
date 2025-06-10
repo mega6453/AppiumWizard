@@ -273,30 +273,35 @@ namespace Appium_Wizard
 
         private async void StartButton1_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(0);
             await StartServer(PortTextBox1, StatusLabel1, 1);
             GoogleAnalytics.SendEvent("StartButton1_Click");
         }
 
         private async void StartButton2_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(1);
             await StartServer(PortTextBox2, StatusLabel2, 2);
             GoogleAnalytics.SendEvent("StartButton2_Click");
         }
 
         private async void StartButton3_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(2);
             await StartServer(PortTextBox3, StatusLabel3, 3);
             GoogleAnalytics.SendEvent("StartButton3_Click");
         }
 
         private async void StartButton4_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(3);
             await StartServer(PortTextBox4, StatusLabel4, 4);
             GoogleAnalytics.SendEvent("StartButton4_Click");
         }
 
         private async void StartButton5_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(4);
             await StartServer(PortTextBox5, StatusLabel5, 5);
             GoogleAnalytics.SendEvent("StartButton5_Click");
         }
@@ -305,26 +310,31 @@ namespace Appium_Wizard
 
         private async void StopButton1_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(0);
             await StopServer(PortTextBox1, StatusLabel1);
         }
 
         private async void StopButton2_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(1);
             await StopServer(PortTextBox2, StatusLabel2);
         }
 
         private async void StopButton3_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(2);
             await StopServer(PortTextBox3, StatusLabel3);
         }
 
         private async void StopButton4_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(3);
             await StopServer(PortTextBox4, StatusLabel4);
         }
 
         private async void StopButton5_Click(object sender, EventArgs e)
         {
+            MainScreen.main.SelectTab(4);
             await StopServer(PortTextBox5, StatusLabel5);
         }
 

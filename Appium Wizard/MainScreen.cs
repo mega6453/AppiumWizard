@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using NLog;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
@@ -200,6 +201,8 @@ namespace Appium_Wizard
             {
                 UpdateRichTextbox(i);
             }
+            tabControl1.SelectedIndex = 0;
+            tabControl1_SelectedIndexChanged(tabControl1,EventArgs.Empty);
             GoogleAnalytics.SendEvent("MainScreen_Shown");
         }
 
@@ -985,7 +988,7 @@ namespace Appium_Wizard
             }
             else
             {
-                moreButtonToolTip.SetToolTip(MoreButton,string.Empty);
+                moreButtonToolTip.SetToolTip(MoreButton, string.Empty);
             }
         }
 
@@ -2213,6 +2216,81 @@ namespace Appium_Wizard
         {
             TestRunner testRunner = new TestRunner();
             testRunner.Show();
+        }
+
+        private async void openLogsButton_Click(object sender, EventArgs e)
+        {
+            TabPage selectedTab = tabControl1.SelectedTab;
+            int selectedIndex = tabControl1.SelectedIndex;
+            int serverNumber = selectedIndex + 1;
+            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
+            {
+                int logsPort;
+                if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
+                {
+                    int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                    string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
+                    string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber);
+                    logsPort = Common.GetFreePort();
+                    _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
+                }
+                else
+                {
+                    logsPort = Common.serverNumberPortNumber[serverNumber];
+                }
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "http://localhost:" + logsPort + "/index.html",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+            }
+            else
+            {
+                MessageBox.Show("Appium server is not running in tab "+ serverNumber + ". Please start the server and then try again. Go to Server->Config to start server.", "Server Not Running",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+            }
+           
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int appiumPortNumber, serverNumber = tabControl1.SelectedIndex + 1;
+            string text = "Open live logs in browser";
+            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
+            {
+                appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                text = "Open live logs in browser - " + appiumPortNumber;
+            }
+            switch (tabControl1.SelectedIndex)
+            {
+                case 0:
+                    openLogsButton.Text = text;
+                    break;
+                case 1:
+                    openLogsButton.Text = text;
+                    break;
+                case 2:
+                    openLogsButton.Text = text;
+                    break;
+                case 3:
+                    openLogsButton.Text = text;
+                    break;
+                case 4:
+                    openLogsButton.Text = text;
+                    break;
+            }
+        }
+
+        public void SelectTab(int tabIndex)
+        {
+            if (tabIndex >= 0 && tabIndex < tabControl1.TabPages.Count)
+            {
+                tabControl1.SelectedIndex = tabIndex;
+            }
+            else
+            {
+                MessageBox.Show("Invalid tab index!");
+            }
         }
     }
 }

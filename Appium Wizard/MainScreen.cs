@@ -1984,100 +1984,6 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");
         }
 
-        private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void richTextBox2_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void richTextBox3_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void richTextBox4_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void richTextBox5_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
 
         private void testRunnerToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2150,10 +2056,6 @@ namespace Appium_Wizard
                 //    }
                 //}
             }
-            //else
-            //{
-            //    MessageBox.Show("Appium server is not running in tab " + serverNumber + ". Please start the server and then try again. Go to Server->Config to start server.", "Server Not Running", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            //}
         }
 
         public void LoadUrlInWebView(WebView2 webView, string url)

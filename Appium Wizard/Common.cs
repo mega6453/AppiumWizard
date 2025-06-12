@@ -1488,93 +1488,9 @@ namespace Appium_Wizard
             }
         }
 
-        private static bool IsPortInUse(int port)
-        {
-            bool isInUse = false;
-            try
-            {
-                using (TcpListener listener = new TcpListener(IPAddress.Loopback, port))
-                {
-                    listener.Start();
-                    listener.Stop();
-                }
-            }
-            catch (SocketException)
-            {
-                isInUse = true;
-            }
-
-            return isInUse;
-        }
-
         public static Dictionary<int,int> serverNumberPortNumber = new Dictionary<int,int>();
-        public static void StartServer2(int serverNumber, int port, string htmlFilePath, string serverLogsFilePath)
-        {
-            string prefix = "http://localhost:" + port + "/";
-            using (HttpListener listener = new HttpListener())
-            {
-                listener.Prefixes.Add(prefix);
-                listener.Start();
-                serverNumberPortNumber[serverNumber] = port;
-                while (true)
-                {
-                    try
-                    {
-                        HttpListenerContext context = listener.GetContext();
-                        HttpListenerRequest request = context.Request;
-                        HttpListenerResponse response = context.Response;
-
-                        //Set CORS headers
-                        response.Headers.Add("Access-Control-Allow-Origin", "*");
-                        response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-                        response.Headers.Add("Pragma", "no-cache");
-                        response.Headers.Add("Expires", "0");
-
-                        if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
-                        {
-                            //Serve the HTML file
-                            string htmlContent = File.ReadAllText(htmlFilePath);
-                            byte[] buffer = Encoding.UTF8.GetBytes(htmlContent);
-                            response.ContentType = "text/html";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
-                        {
-                            //Serve the log file
-                            string fileContent;
-                            using (var fileStream = new FileStream(serverLogsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                            using (var streamReader = new StreamReader(fileStream))
-                            {
-                                fileContent = streamReader.ReadToEnd();
-                            }
-                            byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
-                            response.ContentType = "text/plain";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else
-                        {
-                            //Return 404 if the file is not found
-                            response.StatusCode = (int)HttpStatusCode.NotFound;
-                            byte[] buffer = Encoding.UTF8.GetBytes("File not found");
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-
-                        response.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error: " + ex.Message);
-                    }
-                }
-            }
-        }
-
         private static Dictionary<int, HttpListener> serverListeners = new Dictionary<int, HttpListener>();
         private static Dictionary<int, CancellationTokenSource> serverTokens = new Dictionary<int, CancellationTokenSource>();
-
         public static void StartServer(int serverNumber, int port, string htmlFilePath, string serverLogsFilePath)
         {
             string prefix = "http://localhost:" + port + "/";
@@ -1744,68 +1660,6 @@ namespace Appium_Wizard
             // Return the path to the saved HTML file
             return tempHtmlFilePath;
         }
-
-        //public static string GenerateHtmlWithFilePath(string filePath, int appiumPort)
-        //{
-        //    // HTML template with a placeholder for the file path
-        //    string htmlTemplate = @"
-        //                <!DOCTYPE html>
-        //                <html lang=""en"">
-        //                <head>
-        //                    <meta charset=""UTF-8"">
-        //                    <title>Appium Wizard Server Logs</title>
-        //                    <style>
-        //                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        //                        #container { position: relative; height: 100vh; overflow: hidden; }
-        //                        #header { position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 4px; }
-        //                        #content { padding: 20px; overflow-y: auto; height: calc(100% - 50px); white-space: pre-wrap; background-color: #f4f4f4; }
-        //                        #title { text-align: center; padding: 10px; font-size: 18px; font-weight: bold; background-color: #0078d7; color: white; }
-        //                    </style>
-        //                </head>
-        //                <body>
-        //                    <div id=""title"">Appium Wizard Server Logs</div>
-        //                    <div id=""container"">
-        //                        <div id=""header"">
-        //                            <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
-        //                        </div>
-        //                        <pre id=""content""></pre>
-        //                    </div>
-        //                    <script>
-        //                        const contentElement = document.getElementById('content');
-        //                        const autoScrollCheckbox = document.getElementById('autoScroll');
-        //                        function fetchTextFile() {
-        //                            fetch('/file') // Fetch the file from the server's /file endpoint
-        //                                .then(response => {
-        //                                    if (!response.ok) {
-        //                                        throw new Error(`HTTP error! status: ${response.status}`);
-        //                                    }
-        //                                    return response.text();
-        //                                })
-        //                                .then(text => {
-        //                                    contentElement.textContent = text;
-        //                                    if (autoScrollCheckbox.checked) {
-        //                                        contentElement.scrollTop = contentElement.scrollHeight;
-        //                                    }
-        //                                })
-        //                                .catch(error => {
-        //                                    contentElement.textContent = 'Error loading file: ' + error;
-        //                                });
-        //                        }
-        //                        fetchTextFile();
-        //                        setInterval(fetchTextFile, 2000);
-        //                    </script>
-        //                </body>
-        //                </html>";
-
-        //    htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");
-        //    // Save the updated HTML content to a temporary file
-        //    string tempHtmlFilePath = Path.Combine(Path.GetTempPath(), $"GeneratedHtml_{Guid.NewGuid()}.html");
-        //    File.WriteAllText(tempHtmlFilePath, htmlTemplate);
-
-        //    // Return the path to the saved HTML file
-        //    return tempHtmlFilePath;
-        //}
-
     }
 
 }

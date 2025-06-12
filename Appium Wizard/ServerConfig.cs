@@ -239,6 +239,11 @@ namespace Appium_Wizard
             }
             if (serverSetup.serverStarted)
             {
+                if (MainScreen.main != null)
+                {
+                    MainScreen.main.UpdateTabText(serverNumber, portNumber, true);
+                    MainScreen.main.UpdateOpenLogsButtonText(serverNumber,true);
+                }
                 statusLabel.Text = "Running";
                 Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
                 GoogleAnalytics.SendEvent("ServerStarted");
@@ -246,7 +251,7 @@ namespace Appium_Wizard
             commonProgress.Close();
         }
 
-        private async Task StopServer(TextBox portTextbox, Label statusLabel)
+        private async Task StopServer(int serverNumber, TextBox portTextbox, Label statusLabel)
         {
             int portNumber = int.Parse(portTextbox.Text);
             bool isRunning = false;
@@ -263,79 +268,104 @@ namespace Appium_Wizard
             }
             else
             {
+                if (MainScreen.main != null)
+                {
+                    MainScreen.main.UpdateTabText(serverNumber, portNumber, false);
+                }
                 statusLabel.Text = "Not Running";
             }
             commonProgress.Close();
             GoogleAnalytics.SendEvent("StopServer");
         }
 
+        //---------------------------------------------
 
+        private void ExecuteOnStartServer(int serverNumber)
+        {
+            if (MainScreen.main != null)
+            {
+                MainScreen.main.SelectTab(serverNumber, true);
+            }
+        }
 
         private async void StartButton1_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(0);
+            ExecuteOnStartServer(1);
             await StartServer(PortTextBox1, StatusLabel1, 1);
             GoogleAnalytics.SendEvent("StartButton1_Click");
         }
 
         private async void StartButton2_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(1);
+            ExecuteOnStartServer(2);
             await StartServer(PortTextBox2, StatusLabel2, 2);
             GoogleAnalytics.SendEvent("StartButton2_Click");
         }
 
         private async void StartButton3_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(2);
+            ExecuteOnStartServer(3);
             await StartServer(PortTextBox3, StatusLabel3, 3);
             GoogleAnalytics.SendEvent("StartButton3_Click");
         }
 
         private async void StartButton4_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(3);
+            ExecuteOnStartServer(4);
             await StartServer(PortTextBox4, StatusLabel4, 4);
             GoogleAnalytics.SendEvent("StartButton4_Click");
         }
 
         private async void StartButton5_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(4);
+            ExecuteOnStartServer(5);
             await StartServer(PortTextBox5, StatusLabel5, 5);
             GoogleAnalytics.SendEvent("StartButton5_Click");
         }
 
         //---------------------------------------------------------
 
+        private void ExecuteOnStopServer(int serverNumber)
+        {
+            if (MainScreen.main != null)
+            {
+                MainScreen.main.SelectTab(serverNumber, false);
+                MainScreen.main.UpdateWebViewDefaultText(serverNumber);
+            }
+            MainScreen.serverUrlLoaded.Remove(serverNumber);
+            Common.serverNumberPortNumber.Remove(serverNumber);
+            Common.StopLogsServer(serverNumber);
+            AppiumServerSetup.portServerNumberAndFilePath.Remove(serverNumber);
+        }
+
         private async void StopButton1_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(0);
-            await StopServer(PortTextBox1, StatusLabel1);
+            ExecuteOnStopServer(1);
+            await StopServer(1, PortTextBox1, StatusLabel1);
         }
 
         private async void StopButton2_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(1);
-            await StopServer(PortTextBox2, StatusLabel2);
+            ExecuteOnStopServer(2);
+            await StopServer(2, PortTextBox2, StatusLabel2);
         }
 
         private async void StopButton3_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(2);
-            await StopServer(PortTextBox3, StatusLabel3);
+            ExecuteOnStopServer(3);
+            await StopServer(3, PortTextBox3, StatusLabel3);
         }
 
         private async void StopButton4_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(3);
-            await StopServer(PortTextBox4, StatusLabel4);
+            ExecuteOnStopServer(4);
+            await StopServer(4, PortTextBox4, StatusLabel4);
         }
 
         private async void StopButton5_Click(object sender, EventArgs e)
         {
-            MainScreen.main.SelectTab(4);
-            await StopServer(PortTextBox5, StatusLabel5);
+            ExecuteOnStopServer(5);
+            await StopServer(5, PortTextBox5, StatusLabel5);
         }
 
         //---------------------------------------------------------
@@ -428,7 +458,7 @@ namespace Appium_Wizard
 
         private void ServerConfig_Shown(object sender, EventArgs e)
         {
-           GoogleAnalytics.SendEvent("ServerConfig_Shown");
+            GoogleAnalytics.SendEvent("ServerConfig_Shown");
         }
 
         private bool isValidPortNumber(int port)

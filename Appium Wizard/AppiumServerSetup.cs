@@ -115,6 +115,12 @@ namespace Appium_Wizard
                                     streamWriter.WriteLine("Log level set to error - So only error logs will be displayed.");
                                     streamWriter.WriteLine("\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                                 }
+                                if (MainScreen.main != null)
+                                {
+                                    MainScreen.main.StartLogsServer(serverNumber);
+                                    MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1, true);
+                                    MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
+                                }
                             }
                             count++;
                             if (count == 20)

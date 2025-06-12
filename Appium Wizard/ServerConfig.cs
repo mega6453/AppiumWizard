@@ -332,7 +332,7 @@ namespace Appium_Wizard
                 MainScreen.main.SelectTab(serverNumber, false);
                 MainScreen.main.UpdateWebViewDefaultText(serverNumber);
             }
-            MainScreen.serverUrlLoaded.Remove(serverNumber);
+            MainScreen.serverUrlLoaded.TryRemove(serverNumber, out var serverUrl);
             Common.serverNumberPortNumber.Remove(serverNumber);
             Common.StopLogsServer(serverNumber);
             AppiumServerSetup.portServerNumberAndFilePath.Remove(serverNumber);

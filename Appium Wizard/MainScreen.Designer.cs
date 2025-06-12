@@ -647,7 +647,6 @@ namespace Appium_Wizard
             server1WebView.Size = new Size(990, 556);
             server1WebView.TabIndex = 23;
             server1WebView.ZoomFactor = 1D;
-            server1WebView.CoreWebView2InitializationCompleted += server1WebView_CoreWebView2InitializationCompleted;
             // 
             // tabPage2
             // 

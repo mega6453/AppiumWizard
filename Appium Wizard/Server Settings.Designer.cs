@@ -290,6 +290,7 @@
             infoRadioButton.TabStop = true;
             infoRadioButton.Text = "info";
             infoRadioButton.UseVisualStyleBackColor = true;
+            infoRadioButton.CheckedChanged += infoRadioButton_CheckedChanged;
             // 
             // errorRadioButton
             // 

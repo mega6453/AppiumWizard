@@ -1,6 +1,4 @@
 ﻿using NLog;
-using NLog.Fluent;
-using System.Diagnostics;
 namespace Appium_Wizard
 {
     public partial class LoadingScreen : Form
@@ -12,6 +10,7 @@ namespace Appium_Wizard
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public LoadingScreen()
         {
+            MainScreen mainForm = new MainScreen();
             InitializeComponent();
             statusLabel.Text = "Initializing...";
             Logger.Debug("Initializing...");

@@ -2125,8 +2125,12 @@ namespace Appium_Wizard
             {
                 appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
                 text = "Open logs in browser - " + appiumPortNumber;
+                openLogsButton.Visible = true;
             }
-
+            else
+            {
+                openLogsButton.Visible = false;
+            }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
         }

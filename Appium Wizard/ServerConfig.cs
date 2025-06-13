@@ -92,27 +92,27 @@ namespace Appium_Wizard
             bool isRunning5 = false;
             await Task.Run(() =>
             {
-                if (port1 != 0)
+            if (port1 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
                 {
                     isRunning1 = serverSetup.IsAppiumServerRunning(port1);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 20);
                 }
-                if (port2 != 0)
+                if (port2 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
                 {
                     isRunning2 = serverSetup.IsAppiumServerRunning(port2);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 40);
                 }
-                if (port3 != 0)
+                if (port3 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
                 {
                     isRunning3 = serverSetup.IsAppiumServerRunning(port3);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 60);
                 }
-                if (port4 != 0)
+                if (port4 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
                 {
                     isRunning4 = serverSetup.IsAppiumServerRunning(port4);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 80);
                 }
-                if (port5 != 0)
+                if (port5 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
                 {
                     isRunning5 = serverSetup.IsAppiumServerRunning(port5);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 100);

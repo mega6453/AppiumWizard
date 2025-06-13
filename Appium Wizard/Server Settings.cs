@@ -183,6 +183,7 @@ namespace Appium_Wizard
             ServerArgsRichTextBox.Text = "--allow-cors --allow-insecure=adb_shell";
             DefaultCapabilitiesRichTextBox.Text = "";
             FinalCommandRichTextBox.Text = $@"appium --port {portNumber} {ServerArgsRichTextBox.Text}" + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            infoRadioButton.Checked = true;
             GoogleAnalytics.SendEvent("resetButton_Click");
         }
 

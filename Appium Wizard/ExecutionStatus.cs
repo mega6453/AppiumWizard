@@ -29,7 +29,7 @@ namespace Appium_Wizard
                         sessionId = data.Substring(startIndex, endIndex - startIndex);
                     }
                     // Handling for Find element
-                    if (data.Contains("[POST /element]") | data.Contains("[POST /elements]") | data.Contains("{\"using\":"))
+                    if (data.Contains("POST /element]") | data.Contains("POST /elements]") | data.Contains("{\"using\":"))
                     {
                         string pattern = @"(?<=\[POST\s)(http:\/\/[^\/]+\/session\/[^\/]+\/element)";
                         Regex regex = new Regex(pattern);
@@ -54,7 +54,7 @@ namespace Appium_Wizard
                         }
                     }
                     // Handling for Click
-                    else if ((data.Contains("[POST /session/") | data.Contains("[POST /element/")) && data.Contains("/click]"))
+                    else if ((data.Contains("POST /session/") | data.Contains("POST /element/")) && data.Contains("/click]"))
                     {
                         statusText = "Click " + element;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
@@ -120,7 +120,7 @@ namespace Appium_Wizard
                     }
 
                     // Handling for clear
-                    else if (data.Contains("[POST /element/") && data.Contains("/clear]"))
+                    else if (data.Contains("POST /element/") && data.Contains("/clear"))
                     {
                         statusText = "Clear " + element;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
@@ -189,7 +189,7 @@ namespace Appium_Wizard
                     }
 
                     //Drag Gesture - Android
-                    else if (data.Contains(" POST /session/") && data.Contains("dragGesture"))
+                    else if (data.Contains("POST /session/") && data.Contains("dragGesture"))
                     {
                         string jsonString = GetOnlyJson(data);
                         var jsonDocument = JsonDocument.Parse(jsonString);
@@ -210,7 +210,7 @@ namespace Appium_Wizard
                     }
 
                     //Drag Gesture - iOS
-                    else if (data.Contains(" POST /session/") && data.Contains("dragFromToForDuration"))
+                    else if (data.Contains("POST /session/") && data.Contains("dragFromToForDuration"))
                     {
                         string jsonString = GetOnlyJson(data);
                         var jsonDocument = JsonDocument.Parse(jsonString);

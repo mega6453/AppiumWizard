@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using Windows.ApplicationModel.Contacts.DataProvider;
 
 namespace Appium_Wizard
 {
@@ -97,6 +96,7 @@ namespace Appium_Wizard
                 int processId = appiumServerProcess.Id;
                 MainScreen.runningProcesses.Add(processId);
                 MainScreen.runningProcessesPortNumbers.Add(appiumPort);
+                InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
                 if (logLevel.Equals("error"))
                 {
                     int count = 1;
@@ -107,14 +107,10 @@ namespace Appium_Wizard
                             if (isRunning)
                             {
                                 serverStarted = true;
-                                using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
-                                using (var streamWriter = new StreamWriter(fileStream))
-                                {
-                                    streamWriter.WriteLine("Appium Server Running in Port : " + appiumPort + "\n");
-                                    streamWriter.WriteLine("Appium command : " + updatedCommand + "\n");
-                                    streamWriter.WriteLine("Log level set to error - So only error logs will be displayed.");
-                                    streamWriter.WriteLine("\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
-                                }
+                                WriteLog(serverNumber, "Appium Server Running in Port : " + appiumPort + "\n");
+                                WriteLog(serverNumber, "Appium command : " + updatedCommand + "\n");
+                                WriteLog(serverNumber, "Log level set to error - So only error logs will be displayed.");
+                                WriteLog(serverNumber, "\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                                 if (MainScreen.main != null)
                                 {
                                     MainScreen.main.StartLogsServer(serverNumber);
@@ -161,19 +157,14 @@ namespace Appium_Wizard
                     string data = Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", "");
                     if (portServerNumberAndFilePath.ContainsKey(serverNumber))
                     {
-                        using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
-                        using (var streamWriter = new StreamWriter(fileStream))
+                        WriteLog(serverNumber, data);
+                        if (data.Contains("No plugins have been installed.") || data.Contains("No plugins activated."))
                         {
-                            streamWriter.WriteLine(data);
-                            if (data.Contains("No plugins have been installed.") | data.Contains("No plugins activated."))
+                            WriteLog(serverNumber, "\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
+                            if (MainScreen.main != null)
                             {
-                                streamWriter.WriteLine("\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
-                                if (MainScreen.main != null)
-                                {
-                                    MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1,true);
-                                    MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
-                                }
-
+                                MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1, true);
+                                MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
                             }
                         }
                     }
@@ -199,11 +190,7 @@ namespace Appium_Wizard
                             DateTime now = DateTime.Now;
                             if ((now - lastExecutionTime).TotalSeconds >= 30)
                             {
-                                if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
-                                {
-                                    Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
-                                }
-                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
+                                RestartiOSProxyServer(currentUDID,webDriverAgentProxyPort);
                                 lastExecutionTime = now;
                             }
                         }
@@ -227,11 +214,7 @@ namespace Appium_Wizard
                             //------------------------
                             if (platformName.ToLower().Contains("ios"))
                             {
-                                if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
-                                {
-                                    Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
-                                }
-                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
+                                RestartiOSProxyServer(currentUDID, webDriverAgentProxyPort);
                                 if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                                 {
                                     string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -281,11 +264,7 @@ namespace Appium_Wizard
                             }
                             if (!proxiedUDID.Equals(currentUDID) && !currentUDID.Equals("none"))
                             {
-                                if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
-                                {
-                                    Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
-                                }
-                                iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
+                                RestartiOSProxyServer(currentUDID, webDriverAgentProxyPort);
                                 if (MainScreen.DeviceInfo.ContainsKey(currentUDID))
                                 {
                                     string name = MainScreen.DeviceInfo[currentUDID].Item1;
@@ -313,15 +292,7 @@ namespace Appium_Wizard
                                             string name = MainScreen.DeviceInfo[currentUDID].Item1;
                                             UpdateScreenControl(currentUDID, "Set Device - " + name);
                                         }
-                                        if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
-                                        {
-                                            Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
-                                        }
-                                        if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(webDriverAgentProxyPort))
-                                        {
-                                            Common.KillProcessById(iOSAsyncMethods.PortProcessId[webDriverAgentProxyPort]);
-                                        }
-                                        iOSAsyncMethods.GetInstance().StartiOSProxyServer(currentUDID, webDriverAgentProxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
+                                        RestartiOSProxyServer(currentUDID,webDriverAgentProxyPort);
                                         proxiedUDID = currentUDID;
                                     }
                                 }
@@ -407,14 +378,49 @@ namespace Appium_Wizard
                     }
                     catch (Exception)
                     {
-
                     }
-
                 }
             }
             catch (Exception)
             {
             }
+        }
+
+        private readonly Dictionary<int, StreamWriter> serverLogWriters = new Dictionary<int, StreamWriter>();
+        private void InitializeLogWriter(int serverNumber, string filePath)
+        {
+            if (!serverLogWriters.ContainsKey(serverNumber))
+            {
+                var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                var streamWriter = new StreamWriter(fileStream);
+                serverLogWriters[serverNumber] = streamWriter;
+            }
+        }
+        private void WriteLog(int serverNumber, string logLine)
+        {
+            if (serverLogWriters.ContainsKey(serverNumber))
+            {
+                serverLogWriters[serverNumber].WriteLine(logLine);
+                serverLogWriters[serverNumber].Flush();
+            }
+        }
+
+        private void CloseLogWriter(int serverNumber)
+        {
+            if (serverLogWriters.ContainsKey(serverNumber))
+            {
+                serverLogWriters[serverNumber].Close();
+                serverLogWriters[serverNumber].Dispose();
+                serverLogWriters.Remove(serverNumber);
+            }
+        }
+        private void RestartiOSProxyServer(string udid, int proxyPort)
+        {
+            if (iOSAsyncMethods.PortProcessId != null && iOSAsyncMethods.PortProcessId.ContainsKey(proxyPort))
+            {
+                Common.KillProcessById(iOSAsyncMethods.PortProcessId[proxyPort]);
+            }
+            iOSAsyncMethods.GetInstance().StartiOSProxyServer(udid, proxyPort, 8100, iOS_Proxy.selectediOSProxyMethod);
         }
 
         private void UpdateScreenControl(string udid, string text)
@@ -426,7 +432,7 @@ namespace Appium_Wizard
             }
         }
 
-        public void StopAppiumServer(int port)
+        public void StopAppiumServer(int serverNumber, int port)
         {
             if (listOfProcess.ContainsKey(port))
             {
@@ -437,11 +443,9 @@ namespace Appium_Wizard
                     process.CloseMainWindow();
                     process.Close();
                     process.Dispose();
-                    string logfilePath = listOfProcess[port].Item2;
-                    using (StreamWriter writer = File.AppendText(logfilePath))
-                    {
-                        writer.WriteLine("\t\t------------------------------Appium Server Stopped------------------------------\n\n");
-                    }
+
+                    WriteLog(serverNumber, "\t\t------------------------------Appium Server Stopped------------------------------\n\n");
+                    CloseLogWriter(serverNumber);
                     listOfProcess.Remove(port);
                 }
                 catch (Exception e)

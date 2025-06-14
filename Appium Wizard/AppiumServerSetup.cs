@@ -343,7 +343,7 @@ namespace Appium_Wizard
 
                         }
                         //------------------------
-                        if (data.Contains("POST /session/") && (data.Contains("/element 200") | data.Contains("/elements 200") | data.Contains("/click 200") | data.Contains("/value 200")))
+                        if (data.Contains("POST /session/") && (data.Contains("/element 200") || data.Contains("/elements 200") || data.Contains("/click 200") || data.Contains("/value 200")))
                         {
                             UpdateScreenControl(currentUDID, "");
                         }
@@ -361,6 +361,7 @@ namespace Appium_Wizard
                             string input = data;
                             int startIndex = input.IndexOf(":") + 2;
                             deviceUDID = input.Substring(startIndex);
+                            currentUDID = deviceUDID;
                             screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(deviceUDID);
                             if (MainScreen.DeviceInfo.ContainsKey(deviceUDID))
                             {
@@ -590,15 +591,15 @@ namespace Appium_Wizard
             Dictionary<string, int> rectangleDict = new Dictionary<string, int>();
             try
             {
-                var options = new RestClientOptions(url)
+                var options = new RestClientOptions()
                 {
                     Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest(elementId + "/rect", Method.Get);
-                request.AddHeader("Content-Type", "application/json");
+                var request = new RestRequest(url +"/element/"+ elementId + "/rect", Method.Get);
+                //request.AddHeader("Content-Type", "application/json");
                 RestResponse response = client.Execute(request);
-                if (response.Content != null)
+                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
                 {
                     var jsonObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
                     int x = jsonObject?.value.x;

@@ -29,9 +29,10 @@ namespace Appium_Wizard
         string canvasFunctionID = string.Empty;
         string color = ColorTranslator.ToHtml(Color.Red);
         int lineWidth = 2;
-        bool isAndroid;
+        public bool isAndroid;
         private List<ScreenAction> recordedActions = new List<ScreenAction>();
         private bool isRecordingSteps = false;
+        public string sessionURL = string.Empty;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
@@ -77,6 +78,7 @@ namespace Appium_Wizard
                 while (true)
                 {
                     sessionId = GetSessionID();
+                    sessionURL = URL + "/session/" + sessionId;
                     if (OSType.Equals("Android"))
                     {
                         try
@@ -1283,7 +1285,7 @@ namespace Appium_Wizard
 
         private void copySessionURLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(URL + "/session/" + sessionId);
+            Clipboard.SetText(sessionURL);
         }
 
         private void infoToolStripMenuItem1_Click(object sender, EventArgs e)

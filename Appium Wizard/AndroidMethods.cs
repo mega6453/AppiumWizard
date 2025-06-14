@@ -1236,6 +1236,34 @@ namespace Appium_Wizard
             return elementId;
         }
 
+        public static string FindElement(string URL, string json)
+        {
+            string elementId = string.Empty;
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest(URL + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                string body = json.Replace("\"using\"", "\"strategy\"").Replace("\"value\"", "\"selector\"");
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return elementId;
+        }
+
         public static string ClickElement(string udid, string URL, string sessionId, string XPath)
         {
             string elementId = FindElement(URL, sessionId, XPath);

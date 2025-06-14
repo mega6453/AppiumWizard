@@ -48,8 +48,6 @@ namespace Appium_Wizard
             androidWiFiToolStripMenuItem = new ToolStripMenuItem();
             AddDevice = new Button();
             DeleteDevice = new Button();
-            richTextBox1 = new RichTextBox();
-            autoScrollCheckBox = new CheckBox();
             MoreButton = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -63,6 +61,7 @@ namespace Appium_Wizard
             iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
             iOSProxyToolStripMenuItem = new ToolStripMenuItem();
             signIPAToolStripMenuItem = new ToolStripMenuItem();
+            testRunnerToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             notificationsToolStripMenuItem = new ToolStripMenuItem();
             alwaysOnTopToolStripMenuItem = new ToolStripMenuItem();
@@ -93,14 +92,15 @@ namespace Appium_Wizard
             aboutToolStripMenuItem = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            server1WebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             tabPage2 = new TabPage();
-            richTextBox2 = new RichTextBox();
+            server2WebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             tabPage3 = new TabPage();
-            richTextBox3 = new RichTextBox();
+            server3WebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             tabPage4 = new TabPage();
-            richTextBox4 = new RichTextBox();
+            server4WebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             tabPage5 = new TabPage();
-            richTextBox5 = new RichTextBox();
+            server5WebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
             copyDeviceDetailsToolStripMenuItem = new ToolStripMenuItem();
@@ -121,15 +121,20 @@ namespace Appium_Wizard
             capabilityLabel = new Label();
             mandatorymsglabel = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
-            showLogsCheckBox = new CheckBox();
+            openLogsButton = new Button();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)server1WebView).BeginInit();
             tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)server2WebView).BeginInit();
             tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)server3WebView).BeginInit();
             tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)server4WebView).BeginInit();
             tabPage5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)server5WebView).BeginInit();
             contextMenuStrip2.SuspendLayout();
             panel1.SuspendLayout();
             contextMenuStrip3.SuspendLayout();
@@ -261,32 +266,6 @@ namespace Appium_Wizard
             DeleteDevice.UseVisualStyleBackColor = true;
             DeleteDevice.Click += DeleteDevice_Click;
             // 
-            // richTextBox1
-            // 
-            richTextBox1.Location = new Point(0, 0);
-            richTextBox1.Margin = new Padding(2);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(1000, 602);
-            richTextBox1.TabIndex = 6;
-            richTextBox1.Text = resources.GetString("richTextBox1.Text");
-            richTextBox1.LinkClicked += richTextBox1_LinkClicked;
-            richTextBox1.TextChanged += richTextBox1_TextChanged;
-            // 
-            // autoScrollCheckBox
-            // 
-            autoScrollCheckBox.AutoSize = true;
-            autoScrollCheckBox.Checked = true;
-            autoScrollCheckBox.CheckState = CheckState.Checked;
-            autoScrollCheckBox.Location = new Point(1353, 57);
-            autoScrollCheckBox.Margin = new Padding(2);
-            autoScrollCheckBox.Name = "autoScrollCheckBox";
-            autoScrollCheckBox.Size = new Size(84, 19);
-            autoScrollCheckBox.TabIndex = 7;
-            autoScrollCheckBox.Text = "Auto Scroll";
-            autoScrollCheckBox.UseVisualStyleBackColor = true;
-            autoScrollCheckBox.CheckedChanged += AutoScrollCheckbox_CheckedChanged;
-            // 
             // MoreButton
             // 
             MoreButton.AutoSize = true;
@@ -355,7 +334,7 @@ namespace Appium_Wizard
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, iOSExecutorToolStripMenuItem, iOSProxyToolStripMenuItem, signIPAToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, iOSExecutorToolStripMenuItem, iOSProxyToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(46, 20);
             toolsToolStripMenuItem.Text = "Tools";
@@ -399,6 +378,14 @@ namespace Appium_Wizard
             signIPAToolStripMenuItem.Size = new Size(203, 22);
             signIPAToolStripMenuItem.Text = "IPA Signer";
             signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
+            // 
+            // testRunnerToolStripMenuItem
+            // 
+            testRunnerToolStripMenuItem.Image = Properties.Resources.runner;
+            testRunnerToolStripMenuItem.Name = "testRunnerToolStripMenuItem";
+            testRunnerToolStripMenuItem.Size = new Size(203, 22);
+            testRunnerToolStripMenuItem.Text = "Test Runner";
+            testRunnerToolStripMenuItem.Click += testRunnerToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
@@ -632,116 +619,130 @@ namespace Appium_Wizard
             tabControl1.Margin = new Padding(2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1002, 626);
+            tabControl1.Size = new Size(1002, 588);
             tabControl1.TabIndex = 11;
+            tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
+            tabControl1.Resize += tabControl1_Resize;
             // 
             // tabPage1
             // 
-            tabPage1.Controls.Add(richTextBox1);
+            tabPage1.BackColor = Color.Transparent;
+            tabPage1.Controls.Add(server1WebView);
             tabPage1.Location = new Point(4, 24);
             tabPage1.Margin = new Padding(2);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(2);
-            tabPage1.Size = new Size(994, 598);
+            tabPage1.Size = new Size(994, 560);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "#1";
-            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // server1WebView
+            // 
+            server1WebView.AllowExternalDrop = true;
+            server1WebView.CreationProperties = null;
+            server1WebView.DefaultBackgroundColor = Color.White;
+            server1WebView.Dock = DockStyle.Fill;
+            server1WebView.Location = new Point(2, 2);
+            server1WebView.Name = "server1WebView";
+            server1WebView.Size = new Size(990, 556);
+            server1WebView.TabIndex = 23;
+            server1WebView.ZoomFactor = 1D;
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(richTextBox2);
+            tabPage2.Controls.Add(server2WebView);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Margin = new Padding(2);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(2);
-            tabPage2.Size = new Size(994, 598);
+            tabPage2.Size = new Size(994, 560);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "#2";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // richTextBox2
+            // server2WebView
             // 
-            richTextBox2.Location = new Point(0, 0);
-            richTextBox2.Margin = new Padding(2);
-            richTextBox2.Name = "richTextBox2";
-            richTextBox2.ReadOnly = true;
-            richTextBox2.Size = new Size(524, 277);
-            richTextBox2.TabIndex = 0;
-            richTextBox2.Text = resources.GetString("richTextBox2.Text");
-            richTextBox2.LinkClicked += richTextBox2_LinkClicked;
-            richTextBox2.TextChanged += richTextBox2_TextChanged;
+            server2WebView.AllowExternalDrop = true;
+            server2WebView.CreationProperties = null;
+            server2WebView.DefaultBackgroundColor = Color.White;
+            server2WebView.Dock = DockStyle.Fill;
+            server2WebView.Location = new Point(2, 2);
+            server2WebView.Name = "server2WebView";
+            server2WebView.Size = new Size(990, 556);
+            server2WebView.TabIndex = 22;
+            server2WebView.ZoomFactor = 1D;
             // 
             // tabPage3
             // 
-            tabPage3.Controls.Add(richTextBox3);
+            tabPage3.Controls.Add(server3WebView);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Margin = new Padding(2);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(2);
-            tabPage3.Size = new Size(994, 598);
+            tabPage3.Size = new Size(994, 560);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "#3";
             tabPage3.UseVisualStyleBackColor = true;
             // 
-            // richTextBox3
+            // server3WebView
             // 
-            richTextBox3.Location = new Point(0, 0);
-            richTextBox3.Margin = new Padding(2);
-            richTextBox3.Name = "richTextBox3";
-            richTextBox3.ReadOnly = true;
-            richTextBox3.Size = new Size(524, 276);
-            richTextBox3.TabIndex = 0;
-            richTextBox3.Text = resources.GetString("richTextBox3.Text");
-            richTextBox3.LinkClicked += richTextBox3_LinkClicked;
-            richTextBox3.TextChanged += richTextBox3_TextChanged;
+            server3WebView.AllowExternalDrop = true;
+            server3WebView.CreationProperties = null;
+            server3WebView.DefaultBackgroundColor = Color.White;
+            server3WebView.Dock = DockStyle.Fill;
+            server3WebView.Location = new Point(2, 2);
+            server3WebView.Name = "server3WebView";
+            server3WebView.Size = new Size(990, 556);
+            server3WebView.TabIndex = 22;
+            server3WebView.ZoomFactor = 1D;
             // 
             // tabPage4
             // 
-            tabPage4.Controls.Add(richTextBox4);
+            tabPage4.Controls.Add(server4WebView);
             tabPage4.Location = new Point(4, 24);
             tabPage4.Margin = new Padding(2);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(2);
-            tabPage4.Size = new Size(994, 598);
+            tabPage4.Size = new Size(994, 560);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "#4";
             tabPage4.UseVisualStyleBackColor = true;
             // 
-            // richTextBox4
+            // server4WebView
             // 
-            richTextBox4.Location = new Point(0, 0);
-            richTextBox4.Margin = new Padding(2);
-            richTextBox4.Name = "richTextBox4";
-            richTextBox4.ReadOnly = true;
-            richTextBox4.Size = new Size(524, 276);
-            richTextBox4.TabIndex = 0;
-            richTextBox4.Text = resources.GetString("richTextBox4.Text");
-            richTextBox4.LinkClicked += richTextBox4_LinkClicked;
-            richTextBox4.TextChanged += richTextBox4_TextChanged;
+            server4WebView.AllowExternalDrop = true;
+            server4WebView.CreationProperties = null;
+            server4WebView.DefaultBackgroundColor = Color.White;
+            server4WebView.Dock = DockStyle.Fill;
+            server4WebView.Location = new Point(2, 2);
+            server4WebView.Name = "server4WebView";
+            server4WebView.Size = new Size(990, 556);
+            server4WebView.TabIndex = 22;
+            server4WebView.ZoomFactor = 1D;
             // 
             // tabPage5
             // 
-            tabPage5.Controls.Add(richTextBox5);
+            tabPage5.Controls.Add(server5WebView);
             tabPage5.Location = new Point(4, 24);
             tabPage5.Margin = new Padding(2);
             tabPage5.Name = "tabPage5";
             tabPage5.Padding = new Padding(2);
-            tabPage5.Size = new Size(994, 598);
+            tabPage5.Size = new Size(994, 560);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "#5";
             tabPage5.UseVisualStyleBackColor = true;
             // 
-            // richTextBox5
+            // server5WebView
             // 
-            richTextBox5.Location = new Point(0, 0);
-            richTextBox5.Margin = new Padding(2);
-            richTextBox5.Name = "richTextBox5";
-            richTextBox5.ReadOnly = true;
-            richTextBox5.Size = new Size(524, 277);
-            richTextBox5.TabIndex = 0;
-            richTextBox5.Text = resources.GetString("richTextBox5.Text");
-            richTextBox5.LinkClicked += richTextBox5_LinkClicked;
-            richTextBox5.TextChanged += richTextBox5_TextChanged;
+            server5WebView.AllowExternalDrop = true;
+            server5WebView.CreationProperties = null;
+            server5WebView.DefaultBackgroundColor = Color.White;
+            server5WebView.Dock = DockStyle.Fill;
+            server5WebView.Location = new Point(2, 2);
+            server5WebView.Name = "server5WebView";
+            server5WebView.Size = new Size(990, 556);
+            server5WebView.TabIndex = 22;
+            server5WebView.ZoomFactor = 1D;
             // 
             // contextMenuStrip2
             // 
@@ -926,19 +927,18 @@ namespace Appium_Wizard
             timer1.Interval = 2000;
             timer1.Tick += timer1_Tick;
             // 
-            // showLogsCheckBox
+            // openLogsButton
             // 
-            showLogsCheckBox.AutoSize = true;
-            showLogsCheckBox.Checked = true;
-            showLogsCheckBox.CheckState = CheckState.Checked;
-            showLogsCheckBox.Location = new Point(1244, 57);
-            showLogsCheckBox.Margin = new Padding(2);
-            showLogsCheckBox.Name = "showLogsCheckBox";
-            showLogsCheckBox.Size = new Size(80, 19);
-            showLogsCheckBox.TabIndex = 19;
-            showLogsCheckBox.Text = "Show logs";
-            showLogsCheckBox.UseVisualStyleBackColor = true;
-            showLogsCheckBox.CheckedChanged += checkBox2_CheckedChanged;
+            openLogsButton.AutoSize = true;
+            openLogsButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            openLogsButton.Location = new Point(1118, 51);
+            openLogsButton.Name = "openLogsButton";
+            openLogsButton.Size = new Size(129, 25);
+            openLogsButton.TabIndex = 20;
+            openLogsButton.Text = "Open logs in browser";
+            openLogsButton.UseVisualStyleBackColor = true;
+            openLogsButton.Click += openLogsButton_Click;
+            openLogsButton.Resize += openLogsButton_Resize;
             // 
             // MainScreen
             // 
@@ -946,8 +946,7 @@ namespace Appium_Wizard
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1284, 421);
-            Controls.Add(showLogsCheckBox);
-            Controls.Add(autoScrollCheckBox);
+            Controls.Add(openLogsButton);
             Controls.Add(mandatorymsglabel);
             Controls.Add(capabilityLabel);
             Controls.Add(tableLayoutPanel1);
@@ -974,10 +973,15 @@ namespace Appium_Wizard
             menuStrip1.PerformLayout();
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)server1WebView).EndInit();
             tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)server2WebView).EndInit();
             tabPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)server3WebView).EndInit();
             tabPage4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)server4WebView).EndInit();
             tabPage5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)server5WebView).EndInit();
             contextMenuStrip2.ResumeLayout(false);
             panel1.ResumeLayout(false);
             contextMenuStrip3.ResumeLayout(false);
@@ -1000,8 +1004,6 @@ namespace Appium_Wizard
         private Button DeleteDevice;
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader5;
-        private RichTextBox richTextBox1;
-        private CheckBox autoScrollCheckBox;
         private Button MoreButton;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
@@ -1014,10 +1016,6 @@ namespace Appium_Wizard
         private TabPage tabPage3;
         private TabPage tabPage4;
         private TabPage tabPage5;
-        private RichTextBox richTextBox2;
-        private RichTextBox richTextBox3;
-        private RichTextBox richTextBox4;
-        private RichTextBox richTextBox5;
         private ToolStripMenuItem appiumDocsToolStripMenuItem;
         private ToolStripMenuItem capabilitiesToolStripMenuItem;
         private ToolStripMenuItem xCUITestToolStripMenuItem;
@@ -1078,6 +1076,12 @@ namespace Appium_Wizard
         private ToolStripMenuItem openLogsFolderToolstripMenuItem;
         private ToolStripMenuItem copyDeviceDetailsToolStripMenuItem;
         private ColumnHeader columnHeader8;
-        private CheckBox showLogsCheckBox;
+        private ToolStripMenuItem testRunnerToolStripMenuItem;
+        private Button openLogsButton;
+        private Microsoft.Web.WebView2.WinForms.WebView2 server2WebView;
+        private Microsoft.Web.WebView2.WinForms.WebView2 server3WebView;
+        private Microsoft.Web.WebView2.WinForms.WebView2 server4WebView;
+        private Microsoft.Web.WebView2.WinForms.WebView2 server5WebView;
+        private Microsoft.Web.WebView2.WinForms.WebView2 server1WebView;
     }
 }

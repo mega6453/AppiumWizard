@@ -133,39 +133,44 @@ namespace Appium_Wizard
 
         public static (int, string) RunNetstatAndFindProcessByPort(int portNumber)
         {
-            Process netstatProcess = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
+                Process netstatProcess = new Process
                 {
-                    FileName = "cmd.exe",
-                    Arguments = "/C netstat -ano | findstr \"LISTENING\" | findstr \":" + portNumber,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/C netstat -ano | findstr \"LISTENING\" | findstr \":" + portNumber,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                netstatProcess.Start();
+                string netstatOutput = netstatProcess.StandardOutput.ReadToEnd();
+                netstatProcess.WaitForExit();
+
+                Regex regex = new Regex(@"\sLISTENING\s+(\d+)");
+                Match match = regex.Match(netstatOutput);
+
+                if (match.Success)
+                {
+                    string processIdStr = match.Groups[1].Value;
+                    int processId = int.Parse(processIdStr);
+                    Process process = Process.GetProcessById(processId);
+                    return (process.Id, process.ProcessName);
                 }
-            };
-
-            netstatProcess.Start();
-            string netstatOutput = netstatProcess.StandardOutput.ReadToEnd();
-            netstatProcess.WaitForExit();
-
-            Regex regex = new Regex(@"\sLISTENING\s+(\d+)");
-            Match match = regex.Match(netstatOutput);
-
-            if (match.Success)
-            {
-                string processIdStr = match.Groups[1].Value;
-                int processId = int.Parse(processIdStr);
-                Process process = Process.GetProcessById(processId);
-                Console.WriteLine($"Process Name: {process.ProcessName}, Process ID: {process.Id}");
-                return (process.Id, process.ProcessName);
+                else
+                {
+                    Console.WriteLine("No process ID found in the netstat output.");
+                    return (0, "");
+                }
             }
-            else
+            catch (Exception)
             {
-                Console.WriteLine("No process ID found in the netstat output.");
                 return (0, "");
             }
-
         }
 
         public static void KillProcessById(int processId)
@@ -1481,6 +1486,179 @@ namespace Appium_Wizard
             {
                 Logger.Error(ex, "Delete log file - exception");
             }
+        }
+
+        public static Dictionary<int,int> serverNumberPortNumber = new Dictionary<int,int>();
+        private static Dictionary<int, HttpListener> serverListeners = new Dictionary<int, HttpListener>();
+        private static Dictionary<int, CancellationTokenSource> serverTokens = new Dictionary<int, CancellationTokenSource>();
+        public static void StartServer(int serverNumber, int port, string htmlFilePath, string serverLogsFilePath)
+        {
+            string prefix = "http://localhost:" + port + "/";
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(prefix);
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            serverTokens[serverNumber] = cts;
+            CancellationToken token = cts.Token;
+
+            serverListeners[serverNumber] = listener;
+            serverNumberPortNumber[serverNumber] = port;
+            listener.Start();
+            Console.WriteLine($"Server {serverNumber} started at {prefix}");
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        HttpListenerContext context = listener.GetContext();
+                        HttpListenerRequest request = context.Request;
+                        HttpListenerResponse response = context.Response;
+
+                        // Set CORS headers
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                        response.Headers.Add("Pragma", "no-cache");
+                        response.Headers.Add("Expires", "0");
+
+                        if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
+                        {
+                            // Serve the HTML file
+                            string htmlContent = File.ReadAllText(htmlFilePath);
+                            byte[] buffer = Encoding.UTF8.GetBytes(htmlContent);
+                            response.ContentType = "text/html";
+                            response.ContentLength64 = buffer.Length;
+                            response.OutputStream.Write(buffer, 0, buffer.Length);
+                        }
+                        else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
+                        {
+                            // Serve the log file
+                            string fileContent;
+                            using (var fileStream = new FileStream(serverLogsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                            using (var streamReader = new StreamReader(fileStream))
+                            {
+                                fileContent = streamReader.ReadToEnd();
+                            }
+                            byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
+                            response.ContentType = "text/plain";
+                            response.ContentLength64 = buffer.Length;
+                            response.OutputStream.Write(buffer, 0, buffer.Length);
+                        }
+                        else
+                        {
+                            // Return 404 if the file is not found
+                            response.StatusCode = (int)HttpStatusCode.NotFound;
+                            byte[] buffer = Encoding.UTF8.GetBytes("File not found");
+                            response.ContentLength64 = buffer.Length;
+                            response.OutputStream.Write(buffer, 0, buffer.Length);
+                        }
+
+                        response.Close();
+                    }
+                }
+                catch (HttpListenerException)
+                {
+                    // Listener was stopped, exit gracefully
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+            }, token);
+        }
+
+        public static void StopLogsServer(int serverNumber)
+        {
+            if (serverListeners.ContainsKey(serverNumber) && serverTokens.ContainsKey(serverNumber))
+            {
+                try
+                {
+                    serverTokens[serverNumber].Cancel();
+                    serverListeners[serverNumber].Stop();
+                    serverListeners[serverNumber].Close();
+
+                    serverListeners.Remove(serverNumber);
+                    serverTokens.Remove(serverNumber);
+
+                    Console.WriteLine($"Server {serverNumber} stopped.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error stopping server {serverNumber}: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Server {serverNumber} is not running.");
+            }
+        }
+        public static string GenerateHtmlWithFilePath(string filePath, int appiumPort)
+        {
+            string htmlTemplate = @"
+            <!DOCTYPE html>
+            <html lang=""en"">
+            <head>
+                <meta charset=""UTF-8"">
+                <title>Appium Wizard Server Logs</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+                    #container { position: relative; height: 100vh; overflow: hidden; }
+                    #header { position: relative; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 4px; }
+                    #content { padding: 20px; overflow-y: auto; height: calc(100% - 50px); white-space: pre-wrap; background-color: #f4f4f4; }
+                    #title { text-align: center; font-size: 18px; font-weight: bold; background-color: #0078d7; color: white; flex-grow: 1; }
+                </style>
+            </head>
+            <body>
+                <div id=""container"">
+                    <div id=""header"">
+                        <div id=""title"">Appium Wizard Server Logs</div>
+                        <div>
+                            <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
+                            <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
+                        </div>
+                    </div>
+                    <pre id=""content""></pre>
+                </div>
+                <script>
+                    const contentElement = document.getElementById('content');
+                    const autoScrollCheckbox = document.getElementById('autoScroll');
+                    const pauseFetchCheckbox = document.getElementById('pauseFetch');
+
+                    function fetchTextFile() {
+                        if (pauseFetchCheckbox.checked) {
+                            return; // Do not fetch if pause is checked
+                        }
+                        fetch('/file') // Fetch the file from the server's /file endpoint
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.text();
+                            })
+                            .then(text => {
+                                contentElement.textContent = text;
+                                if (autoScrollCheckbox.checked) {
+                                    contentElement.scrollTop = contentElement.scrollHeight;
+                                }
+                            })
+                            .catch(error => {
+                                contentElement.textContent = 'Error loading file: ' + error;
+                            });
+                    }
+                    fetchTextFile();
+                    setInterval(fetchTextFile, 1000);
+                </script>
+            </body>
+            </html>";
+        
+            htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");
+            // Save the updated HTML content to a temporary file
+            string tempHtmlFilePath = Path.Combine(Path.GetTempPath(), $"GeneratedHtml_{Guid.NewGuid()}.html");
+            File.WriteAllText(tempHtmlFilePath, htmlTemplate);
+
+            // Return the path to the saved HTML file
+            return tempHtmlFilePath;
         }
     }
 

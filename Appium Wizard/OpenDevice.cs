@@ -9,7 +9,7 @@ namespace Appium_Wizard
         public string WDAsessionId = "", UIAutomatorSessionId = "", URL;
         int width, height, proxyPort, screenServerPort;
         public string IPAddress = "localhost";
-        string deviceName, udid, OSType, OSVersion, connectionType;
+        string deviceName, udid, OSType, OSVersion, connectionType, deviceModel;
         bool isScreenServerStarted = false;
         string title;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -21,6 +21,7 @@ namespace Appium_Wizard
             this.OSVersion = selectedVersion;
             this.connectionType = connectionType;
             var screeSize = getDeviceScreenSize(udid);
+            this.deviceModel = getDeviceModel(udid);
             this.width = screeSize.Item1;
             this.height = screeSize.Item2;
             title = "Opening " + deviceName;
@@ -32,41 +33,73 @@ namespace Appium_Wizard
 
         public (int, int) getDeviceScreenSize(string udid)
         {
-            var devicesList = Database.QueryDataFromDevicesTable();
-            foreach (var dictionary in devicesList)
+            try
             {
-                if (dictionary["UDID"].Equals(udid))
+                var devicesList = Database.QueryDataFromDevicesTable();
+                foreach (var dictionary in devicesList)
                 {
-                    int Width = int.Parse(dictionary["Width"]);
-                    int Height = int.Parse(dictionary["Height"]);
-                    return (Width, Height);
+                    if (dictionary["UDID"].Equals(udid))
+                    {
+                        int Width = int.Parse(dictionary["Width"]);
+                        int Height = int.Parse(dictionary["Height"]);
+                        return (Width, Height);
+                    }
                 }
             }
+            catch (Exception)
+            {
+            }           
             return (0, 0);
         }
 
+        public string getDeviceModel(string udid)
+        {
+            try
+            {
+                var devicesList = Database.QueryDataFromDevicesTable();
+                foreach (var dictionary in devicesList)
+                {
+                    if (dictionary["UDID"].Equals(udid))
+                    {
+                        return dictionary["Model"].ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return "";
+        }
+
+
         public async Task<bool> StartBackgroundTasks()
         {
-            commonProgress.Owner = MainScreen.main;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel(title, "Initializing...", 5);
-            if (OSType.Equals("Android"))
+            try
             {
-                await ExecuteAndroid();
+                commonProgress.Owner = MainScreen.main;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel(title, "Initializing...", 5);
+                if (OSType.Equals("Android"))
+                {
+                    await ExecuteAndroid();
+                }
+                else
+                {
+                    await ExecuteiOSBackgroundMethod();
+                }
+                if (isScreenServerStarted)
+                {
+                    commonProgress.UpdateStepLabel(title, "Screen server started...", 90);
+                    ExecuteBackgroundMethod2(commonProgress);
+                }
+                else
+                {
+                    commonProgress.Close();
+                    // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception)
             {
-                await ExecuteiOSBackgroundMethod();
-            }
-            if (isScreenServerStarted)
-            {
-                commonProgress.UpdateStepLabel(title, "Screen server started...", 90);               
-                ExecuteBackgroundMethod2(commonProgress);
-            }
-            else
-            {
-                commonProgress.Close();
-                // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return isScreenServerStarted;
         }
@@ -79,17 +112,17 @@ namespace Appium_Wizard
         {
             bool usePreInstalledWDA = MainScreen.UDIDPreInstalledWDA.ContainsKey(udid);
             Logger.Info("usePreInstalledWDA : " + usePreInstalledWDA);
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
-                var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-                if (!deviceList.Contains(udid))
-                {
-                    MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    isScreenServerStarted = false;
-                    return;
-                }
                 try
                 {
+                    var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
+                    if (!deviceList.Contains(udid))
+                    {
+                        MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isScreenServerStarted = false;
+                        return;
+                    }
                     if (deviceDetails.ContainsKey(udid))
                     {
                         Logger.Info("deviceDetails.ContainsKey : "+udid);
@@ -168,6 +201,7 @@ namespace Appium_Wizard
                             keyValuePairs = new Dictionary<object, object>();
                             bool installedNow = false;
                             bool isRunning = false;
+                            bool installationTried = false;
                             if (!wdaCheck)
                             {
                                 if (usePreInstalledWDA)
@@ -179,6 +213,14 @@ namespace Appium_Wizard
                                     commonProgress.UpdateStepLabel(title, "Please wait while installing WebDriverAgent, this may take some time...", 35);
                                 }
                                 installedNow = iOSMethods.GetInstance().InstallWDA(udid);
+                                installationTried = true;
+                            }
+                            if (!installedNow && installationTried)
+                            {
+                                commonProgress.Close();
+                                isScreenServerStarted = false;
+                                MessageBox.Show("Unable to Install WebDriverAgentRunner. Go to Tools->iOS profile management -> Delete all the profiles, add again and then try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
                             }
                             if (installedNow)
                             {
@@ -267,6 +309,13 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
+                                if (output.Contains("MountImage: failed to get signature from Apple"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Mounting image failed. Please check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
                                 if (!iOSMethods.GetInstance().isImageMounted(udid))
                                 {
                                     iOSMethods.GetInstance().MountImage(udid);
@@ -528,11 +577,11 @@ namespace Appium_Wizard
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
             }
             else
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel);
             }
             screenForm.Name = udid;
             commonProgress.UpdateStepLabel(title, "Loading the screen...", 95);

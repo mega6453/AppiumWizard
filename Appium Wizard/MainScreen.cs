@@ -1,7 +1,11 @@
 ﻿using Appium_Wizard.Properties;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 using Newtonsoft.Json;
 using NLog;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
 {
@@ -23,7 +27,8 @@ namespace Appium_Wizard
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+        private Timer uncheckTimer; private Timer highlightTimer;
+        public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();
 
         public MainScreen()
         {
@@ -38,7 +43,76 @@ namespace Appium_Wizard
             {
                 releaseInfo = Common.GetLatestReleaseInfo();
             }
+            InitializeWebViews();
         }
+        string defaultText = "Appium Server Not Running. Go to Server->Config to start the server...";
+        private async void InitializeWebViews()
+        {
+            await ConfigureWebView(1, server1WebView, defaultText);
+            await ConfigureWebView(2, server2WebView, defaultText);
+            await ConfigureWebView(3, server3WebView, defaultText);
+            await ConfigureWebView(4, server4WebView, defaultText);
+            await ConfigureWebView(5, server5WebView, defaultText);
+        }
+
+        private async Task ConfigureWebView(int serverNumber, WebView2 webView, string defaultText)
+        {
+            serverNumberWebView[serverNumber] = webView;
+            // Ensure the WebView2 environment is initialized
+            await webView.EnsureCoreWebView2Async();
+
+            // Attach ContextMenuRequested event to disable right-click
+            webView.CoreWebView2.ContextMenuRequested += CoreWebView2_ContextMenuRequested;
+
+            // Set default text using NavigateToString
+            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
+            {
+                StartLogsServer(serverNumber);
+            }
+            else
+            {
+                SetDefaultText(webView, defaultText);
+            }
+        }
+
+        private void SetDefaultText(WebView2 webView, string defaultText)
+        {
+            string htmlContent = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100%;
+                            margin: 0;
+                            background-color: #f0f0f0;
+                        }}
+                        div {{
+                            text-align: center;
+                            color: #555;
+                            font-size: 20px;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div>{defaultText}</div>
+                </body>
+                </html>";
+            webView.NavigateToString(htmlContent);
+        }
+
+        private void CoreWebView2_ContextMenuRequested(object sender, CoreWebView2ContextMenuRequestedEventArgs e)
+        {
+            // Suppress the context menu
+            e.Handled = true;
+        }
+
+
+
         private void onFormLoad(object sender, EventArgs e)
         {
             try
@@ -53,11 +127,6 @@ namespace Appium_Wizard
                     {
                         string updateMessage = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
                         ShowMessage(updateMessage);
-                    }
-                    else
-                    {
-                        string tipMessage = "Note: The app may lag due to frequent appium server log updates. To prevent this, keep the 'Show Logs' checkbox unchecked. Enable it only when you need to view the logs.";
-                        ShowMessage(tipMessage);
                     }
                 }
                 var result = Database.QueryDataFromNotificationsTable();
@@ -112,20 +181,8 @@ namespace Appium_Wizard
                 var size = new Size(this.Width - totalColumnWidth - 100, this.Height - 150);
                 tabControl1.Left = listView1.Width + 50;
                 tabControl1.Size = size;
-                richTextBox1.Size = size;
-                richTextBox2.Size = size;
-                richTextBox3.Size = size;
-                richTextBox4.Size = size;
-                richTextBox5.Size = size;
-
-                int checkBoxX = tabControl1.Right - autoScrollCheckBox.Width;
-                int checkBoxY = tabControl1.Top;
-
-                // Set the CheckBox location
-                autoScrollCheckBox.Location = new Point(checkBoxX, checkBoxY);
-                showLogsCheckBox.Location = new Point(checkBoxX - 150, checkBoxY);
-                ToolTip toolTip = new ToolTip();
-                toolTip.SetToolTip(showLogsCheckBox, "Uncheck this to fix Appium Wizard UI lagging issue while test running. This is a temporary fix.");
+                var webviewSize = new Size(size.Width, size.Height - 50);
+                openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
@@ -188,78 +245,9 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
-            for (int i = 1; i <= 5; i++)
-            {
-                UpdateRichTextbox(i);
-            }
+            //tabControl1.SelectedIndex = 0;
+            //tabControl1_SelectedIndexChanged(tabControl1, EventArgs.Empty);
             GoogleAnalytics.SendEvent("MainScreen_Shown");
-        }
-
-        public void UpdateRichTextbox(int tabNumber)
-        {
-            try
-            {
-                if (showLogsCheckBox.Checked)
-                {
-                    if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(tabNumber))
-                    {
-                        using (var fileStream = new FileStream(AppiumServerSetup.portServerNumberAndFilePath[tabNumber].Item2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                        using (var streamReader = new StreamReader(fileStream))
-                        {
-                            var fileContent = streamReader.ReadToEnd();
-                            if (tabNumber == 1 && richTextBox1.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox1.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 2 && richTextBox2.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox2.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 3 && richTextBox3.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox3.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 4 && richTextBox4.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox4.Text = fileContent + "\n\n"));
-                            }
-                            else if (tabNumber == 5 && richTextBox5.IsHandleCreated)
-                            {
-                                Invoke(new Action(() => richTextBox5.Text = fileContent + "\n\n"));
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e);
-            }
-        }
-
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            if (showLogsCheckBox.Checked)
-            {
-                for (int i = 1; i <= 5; i++)
-                {
-                    UpdateRichTextbox(i);
-                }
-            }
-        }
-
-        public void UpdateShowLogsCheckbox(bool enable)
-        {
-            if (this.InvokeRequired)
-            {
-                // If called from a different thread, use Invoke to run on the UI thread
-                this.Invoke(new Action(() => UpdateShowLogsCheckbox(enable)));
-            }
-            else
-            {
-                // If already on the UI thread, directly update the checkbox
-                showLogsCheckBox.Checked = enable;
-            }
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -948,7 +936,7 @@ namespace Appium_Wizard
             }
             else
             {
-                moreButtonToolTip.SetToolTip(MoreButton,string.Empty);
+                moreButtonToolTip.SetToolTip(MoreButton, string.Empty);
             }
         }
 
@@ -1201,74 +1189,6 @@ namespace Appium_Wizard
             iOSProfileManagement.ShowDialog();
         }
 
-
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                richTextBox1.SelectionStart = richTextBox1.Text.Length;
-                richTextBox1.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox1.SelectionStart = richTextBox1.Text.Length;
-            }
-        }
-
-        private void richTextBox2_TextChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                richTextBox2.SelectionStart = richTextBox2.Text.Length;
-                richTextBox2.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox2.SelectionStart = richTextBox2.Text.Length;
-            }
-        }
-
-        private void richTextBox3_TextChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                richTextBox3.SelectionStart = richTextBox3.Text.Length;
-                richTextBox3.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox3.SelectionStart = richTextBox3.Text.Length;
-            }
-        }
-
-
-        private void richTextBox4_TextChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                richTextBox4.SelectionStart = richTextBox4.Text.Length;
-                richTextBox4.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox4.SelectionStart = richTextBox4.Text.Length;
-            }
-        }
-
-
-        private void richTextBox5_TextChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                richTextBox5.SelectionStart = richTextBox5.Text.Length;
-                richTextBox5.ScrollToCaret();
-            }
-            else
-            {
-                richTextBox5.SelectionStart = richTextBox5.Text.Length;
-            }
-        }
-
         private void listView1_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -1295,18 +1215,6 @@ namespace Appium_Wizard
             TroubleShooter troubleShooter = new TroubleShooter();
             await troubleShooter.FindIssues();
             troubleShooter.ShowDialog(this);
-        }
-
-        private void AutoScrollCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (autoScrollCheckBox.Checked)
-            {
-                GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Checked");
-            }
-            else
-            {
-                GoogleAnalytics.SendEvent("Auto_Scroll_CheckBox_Unchecked");
-            }
         }
 
         private void androidWiFiToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2071,104 +1979,226 @@ namespace Appium_Wizard
             string deviceOS = "Device OS - " + selectedOS;
             string deviceOSVersion = "OS Version - " + selectedDeviceVersion;
             string deviceModel = "Model - " + selectedDeviceModel;
-            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel;
+            string udid = "UDID - " + selectedUDID;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
             Clipboard.SetText(deviceDetails);
             GoogleAnalytics.SendEvent("copyDeviceDetailsToolStripMenuItem_Click");
         }
 
-        private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
+
+        private void testRunnerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.LinkText))
+            TestRunner testRunner = new TestRunner();
+            testRunner.Show();
+        }
+
+        private void openLogsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TabPage selectedTab = tabControl1.SelectedTab;
+                int selectedIndex = tabControl1.SelectedIndex;
+                int serverNumber = selectedIndex + 1;
+                if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
+                {
+                    int logsPort;
+                    if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
+                    {
+                        int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                        string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
+                        string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber);
+                        logsPort = Common.GetFreePort();
+                        _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
+                    }
+                    else
+                    {
+                        logsPort = Common.serverNumberPortNumber[serverNumber];
+                    }
+                    ProcessStartInfo psInfo = new ProcessStartInfo
+                    {
+                        FileName = "http://localhost:" + logsPort + "/index.html",
+                        UseShellExecute = true
+                    };
+                    Process.Start(psInfo);
+                }
+                else
+                {
+                    MessageBox.Show("Appium server is not running in tab " + serverNumber + ". Please start the server and then try again. Go to Server->Config to start server.", "Server Not Running", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error occured in Starting Server logs, Please report in github with steps. Exception : " + ex.Message, "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        public static ConcurrentDictionary<int, bool> serverUrlLoaded = new ConcurrentDictionary<int, bool>();
+
+        public void StartLogsServer(int serverNumber)
+        {
+            try
+            {
+                if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
+                {
+                    int logsPort;
+                    if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
+                    {
+                        int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                        string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
+                        string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber);
+                        logsPort = Common.GetFreePort();
+                        _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
+                    }
+                    else
+                    {
+                        logsPort = Common.serverNumberPortNumber[serverNumber];
+                    }
+                    string url = "http://localhost:" + logsPort + "/index.html";
+                    WaitForServerToStart(url);
+                    if (!serverUrlLoaded.GetOrAdd(serverNumber, false))
+                    {
+                        if (serverNumberWebView.ContainsKey(serverNumber))
+                        {
+                            LoadUrlInWebView(serverNumberWebView[serverNumber], url);
+                            serverUrlLoaded[serverNumber] = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error occured in Starting Server logs, Please report in github with steps. Exception : "+ex.Message, "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }          
+        }
+
+        private bool WaitForServerToStart(string url, int timeoutMilliseconds = 5000)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.ElapsedMilliseconds < timeoutMilliseconds)
             {
                 try
                 {
-                    Process.Start(new ProcessStartInfo
+                    using (var client = new HttpClient())
                     {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
+                        var response = client.GetAsync(url).Result;
+                        if (response.IsSuccessStatusCode)
+                        {
+                            return true; // Server is ready
+                        }
+                    }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Ignore exceptions (e.g., server not started yet)
+                }
+                Thread.Sleep(100); // Wait for 100ms before retrying
+            }
+            return false; // Timeout
+        }
+
+        public void LoadUrlInWebView(WebView2 webView, string url)
+        {
+            if (webView.InvokeRequired)
+            {
+                // Marshal the call back to the UI thread
+                webView.Invoke(new Action(() => LoadUrlInWebView(webView, url)));
+            }
+            else
+            {
+                try
+                {
+                    webView.Source = new Uri(url);
+                }
+                catch (UriFormatException ex)
+                {
+                    MessageBox.Show($"Invalid URL format: {url}\nError: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void richTextBox2_LinkClicked(object sender, LinkClickedEventArgs e)
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.LinkText))
+            int appiumPortNumber, serverNumber = tabControl1.SelectedIndex + 1;
+            string text = "Open logs in browser";
+            if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
             {
-                try
+                appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                text = "Open logs in browser - " + appiumPortNumber;
+            }
+
+            openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+            openLogsButton.Text = text;
+        }
+
+
+        public void SelectTab(int serverNumber, bool start)
+        {
+            int tabIndex = serverNumber - 1;
+            tabControl1.SelectedIndex = tabIndex;
+            UpdateOpenLogsButtonText(serverNumber, start);
+        }
+
+        public void UpdateOpenLogsButtonText(int serverNumber, bool start)
+        {
+            if (openLogsButton.InvokeRequired)
+            {
+                openLogsButton.Invoke(new Action(() => UpdateOpenLogsButtonText(serverNumber, start)));
+            }
+            else
+            {
+                int appiumPortNumber;
+                if (start)
                 {
-                    Process.Start(new ProcessStartInfo
+                    if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
                     {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
+                        appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                        string text = "Open logs in browser - " + appiumPortNumber;
+                        openLogsButton.Text = text;
+                        openLogsButton.Visible = true;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    openLogsButton.Text = "Open logs in browser";
+                    openLogsButton.Visible = false;
                 }
             }
         }
 
-        private void richTextBox3_LinkClicked(object sender, LinkClickedEventArgs e)
+        public void UpdateTabText(int serverNumber, int portNumber, bool start)
         {
-            if (!string.IsNullOrEmpty(e.LinkText))
+            int tabIndex = serverNumber - 1;
+            if (tabControl1.InvokeRequired)
             {
-                try
+                tabControl1.Invoke(new Action(() => UpdateTabText(serverNumber, portNumber, start)));
+            }
+            else
+            {
+                if (start)
                 {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
+                    tabControl1.TabPages[tabIndex].Text = "#" + serverNumber + " - " + portNumber;
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    tabControl1.TabPages[tabIndex].Text = "#" + serverNumber;
                 }
             }
         }
 
-        private void richTextBox4_LinkClicked(object sender, LinkClickedEventArgs e)
+        private void tabControl1_Resize(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
         }
 
-        private void richTextBox5_LinkClicked(object sender, LinkClickedEventArgs e)
+        private void openLogsButton_Resize(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.LinkText))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = e.LinkText,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to open the link: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+        }
+
+        public void UpdateWebViewDefaultText(int serverNumber)
+        {
+            SetDefaultText(serverNumberWebView[serverNumber], defaultText);
         }
     }
 }

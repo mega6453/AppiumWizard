@@ -45,8 +45,17 @@
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
+            infoToolStripMenuItem1 = new ToolStripMenuItem();
+            infoToolStripMenuItem = new ToolStripMenuItem();
+            copyProxyPortToolStripMenuItem1 = new ToolStripMenuItem();
+            copyScreenPortToolStripMenuItem1 = new ToolStripMenuItem();
+            copySessionIDToolStripMenuItem1 = new ToolStripMenuItem();
+            copySessionURLToolStripMenuItem1 = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
             objectSpyButton = new ToolStripButton();
+            RecordAndStopRecordingSteps = new ToolStripSplitButton();
+            playStepsToolStripMenuItem = new ToolStripMenuItem();
+            readMeToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
@@ -63,7 +72,7 @@
             ScreenWebView.Location = new Point(0, 0);
             ScreenWebView.Margin = new Padding(2);
             ScreenWebView.Name = "ScreenWebView";
-            ScreenWebView.Size = new Size(398, 346);
+            ScreenWebView.Size = new Size(452, 346);
             ScreenWebView.TabIndex = 0;
             ScreenWebView.ZoomFactor = 1D;
             ScreenWebView.KeyPress += SendKeys;
@@ -76,12 +85,12 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSeparator3, toolStripSeparator1, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, toolStripSeparator2, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, toolStripSeparator4, objectSpyButton, RecordAndStopRecordingSteps });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.RenderMode = ToolStripRenderMode.System;
-            toolStrip1.Size = new Size(398, 31);
+            toolStrip1.Size = new Size(452, 31);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -93,6 +102,7 @@
             AlwaysOnTopToolStripButton.ImageTransparentColor = Color.Magenta;
             AlwaysOnTopToolStripButton.Name = "AlwaysOnTopToolStripButton";
             AlwaysOnTopToolStripButton.Size = new Size(28, 28);
+            AlwaysOnTopToolStripButton.ToolTipText = "Always on Top";
             AlwaysOnTopToolStripButton.Click += AlwaysOnTop_Click;
             // 
             // toolStripSeparator3
@@ -115,6 +125,7 @@
             BackToolStripButton.ImageTransparentColor = Color.Magenta;
             BackToolStripButton.Name = "BackToolStripButton";
             BackToolStripButton.Size = new Size(28, 28);
+            BackToolStripButton.ToolTipText = "Back";
             BackToolStripButton.Click += BackButton_Click;
             // 
             // HomeToolStripButton
@@ -126,6 +137,7 @@
             HomeToolStripButton.ImageTransparentColor = Color.Magenta;
             HomeToolStripButton.Name = "HomeToolStripButton";
             HomeToolStripButton.Size = new Size(28, 28);
+            HomeToolStripButton.ToolTipText = "Home";
             HomeToolStripButton.Click += HomeButton_Click;
             // 
             // recentAppsToolStripButton
@@ -136,6 +148,7 @@
             recentAppsToolStripButton.ImageTransparentColor = Color.Magenta;
             recentAppsToolStripButton.Name = "recentAppsToolStripButton";
             recentAppsToolStripButton.Size = new Size(28, 28);
+            recentAppsToolStripButton.ToolTipText = "Recent Apps";
             recentAppsToolStripButton.Click += recentAppsToolStripButton_Click;
             // 
             // ControlCenterToolStripButton
@@ -148,6 +161,7 @@
             ControlCenterToolStripButton.ImageTransparentColor = Color.Magenta;
             ControlCenterToolStripButton.Name = "ControlCenterToolStripButton";
             ControlCenterToolStripButton.Size = new Size(28, 28);
+            ControlCenterToolStripButton.ToolTipText = "Control Center/Notifications";
             ControlCenterToolStripButton.Click += controlCenter_Click;
             // 
             // SettingsToolStripButton
@@ -158,6 +172,7 @@
             SettingsToolStripButton.ImageTransparentColor = Color.Magenta;
             SettingsToolStripButton.Name = "SettingsToolStripButton";
             SettingsToolStripButton.Size = new Size(28, 28);
+            SettingsToolStripButton.ToolTipText = "Settings";
             SettingsToolStripButton.Click += SettingsToolStripButton_Click;
             // 
             // toolStripSeparator2
@@ -174,6 +189,7 @@
             RecordButton.ImageTransparentColor = Color.Magenta;
             RecordButton.Name = "RecordButton";
             RecordButton.Size = new Size(28, 28);
+            RecordButton.ToolTipText = "Record Screen";
             RecordButton.Click += RecordButton_Click;
             // 
             // ScreenshotToolStripButton
@@ -184,22 +200,24 @@
             ScreenshotToolStripButton.ImageTransparentColor = Color.Magenta;
             ScreenshotToolStripButton.Name = "ScreenshotToolStripButton";
             ScreenshotToolStripButton.Size = new Size(28, 28);
+            ScreenshotToolStripButton.ToolTipText = "Take Screenshot";
             ScreenshotToolStripButton.Click += Screenshot_Click;
             // 
             // MoreToolStripButton
             // 
             MoreToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem });
+            MoreToolStripButton.DropDownItems.AddRange(new ToolStripItem[] { UnlockScreen, manageAppsToolStripMenuItem, infoToolStripMenuItem1, infoToolStripMenuItem });
             MoreToolStripButton.Image = Properties.Resources.ellipsis;
             MoreToolStripButton.ImageTransparentColor = Color.Magenta;
             MoreToolStripButton.Name = "MoreToolStripButton";
             MoreToolStripButton.Size = new Size(37, 28);
+            MoreToolStripButton.ToolTipText = "More...";
             // 
             // UnlockScreen
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(149, 22);
+            UnlockScreen.Size = new Size(188, 30);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -207,9 +225,53 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(149, 22);
+            manageAppsToolStripMenuItem.Size = new Size(188, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
+            // 
+            // infoToolStripMenuItem1
+            // 
+            infoToolStripMenuItem1.Image = Properties.Resources.information;
+            infoToolStripMenuItem1.Name = "infoToolStripMenuItem1";
+            infoToolStripMenuItem1.Size = new Size(188, 30);
+            infoToolStripMenuItem1.Text = "Copy Device Info";
+            infoToolStripMenuItem1.Click += infoToolStripMenuItem1_Click;
+            // 
+            // infoToolStripMenuItem
+            // 
+            infoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyProxyPortToolStripMenuItem1, copyScreenPortToolStripMenuItem1, copySessionIDToolStripMenuItem1, copySessionURLToolStripMenuItem1 });
+            infoToolStripMenuItem.Image = Properties.Resources.information;
+            infoToolStripMenuItem.Name = "infoToolStripMenuItem";
+            infoToolStripMenuItem.Size = new Size(188, 30);
+            infoToolStripMenuItem.Text = "Other Info";
+            // 
+            // copyProxyPortToolStripMenuItem1
+            // 
+            copyProxyPortToolStripMenuItem1.Name = "copyProxyPortToolStripMenuItem1";
+            copyProxyPortToolStripMenuItem1.Size = new Size(180, 22);
+            copyProxyPortToolStripMenuItem1.Text = "Copy Proxy Port";
+            copyProxyPortToolStripMenuItem1.Click += copyProxyPortToolStripMenuItem_Click;
+            // 
+            // copyScreenPortToolStripMenuItem1
+            // 
+            copyScreenPortToolStripMenuItem1.Name = "copyScreenPortToolStripMenuItem1";
+            copyScreenPortToolStripMenuItem1.Size = new Size(180, 22);
+            copyScreenPortToolStripMenuItem1.Text = "Copy Screen Port";
+            copyScreenPortToolStripMenuItem1.Click += copyScreenPortToolStripMenuItem_Click;
+            // 
+            // copySessionIDToolStripMenuItem1
+            // 
+            copySessionIDToolStripMenuItem1.Name = "copySessionIDToolStripMenuItem1";
+            copySessionIDToolStripMenuItem1.Size = new Size(180, 22);
+            copySessionIDToolStripMenuItem1.Text = "Copy Session ID";
+            copySessionIDToolStripMenuItem1.Click += copySessionIDToolStripMenuItem_Click;
+            // 
+            // copySessionURLToolStripMenuItem1
+            // 
+            copySessionURLToolStripMenuItem1.Name = "copySessionURLToolStripMenuItem1";
+            copySessionURLToolStripMenuItem1.Size = new Size(180, 22);
+            copySessionURLToolStripMenuItem1.Text = "Copy Session URL";
+            copySessionURLToolStripMenuItem1.Click += copySessionURLToolStripMenuItem_Click;
             // 
             // toolStripSeparator4
             // 
@@ -225,7 +287,36 @@
             objectSpyButton.ImageTransparentColor = Color.Magenta;
             objectSpyButton.Name = "objectSpyButton";
             objectSpyButton.Size = new Size(28, 28);
+            objectSpyButton.ToolTipText = "Object Spy";
             objectSpyButton.Click += objectSpyButton_Click;
+            // 
+            // RecordAndStopRecordingSteps
+            // 
+            RecordAndStopRecordingSteps.Alignment = ToolStripItemAlignment.Right;
+            RecordAndStopRecordingSteps.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            RecordAndStopRecordingSteps.DropDownItems.AddRange(new ToolStripItem[] { playStepsToolStripMenuItem, readMeToolStripMenuItem });
+            RecordAndStopRecordingSteps.Image = Properties.Resources.RecordSteps;
+            RecordAndStopRecordingSteps.ImageTransparentColor = Color.Magenta;
+            RecordAndStopRecordingSteps.Name = "RecordAndStopRecordingSteps";
+            RecordAndStopRecordingSteps.Size = new Size(40, 28);
+            RecordAndStopRecordingSteps.ToolTipText = "Record and Playback";
+            RecordAndStopRecordingSteps.ButtonClick += RecordAndStopRecordingSteps_ButtonClick;
+            // 
+            // playStepsToolStripMenuItem
+            // 
+            playStepsToolStripMenuItem.Image = Properties.Resources.play;
+            playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
+            playStepsToolStripMenuItem.Size = new Size(127, 22);
+            playStepsToolStripMenuItem.Text = "Play Steps";
+            playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
+            // 
+            // readMeToolStripMenuItem
+            // 
+            readMeToolStripMenuItem.Image = Properties.Resources.readme;
+            readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
+            readMeToolStripMenuItem.Size = new Size(127, 22);
+            readMeToolStripMenuItem.Text = "Read me";
+            readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -234,7 +325,7 @@
             statusStrip1.Location = new Point(0, 324);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.ShowItemToolTips = true;
-            statusStrip1.Size = new Size(398, 22);
+            statusStrip1.Size = new Size(452, 22);
             statusStrip1.TabIndex = 3;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -245,7 +336,7 @@
             toolStripStatusLabel.BorderStyle = Border3DStyle.Adjust;
             toolStripStatusLabel.Font = new Font("Arial Narrow", 8F);
             toolStripStatusLabel.Name = "toolStripStatusLabel";
-            toolStripStatusLabel.Size = new Size(352, 17);
+            toolStripStatusLabel.Size = new Size(437, 17);
             toolStripStatusLabel.Spring = true;
             toolStripStatusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -253,7 +344,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(398, 377);
+            ClientSize = new Size(452, 377);
             Controls.Add(statusStrip1);
             Controls.Add(ScreenWebView);
             Controls.Add(toolStrip1);
@@ -300,5 +391,14 @@
         private ToolStripButton recentAppsToolStripButton;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
+        private ToolStripSplitButton RecordAndStopRecordingSteps;
+        private ToolStripMenuItem playStepsToolStripMenuItem;
+        private ToolStripMenuItem readMeToolStripMenuItem;
+        private ToolStripMenuItem infoToolStripMenuItem;
+        private ToolStripMenuItem infoToolStripMenuItem1;
+        private ToolStripMenuItem copyProxyPortToolStripMenuItem1;
+        private ToolStripMenuItem copyScreenPortToolStripMenuItem1;
+        private ToolStripMenuItem copySessionIDToolStripMenuItem1;
+        private ToolStripMenuItem copySessionURLToolStripMenuItem1;
     }
 }

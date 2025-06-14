@@ -152,7 +152,7 @@ namespace Appium_Wizard
                 if (executable == iOSExecutable.go)
                 {
                     Logger.Info("GetListOfInstalledApps - execute with go...");
-                    var output = ExecuteCommand("apps --list", udid,true,10000);
+                    var output = ExecuteCommand("apps --list", udid, true, 10000);
                     string pattern = @"(\w+(\.\w+)*)\s";
                     MatchCollection matches = Regex.Matches(output, pattern);
 
@@ -436,9 +436,9 @@ namespace Appium_Wizard
         {
             string WDAPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\wda.ipa";
             string signedIPA = SignIPA(udid, WDAPath);
-            if (signedIPA.Equals("notsigned"))
+            if (signedIPA.Equals("notsigned") | signedIPA.Equals("Sign_IPA_Failed"))
             {
-                Logger.Info("InstallWDA, notsigned");
+                Logger.Info("InstallWDA - " + signedIPA);
                 return false;
             }
             else
@@ -1840,7 +1840,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -1868,7 +1868,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session", Method.Post);
@@ -1897,7 +1897,7 @@ namespace Appium_Wizard
             int width, height;
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/window/size", Method.Get);
@@ -1917,7 +1917,7 @@ namespace Appium_Wizard
             return (width, height);
         }
 
-        public static void Tap(string URL, string sessionId, int pressX, int pressY)
+        public static string Tap(string URL, string sessionId, int pressX, int pressY)
         {
             var options = new RestClientOptions(URL);
             var client = new RestClient(options);
@@ -1929,13 +1929,14 @@ namespace Appium_Wizard
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
-        public static void SendText(string URL, string sessionId, string text)
+        public static string SendText(string URL, string sessionId, string text)
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
@@ -1946,13 +1947,34 @@ namespace Appium_Wizard
             request.AddStringBody(body, DataFormat.Json);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
+        }
+
+        public static string SendText(string udid, string URL, string sessionId, string element, string text)
+        {
+            string elementId = FindElement(URL, sessionId, element);
+            GetElementRectAndDraw(udid, URL, sessionId, elementId, "rectangle");
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            var client = new RestClient(options);
+            //var request = new RestRequest("/session/" + sessionId + "/actions", Method.Post);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/value", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            //var body = $@"{{""actions"": [{{""type"": ""key"",""id"": ""keyboard"",""actions"":[{{ ""type"": ""keyDown"", ""value"": ""{text}"" }},{{ ""type"": ""keyUp"", ""value"": ""{text}"" }}]}}]}}";
+            var body = $@"{{""value"":[""{text}""]}}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static void Swipe(string URL, string sessionId, int pressX, int pressY, int moveToX, int moveToY, int waitDuration)
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             //var request = new RestRequest("/session/" + sessionId + "/wda/touch/perform", Method.Post);
@@ -1969,7 +1991,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/unlock", Method.Post);
@@ -1977,11 +1999,11 @@ namespace Appium_Wizard
             Console.WriteLine(response.Content);
         }
 
-        public static void GoToHome(int proxyPort)
+        public static string GoToHome(int proxyPort)
         {
             var options = new RestClientOptions("http://localhost:" + proxyPort)
             {
-                Timeout = TimeSpan.FromSeconds(2)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/wda/homescreen", Method.Post);
@@ -1989,6 +2011,7 @@ namespace Appium_Wizard
             request.AddParameter("text/plain", body, ParameterType.RequestBody);
             RestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+            return response.StatusDescription;
         }
 
         public static void OpenControlCenter(string URL, string sessionId, int screenWidth, int screenHeight)
@@ -2014,7 +2037,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/sessions", Method.Get);
@@ -2038,7 +2061,7 @@ namespace Appium_Wizard
         {
             var options = new RestClientOptions(URL)
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
+                Timeout = TimeSpan.FromSeconds(30)
             };
             var client = new RestClient(options);
             var request = new RestRequest("/session/" + sessionId + "", Method.Get);
@@ -2092,53 +2115,75 @@ namespace Appium_Wizard
 
         public static string LaunchApp(string URL, string sessionId, string bundleId)
         {
-            var options = new RestClientOptions(URL)
+            try
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
-            var body = $@"{{""bundleId"": ""{bundleId}""}}";
-            request.AddParameter("text/plain", body, ParameterType.RequestBody);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
-            return response.Content;
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/wda/apps/launch", Method.Post);
+                var body = $@"{{""bundleId"": ""{bundleId}""}}";
+                request.AddParameter("text/plain", body, ParameterType.RequestBody);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                return response.StatusDescription;
+            }
+            catch (Exception ex)
+            {
+                return "Exception : " + ex.Message;
+            }
         }
 
         public static string KillApp(string URL, string sessionId, string bundleId)
         {
-            var options = new RestClientOptions(URL)
+            try
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
-            var body = $@"{{""bundleId"": ""{bundleId}""}}";
-            request.AddParameter("text/plain", body, ParameterType.RequestBody);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
-            return response.Content;
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/wda/apps/terminate", Method.Post);
+                var body = $@"{{""bundleId"": ""{bundleId}""}}";
+                request.AddParameter("text/plain", body, ParameterType.RequestBody);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                return response.Content;
+            }
+            catch (Exception ex)
+            {
+                return "Exception : " + ex.Message;
+            }
         }
 
-        public static void TakeScreenshot(string URL, string filePath)
+        public static string TakeScreenshot(string URL, string filePath)
         {
-            var options = new RestClientOptions(URL)
+            try
             {
-                Timeout = TimeSpan.FromMilliseconds(-1)
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/screenshot", Method.Get);
-            RestResponse response = client.Execute(request);
-            string jsonString = response.Content;
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+                string jsonString = response.Content;
 
-            JsonDocument doc = JsonDocument.Parse(jsonString);
-            string base64String = doc.RootElement.GetProperty("value").GetString();
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
 
-            byte[] imageBytes = Convert.FromBase64String(base64String);
-            using (MemoryStream ms = new MemoryStream(imageBytes))
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    Image image = Image.FromStream(ms);
+                    image.Save(filePath, ImageFormat.Png);
+                }
+                return response.StatusDescription;
+            }
+            catch (Exception ex)
             {
-                Image image = Image.FromStream(ms);
-                image.Save(filePath, ImageFormat.Png);
+                return "Exception : " + ex.Message;
             }
         }
 
@@ -2149,7 +2194,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/screenshot", Method.Get);
@@ -2178,7 +2223,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/status", Method.Get);
@@ -2213,7 +2258,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/wda/locked", Method.Get);
@@ -2226,44 +2271,184 @@ namespace Appium_Wizard
                 }
                 return "No";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "Error";
+                return "Exception : " + ex.Message;
             }
         }
 
-        public static string GetPageSource(int port)
+        public static string GetPageSource(int port, string sessionId = "")
         {
             string value = "empty";
             try
             {
                 string URL = "http://localhost:" + port;
-                string sessionId = GetWDASessionID(URL);
-                if (sessionId.Equals("nosession"))
+                if (string.IsNullOrEmpty(sessionId))
                 {
-                    CreateWDASession(port);
                     sessionId = GetWDASessionID(URL);
                 }
+
+                // Attempt to get the page source with the provided or new sessionId
+                value = AttemptGetPageSource(URL, sessionId);
+
+                // If the value indicates an invalid session, create a new session and retry
+                if (value == "Invalid session")
+                {
+                    Console.WriteLine("Session is invalid. Creating a new session...");
+                    CreateWDASession(port);
+                    sessionId = GetWDASessionID(URL);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = AttemptGetPageSource(URL, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
+                }
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                return "Exception while getting page source : " + ex.Message;
+            }
+        }
+
+        private static string AttemptGetPageSource(string URL, string sessionId)
+        {
+            try
+            {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);
                 RestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
+
+                if (!response.IsSuccessful || response.Content.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return "Invalid session";
+                }
+
                 using (JsonDocument doc = JsonDocument.Parse(response.Content))
                 {
                     JsonElement root = doc.RootElement;
-                    value = root.GetProperty("value").GetString();
+                    return root.GetProperty("value").GetString();
                 }
+            }
+            catch
+            {
+                return "Invalid session";
+            }
+        }
+
+        public static string FindElement(string URL, string sessionId, string XPath)
+        {
+            string elementId = string.Empty;
+            try
+            {
+                //string sessionId = GetWDASessionID(URL);
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                string body = $@"{{""value"": ""{XPath}"",""using"": ""xpath""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Exception : " + ex.Message;
+            }
+            return elementId;
+        }
+
+        public static string ClickElement(string udid, string URL, string sessionId, string XPath)
+        {
+            try
+            {
+                string elementId = FindElement(URL, sessionId, XPath);
+                GetElementRectAndDraw(udid,URL,sessionId,elementId,"dot");
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/click", Method.Post);
+                RestResponse response = client.Execute(request);
+                return response.StatusDescription;
+            }
+            catch (Exception ex)
+            {
+                return "Exception : " + ex.Message;
+            }
+        }
+
+        public static bool isElementDisplayed(string URL, string sessionId, string XPath)
+        {
+            try
+            {
+                string elementId = FindElement(URL, sessionId, XPath);
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/displayed", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic jsonObject = JsonConvert.DeserializeObject(response.Content);
+                bool value = jsonObject.value;
                 return value;
             }
             catch (Exception)
             {
-                return value;
+                return false;
             }
+        }
 
+        public static void GetElementRectAndDraw(string udid, string URL, string sessionId, string elementId, string draw)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic data = JsonConvert.DeserializeObject(response.Content);
+                int x = Convert.ToInt32(data.value.x);
+                int y = Convert.ToInt32(data.value.y);
+                int width = Convert.ToInt32(data.value.width);
+                int height = Convert.ToInt32(data.value.height);
+                ScreenControl screenControl = ScreenControl.udidScreenControl[udid];
+                if (draw == "dot")
+                {
+                    int updatedX = x + (width / 2);
+                    int updatedY = y + (height / 2);
+                    screenControl.DrawDot(screenControl, updatedX, updatedY);
+                }
+                else
+                {
+                    screenControl.DrawRectangle(screenControl, x, y, width, height);
+                }
+            }
+            catch (Exception)
+            {
+            }          
         }
     }
 }

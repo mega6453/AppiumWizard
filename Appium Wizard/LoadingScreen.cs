@@ -135,12 +135,12 @@ namespace Appium_Wizard
             int adbPort = 5037;
             AndroidMethods.GetInstance().StartAdbServer(adbPort);
             Common.DeleteLogFiles();
+            MainScreen mainForm = new MainScreen();
             UpdateStepLabel("Initializing User Interface...");
             var endTime = DateTime.Now;
             string timeTaken = Common.GetDuration(startTime, endTime);
             string info = "Completed - Time Taken : " + timeTaken;
             GoogleAnalytics.SendEvent(GoogleAnalytics.screenName.Loading_Screen, info);
-            MainScreen mainForm = new MainScreen();
             Hide();
             try
             {

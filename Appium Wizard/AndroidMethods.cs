@@ -1,11 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Management;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Windows.Media.Devices.Core;
 using static System.Windows.Forms.AxHost;
 
@@ -243,7 +247,9 @@ namespace Appium_Wizard
 
         public bool InstallApp(string udid, string path)
         {
-            var output = ExecuteCommand($"-s \"{udid}\" install \"{path}\"");
+            path = path.Replace("\"", "");
+            path = "\"" + path + "\"";
+            var output = ExecuteCommand($"-s {udid} install {path}");
             Logger.Info("install app - " + path);
             Logger.Info("install app output :"+output);
             return output.Contains("Success");
@@ -987,41 +993,158 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetPageSource(int port)
+        public static string GetPageSource(int port, string sessionId="")
         {
             string value = "empty";
             try
             {
-                string sessionId = GetSessionID(port);
-                if (sessionId.Equals("nosession"))
+                string URL = "http://localhost:" + port;
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = GetSessionID(port);
+                }
+
+                // Attempt to get the page source with the retrieved session ID
+                value = AttemptGetPageSource(URL, sessionId);
+
+                // If the value indicates an invalid session, create a new session and retry
+                if (value == "Invalid session")
                 {
                     CreateSession(port);
                     sessionId = GetSessionID(port);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = AttemptGetPageSource(URL, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
                 }
-                var options = new RestClientOptions("http://localhost:" + port)
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                return "Exception while getting page source : " + ex.Message;
+            }
+        }
+
+        // Helper method to attempt to get the page source
+        private static string AttemptGetPageSource(string URL, string sessionId)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);
                 RestResponse response = client.Execute(request);
+
+                if (!response.IsSuccessful || response.Content.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return "Invalid session";
+                }
+
                 if (response.Content != null)
                 {
                     using (JsonDocument doc = JsonDocument.Parse(response.Content))
                     {
                         JsonElement root = doc.RootElement;
-                        value = root.GetProperty("value").GetString() ?? "empty";
+                        return root.GetProperty("value").GetString() ?? "empty";
                     }
                 }
-                return value;
+
+                return "empty";
             }
-            catch (Exception)
+            catch
             {
-                return value;
+                return "Invalid session";
             }
         }
 
-        public static Image TakeScreenshot(int port)
+        public static Image TakeScreenshotWithSessionId(int port, string sessionId = "")
+        {
+            Image image = null;
+            try
+            {
+                string URL = "http://localhost:" + port;
+
+                // If sessionId is not provided or invalid, get a new session ID
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = GetSessionID(port);
+                }
+
+                // Attempt to take a screenshot with the provided or new sessionId
+                image = AttemptTakeScreenshot(URL, sessionId);
+
+                // If the image is null, it indicates an invalid session, create a new session and retry
+                if (image == null)
+                {
+                    Console.WriteLine("Session is invalid. Creating a new session...");
+                    CreateSession(port);
+                    sessionId = GetSessionID(port);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        image = AttemptTakeScreenshot(URL, sessionId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to create a new session.");
+                    }
+                }
+
+                return image;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return image;
+            }
+        }
+
+        private static Image AttemptTakeScreenshot(string URL, string sessionId)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
+                RestResponse response = client.Execute(request);
+
+                string jsonString = response.Content;
+
+                if (!response.IsSuccessful || jsonString.Contains("invalid session id"))
+                {
+                    // Check if the response indicates an invalid session
+                    return null;
+                }
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    return Image.FromStream(ms);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static string TakeScreenshot(int port, string filePath)
         {
             Image image = null;
             try
@@ -1034,7 +1157,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);
@@ -1048,12 +1171,13 @@ namespace Appium_Wizard
                 using (MemoryStream ms = new MemoryStream(imageBytes))
                 {
                     image = Image.FromStream(ms);
-                    return image;
+                    image.Save(filePath, ImageFormat.Png);
                 }
+                return response.StatusDescription;
             }
             catch (Exception)
             {
-                return image;
+                return "Exception";
             }
         }
 
@@ -1069,7 +1193,7 @@ namespace Appium_Wizard
                 }
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(-1)
+                    Timeout = TimeSpan.FromSeconds(10)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/"+sessionId+"/appium/gestures/drag", Method.Post);
@@ -1081,6 +1205,146 @@ namespace Appium_Wizard
             catch (Exception)
             {
             }            
+        }
+
+        public static string FindElement(string URL, string sessionId, string XPath)
+        {
+            string elementId = string.Empty;
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                //string body = $@"{{""value"": ""{XPath}"",""using"": ""xpath""}}";
+                string body = $@"{{""strategy"":""xpath"",""selector"":""{XPath}""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return elementId;
+        }
+
+        public static string ClickElement(string udid, string URL, string sessionId, string XPath)
+        {
+            string elementId = FindElement(URL, sessionId, XPath);
+            GetElementRectAndDraw(udid, URL, sessionId, elementId, "dot");
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/click", Method.Post);
+            RestResponse response = client.Execute(request);
+            return response.StatusDescription;
+        }
+
+        public static string SendText(string udid, string URL, string sessionId, string XPath, string text)
+        {
+            string elementId = FindElement(URL, sessionId, XPath);
+            GetElementRectAndDraw(udid,URL,sessionId,elementId,"rect");
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/value", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            string[] valueArray = text.ToCharArray().Select(c => c.ToString()).ToArray();
+            string body = $@"{{
+                                ""text"":""{text}"",
+                                ""replace"":false,
+                                ""value"":{JsonConvert.SerializeObject(valueArray)}
+                            }}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.StatusDescription;
+        }
+
+        public static bool isElementDisplayed(string URL, string sessionId, string XPath)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/"+sessionId+"/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                var body = $@"{{""strategy"":""xpath"",""selector"":""{XPath}""}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                return response.StatusCode.Equals(HttpStatusCode.OK); ;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        static Dictionary<string,int> udidScreenDensity = new Dictionary<string,int>();
+        public static void GetElementRectAndDraw(string udid, string URL, string sessionId, string elementId, string draw)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                dynamic data = JsonConvert.DeserializeObject(response.Content);
+                int x = Convert.ToInt32(data.value.x);
+                int y = Convert.ToInt32(data.value.y);
+                int width = Convert.ToInt32(data.value.width);
+                int height = Convert.ToInt32(data.value.height);
+                ScreenControl screenControl = ScreenControl.udidScreenControl[udid];
+                int screenDensity = 0;
+                if (udidScreenDensity.ContainsKey(udid))
+                {
+                    screenDensity = udidScreenDensity[udid];
+                }
+                else
+                {
+                    screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    udidScreenDensity.Add(udid, screenDensity);
+                }
+                if (screenDensity != 0)
+                {
+                    x = (int)(x / (screenDensity / 160f));
+                    y = (int)(y / (screenDensity / 160f));
+                    width = (int)(width / (screenDensity / 160f));
+                    height = (int)(height / (screenDensity / 160f));
+                }
+                if (draw == "dot")
+                {
+                    int updatedX = x + (width / 2);
+                    int updatedY = y + (height / 2);
+                    screenControl.DrawDot(screenControl, updatedX, updatedY);
+                }
+                else
+                {
+                    screenControl.DrawRectangle(screenControl, x, y, width, height);
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 }

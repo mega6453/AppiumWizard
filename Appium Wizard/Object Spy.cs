@@ -1,5 +1,5 @@
-﻿using System.Xml;
-using System.Xml.XPath;
+﻿using NLog;
+using System.Xml;
 
 namespace Appium_Wizard
 {
@@ -9,13 +9,17 @@ namespace Appium_Wizard
         Image screenshot;
         string xmlContent;
         bool isAndroid;
-        string os;
-        public Object_Spy(string os, int port, int width, int height)
+        string os, sessionId;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+
+        public Object_Spy(string os, int port, int width, int height, string sessionId)
         {
             this.os = os;
             this.port = port;
             this.width = width;
             this.height = height;
+            this.sessionId = sessionId;
             InitializeComponent();
             if (os.Equals("Android"))
             {
@@ -29,7 +33,7 @@ namespace Appium_Wizard
 
         private async void Object_Spy_Load(object sender, EventArgs e)
         {
-            FetchScreen();
+            await FetchScreen();
         }
 
 
@@ -109,33 +113,70 @@ namespace Appium_Wizard
             return r;
         }
 
+        //private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
+        //{
+        //    if (node == null) return null;
+
+        //    // Check all children first to find the deepest matching node
+        //    XmlNode mostSpecificNode = null;
+        //    foreach (XmlNode childNode in node.ChildNodes)
+        //    {
+        //        XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
+        //        if (foundNode != null)
+        //        {
+        //            mostSpecificNode = foundNode;
+        //            break; // Exit the loop as soon as a node is found
+        //        }
+        //    }
+
+        //    // If no more specific child node contains the point, check the current node
+        //    if (mostSpecificNode == null && IsPointInElementBounds(node, x, y))
+        //    //if (IsPointInElementBounds(node, x, y))
+        //    {
+        //        Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
+        //        return node;
+        //    }
+
+        //    return mostSpecificNode;
+        //}
+
         private XmlNode FindElementByCoordinatesRecursive(XmlNode node, int x, int y)
         {
             if (node == null) return null;
 
-            // Check all children first to find the deepest matching node
-            XmlNode mostSpecificNode = null;
+            XmlNode bestMatch = null;
+            int smallestArea = int.MaxValue;
+
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 XmlNode foundNode = FindElementByCoordinatesRecursive(childNode, x, y);
                 if (foundNode != null)
                 {
-                    mostSpecificNode = foundNode;
-                    break; // Exit the loop as soon as a node is found
+                    int area = GetArea(foundNode);
+                    if (area < smallestArea)
+                    {
+                        bestMatch = foundNode;
+                        smallestArea = area;
+                    }
                 }
             }
 
-            // If no more specific child node contains the point, check the current node
-            if (mostSpecificNode == null && IsPointInElementBounds(node, x, y))
-            //if (IsPointInElementBounds(node, x, y))
+            if (bestMatch == null && IsPointInElementBounds(node, x, y))
             {
-                Console.WriteLine($"Node {node.Name} contains the point: ({x}, {y})");
                 return node;
             }
 
-            return mostSpecificNode;
+            return bestMatch;
         }
 
+        private int GetArea(XmlNode node)
+        {
+            int.TryParse(node.Attributes["x"]?.Value, out int x);
+            int.TryParse(node.Attributes["y"]?.Value, out int y);
+            int.TryParse(node.Attributes["width"]?.Value, out int width);
+            int.TryParse(node.Attributes["height"]?.Value, out int height);
+            return width * height;
+        }
 
         private bool IsPointInElementBounds(XmlNode node, int x, int y)
         {
@@ -208,39 +249,18 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 20);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
-
-            // Start both tasks in parallel
-            Task screenshotTask = Task.Run(() =>
-            {
+            await Task.Run(() => {
                 if (isAndroid)
                 {
-                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
+                    screenshot = AndroidAPIMethods.TakeScreenshotWithSessionId(port, sessionId);
                 }
                 else
                 {
                     screenshot = iOSAPIMethods.TakeScreenshot(url);
                 }
             });
-
-            Task xmlContentTask = Task.Run(() =>
-            {
-                if (isAndroid)
-                {
-                    xmlContent = AndroidAPIMethods.GetPageSource(port);
-                }
-                else
-                {
-                    xmlContent = iOSAPIMethods.GetPageSource(port);
-                }
-            });
-
-            // Await both tasks to complete
-            await Task.WhenAll(screenshotTask, xmlContentTask);
-
-            // Update progress after tasks complete
             commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
 
-            // Check if screenshot was successfully retrieved
             if (screenshot == null)
             {
                 commonProgress.Close();
@@ -248,94 +268,42 @@ namespace Appium_Wizard
                 Close();
                 return;
             }
-
-            pictureBox1.Image = screenshot;
-
-            // Check if XML content was successfully retrieved
-            if (xmlContent.Equals("empty"))
-            {
-                commonProgress.Close();
-                MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
-                return;
-            }
-
-            // Load XML content into the tree view
-            await Task.Run(() =>
-            {
-                LoadXmlToTreeView(xmlContent);
-            });
-
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
-            listView1.Items.Clear();
-            treeView1.ExpandAll();
-
-            // Close the progress dialog
-            commonProgress.Close();
-        }
-
-        private async Task FetchScreen2()
-        {
-            string messageTitle = "Object Spy - BETA";
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = this;
-            commonProgress.Show();
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 20);
-            pictureBox1.Size = new Size(width, height);
-            string url = "http://localhost:" + port;
-            await Task.Run(() =>
-            {
-                if (isAndroid)
-                {
-                    screenshot = AndroidAPIMethods.TakeScreenshot(port);
-                }
-                else
-                {
-                    screenshot = iOSAPIMethods.TakeScreenshot(url);
-                }
-            });
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 50);
-            if (screenshot == null)
-            {
-                commonProgress.Close();
-                MessageBox.Show("Failed to retreive screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
-            }
             else
             {
                 pictureBox1.Image = screenshot;
-                await Task.Run(() =>
-                {
+                await Task.Run(() => {
                     if (isAndroid)
                     {
-                        xmlContent = AndroidAPIMethods.GetPageSource(port);
+                        xmlContent = AndroidAPIMethods.GetPageSource(port, sessionId);
                     }
                     else
                     {
-                        xmlContent = iOSAPIMethods.GetPageSource(port);
+                        xmlContent = iOSAPIMethods.GetPageSource(port, sessionId);
                     }
                 });
-                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 70);
-                if (xmlContent.Equals("empty"))
+
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 75);
+                if (xmlContent.Equals("Invalid session") | xmlContent.Equals("empty") | xmlContent.Contains("Exception while getting page source") | xmlContent.Contains("Failed to create a new session."))
                 {
+                    Logger.Info("xmlContent : "+xmlContent);
                     commonProgress.Close();
                     MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
+                    return;
                 }
-                else
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 85);
+                // Load XML content into the tree view
+                await Task.Run(() =>
                 {
-                    await Task.Run(() =>
-                    {
-                        LoadXmlToTreeView(xmlContent);
-                    });
-                    commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 90);
-                    listView1.Items.Clear();
-                    treeView1.ExpandAll();
-                }
+                    LoadXmlToTreeView(xmlContent);
+                });
+
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 95);
+                listView1.Items.Clear();
+                treeView1.ExpandAll();
             }
             commonProgress.Close();
         }
-
 
         private void LoadXmlToTreeView(string xmlContent)
         {
@@ -553,11 +521,29 @@ namespace Appium_Wizard
                 xmlDoc.LoadXml(xmlContent);
 
                 string filterText = filterTextbox.Text;
-                if (filterText.Contains("'"))
+
+                // Check if the filterText is empty or whitespace
+                if (string.IsNullOrWhiteSpace(filterText))
                 {
-                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]");
+                    // Clear the matching nodes and UI
+                    matchingNodes.Clear();
+                    currentIndex = -1;
+                    filterTextbox.ForeColor = Color.Black;
+                    TotalElementCount.Text = "0";
+                    elementNumberTextbox.Text = "0";
+                    return;
                 }
-                XmlNodeList selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                XmlNodeList selectedXmlNodes;
+                try
+                {
+                     selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                }
+                catch (Exception ex)
+                {
+                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
+                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                }
+               
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -588,17 +574,14 @@ namespace Appium_Wizard
                 {
                     filterTextbox.ForeColor = Color.Red;
                     TotalElementCount.Text = "0";
+                    elementNumberTextbox.Text = "0";
                 }
             }
-            catch (XPathException)
+            catch (Exception)
             {
                 filterTextbox.ForeColor = Color.Red;
                 TotalElementCount.Text = "0";
-            }
-            catch (XmlException)
-            {
-                filterTextbox.ForeColor = Color.Red;
-                TotalElementCount.Text = "0";
+                elementNumberTextbox.Text = "0";
             }
         }
 
@@ -609,13 +592,28 @@ namespace Appium_Wizard
                 if (currentIndex >= 0 && currentIndex < matchingNodes.Count)
                 {
                     TreeNode currentNode = matchingNodes[currentIndex];
-                    treeView1.SelectedNode = currentNode;
-                    treeView1.SelectedNode.EnsureVisible();
+
+                    // Ensure the UI update happens on the correct thread
+                    if (treeView1.InvokeRequired)
+                    {
+                        treeView1.Invoke(new Action(() =>
+                        {
+                            treeView1.SelectedNode = currentNode;
+                            treeView1.SelectedNode.EnsureVisible();
+                        }));
+                    }
+                    else
+                    {
+                        treeView1.SelectedNode = currentNode;
+                        treeView1.SelectedNode.EnsureVisible();
+                    }
+
                     elementNumberTextbox.Text = (currentIndex + 1).ToString();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error in HighlightCurrentNode: {ex.Message}");
             }
         }
 
@@ -623,7 +621,10 @@ namespace Appium_Wizard
         {
             if (matchingNodes.Count > 0)
             {
+                // Increment index and wrap around if necessary
                 currentIndex = (currentIndex + 1) % matchingNodes.Count;
+
+                // Ensure the UI updates correctly
                 HighlightCurrentNode();
             }
         }
@@ -632,13 +633,13 @@ namespace Appium_Wizard
         {
             if (matchingNodes.Count > 0)
             {
+                // Decrement index and wrap around if necessary
                 currentIndex = (currentIndex - 1 + matchingNodes.Count) % matchingNodes.Count;
+
+                // Ensure the UI updates correctly
                 HighlightCurrentNode();
             }
         }
-
-        // Ensure your FindTreeNodeByXmlNode and AreNodesEquivalent methods are defined as before
-
 
         private TreeNode FindTreeNodeByXmlNode(TreeNodeCollection nodes, XmlNode xmlNode)
         {
@@ -698,6 +699,13 @@ namespace Appium_Wizard
         {
             if (int.TryParse(elementNumberTextbox.Text, out int elementNumber))
             {
+                if (elementNumber == 0)
+                {
+                    // Special case: 0 is valid, but no element corresponds to it
+                    elementNumberTextbox.ForeColor = Color.Black;
+                    return;
+                }
+
                 // Convert to zero-based index
                 int index = elementNumber - 1;
 
@@ -857,147 +865,83 @@ namespace Appium_Wizard
             }
         }
 
-        private string GenerateUniqueXPath(XmlNode node)
+        public static string GenerateUniqueXPath(XmlNode node)
         {
             try
             {
-                List<string> preferredAttributes = new List<string>();
-                if (node.Attributes != null)
+
+                // Start with the base XPath using the node name
+                string baseXPath = $"//{node.Name}";
+
+                // Relevant attributes to consider for XPath generation
+                string[] importantAttributes = { 
+                                                // Android attributes
+                                                "resource-id",
+                                                "text",
+                                                "content-desc",
+                                                "class",    
+                                                // iOS attributes
+                                                "name",
+                                                "label",
+                                                "value",
+                                                "type"
+                                            };
+
+                // Step 1: Test each attribute individually
+                foreach (string attributeName in importantAttributes)
                 {
-                    // Iterate over each attribute in the node
-                    foreach (XmlAttribute attribute in node.Attributes)
+                    if (node.Attributes[attributeName] != null)
                     {
-                        // Add the attribute name to the list
-                        preferredAttributes.Add(attribute.Name);
-                    }
-                }
-                // List of attributes to consider for creating a unique XPath
-                //string[] preferredAttributes = { "id", "name", "value", "label", "text", "class", "type", "enabled", "visible", "accessible" };
+                        string testXPath = $"{baseXPath}[@{attributeName}='{node.Attributes[attributeName].Value}']";
+                        XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);
 
-                preferredAttributes.Remove("index");
-                preferredAttributes.Remove("x");
-                preferredAttributes.Remove("y");
-                preferredAttributes.Remove("width");
-                preferredAttributes.Remove("height");
-                // Start with the node name
-                //string xpath = "//" + node.Name;
-                string xpath = "//*";
-                int attCount = preferredAttributes.Count;
-                int counter = 1;
-                foreach (string attr in preferredAttributes)
-                {
-                    if (node.Attributes[attr] != null)
-                    {
-                        string escapedValue = node.Attributes[attr].Value.Replace("'", "&apos;");
-                        string singleAttributeXPath = $"{xpath}[@{attr}='{escapedValue}']";
-                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-                        //string singleAttributeXPath = $"{xpath}[@{attr}='{node.Attributes[attr].Value}']";
-                        //XmlNodeList nodes = node.OwnerDocument.SelectNodes(singleAttributeXPath);
-                        if (nodes.Count == 1)
+                        // If the XPath with this single attribute is unique, return it
+                        if (matchingNodes.Count == 1)
                         {
-                            return singleAttributeXPath;
+                            return testXPath;
                         }
-                        if (attCount == counter)
-                        {
-                            int index = 1;
-                            foreach (XmlNode sibling in nodes)
-                            {
-                                if (sibling == node)
-                                {
-                                    xpath = $"({xpath})[{index}]";
-                                    return xpath;
-                                }
-                                index++;
-                            }
-                        }
-                        counter++;
-                    }
-                }
 
-
-                // Check each preferred attribute
-                foreach (string attr in preferredAttributes)
-                {
-                    if (node.Attributes[attr] != null)
-                    {
-                        xpath += $"[@{attr}='{node.Attributes[attr].Value}']";
-
-                        // Check if this XPath is unique
-                        XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
-                        if (nodes.Count == 1)
+                        // If multiple nodes match, skip further combinations and go to indexing
+                        if (matchingNodes.Count > 1)
                         {
-                            return xpath;
-                        }
-                        else
-                        {
-                            // If not unique, wrap in parentheses and append index
-                            int index = 1;
-                            foreach (XmlNode sibling in nodes)
-                            {
-                                if (sibling == node)
-                                {
-                                    xpath = $"({xpath})[{index}]";
-                                    return xpath;
-                                }
-                                index++;
-                            }
+                            return AddIndexToXPath(testXPath, matchingNodes, node);
                         }
                     }
                 }
 
-                // If no preferred attributes are found, check for inner text
-                if (!string.IsNullOrWhiteSpace(node.InnerText))
+                // Step 2: Incrementally combine attributes (skipped if Step 1 detects multiple matches)
+                var attributeConditions = new System.Text.StringBuilder();
+                foreach (string attributeName in importantAttributes)
                 {
-                    xpath += $"[text()='{node.InnerText.Trim()}']";
-
-                    // Check if this XPath is unique
-                    XmlNodeList nodes = node.OwnerDocument.SelectNodes(xpath);
-                    if (nodes.Count == 1)
+                    if (node.Attributes[attributeName] != null)
                     {
-                        return xpath;
-                    }
-                    else
-                    {
-                        // If not unique, wrap in parentheses and append index
-                        int index = 1;
-                        foreach (XmlNode sibling in nodes)
+                        if (attributeConditions.Length > 0)
                         {
-                            if (sibling == node)
-                            {
-                                xpath = $"({xpath})[{index}]";
-                                return xpath;
-                            }
-                            index++;
+                            attributeConditions.Append(" and ");
+                        }
+                        attributeConditions.Append($"@{attributeName}='{node.Attributes[attributeName].Value}'");
+
+                        string testXPath = $"{baseXPath}[{attributeConditions}]";
+                        XmlNodeList matchingNodes = node.OwnerDocument.SelectNodes(testXPath);
+
+                        // If the XPath with the combined attributes is unique, return it
+                        if (matchingNodes.Count == 1)
+                        {
+                            return testXPath;
+                        }
+
+                        // If multiple nodes match, skip further combinations and go to indexing
+                        if (matchingNodes.Count > 1)
+                        {
+                            return AddIndexToXPath(testXPath, matchingNodes, node);
                         }
                     }
                 }
 
-                // Traverse up to the root, appending each parent node with predicates to ensure uniqueness
-                while (node.ParentNode != null)
-                {
-                    XmlNode parentNode = node.ParentNode;
-                    int index = 1;
-
-                    // Count the index of the node among its siblings with the same name
-                    foreach (XmlNode sibling in parentNode.ChildNodes)
-                    {
-                        if (sibling == node)
-                        {
-                            break;
-                        }
-                        if (sibling.Name == node.Name)
-                        {
-                            index++;
-                        }
-                    }
-
-                    // Wrap the XPath in parentheses and append the index
-                    xpath = $"/{parentNode.Name}/({node.Name})[{index}]" + xpath;
-
-                    // Move to the parent node
-                    node = parentNode;
-                }
-                return xpath;
+                // Step 3: Add indexing to the final XPath
+                string finalXPath = $"{baseXPath}[{attributeConditions}]";
+                XmlNodeList finalMatchingNodes = node.OwnerDocument.SelectNodes(finalXPath);
+                return AddIndexToXPath(finalXPath, finalMatchingNodes, node);
             }
             catch (Exception)
             {
@@ -1005,6 +949,19 @@ namespace Appium_Wizard
             }
         }
 
+        private static string AddIndexToXPath(string xpath, XmlNodeList matchingNodes, XmlNode targetNode)
+        {
+            int index = 1;
+            foreach (XmlNode matchingNode in matchingNodes)
+            {
+                if (matchingNode == targetNode)
+                {
+                    return $"({xpath})[{index}]";
+                }
+                index++;
+            }
+            return xpath; // Fallback (shouldn't happen if indexing is applied correctly)
+        }
 
         private void addUniqueXpathToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1089,10 +1046,32 @@ namespace Appium_Wizard
 
         private void helpButton_Click(object sender, EventArgs e)
         {
-            string message = "Right click on an element/property in the image/tree/list view to get the xpath." +
-                             " \n\nList view(Properities list) xpath is more stable than image/tree view in this release. Select multiple properties to get the combined xpath. "+
-                             " \n\nNOTE:This Object Spy feature is in Beta version. In case if you see any issue, please report it in the github page.";
-            MessageBox.Show(message,"Object Spy - BETA",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            string message = @"
+                This tool helps you inspect UI elements and generate XPath expressions for automation.
+
+                How to use:
+                1. Image View: Right-click on an element in the screenshot to copy its XPath or add it to the filter.
+                    - Hover over the image to see the coordinates of your cursor.
+                    - Click on an element to highlight it and view its details.
+
+                2. Tree View: Right-click on a node in the tree structure to copy its XPath or add it to the filter.
+                    - The tree displays the XML structure of the page source.
+                    - Selecting a node will highlight the corresponding element in the image.
+
+                3. List View: Select one or more properties from the list to generate and copy a stable XPath.
+                    - Combine multiple properties for a more specific XPath.
+
+                4. Filter Textbox: Use XPath expressions to filter elements.
+                    - Type an XPath query in the filter textbox to locate elements.
+                    - Matching nodes will be highlighted in the tree view.
+
+                5. Navigation: Use 'Next' and 'Previous' buttons to navigate through matching elements.
+                    - The total count of matching elements is displayed.
+
+                Note:
+                - This feature is in Beta. If you encounter any issues, please report them on the GitHub page.";
+
+            MessageBox.Show(message, "Object Spy - BETA", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

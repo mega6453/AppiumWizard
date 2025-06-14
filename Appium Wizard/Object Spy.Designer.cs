@@ -132,6 +132,7 @@
             elementNumberTextbox.BorderStyle = BorderStyle.None;
             elementNumberTextbox.Location = new Point(976, 485);
             elementNumberTextbox.Name = "elementNumberTextbox";
+            elementNumberTextbox.RightToLeft = RightToLeft.Yes;
             elementNumberTextbox.Size = new Size(26, 16);
             elementNumberTextbox.TabIndex = 6;
             elementNumberTextbox.TextChanged += elementNumberTextbox_TextChanged;
@@ -139,7 +140,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1003, 486);
+            label1.Location = new Point(1003, 484);
             label1.Name = "label1";
             label1.Size = new Size(12, 15);
             label1.TabIndex = 7;
@@ -148,7 +149,7 @@
             // TotalElementCount
             // 
             TotalElementCount.AutoSize = true;
-            TotalElementCount.Location = new Point(1011, 486);
+            TotalElementCount.Location = new Point(1011, 484);
             TotalElementCount.Name = "TotalElementCount";
             TotalElementCount.Size = new Size(12, 15);
             TotalElementCount.TabIndex = 8;
@@ -253,7 +254,6 @@
             coordLabel.Name = "coordLabel";
             coordLabel.Size = new Size(0, 15);
             coordLabel.TabIndex = 14;
-            coordLabel.Visible = false;
             // 
             // helpButton
             // 

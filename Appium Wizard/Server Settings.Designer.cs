@@ -49,13 +49,18 @@
             xCUITestCapabilityToolStripMenuItem = new ToolStripMenuItem();
             uIAutomator2CapabilityToolStripMenuItem = new ToolStripMenuItem();
             DefaultCapsLinkLabel = new LinkLabel();
+            groupBox1 = new GroupBox();
+            debugRadioButton = new RadioButton();
+            infoRadioButton = new RadioButton();
+            errorRadioButton = new RadioButton();
             contextMenuStrip1.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // ServerArgsRichTextBox
             // 
-            ServerArgsRichTextBox.Location = new Point(8, 57);
-            ServerArgsRichTextBox.Margin = new Padding(2, 2, 2, 2);
+            ServerArgsRichTextBox.Location = new Point(10, 102);
+            ServerArgsRichTextBox.Margin = new Padding(2);
             ServerArgsRichTextBox.Name = "ServerArgsRichTextBox";
             ServerArgsRichTextBox.Size = new Size(719, 45);
             ServerArgsRichTextBox.TabIndex = 1;
@@ -66,7 +71,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label2.Location = new Point(10, 192);
+            label2.Location = new Point(10, 240);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
             label2.Size = new Size(97, 15);
@@ -77,7 +82,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label3.Location = new Point(8, 323);
+            label3.Location = new Point(8, 378);
             label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
             label3.Size = new Size(260, 15);
@@ -87,7 +92,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(8, 342);
+            label4.Location = new Point(8, 397);
             label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new Size(401, 30);
@@ -96,8 +101,8 @@
             // 
             // DefaultCapabilitiesRichTextBox
             // 
-            DefaultCapabilitiesRichTextBox.Location = new Point(10, 125);
-            DefaultCapabilitiesRichTextBox.Margin = new Padding(2, 2, 2, 2);
+            DefaultCapabilitiesRichTextBox.Location = new Point(10, 166);
+            DefaultCapabilitiesRichTextBox.Margin = new Padding(2);
             DefaultCapabilitiesRichTextBox.Name = "DefaultCapabilitiesRichTextBox";
             DefaultCapabilitiesRichTextBox.Size = new Size(719, 67);
             DefaultCapabilitiesRichTextBox.TabIndex = 6;
@@ -107,7 +112,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(8, 40);
+            label6.Location = new Point(10, 85);
             label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new Size(69, 15);
@@ -117,7 +122,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(8, 108);
+            label7.Location = new Point(8, 149);
             label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
             label7.Size = new Size(109, 15);
@@ -128,7 +133,7 @@
             // 
             ServerArgsLink.AutoSize = true;
             ServerArgsLink.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-            ServerArgsLink.Location = new Point(88, 40);
+            ServerArgsLink.Location = new Point(90, 85);
             ServerArgsLink.Margin = new Padding(2, 0, 2, 0);
             ServerArgsLink.Name = "ServerArgsLink";
             ServerArgsLink.Size = new Size(60, 15);
@@ -140,8 +145,8 @@
             // FinalCommandRichTextBox
             // 
             FinalCommandRichTextBox.DetectUrls = false;
-            FinalCommandRichTextBox.Location = new Point(10, 209);
-            FinalCommandRichTextBox.Margin = new Padding(2, 2, 2, 2);
+            FinalCommandRichTextBox.Location = new Point(10, 257);
+            FinalCommandRichTextBox.Margin = new Padding(2);
             FinalCommandRichTextBox.Name = "FinalCommandRichTextBox";
             FinalCommandRichTextBox.ReadOnly = true;
             FinalCommandRichTextBox.Size = new Size(717, 75);
@@ -151,8 +156,8 @@
             // cancelButton
             // 
             cancelButton.AutoSize = true;
-            cancelButton.Location = new Point(292, 286);
-            cancelButton.Margin = new Padding(2, 2, 2, 2);
+            cancelButton.Location = new Point(292, 341);
+            cancelButton.Margin = new Padding(2);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(78, 25);
             cancelButton.TabIndex = 12;
@@ -163,8 +168,8 @@
             // applyButton
             // 
             applyButton.AutoSize = true;
-            applyButton.Location = new Point(396, 286);
-            applyButton.Margin = new Padding(2, 2, 2, 2);
+            applyButton.Location = new Point(396, 341);
+            applyButton.Margin = new Padding(2);
             applyButton.Name = "applyButton";
             applyButton.Size = new Size(95, 25);
             applyButton.TabIndex = 13;
@@ -176,7 +181,7 @@
             // 
             label8.AutoSize = true;
             label8.ForeColor = Color.Chocolate;
-            label8.Location = new Point(195, 108);
+            label8.Location = new Point(195, 149);
             label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
             label8.Size = new Size(509, 15);
@@ -186,8 +191,8 @@
             // resetButton
             // 
             resetButton.AutoSize = true;
-            resetButton.Location = new Point(162, 287);
-            resetButton.Margin = new Padding(2, 2, 2, 2);
+            resetButton.Location = new Point(162, 342);
+            resetButton.Margin = new Padding(2);
             resetButton.Name = "resetButton";
             resetButton.Size = new Size(103, 25);
             resetButton.TabIndex = 16;
@@ -242,7 +247,7 @@
             // 
             DefaultCapsLinkLabel.AutoSize = true;
             DefaultCapsLinkLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-            DefaultCapsLinkLabel.Location = new Point(127, 108);
+            DefaultCapsLinkLabel.Location = new Point(127, 149);
             DefaultCapsLinkLabel.Margin = new Padding(2, 0, 2, 0);
             DefaultCapsLinkLabel.Name = "DefaultCapsLinkLabel";
             DefaultCapsLinkLabel.Size = new Size(60, 15);
@@ -251,12 +256,60 @@
             DefaultCapsLinkLabel.Text = "Refer here";
             DefaultCapsLinkLabel.LinkClicked += DefaultCapsLinkLabel_LinkClicked;
             // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(debugRadioButton);
+            groupBox1.Controls.Add(infoRadioButton);
+            groupBox1.Controls.Add(errorRadioButton);
+            groupBox1.Location = new Point(10, 44);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(328, 38);
+            groupBox1.TabIndex = 19;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Log Level";
+            // 
+            // debugRadioButton
+            // 
+            debugRadioButton.AutoSize = true;
+            debugRadioButton.Location = new Point(259, 13);
+            debugRadioButton.Name = "debugRadioButton";
+            debugRadioButton.Size = new Size(59, 19);
+            debugRadioButton.TabIndex = 22;
+            debugRadioButton.TabStop = true;
+            debugRadioButton.Text = "debug";
+            debugRadioButton.UseVisualStyleBackColor = true;
+            debugRadioButton.CheckedChanged += debugRadioButton_CheckedChanged;
+            // 
+            // infoRadioButton
+            // 
+            infoRadioButton.AutoSize = true;
+            infoRadioButton.Location = new Point(117, 13);
+            infoRadioButton.Name = "infoRadioButton";
+            infoRadioButton.Size = new Size(46, 19);
+            infoRadioButton.TabIndex = 20;
+            infoRadioButton.TabStop = true;
+            infoRadioButton.Text = "info";
+            infoRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // errorRadioButton
+            // 
+            errorRadioButton.AutoSize = true;
+            errorRadioButton.Location = new Point(185, 13);
+            errorRadioButton.Name = "errorRadioButton";
+            errorRadioButton.Size = new Size(50, 19);
+            errorRadioButton.TabIndex = 21;
+            errorRadioButton.TabStop = true;
+            errorRadioButton.Text = "error";
+            errorRadioButton.UseVisualStyleBackColor = true;
+            errorRadioButton.CheckedChanged += errorRadioButton_CheckedChanged;
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(734, 394);
+            ClientSize = new Size(734, 432);
+            Controls.Add(groupBox1);
             Controls.Add(DefaultCapsLinkLabel);
             Controls.Add(resetButton);
             Controls.Add(label8);
@@ -274,7 +327,7 @@
             Controls.Add(ServerArgsRichTextBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "Server_Settings";
@@ -283,6 +336,8 @@
             Text = "Server Settings";
             Load += Server_Settings_Load;
             contextMenuStrip1.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -307,5 +362,9 @@
         private ToolStripMenuItem xCUITestCapabilityToolStripMenuItem;
         private ToolStripMenuItem uIAutomator2CapabilityToolStripMenuItem;
         private LinkLabel DefaultCapsLinkLabel;
+        private GroupBox groupBox1;
+        private RadioButton debugRadioButton;
+        private RadioButton infoRadioButton;
+        private RadioButton errorRadioButton;
     }
 }

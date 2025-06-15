@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using Windows.ApplicationModel.Contacts.DataProvider;
 
 namespace Appium_Wizard
 {
@@ -24,6 +23,8 @@ namespace Appium_Wizard
 
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+            tempFolder = Path.GetTempPath();
+            logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy_h-mm-ss_tt") + ".txt");
             if (!command.Contains("webDriverAgentProxyPort"))
             {
                 command = command + $@" -dc ""{{""""appium:webDriverAgentUrl"""":""""http://localhost:webDriverAgentProxyPort""""}}""";
@@ -33,10 +34,26 @@ namespace Appium_Wizard
                 command = command + " --port " + appiumPort;
             }
             string logLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
-            if (!command.Contains("--log-level"))
-            {
-                command = command + " --log-level " + logLevel;
-            }
+            //if (!command.Contains(" --log "))
+            //{
+            //    command = command + " --log " + logFilePath;
+            //}
+            //if (!command.Contains("--log-level"))
+            //{
+            //    if (logLevel.Equals("info"))
+            //    {
+            //        logLevel = "debug:info"; //use debug logs to get element information to update screen control, show info logs in Main screen.
+            //    }
+            //    else if (logLevel.Equals("error"))
+            //    {
+            //        logLevel = "debug:error";
+            //    }
+            //    command = command + " --log-level " + logLevel;
+            //}
+            //if (!command.Contains(" --local-timezone"))
+            //{
+            //    command = command + " --local-timezone";
+            //}
             int webDriverAgentProxyPort = Common.GetFreePort();
             if (serverNumberWDAPortNumber.ContainsKey(serverNumber))
             {
@@ -47,8 +64,6 @@ namespace Appium_Wizard
                 serverNumberWDAPortNumber.Add(serverNumber, webDriverAgentProxyPort);
             }
             string updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
-            tempFolder = Path.GetTempPath();
-            logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
             File.WriteAllText(logFilePath, "\t\t------------------------------Starting Appium Server------------------------------\n\n");
             if (!Common.IsNodeInstalled())
             {
@@ -100,7 +115,8 @@ namespace Appium_Wizard
                 if (logLevel.Equals("error"))
                 {
                     int count = 1;
-                    Task.Run(() => {
+                    Task.Run(() =>
+                    {
                         while (!serverStarted)
                         {
                             bool isRunning = IsAppiumServerRunning(appiumPort);
@@ -130,7 +146,7 @@ namespace Appium_Wizard
                             Task.Delay(3000);
                         }
                     });
-                }                   
+                }
             }
             catch (Exception ex)
             {
@@ -170,7 +186,7 @@ namespace Appium_Wizard
                                 streamWriter.WriteLine("\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
                                 if (MainScreen.main != null)
                                 {
-                                    MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1,true);
+                                    MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1, true);
                                     MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
                                 }
 
@@ -592,7 +608,6 @@ namespace Appium_Wizard
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest(elementId + "/rect", Method.Get);
-                request.AddHeader("Content-Type", "application/json");
                 RestResponse response = client.Execute(request);
                 if (response.Content != null)
                 {

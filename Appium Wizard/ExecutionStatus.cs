@@ -1,6 +1,6 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Security.Policy;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -13,7 +13,8 @@ namespace Appium_Wizard
         static string tempsessionId = string.Empty;
         static string deviceId = string.Empty;
         static string element = string.Empty;
-        string sessionId = string.Empty; static string url = "";
+        static string elementId = string.Empty;
+        static string url = "";
         int x, y, width, height;
         public void UpdateScreenControl(ScreenControl screenControl, string data, int screenDensity = 0)
         {
@@ -22,14 +23,8 @@ namespace Appium_Wizard
                 string statusText;
                 if (screenControl != null)
                 {
-                    if (data.Contains("POST /session/") && data.Contains("/element"))
-                    {
-                        int startIndex = data.IndexOf("/session/") + "/session/".Length;
-                        int endIndex = data.IndexOf("/", startIndex);
-                        sessionId = data.Substring(startIndex, endIndex - startIndex);
-                    }
                     // Handling for Find element
-                    if (data.Contains("[POST /element]") | data.Contains("[POST /elements]") | data.Contains("{\"using\":"))
+                    if (data.Contains("Proxying [POST /element]"))
                     {
                         string pattern = @"(?<=\[POST\s)(http:\/\/[^\/]+\/session\/[^\/]+\/element)";
                         Regex regex = new Regex(pattern);
@@ -41,41 +36,42 @@ namespace Appium_Wizard
                         string json = GetOnlyJson(data);
                         try
                         {
-                            if (IsValidJson(json))
+                            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                            if (dictionary.ContainsKey("value"))
                             {
-                                var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                                 element = dictionary["value"];
-                                statusText = "Find Element " + element;
-                                screenControl.UpdateStatusLabel(screenControl, statusText);
                             }
+                            else if (dictionary.ContainsKey("selector"))
+                            {
+                                element = dictionary["selector"];
+                            }
+                            statusText = "Find Element " + element;
+                            screenControl.UpdateStatusLabel(screenControl, statusText);
                         }
                         catch (Exception)
                         {
                         }
                     }
                     // Handling for Click
-                    else if ((data.Contains("[POST /session/") | data.Contains("[POST /element/")) && data.Contains("/click]"))
+                    else if ((data.Contains("[HTTP] --> POST /session/") && data.Contains("/element/")) && data.Contains("/click {}"))
                     {
-                        statusText = "Click " + element;
-                        screenControl.UpdateStatusLabel(screenControl, statusText);
                         int updatedX = x + (width / 2);
                         int updatedY = y + (height / 2);
                         screenControl.DrawDot(screenControl, updatedX, updatedY);
+                        statusText = "Click " + element;
+                        screenControl.UpdateStatusLabel(screenControl, statusText);
                     }
                     // Handling for Send text
-                    else if (data.Contains("{\"text\":") | (data.Contains("POST /session/") && data.Contains("/value")))
+                    else if (data.Contains("[HTTP] --> POST /session/") && data.Contains("{\"text\":") && data.Contains("/value"))
                     {
                         string text;
                         string json = GetOnlyJson(data);
                         try
                         {
-                            if (IsValidJson(json))
-                            {
-                                var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
-                                text = jsonObject.text;
-                                statusText = "Send text \"" + text + "\" to " + element;
-                                screenControl.UpdateStatusLabel(screenControl, statusText);
-                            }
+                            var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
+                            text = jsonObject.text;
+                            statusText = "Send text \"" + text + "\" to " + element;
+                            screenControl.UpdateStatusLabel(screenControl, statusText);
                         }
                         catch (Exception)
                         {
@@ -232,7 +228,7 @@ namespace Appium_Wizard
 
 
                     // Handling Responses
-                    else if (data.Contains("Got response with status"))
+                    else if (data.Contains("Got response with status 200"))
                     {
                         try
                         {
@@ -240,10 +236,9 @@ namespace Appium_Wizard
                             {
                                 string json = GetOnlyJson(data);
                                 JObject jsonObject = JObject.Parse(json);
-                                string elementId = jsonObject["value"]["ELEMENT"].ToString();
-                                sessionId = jsonObject["sessionId"].ToString();
+                                elementId = jsonObject["value"]["ELEMENT"].ToString();
                                 var result = AppiumServerSetup.ElementInfo(url, elementId);
-                                if (result != null)
+                                if (result.Count > 0 && result != null)
                                 {
                                     if (screenDensity != 0)
                                     {
@@ -261,12 +256,8 @@ namespace Appium_Wizard
                                     }
                                     screenControl.DrawRectangle(screenControl, x, y, width, height);
                                 }
-                                screenControl.UpdateStatusLabel(screenControl, "");
                             }
-                            else
-                            {
-                                screenControl.UpdateStatusLabel(screenControl, "");
-                            }
+                            screenControl.UpdateStatusLabel(screenControl, "");
                         }
                         catch (Exception)
                         {

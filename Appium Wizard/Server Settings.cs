@@ -183,6 +183,7 @@ namespace Appium_Wizard
             ServerArgsRichTextBox.Text = "--allow-cors --allow-insecure=adb_shell";
             DefaultCapabilitiesRichTextBox.Text = "";
             FinalCommandRichTextBox.Text = $@"appium --port {portNumber} {ServerArgsRichTextBox.Text}" + $@" -dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+            infoRadioButton.Checked = true;
             GoogleAnalytics.SendEvent("resetButton_Click");
         }
 
@@ -251,7 +252,7 @@ namespace Appium_Wizard
         {
             if (isFormInitialized && debugRadioButton.Checked)
             {
-                MessageBox.Show("Setting log-level as 'Debug' may cause the appium wizard to lag due to frequent appium server log updates.\n\n Set to 'Debug' only if necessary; otherwise, set to 'Error' or 'Info'.","Log level - Debug",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Set log-level as 'Debug' only if you want more detailed logs.\n\nOtherwise, set to 'Error' or 'Info'.\n\nThe 'debug' logs will be updated every 5 seconds to reduce any performance issues.", "Log level - Debug", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -260,6 +261,14 @@ namespace Appium_Wizard
             if (isFormInitialized && errorRadioButton.Checked)
             {
                 MessageBox.Show("Setting the log level to 'Error' will only show critical issues.", "Log level - Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void infoRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isFormInitialized && infoRadioButton.Checked)
+            {
+                MessageBox.Show("Setting the log level to 'Info' will only show informational logs.\n\nThe 'info' logs will be updated every 2 seconds to reduce any performance issues.", "Log level - Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

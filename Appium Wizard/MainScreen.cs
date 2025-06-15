@@ -245,6 +245,16 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
+            try
+            {
+                if (server1WebView.CoreWebView2 != null)
+                {
+                    server1WebView.Reload();
+                }
+            }
+            catch (Exception)
+            {
+            }
             //tabControl1.SelectedIndex = 0;
             //tabControl1_SelectedIndexChanged(tabControl1, EventArgs.Empty);
             GoogleAnalytics.SendEvent("MainScreen_Shown");
@@ -2001,19 +2011,7 @@ namespace Appium_Wizard
                 int serverNumber = selectedIndex + 1;
                 if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
                 {
-                    int logsPort;
-                    if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
-                    {
-                        int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
-                        string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
-                        string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber);
-                        logsPort = Common.GetFreePort();
-                        _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
-                    }
-                    else
-                    {
-                        logsPort = Common.serverNumberPortNumber[serverNumber];
-                    }
+                    int logsPort = StartServerAndReturnPort(serverNumber);
                     ProcessStartInfo psInfo = new ProcessStartInfo
                     {
                         FileName = "http://localhost:" + logsPort + "/index.html",
@@ -2032,6 +2030,22 @@ namespace Appium_Wizard
             }
         }
 
+        public int getIntervalToLoadLogs(int serverNumber)
+        {
+            string logLevelFromDB = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
+            switch (logLevelFromDB)
+            {
+                case "error":
+                    return 1000;
+                case "info":
+                    return 2000;
+                case "debug":
+                    return 5000;               
+                default:
+                    return 5000;
+            }
+        }
+
 
         public static ConcurrentDictionary<int, bool> serverUrlLoaded = new ConcurrentDictionary<int, bool>();
 
@@ -2041,19 +2055,7 @@ namespace Appium_Wizard
             {
                 if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
                 {
-                    int logsPort;
-                    if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
-                    {
-                        int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
-                        string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
-                        string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber);
-                        logsPort = Common.GetFreePort();
-                        _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
-                    }
-                    else
-                    {
-                        logsPort = Common.serverNumberPortNumber[serverNumber];
-                    }
+                    int logsPort = StartServerAndReturnPort(serverNumber);
                     string url = "http://localhost:" + logsPort + "/index.html";
                     WaitForServerToStart(url);
                     if (!serverUrlLoaded.GetOrAdd(serverNumber, false))
@@ -2068,8 +2070,26 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error occured in Starting Server logs, Please report in github with steps. Exception : "+ex.Message, "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }          
+                MessageBox.Show("Error occured in Starting Server logs, Please report in github with steps. Exception : " + ex.Message, "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private int StartServerAndReturnPort(int serverNumber)
+        {
+            int logsPort;
+            if (!Common.serverNumberPortNumber.ContainsKey(serverNumber))
+            {
+                int appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
+                string logFilePath = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item2;
+                string htmlFilePath = Common.GenerateHtmlWithFilePath(logFilePath, appiumPortNumber, getIntervalToLoadLogs(serverNumber));
+                logsPort = Common.GetFreePort();
+                _ = Task.Run(() => Common.StartServer(serverNumber, logsPort, htmlFilePath, logFilePath));
+            }
+            else
+            {
+                logsPort = Common.serverNumberPortNumber[serverNumber];
+            }
+            return logsPort;
         }
 
         private bool WaitForServerToStart(string url, int timeoutMilliseconds = 5000)
@@ -2125,8 +2145,12 @@ namespace Appium_Wizard
             {
                 appiumPortNumber = AppiumServerSetup.portServerNumberAndFilePath[serverNumber].Item1;
                 text = "Open logs in browser - " + appiumPortNumber;
+                openLogsButton.Visible = true;
             }
-
+            else
+            {
+                openLogsButton.Visible = false;
+            }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
         }

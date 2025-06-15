@@ -1517,7 +1517,7 @@ namespace Appium_Wizard
                         HttpListenerResponse response = context.Response;
 
                         // Set CORS headers
-                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        response.Headers.Add("Access-Control-Allow-Origin", prefix);
                         response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
                         response.Headers.Add("Pragma", "no-cache");
                         response.Headers.Add("Expires", "0");
@@ -1593,7 +1593,7 @@ namespace Appium_Wizard
                 Console.WriteLine($"Server {serverNumber} is not running.");
             }
         }
-        public static string GenerateHtmlWithFilePath(string filePath, int appiumPort)
+        public static string GenerateHtmlWithFilePath(string filePath, int appiumPort, int interval)
         {
             string htmlTemplate = @"
             <!DOCTYPE html>
@@ -1647,12 +1647,12 @@ namespace Appium_Wizard
                             });
                     }
                     fetchTextFile();
-                    setInterval(fetchTextFile, 1000);
+                    setInterval(fetchTextFile, interval);
                 </script>
             </body>
             </html>";
-        
             htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");
+            htmlTemplate = htmlTemplate.Replace("setInterval(fetchTextFile, interval)", $"setInterval(fetchTextFile, {interval})");
             // Save the updated HTML content to a temporary file
             string tempHtmlFilePath = Path.Combine(Path.GetTempPath(), $"GeneratedHtml_{Guid.NewGuid()}.html");
             File.WriteAllText(tempHtmlFilePath, htmlTemplate);

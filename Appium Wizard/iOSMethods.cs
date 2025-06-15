@@ -2375,6 +2375,35 @@ namespace Appium_Wizard
             return elementId;
         }
 
+        public static string FindElement(string URL, string json)
+        {
+            string elementId = string.Empty;
+            try
+            {
+                //string sessionId = GetWDASessionID(URL);
+                var options = new RestClientOptions(URL)
+                {
+                    //Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest(URL + "/element", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                string body = json;
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.OK &&  response.Content != null)
+                {
+                    JObject jsonObject = JObject.Parse(response.Content);
+                    elementId = jsonObject["value"]?["ELEMENT"]?.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Exception : " + ex.Message;
+            }
+            return elementId;
+        }
+
         public static string ClickElement(string udid, string URL, string sessionId, string XPath)
         {
             try
@@ -2449,6 +2478,35 @@ namespace Appium_Wizard
             catch (Exception)
             {
             }          
+        }
+
+        public static Dictionary<string,int> GetElementRect(string udid, string sessionURL, string elementId)
+        {
+            Dictionary<string, int> keyValuePairs = new Dictionary<string, int>();
+            try
+            {
+                var options = new RestClientOptions(sessionURL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    dynamic data = JsonConvert.DeserializeObject(response.Content);
+                    int x = Convert.ToInt32(data.value.x);
+                    int y = Convert.ToInt32(data.value.y);
+                    int width = Convert.ToInt32(data.value.width);
+                    int height = Convert.ToInt32(data.value.height);
+                    keyValuePairs.Add("x", x); keyValuePairs.Add("y", y);
+                    keyValuePairs.Add("width", width); keyValuePairs.Add("height", height);
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return keyValuePairs;
         }
     }
 }

@@ -92,27 +92,27 @@ namespace Appium_Wizard
             bool isRunning5 = false;
             await Task.Run(() =>
             {
-                if (port1 != 0)
+            if (port1 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(1))
                 {
                     isRunning1 = serverSetup.IsAppiumServerRunning(port1);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 20);
                 }
-                if (port2 != 0)
+                if (port2 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(2))
                 {
                     isRunning2 = serverSetup.IsAppiumServerRunning(port2);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 40);
                 }
-                if (port3 != 0)
+                if (port3 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(3))
                 {
                     isRunning3 = serverSetup.IsAppiumServerRunning(port3);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 60);
                 }
-                if (port4 != 0)
+                if (port4 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(4))
                 {
                     isRunning4 = serverSetup.IsAppiumServerRunning(port4);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 80);
                 }
-                if (port5 != 0)
+                if (port5 != 0 && AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(5))
                 {
                     isRunning5 = serverSetup.IsAppiumServerRunning(port5);
                     commonProgress.UpdateStepLabel("Get Status", "Please wait while getting Appium server status...", 100);
@@ -260,7 +260,7 @@ namespace Appium_Wizard
             commonProgress.UpdateStepLabel("Stop Server", "Please wait while Stopping Appium server on port " + portNumber + "...");
             await Task.Run(() =>
             {
-                serverSetup.StopAppiumServer(portNumber);
+                serverSetup.StopAppiumServer(serverNumber,portNumber);
             });
             if (isRunning)
             {
@@ -268,6 +268,7 @@ namespace Appium_Wizard
             }
             else
             {
+                ExecuteOnStopServer(serverNumber);
                 if (MainScreen.main != null)
                 {
                     MainScreen.main.UpdateTabText(serverNumber, portNumber, false);
@@ -340,31 +341,26 @@ namespace Appium_Wizard
 
         private async void StopButton1_Click(object sender, EventArgs e)
         {
-            ExecuteOnStopServer(1);
             await StopServer(1, PortTextBox1, StatusLabel1);
         }
 
         private async void StopButton2_Click(object sender, EventArgs e)
         {
-            ExecuteOnStopServer(2);
             await StopServer(2, PortTextBox2, StatusLabel2);
         }
 
         private async void StopButton3_Click(object sender, EventArgs e)
         {
-            ExecuteOnStopServer(3);
             await StopServer(3, PortTextBox3, StatusLabel3);
         }
 
         private async void StopButton4_Click(object sender, EventArgs e)
         {
-            ExecuteOnStopServer(4);
             await StopServer(4, PortTextBox4, StatusLabel4);
         }
 
         private async void StopButton5_Click(object sender, EventArgs e)
         {
-            ExecuteOnStopServer(5);
             await StopServer(5, PortTextBox5, StatusLabel5);
         }
 

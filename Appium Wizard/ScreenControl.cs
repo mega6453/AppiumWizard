@@ -19,8 +19,8 @@ namespace Appium_Wizard
         private DateTime pressStartTime;
         private const int PressThresholdMilliseconds = 500;
         public string IPAddress = "127.0.0.1";
-        string deviceName, udid, OSType, OSVersion, deviceModel;
-        int screenPort, proxyPort;
+        public string deviceName, udid, OSType, OSVersion, deviceModel;
+        public int screenPort, proxyPort;
         public static Dictionary<string, ScreenControl> udidScreenControl = new Dictionary<string, ScreenControl>();
         public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
         public static Dictionary<string, WebView2> webview2 = new Dictionary<string, WebView2>();
@@ -33,6 +33,7 @@ namespace Appium_Wizard
         private List<ScreenAction> recordedActions = new List<ScreenAction>();
         private bool isRecordingSteps = false;
         public string sessionURL = string.Empty;
+        public int screenDensity = 0;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
@@ -109,6 +110,7 @@ namespace Appium_Wizard
             udidScreenControl.Add(udid, this);
             if (OSType.Equals("Android"))
             {
+                screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
                 isAndroid = true;
             }
             else

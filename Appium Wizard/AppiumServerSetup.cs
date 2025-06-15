@@ -155,6 +155,7 @@ namespace Appium_Wizard
                         MainScreen.main.StartLogsServer(serverNumber);
                     }
                     string data = Regex.Replace(e.Data, @"\x1b\[[0-9;]*[mGKH]", "");
+                    data = Regex.Replace(data, @"<sup>\(1\)</sup>", "");
                     if (portServerNumberAndFilePath.ContainsKey(serverNumber))
                     {
                         WriteLog(serverNumber, data);
@@ -352,7 +353,10 @@ namespace Appium_Wizard
                         {
                             if (ScreenControl.udidScreenControl.ContainsKey(currentUDID))
                             {
-                                executionStatus.UpdateScreenControl(ScreenControl.udidScreenControl[currentUDID], data, screenDensity);
+                                Task.Run(() =>
+                                {
+                                    executionStatus.UpdateScreenControl(ScreenControl.udidScreenControl[currentUDID], data);
+                                });
                             }
                         }
                         //------------------------
@@ -361,8 +365,7 @@ namespace Appium_Wizard
                             string input = data;
                             int startIndex = input.IndexOf(":") + 2;
                             deviceUDID = input.Substring(startIndex);
-                            currentUDID = deviceUDID;
-                            screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(deviceUDID);
+                            currentUDID = deviceUDID;                            
                             if (MainScreen.DeviceInfo.ContainsKey(deviceUDID))
                             {
                                 string name = MainScreen.DeviceInfo[deviceUDID].Item1;
@@ -591,13 +594,12 @@ namespace Appium_Wizard
             Dictionary<string, int> rectangleDict = new Dictionary<string, int>();
             try
             {
-                var options = new RestClientOptions()
+                var options = new RestClientOptions(url)
                 {
-                    Timeout = TimeSpan.FromSeconds(5),
+                    //Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest(url +"/element/"+ elementId + "/rect", Method.Get);
-                //request.AddHeader("Content-Type", "application/json");
+                var request = new RestRequest(elementId + "/rect", Method.Get);
                 RestResponse response = client.Execute(request);
                 if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
                 {

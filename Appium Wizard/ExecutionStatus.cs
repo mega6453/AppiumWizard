@@ -14,33 +14,21 @@ namespace Appium_Wizard
         static string deviceId = string.Empty;
         static string element = string.Empty;
         static string elementId = string.Empty;
-        string sessionId = string.Empty; static string url = "";
+        static string url = "";
         int x, y, width, height, screenDensity;
         ScreenControl screenControl;
-        public void UpdateScreenControl(ScreenControl screenControl, string data, int screenDensity = 0)
+
+        public void UpdateScreenControl(ScreenControl screenControl, string data)
         {
-            this.screenDensity = screenDensity;
             this.screenControl = screenControl;
+            screenDensity = screenControl.screenDensity;
             try
             {
                 string statusText;
                 if (screenControl != null)
                 {
-                    // Get Session Id
-                    //if (data.Contains("--> POST /session/") && data.Contains("/element"))
-                    //{
-                    //    int startIndex = data.IndexOf("/session/") + "/session/".Length;
-                    //    int endIndex = data.IndexOf("/", startIndex);
-                    //    sessionId = data.Substring(startIndex, endIndex - startIndex);
-                    //}
-                    //if (data.Contains("--> POST /session/") && data.Contains("/element") && data.Contains("{\"using\":"))
-                    //{
-                    //    string json = GetOnlyJson(data);
-                    //    elementId = AndroidAPIMethods.FindElement(screenControl.sessionURL,json);
-                    //    GetRectValues(screenControl.sessionURL, elementId);
-                    //}
                     // Handling for Find element
-                    if (data.Contains("--> POST") && data.Contains("{\"using\":"))
+                    if (data.Contains("[POST /element]") || data.Contains("[POST /elements]"))
                     {
                         string pattern = @"(?<=\[POST\s)(http:\/\/[^\/]+\/session\/[^\/]+\/element)";
                         Regex regex = new Regex(pattern);
@@ -50,25 +38,19 @@ namespace Appium_Wizard
                             url = match.Value;
                         }
                         string json = GetOnlyJson(data);
-                        if (screenControl.isAndroid)
-                        {
-                            elementId = AndroidAPIMethods.FindElement(screenControl.sessionURL, json);
-                        }
-                        else
-                        {
-                            elementId = iOSAPIMethods.FindElement(screenControl.sessionURL, json);
-                        }
-                        if (!string.IsNullOrEmpty(elementId))
-                        {
-                            GetRectValues(screenControl.sessionURL, elementId);
-                            screenControl.DrawRectangle(screenControl, x, y, width, height);
-                        }
                         try
                         {
                             if (IsValidJson(json))
                             {
                                 var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                                element = dictionary["value"];
+                                if (dictionary.ContainsKey("selector"))
+                                {
+                                    element = dictionary["selector"];
+                                }
+                                else if (dictionary.ContainsKey("value"))
+                                {
+                                    element = dictionary["value"];
+                                }
                                 statusText = "Find Element " + element;
                                 screenControl.UpdateStatusLabel(screenControl, statusText);
                             }
@@ -77,34 +59,19 @@ namespace Appium_Wizard
                         {
                         }
                     }
-                    //else if (data.Contains("<-- OPTIONS /session/") && data.Contains("/element/") && (data.Contains("/click") || data.Contains("/value")))
-                    //{
-                    //    if (x == 0 & y == 0)
-                    //    {
-                    //        //elementId = GetElementId(data);
-                    //        //url = "http://127.0.0.1:8200/session/"+sessionId + "/element/";
-                    //        GetRectValues(screenControl.sessionURL, elementId);
-                    //    }
-                    //}
                     // Handling for Click
-                    else if ((data.Contains("--> POST /session/") | data.Contains("--> POST /element/")) && data.Contains("/click"))
+                    else if ((data.Contains(" --> POST /session/") && data.Contains("/element/")) && data.Contains("/click {}"))
                     {
                         statusText = "Click " + element;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
-                        if (x != 0 && y !=0)
-                        {
-                            int updatedX = x + (width / 2);
-                            int updatedY = y + (height / 2);
-                            screenControl.DrawDot(screenControl, updatedX, updatedY);
-                            //x = 0; // reset back so won't show for another element wrongly.
-                            //y = 0;
-                            //width = 0;
-                            //height = 0;
-                        }
+                        int updatedX = x + (width / 2);
+                        int updatedY = y + (height / 2);
+                        screenControl.DrawDot(screenControl, updatedX, updatedY);
                     }
                     // Handling for Send text
-                    else if (data.Contains("{\"text\":") | (data.Contains("--> POST /session/") && data.Contains("/value")))
+                    else if (data.Contains("{\"text\":") | (data.Contains("POST /session/") && data.Contains("/value")))
                     {
+                        screenControl.DrawRectangle(screenControl, x, y, width, height);
                         string text;
                         string json = GetOnlyJson(data);
                         try
@@ -115,17 +82,6 @@ namespace Appium_Wizard
                                 text = jsonObject.text;
                                 statusText = "Send text \"" + text + "\" to " + element;
                                 screenControl.UpdateStatusLabel(screenControl, statusText);
-
-                                //if (x != 0 && y != 0)
-                                //{
-                                //    int updatedX = x + (width / 2);
-                                //    int updatedY = y + (height / 2);
-                                //    screenControl.DrawRectangle(screenControl, updatedX, updatedY, width, height);
-                                //    //x = 0; // reset back so won't show for another element wrongly.
-                                //    //y = 0;
-                                //    //width = 0;
-                                //    //height = 0;
-                                //}
                             }
                         }
                         catch (Exception)
@@ -133,7 +89,7 @@ namespace Appium_Wizard
                         }
                     }
                     // Handling for installApp action
-                    else if (data.Contains("--> POST /session/") && data.Contains("/appium/device/install_app"))
+                    else if (data.Contains("POST /session/") && data.Contains("/appium/device/install_app"))
                     {
                         string fileName = string.Empty;
                         string appPath = GetValueFromJson(data, "appPath");
@@ -145,14 +101,14 @@ namespace Appium_Wizard
                         screenControl.UpdateStatusLabel(screenControl, statusText);
                     }
                     // Handling for uninstallApp action
-                    else if (data.Contains("--> POST /session/") && data.Contains("/appium/device/remove_app"))
+                    else if (data.Contains("POST /session/") && data.Contains("/appium/device/remove_app"))
                     {
                         string appId = GetValueFromJson(data, "appId");
                         statusText = "Uninstall " + appId;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
                     }
                     // Handling for closeApp action
-                    else if (data.Contains("--> POST /session/") && data.Contains("/appium/app/terminate_app"))
+                    else if (data.Contains("POST /session/") && data.Contains("/appium/app/terminate_app"))
                     {
                         string appId = GetValueFromJson(data, "appId");
                         statusText = "Close App " + appId;
@@ -164,14 +120,14 @@ namespace Appium_Wizard
                         screenControl.UpdateStatusLabel(screenControl, "");
                     }
                     // Handling for launchApp action
-                    else if (data.Contains("--> POST /session/") && data.Contains("/appium/app/launch"))
+                    else if (data.Contains("POST /session/") && data.Contains("/appium/app/launch"))
                     {
                         statusText = "Launch App";
                         screenControl.UpdateStatusLabel(screenControl, statusText);
                     }
 
                     // Handling for clear
-                    else if (data.Contains("--> POST /element/") && data.Contains("/clear"))
+                    else if (data.Contains("[POST /element/") && data.Contains("/clear]"))
                     {
                         statusText = "Clear " + element;
                         screenControl.UpdateStatusLabel(screenControl, statusText);
@@ -240,7 +196,7 @@ namespace Appium_Wizard
                     }
 
                     //Drag Gesture - Android
-                    else if (data.Contains("--> POST /session/") && data.Contains("dragGesture"))
+                    else if (data.Contains(" POST /session/") && data.Contains("dragGesture"))
                     {
                         string jsonString = GetOnlyJson(data);
                         var jsonDocument = JsonDocument.Parse(jsonString);
@@ -261,7 +217,7 @@ namespace Appium_Wizard
                     }
 
                     //Drag Gesture - iOS
-                    else if (data.Contains("--> POST /session/") && data.Contains("dragFromToForDuration"))
+                    else if (data.Contains(" POST /session/") && data.Contains("dragFromToForDuration"))
                     {
                         string jsonString = GetOnlyJson(data);
                         var jsonDocument = JsonDocument.Parse(jsonString);
@@ -281,56 +237,29 @@ namespace Appium_Wizard
                         screenControl.DrawArrow(screenControl, startX, startY, endX, endY);
                     }
 
-                    else if (data.Contains("<-- POST /session/") && data.Contains("/element 200"))
-                    {
-                        screenControl.UpdateStatusLabel(screenControl, "");
-                    }
-
                     // Handling Responses
-                    //else if (data.Contains("Got response with status"))
-                    //{
-                    //    try
-                    //    {
-                    //        if (data.Contains("value") && data.Contains("ELEMENT") && data.Contains("sessionId"))
-                    //        {
-                    //            string json = GetOnlyJson(data);
-                    //            JObject jsonObject = JObject.Parse(json);
-                    //            string elementId = jsonObject["value"]["ELEMENT"].ToString();
-                    //            sessionId = jsonObject["sessionId"].ToString();
+                    else if (data.Contains("Got response with status 200"))
+                    {
+                        try
+                        {
+                            if (data.Contains("value") && data.Contains("ELEMENT") && data.Contains("sessionId"))
+                            {
+                                string json = GetOnlyJson(data);
+                                JObject jsonObject = JObject.Parse(json);
+                                string elementId = jsonObject["value"]["ELEMENT"].ToString();
+                                GetRectValues(url,elementId);
+                                screenControl.UpdateStatusLabel(screenControl, "");
+                            }
+                            else
+                            {
+                                screenControl.UpdateStatusLabel(screenControl, "");
+                            }
+                        }
+                        catch (Exception)
+                        {
 
-                    //            //var result = AppiumServerSetup.ElementInfo(url, elementId);
-                    //            //if (result != null)
-                    //            //{
-                    //            //    if (screenDensity != 0)
-                    //            //    {
-                    //            //        x = (int)(result["x"] / (screenDensity / 160f));
-                    //            //        y = (int)(result["y"] / (screenDensity / 160f));
-                    //            //        width = (int)(result["width"] / (screenDensity / 160f));
-                    //            //        height = (int)(result["height"] / (screenDensity / 160f));
-                    //            //    }
-                    //            //    else
-                    //            //    {
-                    //            //        x = result["x"];
-                    //            //        y = result["y"];
-                    //            //        width = result["width"];
-                    //            //        height = result["height"];
-                    //            //    }
-                    //            //    screenControl.DrawRectangle(screenControl, x, y, width, height);
-                    //            //}
-                    //            //GetRectValues(url,elementId);
-                    //            //screenControl.DrawRectangle(screenControl, x, y, width, height);
-                    //            screenControl.UpdateStatusLabel(screenControl, "");
-                    //        }
-                    //        else
-                    //        {
-                    //            screenControl.UpdateStatusLabel(screenControl, "");
-                    //        }
-                    //    }
-                    //    catch (Exception)
-                    //    {
-
-                    //    }
-                    //}
+                        }
+                    }
                 }
             }
             catch (Exception)
@@ -338,12 +267,13 @@ namespace Appium_Wizard
             }
         }
 
+
         private void GetRectValues(string url, string elementId)
         {
             var result = AppiumServerSetup.ElementInfo(url, elementId);
             if (result.Count != 0 && result != null)
             {
-                if (screenDensity != 0)
+                if (screenControl.isAndroid)
                 {
                     x = (int)(result["x"] / (screenDensity / 160f));
                     y = (int)(result["y"] / (screenDensity / 160f));
@@ -357,6 +287,7 @@ namespace Appium_Wizard
                     width = result["width"];
                     height = result["height"];
                 }
+                screenControl.DrawRectangle(screenControl, x, y, width, height);
             }
         }
 

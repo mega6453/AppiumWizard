@@ -2479,5 +2479,34 @@ namespace Appium_Wizard
             {
             }          
         }
+
+        public static Dictionary<string,int> GetElementRect(string udid, string sessionURL, string elementId)
+        {
+            Dictionary<string, int> keyValuePairs = new Dictionary<string, int>();
+            try
+            {
+                var options = new RestClientOptions(sessionURL)
+                {
+                    // Timeout = TimeSpan.FromSeconds(1)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/element/" + elementId + "/rect", Method.Get);
+                RestResponse response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    dynamic data = JsonConvert.DeserializeObject(response.Content);
+                    int x = Convert.ToInt32(data.value.x);
+                    int y = Convert.ToInt32(data.value.y);
+                    int width = Convert.ToInt32(data.value.width);
+                    int height = Convert.ToInt32(data.value.height);
+                    keyValuePairs.Add("x", x); keyValuePairs.Add("y", y);
+                    keyValuePairs.Add("width", width); keyValuePairs.Add("height", height);
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return keyValuePairs;
+        }
     }
 }

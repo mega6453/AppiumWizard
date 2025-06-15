@@ -245,6 +245,16 @@ namespace Appium_Wizard
                     serverConfig.ShowDialog();
                 }
             }
+            try
+            {
+                if (server1WebView.CoreWebView2 != null)
+                {
+                    server1WebView.Reload();
+                }
+            }
+            catch (Exception)
+            {
+            }
             //tabControl1.SelectedIndex = 0;
             //tabControl1_SelectedIndexChanged(tabControl1, EventArgs.Empty);
             GoogleAnalytics.SendEvent("MainScreen_Shown");

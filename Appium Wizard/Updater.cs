@@ -215,6 +215,8 @@ namespace Appium_Wizard
         {
             try
             {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
                 Version v1 = new Version(InstalledXCUITestDriverVersion);
                 Version v2 = new Version(AvailableXCUITestVersion);
                 if (v1.Major != v2.Major)
@@ -223,8 +225,6 @@ namespace Appium_Wizard
                         "\n\nPresss Yes to apply this update.\nPress No to apply next minor version update(if there's any).\nPress Cancel to cancel the update.", "XCUITest Update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
-                        CommonProgress commonProgress = new CommonProgress();
-                        commonProgress.Owner = this;
                         commonProgress.Show();
                         commonProgress.UpdateStepLabel("Update XCUITest driver", "Please wait while updating XCUITest driver version to " + AvailableXCUITestVersion);
                         await Task.Run(() =>
@@ -232,13 +232,9 @@ namespace Appium_Wizard
                             Common.UpdateXCUITestDriver(showExecutionCheckbox.Checked, true);
                             isUpdated = true;
                         });
-                        commonProgress.Close();
-                        await GetVersionInformation();
                     }
                     if (result == DialogResult.No)
                     {
-                        CommonProgress commonProgress = new CommonProgress();
-                        commonProgress.Owner = this;
                         commonProgress.Show();
                         commonProgress.UpdateStepLabel("Update XCUITest driver", "Please wait while updating XCUITest driver version to next available minor version(if there's any)...");
                         await Task.Run(() =>
@@ -246,14 +242,10 @@ namespace Appium_Wizard
                             Common.UpdateXCUITestDriver(showExecutionCheckbox.Checked);
                             isUpdated = true;
                         });
-                        commonProgress.Close();
-                        await GetVersionInformation();
                     }
                 }
                 else
                 {
-                    CommonProgress commonProgress = new CommonProgress();
-                    commonProgress.Owner = this;
                     commonProgress.Show();
                     commonProgress.UpdateStepLabel("Update XCUITest driver", "Please wait while updating XCUITest driver version to " + AvailableXCUITestVersion);
                     await Task.Run(() =>
@@ -261,9 +253,18 @@ namespace Appium_Wizard
                         Common.UpdateXCUITestDriver(showExecutionCheckbox.Checked, true);
                         isUpdated = true;
                     });
-                    commonProgress.Close();
-                    await GetVersionInformation();
                 }
+                if (isUpdated)
+                {
+                    commonProgress.UpdateStepLabel("Get WebDriverAgent", "Getting compatible WebDriverAgent based on the updated XCUITest driver version, This may take sometime, Please wait...",75);
+                    await Task.Run(() =>
+                    {
+                        Common.GetWebDriverAgentIPAFile();
+                    });
+                    commonProgress.Close();
+                    MessageBox.Show("Downloaded compatible version of WDA.\nDelete the already installed WDA from your iPhone and Open the device again to install the compataible WDA.", "Re-Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                await GetVersionInformation();
             }
             catch (Exception)
             {

@@ -220,7 +220,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Get WebDriverAgent", "Getting compatible WebDriverAgent based on installed XCUITest driver version, This may take sometime, Please wait...");
+            commonProgress.UpdateStepLabel("Get WebDriverAgent", "Getting compatible WebDriverAgent based on the installed XCUITest driver version, This may take sometime, Please wait...");
             await Task.Run(() =>
             {
                 Common.GetWebDriverAgentIPAFile();
@@ -300,7 +300,7 @@ namespace Appium_Wizard
         {
             if (showProgresscheckBox.Checked)
             {
-                MessageBox.Show("Checking this box will display the CMD window where the Appium server or driver uninstallation/installation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Checking this box will display the CMD window where the Appium server or driver uninstallation/installation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

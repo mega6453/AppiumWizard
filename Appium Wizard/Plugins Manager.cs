@@ -205,7 +205,7 @@ namespace Appium_Wizard
         {
             if (showProgressCheckBox2.Checked)
             {
-                MessageBox.Show("Checking this box will display the CMD window where the plugin installation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Checking this box will display the CMD window where the plugin installation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Appium_Wizard
         {
             if (showProgressCheckBox1.Checked)
             {
-                MessageBox.Show("Checking this box will display the CMD window where the plugin installation/updation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Checking this box will display the CMD window where the plugin installation/updation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

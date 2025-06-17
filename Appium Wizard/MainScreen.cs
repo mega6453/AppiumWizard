@@ -1203,9 +1203,12 @@ namespace Appium_Wizard
         {
             if (e.Button == MouseButtons.Right)
             {
-                if (listView1.FocusedItem.Bounds.Contains(e.Location))
+                if (listView1.FocusedItem != null && listView1.FocusedItem.Bounds.Contains(e.Location))
                 {
-                    contextMenuStrip2.Show(Cursor.Position);
+                    if (contextMenuStrip2 != null)
+                    {
+                        contextMenuStrip2.Show(Cursor.Position);
+                    }
                 }
             }
         }
@@ -2040,7 +2043,7 @@ namespace Appium_Wizard
                 case "info":
                     return 2000;
                 case "debug":
-                    return 5000;               
+                    return 5000;
                 default:
                     return 5000;
             }

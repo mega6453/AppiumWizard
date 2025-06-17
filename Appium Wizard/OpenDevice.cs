@@ -147,6 +147,8 @@ namespace Appium_Wizard
                     else
                     {
                         Logger.Info("connectionType NOT Equals(\"Wi-Fi\"), Start iProxy server");
+                        Common.KillProcessByPortNumber(proxyPort);
+                        Common.KillProcessByPortNumber(screenServerPort);
                         iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                     }
                     commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent already running...", 15);
@@ -157,6 +159,13 @@ namespace Appium_Wizard
                         {
                             commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
                             var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
+                            if (screenSize.Item1 == 0)
+                            {
+                                commonProgress.Close();
+                                isScreenServerStarted = false;
+                                MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                             width = screenSize.Item1;
                             height = screenSize.Item2;
                         }
@@ -234,6 +243,13 @@ namespace Appium_Wizard
                             {
                                 commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
                                 var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
+                                if (screenSize.Item1 == 0)
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
                                 width = screenSize.Item1;
                                 height = screenSize.Item2;
                                 commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
@@ -387,6 +403,13 @@ namespace Appium_Wizard
                                     iOSAPIMethods.GoToHome(proxyPort);
                                     commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
                                     var screenSize = iOSAPIMethods.GetScreenSize(proxyPort);
+                                    if (screenSize.Item1 == 0)
+                                    {
+                                        commonProgress.Close();
+                                        isScreenServerStarted = false;
+                                        MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
                                     width = screenSize.Item1;
                                     height = screenSize.Item2;
                                     commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);

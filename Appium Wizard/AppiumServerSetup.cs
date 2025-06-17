@@ -20,9 +20,11 @@ namespace Appium_Wizard
         public static bool UpdateStatusInScreenFlag = true;
         public static Dictionary<int, int> serverNumberWDAPortNumber = new Dictionary<int, int>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+        string appiumLogLevel, updatedCommand;
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+            tempFolder = Path.GetTempPath();
+            logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy_h-mm-ss_tt") + ".txt");
             if (!command.Contains("webDriverAgentProxyPort"))
             {
                 command = command + $@" -dc ""{{""""appium:webDriverAgentUrl"""":""""http://localhost:webDriverAgentProxyPort""""}}""";
@@ -31,10 +33,30 @@ namespace Appium_Wizard
             {
                 command = command + " --port " + appiumPort;
             }
-            string logLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
+            appiumLogLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
+            if (!command.Contains(" --log "))
+            {
+                command = command + " --log " + logFilePath;
+            }
             if (!command.Contains("--log-level"))
             {
-                command = command + " --log-level " + logLevel;
+                if (appiumLogLevel.Equals("info"))
+                {
+                    appiumLogLevel = "debug:info"; //use debug logs to get element information to update screen control, show info logs in Main screen.
+                }
+                else if (appiumLogLevel.Equals("error"))
+                {
+                    appiumLogLevel = "debug:error";
+                }
+                else
+                {
+                    appiumLogLevel = "debug:debug";
+                }
+                command = command + " --log-level " + appiumLogLevel;
+            }
+            if (!command.Contains(" --local-timezone"))
+            {
+                command = command + " --local-timezone";
             }
             int webDriverAgentProxyPort = Common.GetFreePort();
             if (serverNumberWDAPortNumber.ContainsKey(serverNumber))
@@ -45,14 +67,20 @@ namespace Appium_Wizard
             {
                 serverNumberWDAPortNumber.Add(serverNumber, webDriverAgentProxyPort);
             }
-            string updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
-            tempFolder = Path.GetTempPath();
-            logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy h-mm-ss tt") + ".txt");
-            File.WriteAllText(logFilePath, "\t\t------------------------------Starting Appium Server------------------------------\n\n");
+            updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
+            string startingText = "\t\t------------------------------Starting Appium Server------------------------------\n\n";
+            InitializeLogWriter(serverNumber,logFilePath);
+            WriteLog(serverNumber, startingText);
+            CloseLogWriter(serverNumber);
             if (!Common.IsNodeInstalled())
             {
-                File.WriteAllText(logFilePath, "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n");
-            }
+                startingText = "\t\t----------------NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server----------------\n\n";
+                InitializeLogWriter(serverNumber, logFilePath);
+                WriteLog(serverNumber, startingText);
+                CloseLogWriter(serverNumber);
+                statusText = "NodeJS not installed";
+                return;
+            }           
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -95,38 +123,7 @@ namespace Appium_Wizard
                 }
                 int processId = appiumServerProcess.Id;
                 MainScreen.runningProcesses.Add(processId);
-                MainScreen.runningProcessesPortNumbers.Add(appiumPort);
-                InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
-                if (logLevel.Equals("error"))
-                {
-                    int count = 1;
-                    Task.Run(() => {
-                        while (!serverStarted)
-                        {
-                            bool isRunning = IsAppiumServerRunning(appiumPort);
-                            if (isRunning)
-                            {
-                                serverStarted = true;
-                                WriteLog(serverNumber, "Appium Server Running in Port : " + appiumPort + "\n");
-                                WriteLog(serverNumber, "Appium command : " + updatedCommand + "\n");
-                                WriteLog(serverNumber, "Log level set to error - So only error logs will be displayed.");
-                                WriteLog(serverNumber, "\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
-                                if (MainScreen.main != null)
-                                {
-                                    MainScreen.main.StartLogsServer(serverNumber);
-                                    MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1, true);
-                                    MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
-                                }
-                            }
-                            count++;
-                            if (count == 20)
-                            {
-                                break;
-                            }
-                            Task.Delay(3000);
-                        }
-                    });
-                }                   
+                MainScreen.runningProcessesPortNumbers.Add(appiumPort);                
             }
             catch (Exception ex)
             {
@@ -158,10 +155,17 @@ namespace Appium_Wizard
                     data = Regex.Replace(data, @"<sup>\(1\)</sup>", "");
                     if (portServerNumberAndFilePath.ContainsKey(serverNumber))
                     {
-                        WriteLog(serverNumber, data);
                         if (data.Contains("No plugins have been installed.") || data.Contains("No plugins activated."))
                         {
+                            InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
+                            if (appiumLogLevel.Contains("error"))
+                            {
+                                WriteLog(serverNumber, "Appium Server Running in Port : " + portServerNumberAndFilePath[serverNumber].Item1 + "\n");
+                                WriteLog(serverNumber, "Appium command : " + updatedCommand + "\n");
+                                WriteLog(serverNumber, "Log level set to error - So only error logs will be displayed.");
+                            }
                             WriteLog(serverNumber, "\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");
+                            CloseLogWriter(serverNumber);
                             if (MainScreen.main != null)
                             {
                                 MainScreen.main.UpdateTabText(serverNumber, portServerNumberAndFilePath[serverNumber].Item1, true);

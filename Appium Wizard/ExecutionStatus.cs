@@ -248,12 +248,8 @@ namespace Appium_Wizard
                                 JObject jsonObject = JObject.Parse(json);
                                 string elementId = jsonObject["value"]["ELEMENT"].ToString();
                                 GetRectValues(url,elementId);
-                                screenControl.UpdateStatusLabel(screenControl, "");
                             }
-                            else
-                            {
-                                screenControl.UpdateStatusLabel(screenControl, "");
-                            }
+                            screenControl.UpdateStatusLabel(screenControl, "");
                         }
                         catch (Exception)
                         {

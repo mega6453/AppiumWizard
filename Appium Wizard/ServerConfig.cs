@@ -217,6 +217,12 @@ namespace Appium_Wizard
                         MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         break;
                     }
+                    else if (serverSetup.statusText.Equals("NodeJS not installed"))
+                    {
+                        statusLabel.Text = "Not Running";
+                        MessageBox.Show("NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
                     else if (count == 20)
                     {
                         MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -299,7 +299,7 @@ namespace Appium_Wizard
         {
             if (showExecutionCheckbox.Checked)
             {
-                MessageBox.Show("Checking this box will display the CMD window where the Appium server or driver update execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.\"", "Show execution status",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                MessageBox.Show("Checking this box will display the CMD window where the Appium server or driver update execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.", "Show execution status",MessageBoxButtons.OK,MessageBoxIcon.Information);
             }
         }
     }

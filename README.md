@@ -42,7 +42,7 @@ to install it during the first time launch which may take sometime to complete i
 ## Features Available
 #### Server
 * 5 Parallel Appium servers
-* Server Settings - Set server arguments and default capabilities & log level separately for each server 
+* Server Settings - Set server arguments, default capabilities & log level separately for each server 
 * Update Appium Server and drivers
 * Troubleshooter to fix appium and driver issues
 * Plugins Manager - Install, Update and Uninstall

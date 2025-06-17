@@ -765,6 +765,19 @@ namespace Appium_Wizard
             }
         }
 
+        public void KillWDA(string udid)
+        {
+
+            if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
+            {
+                KillAppUsingExecutable(MainScreen.UDIDPreInstalledWDA[udid], udid);
+            }
+            else
+            {
+                KillAppUsingExecutable("com.facebook.WebDriverAgentRunner.xctrunner",udid);
+            }
+           
+        }
         public string IsWDARunning(int port)
         {
             try
@@ -1630,6 +1643,11 @@ namespace Appium_Wizard
                     {
                         Thread.Sleep(7000);
                         iOSMethods.GetInstance().GoToHomeScreen(udid);
+                        if (count==5)
+                        {
+                            Common.KillProcessByPortNumber(port);
+                            GetInstance().StartiOSProxyServer(udid, port, 8100);
+                        }
                         Thread.Sleep(2000);
                         sessionId = iOSAPIMethods.CreateWDASession(port);
                         if (!sessionId.Equals("nosession"))
@@ -1637,6 +1655,7 @@ namespace Appium_Wizard
                             break;
                         }
                         commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
+                        iOSMethods.GetInstance().KillWDA(udid);
                         iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
                         commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");
                         count++;
@@ -1894,25 +1913,27 @@ namespace Appium_Wizard
 
         public static (int, int) GetScreenSize(int proxyPort)
         {
-            int width, height;
-            var options = new RestClientOptions("http://localhost:" + proxyPort)
+            int width=0, height=0;
+            try
             {
-                Timeout = TimeSpan.FromSeconds(30)
-            };
-            var client = new RestClient(options);
-            var request = new RestRequest("/window/size", Method.Get);
-            RestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
-            Logger.Info("GetScreenSize response content : " + response.Content);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                dynamic jsonObj = JsonConvert.DeserializeObject(response.Content);
-                width = jsonObj.value.width;
-                height = jsonObj.value.height;
+                var options = new RestClientOptions("http://localhost:" + proxyPort)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/window/size", Method.Get);
+                RestResponse response = client.Execute(request);
+                Console.WriteLine(response.Content);
+                Logger.Info("GetScreenSize response content : " + response.Content);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    dynamic jsonObj = JsonConvert.DeserializeObject(response.Content);
+                    width = jsonObj.value.width;
+                    height = jsonObj.value.height;
+                }
             }
-            else
+            catch (Exception)
             {
-                throw new Exception(response.Content);
             }
             return (width, height);
         }

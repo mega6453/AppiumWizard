@@ -168,10 +168,10 @@ This project is dual-licensed under the MIT and GPL 3.0 licenses.
 * [**Meganathan C**](https://mega6453.carrd.co)
 
 ## Changelog
-* ./CHANGELOG.md
+* [Changelog](./CHANGELOG.md)
 
 ## Troubleshooting Guide
-* ./TROUBLESHOOTINGGUIDE.md
+* [Troubleshooting Guide](./TROUBLESHOOTINGGUIDE.md)
 
 ## Contributing to the Project
 * **Fork the Repo**: Click the "Fork" button at the top right of the repository page to create your own copy of the repository.

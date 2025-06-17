@@ -42,7 +42,7 @@ to install it during the first time launch which may take sometime to complete i
 ## Features Available
 #### Server
 * 5 Parallel Appium servers
-* Server Settings - Set server arguments and default capabilities separately for each server 
+* Server Settings - Set server arguments and default capabilitie ls & log level separately for each server 
 * Update Appium Server and drivers
 * Troubleshooter to fix appium and driver issues
 * Plugins Manager - Install, Update and Uninstall
@@ -53,7 +53,7 @@ to install it during the first time launch which may take sometime to complete i
 * IPA Signer
 * iOS Proxy selection with 3 methods
 * iOS Executor - 2 ways to execute iOS actions
-* Option to use pre-installed WDA by right clicking on iPhone (skipping certificate check) (**New**)
+* Option to use pre-installed WDA by right clicking on iPhone (skipping certificate check)
 #### Android 
 * Android Automation Execution
 * Android Screen Reflection and Screen Control
@@ -68,6 +68,8 @@ to install it during the first time launch which may take sometime to complete i
 * Record Screen from Screen Control
 * Notifications - Enable/Disable Notifications for few events 
 * Object Spy - Beta version
+* Test Runner (**New**)
+* Record and Playback (**New**)
 
 ## Features/Improvements in Queue
 * Add cancel button for progress window

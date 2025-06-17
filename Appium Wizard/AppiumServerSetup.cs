@@ -34,26 +34,26 @@ namespace Appium_Wizard
                 command = command + " --port " + appiumPort;
             }
             string logLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
-            //if (!command.Contains(" --log "))
-            //{
-            //    command = command + " --log " + logFilePath;
-            //}
-            //if (!command.Contains("--log-level"))
-            //{
-            //    if (logLevel.Equals("info"))
-            //    {
-            //        logLevel = "debug:info"; //use debug logs to get element information to update screen control, show info logs in Main screen.
-            //    }
-            //    else if (logLevel.Equals("error"))
-            //    {
-            //        logLevel = "debug:error";
-            //    }
-            //    command = command + " --log-level " + logLevel;
-            //}
-            //if (!command.Contains(" --local-timezone"))
-            //{
-            //    command = command + " --local-timezone";
-            //}
+            if (!command.Contains(" --log "))
+            {
+                command = command + " --log " + logFilePath;
+            }
+            if (!command.Contains("--log-level"))
+            {
+                if (logLevel.Equals("info"))
+                {
+                    logLevel = "debug:info"; //use debug logs to get element information to update screen control, show info logs in Main screen.
+                }
+                else if (logLevel.Equals("error"))
+                {
+                    logLevel = "debug:error";
+                }
+                command = command + " --log-level " + logLevel;
+            }
+            if (!command.Contains(" --local-timezone"))
+            {
+                command = command + " --local-timezone";
+            }
             int webDriverAgentProxyPort = Common.GetFreePort();
             if (serverNumberWDAPortNumber.ContainsKey(serverNumber))
             {
@@ -180,7 +180,7 @@ namespace Appium_Wizard
                         using (var fileStream = new FileStream(portServerNumberAndFilePath[serverNumber].Item2, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                         using (var streamWriter = new StreamWriter(fileStream))
                         {
-                            streamWriter.WriteLine(data);
+                            //streamWriter.WriteLine(data);
                             if (data.Contains("No plugins have been installed.") | data.Contains("No plugins activated."))
                             {
                                 streamWriter.WriteLine("\n\n\t\t------------------------------Appium Server Ready to Use------------------------------\n\n");

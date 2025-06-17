@@ -167,6 +167,12 @@ This project is dual-licensed under the MIT and GPL 3.0 licenses.
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)
 
+## Changelog
+* ./CHANGELOG.md
+
+## Troubleshooting Guide
+* ./TROUBLESHOOTINGGUIDE.md
+
 ## Contributing to the Project
 * **Fork the Repo**: Click the "Fork" button at the top right of the repository page to create your own copy of the repository.
 * **Make Changes**: Clone your forked repository to your local machine, and make the necessary changes in a new branch. It's a good practice to give your branch a descriptive name related to the changes you're making.

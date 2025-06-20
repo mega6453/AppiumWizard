@@ -324,6 +324,18 @@ namespace Appium_Wizard
             }
         }
 
+        public void UninstallWDA(string udid)
+        {
+            if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
+            {
+                UninstallApp(udid, MainScreen.UDIDPreInstalledWDA[udid]);
+            }
+            else
+            {
+                UninstallApp(udid, "com.facebook.WebDriverAgentRunner.xctrunner");
+            }
+        }
+
         public void TakeScreenshot(string udid, string path)
         {
             if (MainScreen.udidProxyPort.ContainsKey(udid))

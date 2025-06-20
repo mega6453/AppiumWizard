@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
@@ -276,6 +277,7 @@ namespace Appium_Wizard
                     selectedDeviceIP = selectedItem.SubItems.Count > 6 ? selectedItem.SubItems[6].Text : string.Empty;
                     selectedDeviceModel = selectedItem.SubItems.Count > 7 ? selectedItem.SubItems[7].Text : string.Empty;
                     Open.Enabled = true;
+                    OpenDropDownButton.Enabled = true;
                     MoreButton.Enabled = true;
                     DeleteDevice.Enabled = true;
                     if (selectedOS.Equals("iOS"))
@@ -323,6 +325,7 @@ namespace Appium_Wizard
                         panel1.Visible = false;
                         capabilityLabel.Visible = false;
                         Open.Enabled = false;
+                        OpenDropDownButton.Enabled = false;
                         contextMenuStrip4.Items[0].Enabled = false;
                         contextMenuStrip4.Items[1].Enabled = false;
                         contextMenuStrip4.Items[2].Enabled = true; // Refresh
@@ -333,6 +336,7 @@ namespace Appium_Wizard
                     else
                     {
                         Open.Enabled = true;
+                        OpenDropDownButton.Enabled = true;
                         foreach (var item in contextMenuStrip4.Items)
                         {
                             if (item is ToolStripItem toolStripItem)
@@ -347,6 +351,7 @@ namespace Appium_Wizard
                     panel1.Visible = false;
                     capabilityLabel.Visible = false;
                     Open.Enabled = false;
+                    OpenDropDownButton.Enabled = false;
                     DeleteDevice.Enabled = false;
                     MoreButton.Enabled = false;
                     mandatorymsglabel.Visible = false;
@@ -2226,6 +2231,79 @@ namespace Appium_Wizard
         public void UpdateWebViewDefaultText(int serverNumber)
         {
             SetDefaultText(serverNumberWebView[serverNumber], defaultText);
+        }
+
+        private async void reInitializeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string description = "Use this option in case if opening device fails. ";
+            if (selectedOS.Equals("iOS"))
+            {
+                description += "This action will reinstall the WebDriverAgent on the " + selectedDeviceName + " and restart the device.\n\nOnce the device rebooted, unlock the device and then try to open the device again.\n\nDo you want to continue?";
+
+            }
+            else
+            {
+                description += "This action will reinstall the UIAutomator on the " + selectedDeviceName + " and restart the device.\n\nOnce the device rebooted, unlock the device and then try to open the device again.\n\nDo you want to continue?";
+            }
+            var result = MessageBox.Show(description, "Re-Initialize Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                if (selectedOS.Equals("iOS"))
+                {
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling WDA...", 10);
+                    await Task.Run(() =>
+                    {
+                        iOSMethods.GetInstance().UninstallWDA(selectedUDID);
+                    });
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing WDA...", 30);
+                    bool isWDAInstalled = false;
+                    await Task.Run(() =>
+                    {
+                        isWDAInstalled = iOSMethods.GetInstance().InstallWDA(selectedUDID);
+                    });
+                    if (isWDAInstalled)
+                    {
+                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                        await Task.Run(() =>
+                        {
+                            iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                        });
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to install WebDriverAgent. Please check if you have valid profile in iOS profile management.\n\n Canceling Reboot step.", "Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling uiautomator...", 10);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().UninstallUIAutomator(selectedUDID);
+                    });
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing uiautomator...", 30);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().InstallUIAutomator(selectedUDID);
+                    });
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().RebootDevice(selectedUDID);
+                    });
+                }
+                commonProgress.Close();
+                MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void OpenDropDownButton_Click(object sender, EventArgs e)
+        {
+            Point screenPoint = OpenDropDownButton.PointToScreen(new Point(0, OpenDropDownButton.Height));
+            openContextMenuStrip.Show(screenPoint);
         }
     }
 }

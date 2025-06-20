@@ -182,7 +182,11 @@ namespace Appium_Wizard
                 var size = new Size(this.Width - totalColumnWidth - 100, this.Height - 150);
                 tabControl1.Left = listView1.Width + 50;
                 tabControl1.Size = size;
-                var webviewSize = new Size(size.Width, size.Height - 50);
+                server1WebView.Size = size;
+                server2WebView.Size = size;
+                server3WebView.Size = size;
+                server4WebView.Size = size;
+                server5WebView.Size = size;
                 openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
@@ -2253,28 +2257,37 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 if (selectedOS.Equals("iOS"))
                 {
-                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling WDA...", 10);
-                    await Task.Run(() =>
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while checking if provisioning profile available for this device...", 10);
+                    if (iOSMethods.GetInstance().isProfileAvailableToSign(selectedUDID).Item1)
                     {
-                        iOSMethods.GetInstance().UninstallWDA(selectedUDID);
-                    });
-                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing WDA...", 30);
-                    bool isWDAInstalled = false;
-                    await Task.Run(() =>
-                    {
-                        isWDAInstalled = iOSMethods.GetInstance().InstallWDA(selectedUDID);
-                    });
-                    if (isWDAInstalled)
-                    {
-                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling WDA...", 20);
                         await Task.Run(() =>
                         {
-                            iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                            iOSMethods.GetInstance().UninstallWDA(selectedUDID);
                         });
+                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing WDA...", 30);
+                        bool isWDAInstalled = false;
+                        await Task.Run(() =>
+                        {
+                            isWDAInstalled = iOSMethods.GetInstance().InstallWDA(selectedUDID);
+                        });
+                        if (isWDAInstalled)
+                        {
+                            commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                            await Task.Run(() =>
+                            {
+                                iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                            });
+                            MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.\n\nIf possible, restart Appium Wizard also and then try opening device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to install WebDriverAgent. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Reboot step.", "Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Failed to install WebDriverAgent. Please check if you have valid profile in iOS profile management.\n\n Canceling Reboot step.", "Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Provisioning profile not found for this device. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Uninstalling WDA step.\n\nIf you have WDA already installed in this device, try restarting the device and then open the device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else
@@ -2294,9 +2307,9 @@ namespace Appium_Wizard
                     {
                         AndroidMethods.GetInstance().RebootDevice(selectedUDID);
                     });
+                    MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.\n\nIf possible, restart Appium Wizard also and then try opening device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 commonProgress.Close();
-                MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

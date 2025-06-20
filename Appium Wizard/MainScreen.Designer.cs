@@ -149,7 +149,7 @@ namespace Appium_Wizard
             // 
             Open.AutoSize = true;
             Open.Enabled = false;
-            Open.Location = new Point(218, 50);
+            Open.Location = new Point(222, 50);
             Open.Margin = new Padding(2);
             Open.Name = "Open";
             Open.Size = new Size(91, 26);
@@ -260,7 +260,7 @@ namespace Appium_Wizard
             // 
             DeleteDevice.AutoSize = true;
             DeleteDevice.Enabled = false;
-            DeleteDevice.Location = new Point(111, 50);
+            DeleteDevice.Location = new Point(115, 50);
             DeleteDevice.Margin = new Padding(2);
             DeleteDevice.Name = "DeleteDevice";
             DeleteDevice.Size = new Size(98, 26);
@@ -947,7 +947,7 @@ namespace Appium_Wizard
             // 
             OpenDropDownButton.AutoSize = true;
             OpenDropDownButton.Enabled = false;
-            OpenDropDownButton.Location = new Point(308, 51);
+            OpenDropDownButton.Location = new Point(312, 50);
             OpenDropDownButton.Name = "OpenDropDownButton";
             OpenDropDownButton.Size = new Size(27, 25);
             OpenDropDownButton.TabIndex = 21;

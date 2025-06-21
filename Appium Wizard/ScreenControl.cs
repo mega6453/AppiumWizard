@@ -1,6 +1,7 @@
 ﻿using Appium_Wizard.Properties;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
+using NLog;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
@@ -35,6 +36,8 @@ namespace Appium_Wizard
         public string sessionURL = string.Empty;
         public int screenDensity = 0;
         public string deviceSerialNumber;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
@@ -120,6 +123,7 @@ namespace Appium_Wizard
                 isAndroid = false;
                 deviceSerialNumber = iOSMethods.GetInstance().GetDeviceSerialNumber(udid);
             }
+            Logger.Info("Initialization completed");
         }
 
         public void UpdateStatusLabel(ScreenControl screenControl, string actualText)
@@ -161,7 +165,7 @@ namespace Appium_Wizard
             toolStrip1.Refresh();
             statusStrip1.Refresh();
             Activate();
-
+            Logger.Info("Before loading screen...");
             // Await the asynchronous LoadScreen method
             await LoadScreen(udid, screenPort);
         }
@@ -224,21 +228,24 @@ namespace Appium_Wizard
 
             try
             {
+                Logger.Info("Starting NavigateToString...");
                 ScreenWebView.NavigateToString(htmlContent);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 string tempFilePath = Path.GetTempFileName() + ".html";
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
+                Logger.Error(ex, "NavigateToString exception");
             }
             try
             {
                 await tcs.Task; // Wait for navigation to complete
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 screenControlButtons(false);
+                Logger.Error(ex, "Wait for navigation to complete exception");
                 return;
             }
 
@@ -283,11 +290,12 @@ namespace Appium_Wizard
             {
                 ScreenWebView.NavigateToString(htmlContent);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 string tempFilePath = Path.GetTempFileName() + ".html";
                 File.WriteAllText(tempFilePath, htmlContent);
                 ScreenWebView.CoreWebView2.Navigate(tempFilePath);
+                Logger.Error(ex, "NavigateToString exception");
             }
             screenControlButtons(false);
             GoogleAnalytics.SendEvent("LoadDeviceDisconnected");
@@ -487,37 +495,45 @@ namespace Appium_Wizard
                     GoogleAnalytics.SendEvent("SwipeScreen", "iOS");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error(ex, "Exception in WebView_MouseUp");
             }
         }
 
         public async void SendKeys(object sender, KeyPressEventArgs e)
         {
-            string text = e.KeyChar.ToString();
-            if (isRecordingSteps)
+            try
             {
-                recordedActions.Add(new ScreenAction
+                string text = e.KeyChar.ToString();
+                if (isRecordingSteps)
                 {
-                    ActionType = "Send Text Without Element",
-                    Text = text
-                });
+                    recordedActions.Add(new ScreenAction
+                    {
+                        ActionType = "Send Text Without Element",
+                        Text = text
+                    });
+                }
+                if (OSType.Equals("iOS"))
+                {
+                    await Task.Run(() =>
+                    {
+                        iOSAPIMethods.SendText(URL, sessionId, text);
+                    });
+                    GoogleAnalytics.SendEvent("SendKeys", "iOS");
+                }
+                else
+                {
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().SendText(udid, text);
+                    });
+                    GoogleAnalytics.SendEvent("SendKeys", "Android");
+                }
             }
-            if (OSType.Equals("iOS"))
+            catch (Exception ex)
             {
-                await Task.Run(() =>
-                {
-                    iOSAPIMethods.SendText(URL, sessionId, text);
-                });
-                GoogleAnalytics.SendEvent("SendKeys", "iOS");
-            }
-            else
-            {
-                await Task.Run(() =>
-                {
-                    AndroidMethods.GetInstance().SendText(udid, text);
-                });
-                GoogleAnalytics.SendEvent("SendKeys", "Android");
+                Logger.Error(ex, "Exception in SendKeys");
             }
         }
 
@@ -543,8 +559,9 @@ namespace Appium_Wizard
                     {
                         return CreateSession();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Logger.Error(ex, "Exception in CreateSession");
                         return "nosession";
                     }
                 }
@@ -587,8 +604,9 @@ namespace Appium_Wizard
                     {
                         return CreateSession();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Logger.Error(ex, "Exception in CreateSession");
                         return "nosession";
                     }
                 }
@@ -1015,20 +1033,27 @@ namespace Appium_Wizard
         private InstalledAppsList installedAppsListForm;
         private async void manageAppsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GoogleAnalytics.SendEvent("Manage_Apps_Click_ScreenControl");
-            if (installedAppsListForm == null || installedAppsListForm.IsDisposed)
+            try
             {
-                installedAppsListForm = new InstalledAppsList(OSType, udid, deviceName);
-                await installedAppsListForm.GetInstalledAppsList(this);
-                installedAppsListForm.Show();
-            }
-            else
-            {
-                if (installedAppsListForm.WindowState == FormWindowState.Minimized)
+                if (installedAppsListForm == null || installedAppsListForm.IsDisposed)
                 {
-                    installedAppsListForm.WindowState = FormWindowState.Normal;
+                    installedAppsListForm = new InstalledAppsList(OSType, udid, deviceName);
+                    await installedAppsListForm.GetInstalledAppsList(this);
+                    installedAppsListForm.Show();
                 }
-                installedAppsListForm.BringToFront();
+                else
+                {
+                    if (installedAppsListForm.WindowState == FormWindowState.Minimized)
+                    {
+                        installedAppsListForm.WindowState = FormWindowState.Normal;
+                    }
+                    installedAppsListForm.BringToFront();
+                }
+                GoogleAnalytics.SendEvent("Manage_Apps_Click_ScreenControl");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("Manage_Apps_Click_ScreenControl", exception.Message);
             }
         }
 
@@ -1046,7 +1071,6 @@ namespace Appium_Wizard
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Exception" + exception);
                 GoogleAnalytics.SendExceptionEvent("ObjectSpy_Click", exception.Message);
             }
         }
@@ -1059,18 +1083,26 @@ namespace Appium_Wizard
 
         private async void recentAppsToolStripButton_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            try
             {
-                if (isAndroid)
+                await Task.Run(() =>
                 {
-                    AndroidMethods.GetInstance().ShowRecentApps(udid);
-                }
-                else
-                {
-                    int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
-                    iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
-                }
-            });
+                    if (isAndroid)
+                    {
+                        AndroidMethods.GetInstance().ShowRecentApps(udid);
+                    }
+                    else
+                    {
+                        int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
+                        iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
+                    }
+                });
+                GoogleAnalytics.SendEvent("recentAppsToolStripButton_Click", OSType);
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("recentAppsToolStripButton_Click", exception.Message);
+            }
         }
 
         private void SaveRecordedStepsToJson(string filePath)
@@ -1212,6 +1244,7 @@ namespace Appium_Wizard
                 }
             });
             MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent("Steps playback completed", OSType);
             playStepsToolStripMenuItem.Enabled = true;
         }
 
@@ -1227,6 +1260,7 @@ namespace Appium_Wizard
                     ActionType = "Set Device",
                 });
                 MessageBox.Show("Recording steps started.", "Record Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GoogleAnalytics.SendEvent("Recording steps started",OSType);
             }
             else
             {
@@ -1237,6 +1271,7 @@ namespace Appium_Wizard
                     return;
                 }
                 var result = MessageBox.Show("Recording steps have stopped. You can press the play steps button to execute the recorded steps any number of times until you close this screen. If you want to execute it in the future(with Tools->Test Runner), you can save it.\n\nDo you want to save the script ? ", "Record Steps", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                GoogleAnalytics.SendEvent("Recording steps stopped", OSType);
                 if (result == DialogResult.Yes)
                 {
                     using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -1252,6 +1287,7 @@ namespace Appium_Wizard
                         {
                             // Call the method to save recorded steps and pass the selected file path
                             SaveRecordedStepsToJson(saveFileDialog.FileName);
+                            GoogleAnalytics.SendEvent("Recording steps saved in file", OSType);
                         }
                     }
                 }

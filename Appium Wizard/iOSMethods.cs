@@ -132,6 +132,16 @@ namespace Appium_Wizard
             }
         }
 
+        public string GetDeviceSerialNumber(string udid)
+        {
+            var result = GetDeviceInformation(udid);
+            if (result.ContainsKey("SerialNumber"))
+            {
+                return result["SerialNumber"].ToString();
+            }
+            return "failedToGetSerialNumber";
+        }
+
         public static string iOSConnectedVia(bool HostAttached)
         {
             if (HostAttached.Equals(true))

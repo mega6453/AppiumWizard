@@ -34,6 +34,7 @@ namespace Appium_Wizard
         private bool isRecordingSteps = false;
         public string sessionURL = string.Empty;
         public int screenDensity = 0;
+        public string deviceSerialNumber;
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
@@ -112,10 +113,12 @@ namespace Appium_Wizard
             {
                 screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
                 isAndroid = true;
+                deviceSerialNumber = udid;
             }
             else
             {
                 isAndroid = false;
+                deviceSerialNumber = iOSMethods.GetInstance().GetDeviceSerialNumber(udid);
             }
         }
 
@@ -1290,15 +1293,36 @@ namespace Appium_Wizard
             Clipboard.SetText(sessionURL);
         }
 
-        private void infoToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void copySerialNumberToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(deviceSerialNumber);
+        }
+
+        private void copyModelNumberToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(deviceModel);
+        }
+
+        private void copyOSVersionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(OSType + " " + OSVersion);
+        }
+
+        private void copyAllInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string deviceName = "Device Name - " + this.deviceName;
             string deviceOS = "Device OS - " + OSType;
             string deviceOSVersion = "OS Version - " + OSVersion;
             string deviceModel = "Model - " + this.deviceModel;
+            string deviceSerialNumber = "Serial Number - " + this.deviceSerialNumber;
             string udid = "UDID - " + this.udid;
-            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + deviceSerialNumber + "\n" + udid;
             Clipboard.SetText(deviceDetails);
+        }
+
+        private void copyUDIDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(this.udid);
         }
     }
 

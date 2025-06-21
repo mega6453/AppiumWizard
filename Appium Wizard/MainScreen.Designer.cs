@@ -959,12 +959,13 @@ namespace Appium_Wizard
             // 
             openContextMenuStrip.Items.AddRange(new ToolStripItem[] { reInitializeDeviceToolStripMenuItem });
             openContextMenuStrip.Name = "openContextMenuStrip";
-            openContextMenuStrip.Size = new Size(174, 26);
+            openContextMenuStrip.Size = new Size(181, 48);
             // 
             // reInitializeDeviceToolStripMenuItem
             // 
+            reInitializeDeviceToolStripMenuItem.Image = Properties.Resources.Refresh;
             reInitializeDeviceToolStripMenuItem.Name = "reInitializeDeviceToolStripMenuItem";
-            reInitializeDeviceToolStripMenuItem.Size = new Size(173, 22);
+            reInitializeDeviceToolStripMenuItem.Size = new Size(180, 22);
             reInitializeDeviceToolStripMenuItem.Text = "Re-Initialize Device";
             reInitializeDeviceToolStripMenuItem.Click += reInitializeDeviceToolStripMenuItem_Click;
             // 

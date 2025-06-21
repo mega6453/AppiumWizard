@@ -2287,7 +2287,7 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        MessageBox.Show("Provisioning profile not found for this device. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Uninstalling WDA step.\n\nIf you have WDA already installed in this device, try restarting the device and then open the device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Provisioning profile not found for this device. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Uninstalling WDA step.\n\nIf you have WDA already installed in this device, restart the device and then try opening the device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else

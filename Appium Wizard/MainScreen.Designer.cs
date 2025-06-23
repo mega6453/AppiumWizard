@@ -89,6 +89,8 @@ namespace Appium_Wizard
             openLogsFolderToolstripMenuItem = new ToolStripMenuItem();
             startADiscussionToolStripMenuItem = new ToolStripMenuItem();
             checkForUpdatesToolStripMenuItem = new ToolStripMenuItem();
+            changeLogToolStripMenuItem = new ToolStripMenuItem();
+            readMeToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
@@ -430,7 +432,7 @@ namespace Appium_Wizard
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, otherDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, openLogsFolderToolstripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, aboutToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { appiumDocsToolStripMenuItem, otherDocsToolStripMenuItem, troubleshootToolStripMenuItem, reportAnIssueToolStripMenuItem, openLogsFolderToolstripMenuItem, startADiscussionToolStripMenuItem, checkForUpdatesToolStripMenuItem, changeLogToolStripMenuItem, readMeToolStripMenuItem, aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(44, 20);
             helpToolStripMenuItem.Text = "Help";
@@ -440,7 +442,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, pluginsToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(247, 22);
+            appiumDocsToolStripMenuItem.Size = new Size(255, 30);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -552,7 +554,7 @@ namespace Appium_Wizard
             otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
             otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
             otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
-            otherDocsToolStripMenuItem.Size = new Size(247, 22);
+            otherDocsToolStripMenuItem.Size = new Size(255, 30);
             otherDocsToolStripMenuItem.Text = "Other Docs";
             // 
             // iOSNativeAppsBundleToolStripMenuItem
@@ -567,7 +569,7 @@ namespace Appium_Wizard
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(247, 22);
+            troubleshootToolStripMenuItem.Size = new Size(255, 30);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
             // 
@@ -575,7 +577,7 @@ namespace Appium_Wizard
             // 
             reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
-            reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
+            reportAnIssueToolStripMenuItem.Size = new Size(255, 30);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
@@ -583,7 +585,7 @@ namespace Appium_Wizard
             // 
             openLogsFolderToolstripMenuItem.Image = Properties.Resources.log;
             openLogsFolderToolstripMenuItem.Name = "openLogsFolderToolstripMenuItem";
-            openLogsFolderToolstripMenuItem.Size = new Size(247, 22);
+            openLogsFolderToolstripMenuItem.Size = new Size(255, 30);
             openLogsFolderToolstripMenuItem.Text = "Open Logs folder";
             openLogsFolderToolstripMenuItem.Click += openLogsFolderToolstripMenuItem_Click;
             // 
@@ -591,7 +593,7 @@ namespace Appium_Wizard
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
-            startADiscussionToolStripMenuItem.Size = new Size(247, 22);
+            startADiscussionToolStripMenuItem.Size = new Size(255, 30);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
@@ -599,15 +601,31 @@ namespace Appium_Wizard
             // 
             checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
+            checkForUpdatesToolStripMenuItem.Size = new Size(255, 30);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
             checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
+            // 
+            // changeLogToolStripMenuItem
+            // 
+            changeLogToolStripMenuItem.Image = Properties.Resources.changelog;
+            changeLogToolStripMenuItem.Name = "changeLogToolStripMenuItem";
+            changeLogToolStripMenuItem.Size = new Size(255, 30);
+            changeLogToolStripMenuItem.Text = "Changelog";
+            changeLogToolStripMenuItem.Click += changeLogToolStripMenuItem_Click;
+            // 
+            // readMeToolStripMenuItem
+            // 
+            readMeToolStripMenuItem.Image = Properties.Resources.readme;
+            readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
+            readMeToolStripMenuItem.Size = new Size(255, 30);
+            readMeToolStripMenuItem.Text = "Read me";
+            readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(247, 22);
+            aboutToolStripMenuItem.Size = new Size(255, 30);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -959,13 +977,13 @@ namespace Appium_Wizard
             // 
             openContextMenuStrip.Items.AddRange(new ToolStripItem[] { reInitializeDeviceToolStripMenuItem });
             openContextMenuStrip.Name = "openContextMenuStrip";
-            openContextMenuStrip.Size = new Size(181, 48);
+            openContextMenuStrip.Size = new Size(174, 26);
             // 
             // reInitializeDeviceToolStripMenuItem
             // 
             reInitializeDeviceToolStripMenuItem.Image = Properties.Resources.Refresh;
             reInitializeDeviceToolStripMenuItem.Name = "reInitializeDeviceToolStripMenuItem";
-            reInitializeDeviceToolStripMenuItem.Size = new Size(180, 22);
+            reInitializeDeviceToolStripMenuItem.Size = new Size(173, 22);
             reInitializeDeviceToolStripMenuItem.Text = "Re-Initialize Device";
             reInitializeDeviceToolStripMenuItem.Click += reInitializeDeviceToolStripMenuItem_Click;
             // 
@@ -1117,5 +1135,7 @@ namespace Appium_Wizard
         private Button OpenDropDownButton;
         private ContextMenuStrip openContextMenuStrip;
         private ToolStripMenuItem reInitializeDeviceToolStripMenuItem;
+        private ToolStripMenuItem changeLogToolStripMenuItem;
+        private ToolStripMenuItem readMeToolStripMenuItem;
     }
 }

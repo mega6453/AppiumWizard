@@ -1181,20 +1181,19 @@ namespace Appium_Wizard
 
         private void fAQToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string faqFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Docs\\Appium Wizard Troubleshooting Guide.html";
             try
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo
                 {
-                    FileName = faqFilePath,
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/TROUBLESHOOTINGGUIDE.md",
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
-                GoogleAnalytics.SendEvent("FAQToolStripMenuItem_Click");
+                GoogleAnalytics.SendEvent("fAQToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                GoogleAnalytics.SendExceptionEvent("FAQToolStripMenuItem_Click", exception.Message);
+                GoogleAnalytics.SendExceptionEvent("fAQToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -2317,6 +2316,42 @@ namespace Appium_Wizard
         {
             Point screenPoint = OpenDropDownButton.PointToScreen(new Point(0, OpenDropDownButton.Height));
             openContextMenuStrip.Show(screenPoint);
+        }
+
+        private void changeLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/CHANGELOG.md",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("changeLogToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("changeLogToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void readMeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/README.md",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("readMeToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("readMeToolStripMenuItem_Click", exception.Message);
+            }
         }
     }
 }

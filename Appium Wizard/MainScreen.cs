@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NLog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Appium_Wizard
@@ -181,7 +182,11 @@ namespace Appium_Wizard
                 var size = new Size(this.Width - totalColumnWidth - 100, this.Height - 150);
                 tabControl1.Left = listView1.Width + 50;
                 tabControl1.Size = size;
-                var webviewSize = new Size(size.Width, size.Height - 50);
+                server1WebView.Size = size;
+                server2WebView.Size = size;
+                server3WebView.Size = size;
+                server4WebView.Size = size;
+                server5WebView.Size = size;
                 openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             }
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
@@ -276,6 +281,7 @@ namespace Appium_Wizard
                     selectedDeviceIP = selectedItem.SubItems.Count > 6 ? selectedItem.SubItems[6].Text : string.Empty;
                     selectedDeviceModel = selectedItem.SubItems.Count > 7 ? selectedItem.SubItems[7].Text : string.Empty;
                     Open.Enabled = true;
+                    OpenDropDownButton.Enabled = true;
                     MoreButton.Enabled = true;
                     DeleteDevice.Enabled = true;
                     if (selectedOS.Equals("iOS"))
@@ -323,6 +329,7 @@ namespace Appium_Wizard
                         panel1.Visible = false;
                         capabilityLabel.Visible = false;
                         Open.Enabled = false;
+                        OpenDropDownButton.Enabled = false;
                         contextMenuStrip4.Items[0].Enabled = false;
                         contextMenuStrip4.Items[1].Enabled = false;
                         contextMenuStrip4.Items[2].Enabled = true; // Refresh
@@ -333,6 +340,7 @@ namespace Appium_Wizard
                     else
                     {
                         Open.Enabled = true;
+                        OpenDropDownButton.Enabled = true;
                         foreach (var item in contextMenuStrip4.Items)
                         {
                             if (item is ToolStripItem toolStripItem)
@@ -347,6 +355,7 @@ namespace Appium_Wizard
                     panel1.Visible = false;
                     capabilityLabel.Visible = false;
                     Open.Enabled = false;
+                    OpenDropDownButton.Enabled = false;
                     DeleteDevice.Enabled = false;
                     MoreButton.Enabled = false;
                     mandatorymsglabel.Visible = false;
@@ -1172,20 +1181,19 @@ namespace Appium_Wizard
 
         private void fAQToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string faqFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Docs\\Appium Wizard Troubleshooting Guide.html";
             try
             {
                 ProcessStartInfo psInfo = new ProcessStartInfo
                 {
-                    FileName = faqFilePath,
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/TROUBLESHOOTINGGUIDE.md",
                     UseShellExecute = true
                 };
                 Process.Start(psInfo);
-                GoogleAnalytics.SendEvent("FAQToolStripMenuItem_Click");
+                GoogleAnalytics.SendEvent("fAQToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
-                GoogleAnalytics.SendExceptionEvent("FAQToolStripMenuItem_Click", exception.Message);
+                GoogleAnalytics.SendExceptionEvent("fAQToolStripMenuItem_Click", exception.Message);
             }
         }
 
@@ -2226,6 +2234,124 @@ namespace Appium_Wizard
         public void UpdateWebViewDefaultText(int serverNumber)
         {
             SetDefaultText(serverNumberWebView[serverNumber], defaultText);
+        }
+
+        private async void reInitializeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string description = "Use this option in case if opening device fails. ";
+            if (selectedOS.Equals("iOS"))
+            {
+                description += "This action will reinstall the WebDriverAgent on the " + selectedDeviceName + " and restart the device.\n\nOnce the device rebooted, unlock the device and then try to open the device again.\n\nDo you want to continue?";
+
+            }
+            else
+            {
+                description += "This action will reinstall the UIAutomator on the " + selectedDeviceName + " and restart the device.\n\nOnce the device rebooted, unlock the device and then try to open the device again.\n\nDo you want to continue?";
+            }
+            var result = MessageBox.Show(description, "Re-Initialize Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                if (selectedOS.Equals("iOS"))
+                {
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while checking if provisioning profile available for this device...", 10);
+                    if (iOSMethods.GetInstance().isProfileAvailableToSign(selectedUDID).Item1)
+                    {
+                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling WDA...", 20);
+                        await Task.Run(() =>
+                        {
+                            iOSMethods.GetInstance().UninstallWDA(selectedUDID);
+                        });
+                        commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing WDA...", 30);
+                        bool isWDAInstalled = false;
+                        await Task.Run(() =>
+                        {
+                            isWDAInstalled = iOSMethods.GetInstance().InstallWDA(selectedUDID);
+                        });
+                        if (isWDAInstalled)
+                        {
+                            commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                            await Task.Run(() =>
+                            {
+                                iOSMethods.GetInstance().RebootDevice(selectedUDID);
+                            });
+                            MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.\n\nIf possible, restart Appium Wizard also and then try opening device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to install WebDriverAgent. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Reboot step.", "Install WDA", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Provisioning profile not found for this device. Please check if you have valid profile in Tools->iOS profile management.\n\n Canceling Uninstalling WDA step.\n\nIf you have WDA already installed in this device, restart the device and then try opening the device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while uninstalling uiautomator...", 10);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().UninstallUIAutomator(selectedUDID);
+                    });
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while installing uiautomator...", 30);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().InstallUIAutomator(selectedUDID);
+                    });
+                    commonProgress.UpdateStepLabel("Re-Initialize Device", "Please wait while Rebooting device...", 70);
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().RebootDevice(selectedUDID);
+                    });
+                    MessageBox.Show("Reboot Initiated. Once the device rebooted, unlock the device and then try to open the device again.\n\nIf possible, restart Appium Wizard also and then try opening device.", "Re-Initialize Device", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                commonProgress.Close();
+            }
+        }
+
+        private void OpenDropDownButton_Click(object sender, EventArgs e)
+        {
+            Point screenPoint = OpenDropDownButton.PointToScreen(new Point(0, OpenDropDownButton.Height));
+            openContextMenuStrip.Show(screenPoint);
+        }
+
+        private void changeLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/CHANGELOG.md",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("changeLogToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("changeLogToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void readMeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://github.com/mega6453/AppiumWizard/blob/master/README.md",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("readMeToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("readMeToolStripMenuItem_Click", exception.Message);
+            }
         }
     }
 }

@@ -132,6 +132,16 @@ namespace Appium_Wizard
             }
         }
 
+        public string GetDeviceSerialNumber(string udid)
+        {
+            var result = GetDeviceInformation(udid);
+            if (result.ContainsKey("SerialNumber"))
+            {
+                return result["SerialNumber"].ToString();
+            }
+            return "failedToGetSerialNumber";
+        }
+
         public static string iOSConnectedVia(bool HostAttached)
         {
             if (HostAttached.Equals(true))
@@ -321,6 +331,18 @@ namespace Appium_Wizard
             else
             {
                 ExecuteCommandPy("developer core-device uninstall " + bundleId, udid);
+            }
+        }
+
+        public void UninstallWDA(string udid)
+        {
+            if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid))
+            {
+                UninstallApp(udid, MainScreen.UDIDPreInstalledWDA[udid]);
+            }
+            else
+            {
+                UninstallApp(udid, "com.facebook.WebDriverAgentRunner.xctrunner");
             }
         }
 

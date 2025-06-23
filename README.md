@@ -145,6 +145,7 @@ to install it during the first time launch which may take sometime to complete i
 * <a href="https://www.flaticon.com/free-icons/seo-and-web" title="seo and web icons">Seo and web icons created by RaftelDesign - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/readme" title="readme icons">Readme icons created by Flat Icons - Flaticon</a>
 * <a href="https://www.flaticon.com/free-animated-icons/notepad" title="notepad animated icons">Notepad animated icons created by Freepik - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/log" title="log icons">Log icons created by Iconjam - Flaticon</a>
 
 ## NOTE
 Appium Wizard is in it's early stage of development. So,expect 

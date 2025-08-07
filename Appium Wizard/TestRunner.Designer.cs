@@ -206,7 +206,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label5.ForeColor = Color.IndianRed;
+            label5.ForeColor = Color.Brown;
             label5.Location = new Point(663, 342);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
@@ -217,6 +217,7 @@
             // repeatCountLabel
             // 
             repeatCountLabel.AutoSize = true;
+            repeatCountLabel.ForeColor = Color.FromArgb(192, 0, 0);
             repeatCountLabel.Location = new Point(567, 442);
             repeatCountLabel.Name = "repeatCountLabel";
             repeatCountLabel.Size = new Size(0, 15);
@@ -311,6 +312,7 @@
             // 
             // panel2
             // 
+            panel2.BackColor = SystemColors.ControlLightLight;
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(currentExecution);
             panel2.Location = new Point(12, 392);
@@ -321,6 +323,8 @@
             // currentExecution
             // 
             currentExecution.AutoSize = true;
+            currentExecution.BackColor = Color.Transparent;
+            currentExecution.ForeColor = Color.FromArgb(192, 0, 0);
             currentExecution.Location = new Point(3, 10);
             currentExecution.Name = "currentExecution";
             currentExecution.Size = new Size(0, 15);
@@ -331,9 +335,9 @@
             label2.AutoSize = true;
             label2.Location = new Point(12, 376);
             label2.Name = "label2";
-            label2.Size = new Size(94, 15);
+            label2.Size = new Size(97, 15);
             label2.TabIndex = 0;
-            label2.Text = "Execution Status";
+            label2.Text = "Execution Status:";
             // 
             // TestRunner
             // 

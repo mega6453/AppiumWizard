@@ -919,6 +919,7 @@ namespace Appium_Wizard
                     }
                 }
                 UpdateScreenControl("");
+                Common.ShowNotification("Test Runner", "Execution completed.");
             });
         }
 

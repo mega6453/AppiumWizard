@@ -166,16 +166,22 @@ namespace Appium_Wizard
                         if (actionName == "Send Text With Random Values" && property.Key == "Text Type")
                         {
                             // Create a ComboBox cell for the "Text Type" field
+                            var validOptions = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" };
                             var comboBoxCell = new DataGridViewComboBoxCell
                             {
-                                DataSource = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" }, // Dropdown options
-                                Value = property.Value // Default value
+                                DataSource = validOptions
                             };
 
                             // Validate the value to ensure it matches one of the dropdown options
-                            if (comboBoxCell.DataSource is List<string> dataSource && !dataSource.Contains(comboBoxCell.Value))
+                            if (validOptions.Contains(property.Value))
                             {
-                                comboBoxCell.Value = dataSource.FirstOrDefault(); // Set to the first valid option if invalid
+                                comboBoxCell.Value = property.Value; // Set valid value
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = validOptions.FirstOrDefault(); // Set to first valid option if invalid
+                                                                                    // Update the underlying data to reflect the change
+                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
                             }
 
                             row.Cells[1] = comboBoxCell;
@@ -185,23 +191,48 @@ namespace Appium_Wizard
                             // Create a standard TextBox cell for "Number of digits/characters"
                             row.Cells[1].Value = property.Value;
                         }
-                        if (actionName == "Set Device" && property.Key == "Device Name")
+                        else if (actionName == "Set Device" && property.Key == "Device Name")
                         {
                             // Create a ComboBox cell for the value field
                             var comboBoxCell = new DataGridViewComboBoxCell
                             {
-                                DataSource = deviceNames // Populate with device names
+                                DataSource = new List<string>(deviceNames) // Create a new list to avoid reference issues
                             };
-                            comboBoxCell.Value = property.Value;
+
+                            // Validate if the device name exists in the current device list
+                            if (deviceNames.Contains(property.Value))
+                            {
+                                comboBoxCell.Value = property.Value; // Set valid value
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = deviceNames.FirstOrDefault(); // Set to first device or null if none
+                                                                                   // Update the underlying data to reflect the change
+                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
+                            }
+
                             row.Cells[1] = comboBoxCell;
                         }
-                        else if (actionName == "Device Action")
+                        else if (actionName == "Device Action" && property.Key == "Action")
                         {
-                            var comboBoxCell = new DataGridViewComboBoxCell();
+                            var validActions = new List<string> { "Home", "Back" };
+                            var comboBoxCell = new DataGridViewComboBoxCell
+                            {
+                                DataSource = validActions
+                            };
 
-                            List<string> items = new List<string> { "Home", "Back" };
-                            comboBoxCell.DataSource = items;
-                            comboBoxCell.Value = property.Value;
+                            // Validate if the action exists in the list
+                            if (validActions.Contains(property.Value))
+                            {
+                                comboBoxCell.Value = property.Value; // Set valid value
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = validActions.FirstOrDefault(); // Set to first valid option
+                                                                                    // Update the underlying data to reflect the change
+                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
+                            }
+
                             row.Cells[1] = comboBoxCell;
                         }
                         else
@@ -232,6 +263,7 @@ namespace Appium_Wizard
             {
                 // Log or handle exception
                 Console.WriteLine(ex.Message);
+                MessageBox.Show($"Error in DataGridView selection: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1039,9 +1071,35 @@ namespace Appium_Wizard
                     if (action.Item1 == "Set Device" && action.Item2.ContainsKey("Device Name"))
                     {
                         string deviceName = action.Item2["Device Name"];
+                        // Check if the device name exists in current device list
                         if (deviceNameToUdidMap.ContainsKey(deviceName))
                         {
                             commandGridView.Rows[rowIndex].Tag = deviceNameToUdidMap[deviceName]; // Restore the UDID
+                        }
+                        else
+                        {
+                            // Device name doesn't exist, clear it from the data
+                            action.Item2["Device Name"] = "";
+                            commandGridView.Rows[rowIndex].Tag = null;
+                        }
+                    }
+
+                    // Validate other dropdown values
+                    if (action.Item1 == "Send Text With Random Values" && action.Item2.ContainsKey("Text Type"))
+                    {
+                        var validTextTypes = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" };
+                        if (!validTextTypes.Contains(action.Item2["Text Type"]))
+                        {
+                            action.Item2["Text Type"] = validTextTypes.FirstOrDefault();
+                        }
+                    }
+
+                    if (action.Item1 == "Device Action" && action.Item2.ContainsKey("Action"))
+                    {
+                        var validActions = new List<string> { "Home", "Back" };
+                        if (!validActions.Contains(action.Item2["Action"]))
+                        {
+                            action.Item2["Action"] = validActions.FirstOrDefault();
                         }
                     }
 
@@ -1049,6 +1107,10 @@ namespace Appium_Wizard
                     commandGridView.Rows[rowIndex].Cells[1].Value = FormatActionText(rowIndex);
                 }
                 scriptFilePath = filePath;
+
+                // Show a message if any invalid values were found and corrected
+                MessageBox.Show("Script loaded successfully. Any invalid dropdown values have been reset to default values.",
+                               "Script Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {

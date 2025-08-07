@@ -2009,8 +2009,15 @@ namespace Appium_Wizard
 
         private void testRunnerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TestRunner testRunner = new TestRunner();
-            testRunner.Show();
+            if (listView1.Items.Count > 0)
+            {
+                TestRunner testRunner = new TestRunner();
+                testRunner.Show();
+            }
+            else
+            {
+                MessageBox.Show("No devices available. Add a device first and then try opening Test Runner.","No Devices available", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void openLogsButton_Click(object sender, EventArgs e)

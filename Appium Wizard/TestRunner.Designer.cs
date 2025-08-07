@@ -217,7 +217,7 @@
             // repeatCountLabel
             // 
             repeatCountLabel.AutoSize = true;
-            repeatCountLabel.Location = new Point(582, 392);
+            repeatCountLabel.Location = new Point(567, 442);
             repeatCountLabel.Name = "repeatCountLabel";
             repeatCountLabel.Size = new Size(0, 15);
             repeatCountLabel.TabIndex = 12;

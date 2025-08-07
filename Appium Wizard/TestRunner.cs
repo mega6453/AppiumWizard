@@ -87,7 +87,9 @@ namespace Appium_Wizard
                     properties.Add("Text to Enter", "");
                     break;
                 case "Set Device":
-                    properties.Add("Device Name", "");
+                    // Set default device name
+                    string defaultDeviceName = deviceNames.FirstOrDefault() ?? "";
+                    properties.Add("Device Name", defaultDeviceName);
                     break;
                 case "Wait for element visible":
                     properties.Add("XPath", "");
@@ -126,14 +128,28 @@ namespace Appium_Wizard
 
             // Add the action to DataGridView1
             int rowIndex = commandGridView.Rows.Add(); // Add a new row
+
+            // Set the Tag for "Set Device" actions when they are first created
+            if (selectedAction == "Set Device")
+            {
+                string defaultDeviceName = deviceNames.FirstOrDefault() ?? "";
+                if (!string.IsNullOrEmpty(defaultDeviceName) && deviceNameToUdidMap.ContainsKey(defaultDeviceName))
+                {
+                    commandGridView.Rows[rowIndex].Tag = deviceNameToUdidMap[defaultDeviceName];
+                }
+            }
+
+            // **FIX: Set the formatted text instead of just the action name**
             if (selectedAction == "Take Screenshot")
             {
                 commandGridView.Rows[rowIndex].Cells[1].Value = "Take Screenshot and attach it to report";
             }
             else
             {
-                commandGridView.Rows[rowIndex].Cells[1].Value = selectedAction; // Set the value in column 1
+                // Use FormatActionText to show the proper formatted text with details
+                commandGridView.Rows[rowIndex].Cells[1].Value = FormatActionText(rowIndex);
             }
+
             commandGridView.ClearSelection();
             DataGridViewRow newRow = commandGridView.Rows[rowIndex];
             // Highlight the newly created row
@@ -203,12 +219,24 @@ namespace Appium_Wizard
                             if (deviceNames.Contains(property.Value))
                             {
                                 comboBoxCell.Value = property.Value; // Set valid value
+                                                                     // Set the Tag for existing valid device
+                                if (deviceNameToUdidMap.ContainsKey(property.Value))
+                                {
+                                    commandGridView.Rows[selectedIndex].Tag = deviceNameToUdidMap[property.Value];
+                                }
                             }
                             else
                             {
                                 comboBoxCell.Value = deviceNames.FirstOrDefault(); // Set to first device or null if none
                                                                                    // Update the underlying data to reflect the change
-                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
+                                string defaultDeviceName = comboBoxCell.Value?.ToString() ?? "";
+                                actionData[selectedIndex].Item2[property.Key] = defaultDeviceName;
+
+                                // **FIX: Set the Tag for the default device**
+                                if (!string.IsNullOrEmpty(defaultDeviceName) && deviceNameToUdidMap.ContainsKey(defaultDeviceName))
+                                {
+                                    commandGridView.Rows[selectedIndex].Tag = deviceNameToUdidMap[defaultDeviceName];
+                                }
                             }
 
                             row.Cells[1] = comboBoxCell;
@@ -1324,6 +1352,19 @@ namespace Appium_Wizard
             File.WriteAllText(htmlReportPath, htmlContent);
         }
 
+        private string HtmlEncode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            return text
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;")
+                .Replace("\"", "&quot;")
+                .Replace("'", "&#39;");
+        }
+
         private void AppendToHtmlReport(string command, string output, string? screenshotPath = null)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1332,16 +1373,21 @@ namespace Appium_Wizard
             if (!string.IsNullOrEmpty(screenshotPath))
             {
                 string relativePath = Path.GetFileName(screenshotPath);
-                screenshotHtml = $@"<br><a href='{relativePath}' target='_blank'><img src='{relativePath}' alt='Screenshot' style='max-width: 300px; max-height: 300px;'/></a>";
+                string encodedPath = HtmlEncode(relativePath);
+
+                screenshotHtml = $@"<br><a href='{encodedPath}' target='_blank'><img src='{encodedPath}' alt='Screenshot' style='max-width: 300px; max-height: 300px;'/></a>";
             }
 
+            string encodedCommand = HtmlEncode(command);
+            string encodedOutput = HtmlEncode(output);
+
             string row = $@"
-                            <tr>
-                                <td>{timestamp}</td>
-                                <td>{command}</td>
-                                <td>{output}{screenshotHtml}</td>
-                            </tr>
-                        ";
+                    <tr>
+                        <td>{timestamp}</td>
+                        <td>{encodedCommand}</td>
+                        <td>{encodedOutput}{screenshotHtml}</td>
+                    </tr>
+                ";
 
             File.AppendAllText(htmlReportPath, row);
         }

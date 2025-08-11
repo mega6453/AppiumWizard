@@ -486,6 +486,7 @@ namespace Appium_Wizard
                 htmlReportPath = filePath;
                 CreateHtmlReport();
                 await performActions(cancellationTokenSource.Token);
+                Common.ShowNotification("Test Runner", "Execution completed.");
                 FinalizeHtmlReport();
             }
             catch (OperationCanceledException)
@@ -548,6 +549,16 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        if (screenshotCheckBox.Checked)
+                        {
+                            var activeActionCount = actionActiveStates.Count(isActive => isActive);
+                            var screenshotCount = activeActionCount * repetitions;
+                            var result = MessageBox.Show("Take Screenshot after every step is enabled. So, this execution will take totally "+screenshotCount+" screenshots. Do you want to keep it enabled and continue?", "Take Screenshot after every step",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                            if (result == DialogResult.No)
+                            {
+                                return;
+                            }
+                        }
                         GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
                         string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                         string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
@@ -562,6 +573,7 @@ namespace Appium_Wizard
                                 repeatCountLabel.Text = $"{i}/{repetitions}";
                             }
                         }
+                        Common.ShowNotification("Test Runner", "Execution completed.");
                         erroShown = false;
                         FinalizeHtmlReport();
                     }
@@ -917,9 +929,25 @@ namespace Appium_Wizard
                             MessageBox.Show($"Unknown Command: {actionType}", "Unknown Command", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             break;
                     }
+                    if (screenshotCheckBox.Checked)
+                    {
+                        string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                        string screenshotFilePath = Path.Combine(reportsFolderPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
+                        string TakeScreenshotCommand = "Take Screenshot";
+                        UpdateScreenControl(TakeScreenshotCommand);
+                        string TakeScreenshotStatusDescription = "-";
+                        if (isAndroid)
+                        {
+                            TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, screenshotFilePath);
+                        }
+                        else
+                        {
+                            TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, screenshotFilePath);
+                        }
+                        AppendToHtmlReport(TakeScreenshotCommand, TakeScreenshotStatusDescription, screenshotFilePath);
+                    }
                 }
                 UpdateScreenControl("");
-                Common.ShowNotification("Test Runner", "Execution completed.");
             });
         }
 

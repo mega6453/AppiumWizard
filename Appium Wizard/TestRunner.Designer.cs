@@ -58,6 +58,7 @@
             panel2 = new Panel();
             currentExecution = new Label();
             label2 = new Label();
+            screenshotCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             contextMenuStrip1.SuspendLayout();
@@ -339,12 +340,23 @@
             label2.TabIndex = 0;
             label2.Text = "Execution Status:";
             // 
+            // screenshotCheckBox
+            // 
+            screenshotCheckBox.AutoSize = true;
+            screenshotCheckBox.Location = new Point(171, 443);
+            screenshotCheckBox.Name = "screenshotCheckBox";
+            screenshotCheckBox.Size = new Size(193, 19);
+            screenshotCheckBox.TabIndex = 20;
+            screenshotCheckBox.Text = "Take Screenshot after every step";
+            screenshotCheckBox.UseVisualStyleBackColor = true;
+            // 
             // TestRunner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 474);
+            Controls.Add(screenshotCheckBox);
             Controls.Add(label2);
             Controls.Add(newButton);
             Controls.Add(saveDownButton);
@@ -413,5 +425,6 @@
         private Panel panel2;
         private Label currentExecution;
         private Label label2;
+        private CheckBox screenshotCheckBox;
     }
 }

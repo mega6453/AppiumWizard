@@ -383,6 +383,11 @@ namespace Appium_Wizard
                             }
                         }
                         //------------------------
+                        if (data.Contains("Error executing adbExec.") | data.Contains("cannot be proxied to UiAutomator2 server because the instrumentation process is not running (probably crashed)"))
+                        {
+                            AndroidMethods.GetInstance().StopAdbServer();
+                            AndroidMethods.GetInstance().StartAdbServer();    
+                        }
                     }
                     catch (Exception)
                     {

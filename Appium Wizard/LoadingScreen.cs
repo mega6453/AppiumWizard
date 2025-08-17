@@ -131,8 +131,8 @@ namespace Appium_Wizard
             UpdateStepLabel("Scanning for detached Appium Wizard processes...");
             Common.ScanForDetachedProcesses();
             UpdateStepLabel("Loading Modules...");
-            int adbPort = 5037;
-            AndroidMethods.GetInstance().StartAdbServer(adbPort);
+            AndroidMethods.GetInstance().StopAdbServer();
+            AndroidMethods.GetInstance().StartAdbServer();
             Common.DeleteLogFiles();
             MainScreen mainForm = new MainScreen();
             UpdateStepLabel("Initializing User Interface...");

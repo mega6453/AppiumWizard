@@ -55,6 +55,7 @@ namespace Appium_Wizard
             fixInstallationToolStripMenuItem = new ToolStripMenuItem();
             updaterToolStripMenuItem = new ToolStripMenuItem();
             pluginsToolStripMenuItem1 = new ToolStripMenuItem();
+            restartADBServerToolStripMenuItem = new ToolStripMenuItem();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
@@ -241,6 +242,7 @@ namespace Appium_Wizard
             // 
             // androidWiFiToolStripMenuItem
             // 
+            androidWiFiToolStripMenuItem.Image = Properties.Resources.wifi;
             androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
             androidWiFiToolStripMenuItem.Size = new Size(156, 30);
             androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
@@ -300,7 +302,7 @@ namespace Appium_Wizard
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem, pluginsToolStripMenuItem1 });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { serverSetupToolStripMenuItem, fixInstallationToolStripMenuItem, updaterToolStripMenuItem, pluginsToolStripMenuItem1, restartADBServerToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(51, 20);
             fileToolStripMenuItem.Text = "Server";
@@ -309,7 +311,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(163, 22);
+            serverSetupToolStripMenuItem.Size = new Size(188, 30);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -317,7 +319,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(163, 22);
+            fixInstallationToolStripMenuItem.Size = new Size(188, 30);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -325,7 +327,7 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = Properties.Resources.update;
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(163, 22);
+            updaterToolStripMenuItem.Size = new Size(188, 30);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
@@ -333,9 +335,17 @@ namespace Appium_Wizard
             // 
             pluginsToolStripMenuItem1.Image = Properties.Resources.plug_in;
             pluginsToolStripMenuItem1.Name = "pluginsToolStripMenuItem1";
-            pluginsToolStripMenuItem1.Size = new Size(163, 22);
+            pluginsToolStripMenuItem1.Size = new Size(188, 30);
             pluginsToolStripMenuItem1.Text = "Plugins Manager";
             pluginsToolStripMenuItem1.Click += pluginsToolStripMenuItem1_Click;
+            // 
+            // restartADBServerToolStripMenuItem
+            // 
+            restartADBServerToolStripMenuItem.Image = Properties.Resources.adb;
+            restartADBServerToolStripMenuItem.Name = "restartADBServerToolStripMenuItem";
+            restartADBServerToolStripMenuItem.Size = new Size(188, 30);
+            restartADBServerToolStripMenuItem.Text = "Restart ADB Server";
+            restartADBServerToolStripMenuItem.Click += restartADBServerToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem
             // 
@@ -442,7 +452,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, pluginsToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(255, 30);
+            appiumDocsToolStripMenuItem.Size = new Size(247, 22);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -554,7 +564,7 @@ namespace Appium_Wizard
             otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
             otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
             otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
-            otherDocsToolStripMenuItem.Size = new Size(255, 30);
+            otherDocsToolStripMenuItem.Size = new Size(247, 22);
             otherDocsToolStripMenuItem.Text = "Other Docs";
             // 
             // iOSNativeAppsBundleToolStripMenuItem
@@ -569,7 +579,7 @@ namespace Appium_Wizard
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(255, 30);
+            troubleshootToolStripMenuItem.Size = new Size(247, 22);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
             // 
@@ -577,7 +587,7 @@ namespace Appium_Wizard
             // 
             reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
-            reportAnIssueToolStripMenuItem.Size = new Size(255, 30);
+            reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
@@ -585,7 +595,7 @@ namespace Appium_Wizard
             // 
             openLogsFolderToolstripMenuItem.Image = Properties.Resources.log;
             openLogsFolderToolstripMenuItem.Name = "openLogsFolderToolstripMenuItem";
-            openLogsFolderToolstripMenuItem.Size = new Size(255, 30);
+            openLogsFolderToolstripMenuItem.Size = new Size(247, 22);
             openLogsFolderToolstripMenuItem.Text = "Open Logs folder";
             openLogsFolderToolstripMenuItem.Click += openLogsFolderToolstripMenuItem_Click;
             // 
@@ -593,7 +603,7 @@ namespace Appium_Wizard
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
-            startADiscussionToolStripMenuItem.Size = new Size(255, 30);
+            startADiscussionToolStripMenuItem.Size = new Size(247, 22);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
@@ -601,7 +611,7 @@ namespace Appium_Wizard
             // 
             checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            checkForUpdatesToolStripMenuItem.Size = new Size(255, 30);
+            checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
             checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
             // 
@@ -609,7 +619,7 @@ namespace Appium_Wizard
             // 
             changeLogToolStripMenuItem.Image = Properties.Resources.changelog;
             changeLogToolStripMenuItem.Name = "changeLogToolStripMenuItem";
-            changeLogToolStripMenuItem.Size = new Size(255, 30);
+            changeLogToolStripMenuItem.Size = new Size(247, 22);
             changeLogToolStripMenuItem.Text = "Changelog";
             changeLogToolStripMenuItem.Click += changeLogToolStripMenuItem_Click;
             // 
@@ -617,7 +627,7 @@ namespace Appium_Wizard
             // 
             readMeToolStripMenuItem.Image = Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
-            readMeToolStripMenuItem.Size = new Size(255, 30);
+            readMeToolStripMenuItem.Size = new Size(247, 22);
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
@@ -625,7 +635,7 @@ namespace Appium_Wizard
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(255, 30);
+            aboutToolStripMenuItem.Size = new Size(247, 22);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -1137,5 +1147,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem reInitializeDeviceToolStripMenuItem;
         private ToolStripMenuItem changeLogToolStripMenuItem;
         private ToolStripMenuItem readMeToolStripMenuItem;
+        private ToolStripMenuItem restartADBServerToolStripMenuItem;
     }
 }

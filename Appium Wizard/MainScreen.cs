@@ -2016,7 +2016,7 @@ namespace Appium_Wizard
             }
             else
             {
-                MessageBox.Show("No devices available. Add a device first and then try opening Test Runner.","No Devices available", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No devices available. Add a device first and then try opening Test Runner.", "No Devices available", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2358,6 +2358,29 @@ namespace Appium_Wizard
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent("readMeToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void restartADBServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Restarting the ADB server may help fix issues related to Android execution. However, any tests currently running on the Android device may be interrupted.\n\nAre you sure you want to restart the ADB server ? ","Restart ADB Server",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                var isStopped = AndroidMethods.GetInstance().StopAdbServer();
+                if (!isStopped)
+                {
+                    MessageBox.Show("Failed to stop ADB Server", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                var isRunning = AndroidMethods.GetInstance().StartAdbServer();
+                if (isRunning)
+                {
+                    MessageBox.Show("ADB Server restarted successfully.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to restart ADB Server.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }

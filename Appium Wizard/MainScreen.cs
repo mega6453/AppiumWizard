@@ -335,6 +335,7 @@ namespace Appium_Wizard
                         contextMenuStrip4.Items[2].Enabled = true; // Refresh
                         contextMenuStrip4.Items[3].Enabled = false;
                         contextMenuStrip4.Items[4].Enabled = false;
+                        contextMenuStrip4.Items[5].Enabled = false;
                         mandatorymsglabel.Visible = false;
                     }
                     else

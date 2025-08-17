@@ -2253,7 +2253,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(15)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/screenshot", Method.Get);
@@ -2381,7 +2381,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);

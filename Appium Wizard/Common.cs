@@ -163,7 +163,6 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    Console.WriteLine("No process ID found in the netstat output.");
                     return (0, "");
                 }
             }
@@ -188,9 +187,8 @@ namespace Appium_Wizard
                     Console.WriteLine("Process with ID " + processId + " is already terminated.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Process with ID " + processId + " not found: " + ex.Message);
             }
         }
 

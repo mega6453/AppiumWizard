@@ -27,40 +27,108 @@ namespace Appium_Wizard
         public static Dictionary<int, int> PortProcessId = new Dictionary<int, int>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public void StartAdbServer(int AdbPort)
+        public bool StartAdbServer()
         {
-            ProcessStartInfo adbStartInfo = new ProcessStartInfo
+            if (string.IsNullOrEmpty(adbFilePath) || !File.Exists(adbFilePath))
             {
-                FileName = adbFilePath,
-                Arguments = "-P " + AdbPort + " start-server",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                throw new FileNotFoundException("ADB executable not found");
+            }
 
-            adbProcess = new Process { StartInfo = adbStartInfo };
-            adbProcess.Start();
-            Thread.Sleep(2000);
-            int processId = adbProcess.Id;
-            MainScreen.runningProcesses.Add(processId);
+            try
+            {
+                ProcessStartInfo adbStartInfo = new ProcessStartInfo
+                {
+                    FileName = adbFilePath,
+                    Arguments = "start-server",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = adbStartInfo })
+                {
+                    process.Start();
+
+                    if (process.WaitForExit(10000))
+                    {
+                        return IsAdbServerRunning();
+                    }
+                    else
+                    {
+                        process.Kill();
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error starting ADB server: {ex.Message}");
+                return false;
+            }
         }
 
-        public void StopAdbServer(int AdbPort)
+        public bool StopAdbServer()
         {
-            ProcessStartInfo adbStopInfo = new ProcessStartInfo
+            try
             {
-                FileName = adbFilePath,
-                Arguments = "-P " + AdbPort + " kill-server",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                ProcessStartInfo adbStopInfo = new ProcessStartInfo
+                {
+                    FileName = adbFilePath,
+                    Arguments = "kill-server",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-            adbProcess = new Process { StartInfo = adbStopInfo };
-            adbProcess.Start();
-            adbProcess.WaitForExit();
+                using (Process process = new Process { StartInfo = adbStopInfo })
+                {
+                    process.Start();
+
+                    if (process.WaitForExit(5000))
+                    {
+                        return process.ExitCode == 0;
+                    }
+                    else
+                    {
+                        process.Kill();
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error stopping ADB server: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool IsAdbServerRunning()
+        {
+            try
+            {
+                ProcessStartInfo checkInfo = new ProcessStartInfo
+                {
+                    FileName = adbFilePath,
+                    Arguments = $"devices",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = checkInfo })
+                {
+                    process.Start();
+                    process.WaitForExit(3000);
+                    return process.ExitCode == 0;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public void StopUIAutomator(string udid)
@@ -220,7 +288,7 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell input text " + text);
         }
 
-        public void Swipe(string udid, int startX, int startY, int endX, int endY, int duration)
+        public void SwipeForScreenControl(string udid, int startX, int startY, int endX, int endY, int duration)
         {
             float dpi = GetScreenDensity(udid);
             startX = DpToPixels(startX, dpi);
@@ -448,8 +516,11 @@ namespace Appium_Wizard
 
         public void UnlockScreen(string udid, string password)
         {
-            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82");
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82"); // Wake screen
+            Thread.Sleep(500);
             SendText(udid, password);
+            Thread.Sleep(300);
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 66"); // Enter key
         }
 
         public bool ClearAppData(string udid, string packageName)
@@ -460,6 +531,36 @@ namespace Appium_Wizard
                 return true;
             }
             return false;
+        }
+
+        public void BackSpace(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 67");
+        }
+
+        public void Delete(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 112");
+        }
+
+        public void UpArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 19");
+        }
+
+        public void DownArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 20");
+        }
+
+        public void LeftArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 21");
+        }
+
+        public void RightArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 22");
         }
 
         public List<string> GetListOfInstalledApps(string udid)
@@ -1038,7 +1139,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source", Method.Get);
@@ -1115,7 +1216,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(15)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/screenshot", Method.Get);

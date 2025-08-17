@@ -1040,21 +1040,20 @@ namespace Appium_Wizard
 
         public void UnlockScreen(string udid, string password, string deviceName)
         {
-            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            int port = Common.GetFreePort();
+            iOSAsyncMethods.GetInstance().StartiProxyServer(port, 8100);
+            string sessionId = IsWDARunning(port);
+            if (!sessionId.Equals("nosession"))
             {
-                int port = MainScreen.udidProxyPort[udid];
-                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                if (!sessionId.Equals("nosession"))
-                {
-                    string url = "http://localhost:" + port;
-                    iOSAPIMethods.Unlock(port);
-                    iOSAPIMethods.SendText(url, sessionId, password);
-                }
-                else
-                {
-                    MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Unlock Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                string url = "http://localhost:" + port;
+                iOSAPIMethods.Unlock(port);
+                iOSAPIMethods.SendText(url, sessionId, password);
             }
+            else
+            {
+                MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Unlock Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            Common.KillProcessByPortNumber(port);
         }
 
         public void KillAppUsingExecutable(string bundleId, string udid)
@@ -1993,6 +1992,23 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
+        public static string BackSpace(string URL, string sessionId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/keys", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            var body = @"{""value"":[""\b""]}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.StatusDescription;
+        }
+
+
         public static string SendText(string udid, string URL, string sessionId, string element, string text)
         {
             string elementId = FindElement(URL, sessionId, element);
@@ -2237,7 +2253,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(15)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/screenshot", Method.Get);
@@ -2365,7 +2381,7 @@ namespace Appium_Wizard
             {
                 var options = new RestClientOptions(URL)
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(30)
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest("/session/" + sessionId + "/source?format=xml&scope=AppiumAUT", Method.Get);

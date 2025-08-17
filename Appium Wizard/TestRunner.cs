@@ -87,7 +87,9 @@ namespace Appium_Wizard
                     properties.Add("Text to Enter", "");
                     break;
                 case "Set Device":
-                    properties.Add("Device Name", "");
+                    // Set default device name
+                    string defaultDeviceName = deviceNames.FirstOrDefault() ?? "";
+                    properties.Add("Device Name", defaultDeviceName);
                     break;
                 case "Wait for element visible":
                     properties.Add("XPath", "");
@@ -126,14 +128,28 @@ namespace Appium_Wizard
 
             // Add the action to DataGridView1
             int rowIndex = commandGridView.Rows.Add(); // Add a new row
+
+            // Set the Tag for "Set Device" actions when they are first created
+            if (selectedAction == "Set Device")
+            {
+                string defaultDeviceName = deviceNames.FirstOrDefault() ?? "";
+                if (!string.IsNullOrEmpty(defaultDeviceName) && deviceNameToUdidMap.ContainsKey(defaultDeviceName))
+                {
+                    commandGridView.Rows[rowIndex].Tag = deviceNameToUdidMap[defaultDeviceName];
+                }
+            }
+
+            // **FIX: Set the formatted text instead of just the action name**
             if (selectedAction == "Take Screenshot")
             {
                 commandGridView.Rows[rowIndex].Cells[1].Value = "Take Screenshot and attach it to report";
             }
             else
             {
-                commandGridView.Rows[rowIndex].Cells[1].Value = selectedAction; // Set the value in column 1
+                // Use FormatActionText to show the proper formatted text with details
+                commandGridView.Rows[rowIndex].Cells[1].Value = FormatActionText(rowIndex);
             }
+
             commandGridView.ClearSelection();
             DataGridViewRow newRow = commandGridView.Rows[rowIndex];
             // Highlight the newly created row
@@ -166,16 +182,22 @@ namespace Appium_Wizard
                         if (actionName == "Send Text With Random Values" && property.Key == "Text Type")
                         {
                             // Create a ComboBox cell for the "Text Type" field
+                            var validOptions = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" };
                             var comboBoxCell = new DataGridViewComboBoxCell
                             {
-                                DataSource = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" }, // Dropdown options
-                                Value = property.Value // Default value
+                                DataSource = validOptions
                             };
 
                             // Validate the value to ensure it matches one of the dropdown options
-                            if (comboBoxCell.DataSource is List<string> dataSource && !dataSource.Contains(comboBoxCell.Value))
+                            if (validOptions.Contains(property.Value))
                             {
-                                comboBoxCell.Value = dataSource.FirstOrDefault(); // Set to the first valid option if invalid
+                                comboBoxCell.Value = property.Value; // Set valid value
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = validOptions.FirstOrDefault(); // Set to first valid option if invalid
+                                                                                    // Update the underlying data to reflect the change
+                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
                             }
 
                             row.Cells[1] = comboBoxCell;
@@ -185,23 +207,60 @@ namespace Appium_Wizard
                             // Create a standard TextBox cell for "Number of digits/characters"
                             row.Cells[1].Value = property.Value;
                         }
-                        if (actionName == "Set Device" && property.Key == "Device Name")
+                        else if (actionName == "Set Device" && property.Key == "Device Name")
                         {
                             // Create a ComboBox cell for the value field
                             var comboBoxCell = new DataGridViewComboBoxCell
                             {
-                                DataSource = deviceNames // Populate with device names
+                                DataSource = new List<string>(deviceNames) // Create a new list to avoid reference issues
                             };
-                            comboBoxCell.Value = property.Value;
+
+                            // Validate if the device name exists in the current device list
+                            if (deviceNames.Contains(property.Value))
+                            {
+                                comboBoxCell.Value = property.Value; // Set valid value
+                                                                     // Set the Tag for existing valid device
+                                if (deviceNameToUdidMap.ContainsKey(property.Value))
+                                {
+                                    commandGridView.Rows[selectedIndex].Tag = deviceNameToUdidMap[property.Value];
+                                }
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = deviceNames.FirstOrDefault(); // Set to first device or null if none
+                                                                                   // Update the underlying data to reflect the change
+                                string defaultDeviceName = comboBoxCell.Value?.ToString() ?? "";
+                                actionData[selectedIndex].Item2[property.Key] = defaultDeviceName;
+
+                                // **FIX: Set the Tag for the default device**
+                                if (!string.IsNullOrEmpty(defaultDeviceName) && deviceNameToUdidMap.ContainsKey(defaultDeviceName))
+                                {
+                                    commandGridView.Rows[selectedIndex].Tag = deviceNameToUdidMap[defaultDeviceName];
+                                }
+                            }
+
                             row.Cells[1] = comboBoxCell;
                         }
-                        else if (actionName == "Device Action")
+                        else if (actionName == "Device Action" && property.Key == "Action")
                         {
-                            var comboBoxCell = new DataGridViewComboBoxCell();
+                            var validActions = new List<string> { "Home", "Back" };
+                            var comboBoxCell = new DataGridViewComboBoxCell
+                            {
+                                DataSource = validActions
+                            };
 
-                            List<string> items = new List<string> { "Home", "Back" };
-                            comboBoxCell.DataSource = items;
-                            comboBoxCell.Value = property.Value;
+                            // Validate if the action exists in the list
+                            if (validActions.Contains(property.Value))
+                            {
+                                comboBoxCell.Value = property.Value; // Set valid value
+                            }
+                            else
+                            {
+                                comboBoxCell.Value = validActions.FirstOrDefault(); // Set to first valid option
+                                                                                    // Update the underlying data to reflect the change
+                                actionData[selectedIndex].Item2[property.Key] = comboBoxCell.Value?.ToString() ?? "";
+                            }
+
                             row.Cells[1] = comboBoxCell;
                         }
                         else
@@ -232,6 +291,7 @@ namespace Appium_Wizard
             {
                 // Log or handle exception
                 Console.WriteLine(ex.Message);
+                MessageBox.Show($"Error in DataGridView selection: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -426,6 +486,7 @@ namespace Appium_Wizard
                 htmlReportPath = filePath;
                 CreateHtmlReport();
                 await performActions(cancellationTokenSource.Token);
+                Common.ShowNotification("Test Runner", "Execution completed.");
                 FinalizeHtmlReport();
             }
             catch (OperationCanceledException)
@@ -488,6 +549,16 @@ namespace Appium_Wizard
                     }
                     else
                     {
+                        if (screenshotCheckBox.Checked)
+                        {
+                            var activeActionCount = actionActiveStates.Count(isActive => isActive);
+                            var screenshotCount = activeActionCount * repetitions;
+                            var result = MessageBox.Show("Take Screenshot after every step is enabled. So, this execution will take totally "+screenshotCount+" screenshots. Do you want to keep it enabled and continue?", "Take Screenshot after every step",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                            if (result == DialogResult.No)
+                            {
+                                return;
+                            }
+                        }
                         GoogleAnalytics.SendEvent("Repeat_TestRunner", repetitions.ToString());
                         string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                         string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
@@ -502,6 +573,7 @@ namespace Appium_Wizard
                                 repeatCountLabel.Text = $"{i}/{repetitions}";
                             }
                         }
+                        Common.ShowNotification("Test Runner", "Execution completed.");
                         erroShown = false;
                         FinalizeHtmlReport();
                     }
@@ -857,6 +929,23 @@ namespace Appium_Wizard
                             MessageBox.Show($"Unknown Command: {actionType}", "Unknown Command", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             break;
                     }
+                    if (screenshotCheckBox.Checked)
+                    {
+                        string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                        string screenshotFilePath = Path.Combine(reportsFolderPath, $"Screenshot_{selectedDeviceName}_{timestamp}.png");
+                        string TakeScreenshotCommand = "Take Screenshot";
+                        UpdateScreenControl(TakeScreenshotCommand);
+                        string TakeScreenshotStatusDescription = "-";
+                        if (isAndroid)
+                        {
+                            TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, screenshotFilePath);
+                        }
+                        else
+                        {
+                            TakeScreenshotStatusDescription = iOSAPIMethods.TakeScreenshot(URL, screenshotFilePath);
+                        }
+                        AppendToHtmlReport(TakeScreenshotCommand, TakeScreenshotStatusDescription, screenshotFilePath);
+                    }
                 }
                 UpdateScreenControl("");
             });
@@ -1039,9 +1128,35 @@ namespace Appium_Wizard
                     if (action.Item1 == "Set Device" && action.Item2.ContainsKey("Device Name"))
                     {
                         string deviceName = action.Item2["Device Name"];
+                        // Check if the device name exists in current device list
                         if (deviceNameToUdidMap.ContainsKey(deviceName))
                         {
                             commandGridView.Rows[rowIndex].Tag = deviceNameToUdidMap[deviceName]; // Restore the UDID
+                        }
+                        else
+                        {
+                            // Device name doesn't exist, clear it from the data
+                            action.Item2["Device Name"] = "";
+                            commandGridView.Rows[rowIndex].Tag = null;
+                        }
+                    }
+
+                    // Validate other dropdown values
+                    if (action.Item1 == "Send Text With Random Values" && action.Item2.ContainsKey("Text Type"))
+                    {
+                        var validTextTypes = new List<string> { "Random Number", "Random Alphabets", "Random Alphanumeric" };
+                        if (!validTextTypes.Contains(action.Item2["Text Type"]))
+                        {
+                            action.Item2["Text Type"] = validTextTypes.FirstOrDefault();
+                        }
+                    }
+
+                    if (action.Item1 == "Device Action" && action.Item2.ContainsKey("Action"))
+                    {
+                        var validActions = new List<string> { "Home", "Back" };
+                        if (!validActions.Contains(action.Item2["Action"]))
+                        {
+                            action.Item2["Action"] = validActions.FirstOrDefault();
                         }
                     }
 
@@ -1049,6 +1164,10 @@ namespace Appium_Wizard
                     commandGridView.Rows[rowIndex].Cells[1].Value = FormatActionText(rowIndex);
                 }
                 scriptFilePath = filePath;
+
+                // Show a message if any invalid values were found and corrected
+                MessageBox.Show("Script loaded successfully. Any invalid dropdown values have been reset to default values.",
+                               "Script Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -1262,6 +1381,19 @@ namespace Appium_Wizard
             File.WriteAllText(htmlReportPath, htmlContent);
         }
 
+        private string HtmlEncode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            return text
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;")
+                .Replace("\"", "&quot;")
+                .Replace("'", "&#39;");
+        }
+
         private void AppendToHtmlReport(string command, string output, string? screenshotPath = null)
         {
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1270,16 +1402,21 @@ namespace Appium_Wizard
             if (!string.IsNullOrEmpty(screenshotPath))
             {
                 string relativePath = Path.GetFileName(screenshotPath);
-                screenshotHtml = $@"<br><a href='{relativePath}' target='_blank'><img src='{relativePath}' alt='Screenshot' style='max-width: 300px; max-height: 300px;'/></a>";
+                string encodedPath = HtmlEncode(relativePath);
+
+                screenshotHtml = $@"<br><a href='{encodedPath}' target='_blank'><img src='{encodedPath}' alt='Screenshot' style='max-width: 300px; max-height: 300px;'/></a>";
             }
 
+            string encodedCommand = HtmlEncode(command);
+            string encodedOutput = HtmlEncode(output);
+
             string row = $@"
-                            <tr>
-                                <td>{timestamp}</td>
-                                <td>{command}</td>
-                                <td>{output}{screenshotHtml}</td>
-                            </tr>
-                        ";
+                    <tr>
+                        <td>{timestamp}</td>
+                        <td>{encodedCommand}</td>
+                        <td>{encodedOutput}{screenshotHtml}</td>
+                    </tr>
+                ";
 
             File.AppendAllText(htmlReportPath, row);
         }

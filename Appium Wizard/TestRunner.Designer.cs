@@ -58,6 +58,7 @@
             panel2 = new Panel();
             currentExecution = new Label();
             label2 = new Label();
+            screenshotCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             contextMenuStrip1.SuspendLayout();
@@ -206,7 +207,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label5.ForeColor = Color.IndianRed;
+            label5.ForeColor = Color.Brown;
             label5.Location = new Point(663, 342);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
@@ -217,7 +218,8 @@
             // repeatCountLabel
             // 
             repeatCountLabel.AutoSize = true;
-            repeatCountLabel.Location = new Point(582, 392);
+            repeatCountLabel.ForeColor = Color.FromArgb(192, 0, 0);
+            repeatCountLabel.Location = new Point(567, 442);
             repeatCountLabel.Name = "repeatCountLabel";
             repeatCountLabel.Size = new Size(0, 15);
             repeatCountLabel.TabIndex = 12;
@@ -311,6 +313,7 @@
             // 
             // panel2
             // 
+            panel2.BackColor = SystemColors.ControlLightLight;
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(currentExecution);
             panel2.Location = new Point(12, 392);
@@ -321,6 +324,8 @@
             // currentExecution
             // 
             currentExecution.AutoSize = true;
+            currentExecution.BackColor = Color.Transparent;
+            currentExecution.ForeColor = Color.FromArgb(192, 0, 0);
             currentExecution.Location = new Point(3, 10);
             currentExecution.Name = "currentExecution";
             currentExecution.Size = new Size(0, 15);
@@ -331,9 +336,19 @@
             label2.AutoSize = true;
             label2.Location = new Point(12, 376);
             label2.Name = "label2";
-            label2.Size = new Size(94, 15);
+            label2.Size = new Size(97, 15);
             label2.TabIndex = 0;
-            label2.Text = "Execution Status";
+            label2.Text = "Execution Status:";
+            // 
+            // screenshotCheckBox
+            // 
+            screenshotCheckBox.AutoSize = true;
+            screenshotCheckBox.Location = new Point(171, 443);
+            screenshotCheckBox.Name = "screenshotCheckBox";
+            screenshotCheckBox.Size = new Size(193, 19);
+            screenshotCheckBox.TabIndex = 20;
+            screenshotCheckBox.Text = "Take Screenshot after every step";
+            screenshotCheckBox.UseVisualStyleBackColor = true;
             // 
             // TestRunner
             // 
@@ -341,6 +356,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 474);
+            Controls.Add(screenshotCheckBox);
             Controls.Add(label2);
             Controls.Add(newButton);
             Controls.Add(saveDownButton);
@@ -409,5 +425,6 @@
         private Panel panel2;
         private Label currentExecution;
         private Label label2;
+        private CheckBox screenshotCheckBox;
     }
 }

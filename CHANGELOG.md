@@ -1,3 +1,10 @@
+# v8.1.0:
+1. Restart ADB Server option added under Server
+2. Backspace, Delete handled in screen control
+3. Re-Initialize device to fix any issue while opening device
+4. Bug fixes in Test Runner
+5. Other bug fixes
+
 # v8.0.0:
 1. Test Runner
 2. Record and Playback

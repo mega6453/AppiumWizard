@@ -335,6 +335,7 @@ namespace Appium_Wizard
                         contextMenuStrip4.Items[2].Enabled = true; // Refresh
                         contextMenuStrip4.Items[3].Enabled = false;
                         contextMenuStrip4.Items[4].Enabled = false;
+                        contextMenuStrip4.Items[5].Enabled = false;
                         mandatorymsglabel.Visible = false;
                     }
                     else
@@ -2009,8 +2010,15 @@ namespace Appium_Wizard
 
         private void testRunnerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TestRunner testRunner = new TestRunner();
-            testRunner.Show();
+            if (listView1.Items.Count > 0)
+            {
+                TestRunner testRunner = new TestRunner();
+                testRunner.Show();
+            }
+            else
+            {
+                MessageBox.Show("No devices available. Add a device first and then try opening Test Runner.", "No Devices available", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void openLogsButton_Click(object sender, EventArgs e)
@@ -2352,6 +2360,36 @@ namespace Appium_Wizard
             {
                 GoogleAnalytics.SendExceptionEvent("readMeToolStripMenuItem_Click", exception.Message);
             }
+        }
+
+        private void restartADBServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Restarting the ADB server may help fix issues related to Android execution. However, any tests currently running on the Android device may be interrupted.\n\nAre you sure you want to restart the ADB server ? ", "Restart ADB Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                var isStopped = AndroidMethods.GetInstance().StopAdbServer();
+                if (!isStopped)
+                {
+                    MessageBox.Show("Failed to stop ADB Server", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                var isRunning = AndroidMethods.GetInstance().StartAdbServer();
+                if (isRunning)
+                {
+                    MessageBox.Show("ADB Server restarted successfully.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to restart ADB Server.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void unlockDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EnterPassword enterPassword = new EnterPassword(selectedOS, selectedUDID, selectedDeviceName);
+            enterPassword.ShowDialog();
+            GoogleAnalytics.SendEvent("unlockDeviceToolStripMenuItem_Click");
         }
     }
 }

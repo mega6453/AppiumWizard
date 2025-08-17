@@ -220,7 +220,7 @@ namespace Appium_Wizard
             ExecuteCommand("-s " + udid + " shell input text " + text);
         }
 
-        public void Swipe(string udid, int startX, int startY, int endX, int endY, int duration)
+        public void SwipeForScreenControl(string udid, int startX, int startY, int endX, int endY, int duration)
         {
             float dpi = GetScreenDensity(udid);
             startX = DpToPixels(startX, dpi);

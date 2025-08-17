@@ -368,7 +368,6 @@ namespace Appium_Wizard
             }
         }
 
-
         public async void WebView_MouseUp(object sender, MouseEventArgs e)
         {
             moveToX = e.Location.X;
@@ -384,6 +383,7 @@ namespace Appium_Wizard
                 // Check if the movement qualifies as a swipe
                 if (Math.Abs(deltaX) < swipeThreshold && Math.Abs(deltaY) < swipeThreshold)
                 {
+                    // Handle tap
                     if (isAndroid)
                     {
                         await Task.Run(() =>
@@ -403,90 +403,24 @@ namespace Appium_Wizard
                     return;
                 }
 
-                // Calculate screen-based swipe coordinates
-                int horizontalSwipeStartX = (int)(width * 0.1); // Start swipe at 10% of screen width
-                int horizontalSwipeEndX = (int)(width * 0.9);   // End swipe at 90% of screen width
-                int verticalSwipeStartY = (int)(height * 0.5);  // Start swipe at 50% of screen height
-                int verticalSwipeEndY = (int)(height * 0.9);    // End swipe at 90% of screen height
-                if (Math.Abs(deltaX) > Math.Abs(deltaY))
+                // Use actual mouse coordinates for swipe
+                int waitDuration = 300;
+
+                if (isAndroid)
                 {
-                    int waitDuration = 100;
-                    if (deltaX > 0)
-                    {   // Swipe right
-                        if (isAndroid)
-                        {
-                            await Task.Run(() =>
-                            {
-                                AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
-                            });
-                        }
-                        else
-                        {
-                            await Task.Run(() =>
-                            {
-                                iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeStartX, height / 2, horizontalSwipeEndX, height / 2, waitDuration);
-                            });
-                        }
-                    }
-                    else
+                    await Task.Run(() =>
                     {
-                        // Swipe left
-                        if (isAndroid)
-                        {
-                            await Task.Run(() =>
-                            {
-                                AndroidMethods.GetInstance().Swipe(udid, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
-                            });
-                        }
-                        else
-                        {
-                            await Task.Run(() =>
-                            {
-                                iOSAPIMethods.Swipe(URL, sessionId, horizontalSwipeEndX, height / 2, horizontalSwipeStartX, height / 2, waitDuration);
-                            });
-                        }
-                    }
+                        AndroidMethods.GetInstance().SwipeForScreenControl(udid, pressX, pressY, moveToX, moveToY, waitDuration);
+                    });
                 }
                 else
                 {
-                    int waitDuration = 1000;
-                    if (deltaY > 0)
+                    await Task.Run(() =>
                     {
-                        // Swipe down
-                        if (isAndroid)
-                        {
-                            await Task.Run(() =>
-                            {
-                                AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
-                            });
-                        }
-                        else
-                        {
-                            await Task.Run(() =>
-                            {
-                                iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeStartY, width / 2, verticalSwipeEndY, waitDuration);
-                            });
-                        }
-                    }
-                    else
-                    {
-                        // Swipe up
-                        if (isAndroid)
-                        {
-                            await Task.Run(() =>
-                            {
-                                AndroidMethods.GetInstance().Swipe(udid, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
-                            });
-                        }
-                        else
-                        {
-                            await Task.Run(() =>
-                            {
-                                iOSAPIMethods.Swipe(URL, sessionId, width / 2, verticalSwipeEndY, width / 2, verticalSwipeStartY, waitDuration);
-                            });
-                        }
-                    }
+                        iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
+                    });
                 }
+
                 if (isAndroid)
                 {
                     GoogleAnalytics.SendEvent("SwipeScreen", "Android");

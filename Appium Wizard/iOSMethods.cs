@@ -1993,6 +1993,23 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
+        public static string BackSpace(string URL, string sessionId)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/" + sessionId + "/wda/keys", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            var body = @"{""value"":[""\b""]}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+            return response.StatusDescription;
+        }
+
+
         public static string SendText(string udid, string URL, string sessionId, string element, string text)
         {
             string elementId = FindElement(URL, sessionId, element);

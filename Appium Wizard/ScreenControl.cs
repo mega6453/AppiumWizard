@@ -124,6 +124,7 @@ namespace Appium_Wizard
                 deviceSerialNumber = iOSMethods.GetInstance().GetDeviceSerialNumber(udid);
             }
             Logger.Info("Initialization completed");
+            this.KeyPreview = true;
         }
 
         public void UpdateStatusLabel(ScreenControl screenControl, string actualText)
@@ -1260,7 +1261,7 @@ namespace Appium_Wizard
                     ActionType = "Set Device",
                 });
                 MessageBox.Show("Recording steps started.", "Record Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                GoogleAnalytics.SendEvent("Recording steps started",OSType);
+                GoogleAnalytics.SendEvent("Recording steps started", OSType);
             }
             else
             {
@@ -1359,6 +1360,68 @@ namespace Appium_Wizard
         private void copyUDIDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(this.udid);
+        }
+
+        private void ScreenWebView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Back)
+            {
+                if (OSType.Equals("iOS"))
+                {
+                    iOSAPIMethods.BackSpace(URL, sessionId);
+                }
+                else
+                {
+                    AndroidMethods.GetInstance().BackSpace(udid);
+                }
+            }
+            else if (e.KeyCode == Keys.Delete)
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().Delete(udid);
+                }
+                //iOS don't have delete option
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().UpArrow(udid);
+                }
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().DownArrow(udid);
+                }
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().LeftArrow(udid);
+                }
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().RightArrow(udid);
+                }
+            }
+        }
+
+        private void ScreenWebView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            Debug.WriteLine($"PreviewKeyDown: {e.KeyCode}");
+            if (e.KeyCode == Keys.Back || e.KeyCode == Keys.Delete ||
+                e.KeyCode == Keys.Up || e.KeyCode == Keys.Down ||
+                e.KeyCode == Keys.Left || e.KeyCode == Keys.Right)
+            {
+                e.IsInputKey = true;
+            }
         }
     }
 

@@ -462,6 +462,36 @@ namespace Appium_Wizard
             return false;
         }
 
+        public void BackSpace(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 67");
+        }
+
+        public void Delete(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 112");
+        }
+
+        public void UpArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 19");
+        }
+
+        public void DownArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 20");
+        }
+
+        public void LeftArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 21");
+        }
+
+        public void RightArrow(string udid)
+        {
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 22");
+        }
+
         public List<string> GetListOfInstalledApps(string udid)
         {
             var output = ExecuteCommand("-s " + udid + " shell pm list packages -3 --user 0");

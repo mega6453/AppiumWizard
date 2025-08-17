@@ -516,8 +516,11 @@ namespace Appium_Wizard
 
         public void UnlockScreen(string udid, string password)
         {
-            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82");
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 82"); // Wake screen
+            Thread.Sleep(500);
             SendText(udid, password);
+            Thread.Sleep(300);
+            ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 66"); // Enter key
         }
 
         public bool ClearAppData(string udid, string packageName)

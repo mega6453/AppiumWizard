@@ -2363,7 +2363,7 @@ namespace Appium_Wizard
 
         private void restartADBServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Restarting the ADB server may help fix issues related to Android execution. However, any tests currently running on the Android device may be interrupted.\n\nAre you sure you want to restart the ADB server ? ","Restart ADB Server",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+            var result = MessageBox.Show("Restarting the ADB server may help fix issues related to Android execution. However, any tests currently running on the Android device may be interrupted.\n\nAre you sure you want to restart the ADB server ? ", "Restart ADB Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 var isStopped = AndroidMethods.GetInstance().StopAdbServer();
@@ -2382,6 +2382,13 @@ namespace Appium_Wizard
                     MessageBox.Show("Failed to restart ADB Server.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void unlockDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EnterPassword enterPassword = new EnterPassword(selectedOS, selectedUDID, selectedDeviceName);
+            enterPassword.ShowDialog();
+            GoogleAnalytics.SendEvent("unlockDeviceToolStripMenuItem_Click");
         }
     }
 }

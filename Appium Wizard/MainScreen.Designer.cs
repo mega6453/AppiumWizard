@@ -128,6 +128,7 @@ namespace Appium_Wizard
             OpenDropDownButton = new Button();
             openContextMenuStrip = new ContextMenuStrip(components);
             reInitializeDeviceToolStripMenuItem = new ToolStripMenuItem();
+            unlockDeviceToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -311,7 +312,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(188, 30);
+            serverSetupToolStripMenuItem.Size = new Size(171, 22);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -319,7 +320,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(188, 30);
+            fixInstallationToolStripMenuItem.Size = new Size(171, 22);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -327,7 +328,7 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = Properties.Resources.update;
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(188, 30);
+            updaterToolStripMenuItem.Size = new Size(171, 22);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
@@ -335,7 +336,7 @@ namespace Appium_Wizard
             // 
             pluginsToolStripMenuItem1.Image = Properties.Resources.plug_in;
             pluginsToolStripMenuItem1.Name = "pluginsToolStripMenuItem1";
-            pluginsToolStripMenuItem1.Size = new Size(188, 30);
+            pluginsToolStripMenuItem1.Size = new Size(171, 22);
             pluginsToolStripMenuItem1.Text = "Plugins Manager";
             pluginsToolStripMenuItem1.Click += pluginsToolStripMenuItem1_Click;
             // 
@@ -343,7 +344,7 @@ namespace Appium_Wizard
             // 
             restartADBServerToolStripMenuItem.Image = Properties.Resources.adb;
             restartADBServerToolStripMenuItem.Name = "restartADBServerToolStripMenuItem";
-            restartADBServerToolStripMenuItem.Size = new Size(188, 30);
+            restartADBServerToolStripMenuItem.Size = new Size(171, 22);
             restartADBServerToolStripMenuItem.Text = "Restart ADB Server";
             restartADBServerToolStripMenuItem.Click += restartADBServerToolStripMenuItem_Click;
             // 
@@ -859,9 +860,9 @@ namespace Appium_Wizard
             // contextMenuStrip4
             // 
             contextMenuStrip4.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, rebootDeviceToolStripMenuItem });
+            contextMenuStrip4.Items.AddRange(new ToolStripItem[] { installAppToolStripMenuItem, launchAppToolStripMenuItem, refreshStatusToolStripMenuItem, takeScreenshotToolStripMenuItem, unlockDeviceToolStripMenuItem, rebootDeviceToolStripMenuItem });
             contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(240, 154);
+            contextMenuStrip4.Size = new Size(240, 206);
             // 
             // installAppToolStripMenuItem
             // 
@@ -996,6 +997,14 @@ namespace Appium_Wizard
             reInitializeDeviceToolStripMenuItem.Size = new Size(173, 22);
             reInitializeDeviceToolStripMenuItem.Text = "Re-Initialize Device";
             reInitializeDeviceToolStripMenuItem.Click += reInitializeDeviceToolStripMenuItem_Click;
+            // 
+            // unlockDeviceToolStripMenuItem
+            // 
+            unlockDeviceToolStripMenuItem.Image = Properties.Resources.Unlock;
+            unlockDeviceToolStripMenuItem.Name = "unlockDeviceToolStripMenuItem";
+            unlockDeviceToolStripMenuItem.Size = new Size(239, 30);
+            unlockDeviceToolStripMenuItem.Text = "Unlock Device";
+            unlockDeviceToolStripMenuItem.Click += unlockDeviceToolStripMenuItem_Click;
             // 
             // MainScreen
             // 
@@ -1148,5 +1157,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem changeLogToolStripMenuItem;
         private ToolStripMenuItem readMeToolStripMenuItem;
         private ToolStripMenuItem restartADBServerToolStripMenuItem;
+        private ToolStripMenuItem unlockDeviceToolStripMenuItem;
     }
 }

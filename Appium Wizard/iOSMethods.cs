@@ -1040,21 +1040,20 @@ namespace Appium_Wizard
 
         public void UnlockScreen(string udid, string password, string deviceName)
         {
-            if (MainScreen.udidProxyPort.ContainsKey(udid))
+            int port = Common.GetFreePort();
+            iOSAsyncMethods.GetInstance().StartiProxyServer(port, 8100);
+            string sessionId = IsWDARunning(port);
+            if (!sessionId.Equals("nosession"))
             {
-                int port = MainScreen.udidProxyPort[udid];
-                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
-                if (!sessionId.Equals("nosession"))
-                {
-                    string url = "http://localhost:" + port;
-                    iOSAPIMethods.Unlock(port);
-                    iOSAPIMethods.SendText(url, sessionId, password);
-                }
-                else
-                {
-                    MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Unlock Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                string url = "http://localhost:" + port;
+                iOSAPIMethods.Unlock(port);
+                iOSAPIMethods.SendText(url, sessionId, password);
             }
+            else
+            {
+                MessageBox.Show("Unable to connect with WebDriverAgent in your " + deviceName + ". This works only if the WDA already running in the iPhone.", "Unlock Device", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            Common.KillProcessByPortNumber(port);
         }
 
         public void KillAppUsingExecutable(string bundleId, string udid)

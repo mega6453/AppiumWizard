@@ -478,6 +478,14 @@ namespace Appium_Wizard
                 string sessionIdAvailableForAutomation = string.Empty;
                 try
                 {
+                    commonProgress.UpdateStepLabel(title, "Getting screen density...", 5);
+                    try
+                    {
+                        MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    }
+                    catch (Exception)
+                    {
+                    }
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 10);
                     AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 15);

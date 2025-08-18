@@ -275,9 +275,19 @@ namespace Appium_Wizard
             const float dpFactor = 160f;
             return (int)(dp * (dpi / dpFactor));
         }
+
         public void Tap(string udid, int x, int y)
         {
-            float dpi = GetScreenDensity(udid);
+            float dpi = 0;
+            if (MainScreen.udidScreenDensity.ContainsKey(udid))
+            {
+                dpi = MainScreen.udidScreenDensity[udid];
+            }
+            else
+            {
+                dpi = GetScreenDensity(udid);
+                MainScreen.udidScreenDensity[udid] = dpi;
+            }
             x = DpToPixels(x, dpi);
             y = DpToPixels(y, dpi);
             ExecuteCommand("-s " + udid + " shell input tap " + x + " " + y + "");
@@ -290,7 +300,16 @@ namespace Appium_Wizard
 
         public void SwipeForScreenControl(string udid, int startX, int startY, int endX, int endY, int duration)
         {
-            float dpi = GetScreenDensity(udid);
+            float dpi = 0;
+            if (MainScreen.udidScreenDensity.ContainsKey(udid))
+            {
+                dpi = MainScreen.udidScreenDensity[udid];
+            }
+            else
+            {
+                dpi = GetScreenDensity(udid);
+                MainScreen.udidScreenDensity[udid] = dpi;
+            }
             startX = DpToPixels(startX, dpi);
             startY = DpToPixels(startY, dpi);
             endX = DpToPixels(endX, dpi);

@@ -29,6 +29,10 @@ namespace Appium_Wizard
             {
                 this.udid = deviceIPAddress;
             }
+            if (OSType.Equals("Android"))
+            {
+                MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
+            }
         }
 
         public (int, int) getDeviceScreenSize(string udid)

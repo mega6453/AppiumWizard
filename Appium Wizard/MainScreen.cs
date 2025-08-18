@@ -30,7 +30,7 @@ namespace Appium_Wizard
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private Timer uncheckTimer; private Timer highlightTimer;
         public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();
-
+        public static Dictionary<string, float> udidScreenDensity = new Dictionary<string, float>(); // for android
         public MainScreen()
         {
             InitializeComponent();

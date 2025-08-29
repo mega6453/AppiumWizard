@@ -230,6 +230,7 @@ namespace Appium_Wizard
             {
                 if (listView1.FocusedItem.Bounds.Contains(e.Location))
                 {
+                    copyActivityNameToolStripMenuItem.Visible = os.Equals("Android");
                     copyContextMenuStrip.Show(Cursor.Position);
                 }
             }
@@ -242,6 +243,24 @@ namespace Appium_Wizard
                 string packageName = listView1.SelectedItems[0].SubItems[0].Text;
                 Clipboard.SetText(packageName);
                 GoogleAnalytics.SendEvent("copyPackageNameToolStripMenuItem_Click");
+            }
+        }
+
+        private async void copyActivityNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Show();
+                string packageName = listView1.SelectedItems[0].SubItems[0].Text;
+                commonProgress.UpdateStepLabel("Get Activity Name", "Please wait while getting activity name for package " + selectedPackageName + "...");
+                string activityName = string.Empty;
+                await Task.Run(() =>{
+                    activityName = AndroidMethods.GetInstance().GetAppActivity(udid, selectedPackageName);
+                });
+                Clipboard.SetText(activityName);
+                commonProgress.Close();
+                GoogleAnalytics.SendEvent("copyActivityNameToolStripMenuItem_Click");
             }
         }
     }

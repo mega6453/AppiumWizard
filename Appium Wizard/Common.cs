@@ -1926,7 +1926,14 @@ namespace Appium_Wizard
                                         <div id=""header"">
                                             <div id=""title"">Appium Wizard Server Logs</div>
                                             <div id=""controls"">
-                                                <button id=""downloadBtn"">Download full logs</button>
+                                                <button id=""downloadBtn"" style=""position: relative;"">
+                                                  Download full logs
+                                                  <span 
+                                                    style=""margin-left: 6px; cursor: pointer; font-weight: bold; color: #555;"" 
+                                                    title=""Only the last 1000 lines are shown in the viewer. Click to download the complete log file."">
+                                                    &#9432;
+                                                  </span>
+                                                </button>
                                                 <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
                                                 <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
                                             </div>

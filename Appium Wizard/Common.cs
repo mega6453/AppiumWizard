@@ -1486,9 +1486,16 @@ namespace Appium_Wizard
             }
         }
 
-        public static Dictionary<int,int> serverNumberPortNumber = new Dictionary<int,int>();
+        public static Dictionary<int, int> serverNumberPortNumber = new Dictionary<int, int>();
         private static Dictionary<int, HttpListener> serverListeners = new Dictionary<int, HttpListener>();
         private static Dictionary<int, CancellationTokenSource> serverTokens = new Dictionary<int, CancellationTokenSource>();
+        private static Dictionary<int, string> serverHtmlFiles = new Dictionary<int, string>(); // Track temp files
+
+        // Add these constants for memory management
+        private const int MAX_LOG_LINES = 1000;
+        private const long MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+        private static readonly object fileLock = new object();
+
         public static void StartServer(int serverNumber, int port, string htmlFilePath, string serverLogsFilePath)
         {
             string prefix = "http://localhost:" + port + "/";
@@ -1501,70 +1508,255 @@ namespace Appium_Wizard
 
             serverListeners[serverNumber] = listener;
             serverNumberPortNumber[serverNumber] = port;
+            serverHtmlFiles[serverNumber] = htmlFilePath; // Track HTML file for cleanup
+
             listener.Start();
             Console.WriteLine($"Server {serverNumber} started at {prefix}");
 
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
                     while (!token.IsCancellationRequested)
                     {
-                        HttpListenerContext context = listener.GetContext();
-                        HttpListenerRequest request = context.Request;
-                        HttpListenerResponse response = context.Response;
-
-                        // Set CORS headers
-                        response.Headers.Add("Access-Control-Allow-Origin", prefix);
-                        response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-                        response.Headers.Add("Pragma", "no-cache");
-                        response.Headers.Add("Expires", "0");
-
-                        if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
+                        try
                         {
-                            // Serve the HTML file
-                            string htmlContent = File.ReadAllText(htmlFilePath);
-                            byte[] buffer = Encoding.UTF8.GetBytes(htmlContent);
-                            response.ContentType = "text/html";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
-                        {
-                            // Serve the log file
-                            string fileContent;
-                            using (var fileStream = new FileStream(serverLogsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                            using (var streamReader = new StreamReader(fileStream))
-                            {
-                                fileContent = streamReader.ReadToEnd();
-                            }
-                            byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
-                            response.ContentType = "text/plain";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else
-                        {
-                            // Return 404 if the file is not found
-                            response.StatusCode = (int)HttpStatusCode.NotFound;
-                            byte[] buffer = Encoding.UTF8.GetBytes("File not found");
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
+                            HttpListenerContext context = await GetContextAsync(listener, token);
+                            if (context == null) break;
 
-                        response.Close();
+                            _ = Task.Run(() => ProcessRequest(context, htmlFilePath, serverLogsFilePath), token);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            break; // Listener was disposed
+                        }
+                        catch (HttpListenerException)
+                        {
+                            break; // Listener was stopped
+                        }
                     }
-                }
-                catch (HttpListenerException)
-                {
-                    // Listener was stopped, exit gracefully
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error: " + ex.Message);
+                    Console.WriteLine("Server error: " + ex.Message);
                 }
             }, token);
         }
+
+        private static async Task<HttpListenerContext> GetContextAsync(HttpListener listener, CancellationToken token)
+        {
+            try
+            {
+                return await Task.Run(() => listener.GetContext(), token);
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (ObjectDisposedException)
+            {
+                return null;
+            }
+        }
+
+        private static void ProcessRequest(HttpListenerContext context, string htmlFilePath, string serverLogsFilePath)
+        {
+            HttpListenerRequest request = context.Request;
+            HttpListenerResponse response = context.Response;
+
+            try
+            {
+                // Set CORS headers
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                response.Headers.Add("Pragma", "no-cache");
+                response.Headers.Add("Expires", "0");
+
+                if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
+                {
+                    // Serve the HTML file
+                    ServeHtmlFile(response, htmlFilePath);
+                }
+                else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
+                {
+                    // Serve the log file with memory optimization
+                    ServeLogFile(response, serverLogsFilePath);
+                }
+                else
+                {
+                    // Return 404 if the file is not found
+                    Send404Response(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Request processing error: " + ex.Message);
+                try
+                {
+                    response.StatusCode = 500;
+                    response.Close();
+                }
+                catch { }
+            }
+        }
+
+        private static void ServeHtmlFile(HttpListenerResponse response, string htmlFilePath)
+        {
+            try
+            {
+                byte[] buffer = File.ReadAllBytes(htmlFilePath);
+                response.ContentType = "text/html";
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error serving HTML: " + ex.Message);
+                Send404Response(response);
+            }
+        }
+
+        private static void ServeLogFile(HttpListenerResponse response, string serverLogsFilePath)
+        {
+            try
+            {
+                lock (fileLock)
+                {
+                    FileInfo fileInfo = new FileInfo(serverLogsFilePath);
+
+                    // Check file size limit
+                    if (fileInfo.Length > MAX_FILE_SIZE_BYTES)
+                    {
+                        // Read only the last portion of large files
+                        string limitedContent = ReadLastLinesFromLargeFile(serverLogsFilePath, MAX_LOG_LINES);
+                        byte[] buffer = Encoding.UTF8.GetBytes(limitedContent);
+                        response.ContentType = "text/plain";
+                        response.ContentLength64 = buffer.Length;
+                        response.OutputStream.Write(buffer, 0, buffer.Length);
+                    }
+                    else
+                    {
+                        // For smaller files, read last N lines efficiently
+                        string fileContent = ReadLastLines(serverLogsFilePath, MAX_LOG_LINES);
+                        byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
+                        response.ContentType = "text/plain";
+                        response.ContentLength64 = buffer.Length;
+                        response.OutputStream.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error serving log file: " + ex.Message);
+                Send404Response(response);
+            }
+        }
+
+        private static string ReadLastLines(string filePath, int maxLines)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    var lines = new List<string>();
+                    string line;
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        lines.Add(line);
+                        if (lines.Count > maxLines)
+                        {
+                            lines.RemoveAt(0); // Remove oldest line
+                        }
+                    }
+                    return string.Join("\n", lines);
+                }
+            }
+            catch
+            {
+                return "Error reading log file";
+            }
+        }
+
+        private static string ReadLastLinesFromLargeFile(string filePath, int maxLines)
+        {
+            try
+            {
+                const int bufferSize = 8192;
+                var lines = new List<string>();
+
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    // Start from the end of file and read backwards
+                    long position = fileStream.Length;
+                    byte[] buffer = new byte[bufferSize];
+                    StringBuilder currentLine = new StringBuilder();
+
+                    while (position > 0 && lines.Count < maxLines)
+                    {
+                        int bytesToRead = (int)Math.Min(bufferSize, position);
+                        position -= bytesToRead;
+                        fileStream.Seek(position, SeekOrigin.Begin);
+                        fileStream.Read(buffer, 0, bytesToRead);
+
+                        // Process buffer in reverse
+                        for (int i = bytesToRead - 1; i >= 0; i--)
+                        {
+                            if (buffer[i] == '\n')
+                            {
+                                if (currentLine.Length > 0)
+                                {
+                                    // Reverse the characters in currentLine
+                                    char[] chars = currentLine.ToString().ToCharArray();
+                                    Array.Reverse(chars);
+                                    lines.Add(new string(chars));
+                                    currentLine.Clear();
+
+                                    if (lines.Count >= maxLines)
+                                        break;
+                                }
+                            }
+                            else if (buffer[i] != '\r')
+                            {
+                                currentLine.Append((char)buffer[i]);
+                            }
+                        }
+                    }
+
+                    // Add any remaining content
+                    if (currentLine.Length > 0 && lines.Count < maxLines)
+                    {
+                        char[] chars = currentLine.ToString().ToCharArray();
+                        Array.Reverse(chars);
+                        lines.Add(new string(chars));
+                    }
+                }
+
+                // Reverse the lines list to get correct order
+                lines.Reverse();
+                return string.Join("\n", lines);
+            }
+            catch
+            {
+                return "Error reading large log file";
+            }
+        }
+
+        private static void Send404Response(HttpListenerResponse response)
+        {
+            try
+            {
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                byte[] buffer = Encoding.UTF8.GetBytes("File not found");
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch { }
+        }
+
 
         public static void StopLogsServer(int serverNumber)
         {
@@ -1572,14 +1764,43 @@ namespace Appium_Wizard
             {
                 try
                 {
+                    // Cancel the token first
                     serverTokens[serverNumber].Cancel();
-                    serverListeners[serverNumber].Stop();
+
+                    // Stop and close the listener
+                    if (serverListeners[serverNumber].IsListening)
+                    {
+                        serverListeners[serverNumber].Stop();
+                    }
                     serverListeners[serverNumber].Close();
 
+                    // Clean up temporary HTML file
+                    if (serverHtmlFiles.ContainsKey(serverNumber))
+                    {
+                        try
+                        {
+                            if (File.Exists(serverHtmlFiles[serverNumber]))
+                            {
+                                File.Delete(serverHtmlFiles[serverNumber]);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting temp HTML file: {ex.Message}");
+                        }
+                        serverHtmlFiles.Remove(serverNumber);
+                    }
+
+                    // Remove from dictionaries
                     serverListeners.Remove(serverNumber);
                     serverTokens.Remove(serverNumber);
+                    serverNumberPortNumber.Remove(serverNumber);
 
                     Console.WriteLine($"Server {serverNumber} stopped.");
+
+                    // Force garbage collection
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
                 catch (Exception ex)
                 {
@@ -1591,72 +1812,129 @@ namespace Appium_Wizard
                 Console.WriteLine($"Server {serverNumber} is not running.");
             }
         }
+
         public static string GenerateHtmlWithFilePath(string filePath, int appiumPort, int interval)
         {
             string htmlTemplate = @"
-            <!DOCTYPE html>
-            <html lang=""en"">
-            <head>
-                <meta charset=""UTF-8"">
-                <title>Appium Wizard Server Logs</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-                    #container { position: relative; height: 100vh; overflow: hidden; }
-                    #header { position: relative; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 4px; }
-                    #content { padding: 20px; overflow-y: auto; height: calc(100% - 50px); white-space: pre-wrap; background-color: #f4f4f4; }
-                    #title { text-align: center; font-size: 18px; font-weight: bold; background-color: #0078d7; color: white; flex-grow: 1; }
-                </style>
-            </head>
-            <body>
-                <div id=""container"">
-                    <div id=""header"">
-                        <div id=""title"">Appium Wizard Server Logs</div>
-                        <div>
-                            <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
-                            <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
-                        </div>
-                    </div>
-                    <pre id=""content""></pre>
+    <!DOCTYPE html>
+    <html lang=""en"">
+    <head>
+        <meta charset=""UTF-8"">
+        <title>Appium Wizard Server Logs</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            #container { position: relative; height: 100vh; overflow: hidden; }
+            #header { position: relative; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 4px; }
+            #content { padding: 20px; overflow-y: auto; height: calc(100% - 50px); white-space: pre-wrap; background-color: #f4f4f4; }
+            #title { text-align: center; font-size: 18px; font-weight: bold; background-color: #0078d7; color: white; flex-grow: 1; }
+        </style>
+    </head>
+    <body>
+        <div id=""container"">
+            <div id=""header"">
+                <div id=""title"">Appium Wizard Server Logs</div>
+                <div>
+                    <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
+                    <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
                 </div>
-                <script>
-                    const contentElement = document.getElementById('content');
-                    const autoScrollCheckbox = document.getElementById('autoScroll');
-                    const pauseFetchCheckbox = document.getElementById('pauseFetch');
+            </div>
+            <pre id=""content"">Loading logs...</pre>
+        </div>
+        <script>
+            console.log('Script started');
+            const contentElement = document.getElementById('content');
+            const autoScrollCheckbox = document.getElementById('autoScroll');
+            const pauseFetchCheckbox = document.getElementById('pauseFetch');
 
-                    function fetchTextFile() {
-                        if (pauseFetchCheckbox.checked) {
-                            return; // Do not fetch if pause is checked
+            function fetchTextFile() {
+                console.log('fetchTextFile called, paused:', pauseFetchCheckbox.checked);
+                if (pauseFetchCheckbox.checked) {
+                    return;
+                }
+                
+                fetch('/file')
+                    .then(response => {
+                        console.log('Response received:', response.status, response.ok);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
-                        fetch('/file') // Fetch the file from the server's /file endpoint
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
-                                return response.text();
-                            })
-                            .then(text => {
-                                contentElement.textContent = text;
-                                if (autoScrollCheckbox.checked) {
-                                    contentElement.scrollTop = contentElement.scrollHeight;
-                                }
-                            })
-                            .catch(error => {
-                                contentElement.textContent = 'Error loading file: ' + error;
-                            });
-                    }
-                    fetchTextFile();
-                    setInterval(fetchTextFile, interval);
-                </script>
-            </body>
-            </html>";
+                        return response.text();
+                    })
+                    .then(text => {
+                        console.log('Text received, length:', text.length);
+                        contentElement.textContent = text;
+                        if (autoScrollCheckbox.checked) {
+                            contentElement.scrollTop = contentElement.scrollHeight;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        contentElement.textContent = 'Error loading file: ' + error;
+                    });
+            }
+            
+            console.log('Setting up initial fetch and interval');
+            fetchTextFile();
+            setInterval(fetchTextFile, {INTERVAL});
+        </script>
+    </body>
+    </html>";
+
+            // Replace placeholders
             htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");
-            htmlTemplate = htmlTemplate.Replace("setInterval(fetchTextFile, interval)", $"setInterval(fetchTextFile, {interval})");
-            // Save the updated HTML content to a temporary file
+            htmlTemplate = htmlTemplate.Replace("{PORT}", appiumPort.ToString());
+            htmlTemplate = htmlTemplate.Replace("setInterval(fetchTextFile, {INTERVAL})", $"setInterval(fetchTextFile, {interval})");
+
+            // Save temp file
             string tempHtmlFilePath = Path.Combine(Path.GetTempPath(), $"GeneratedHtml_{Guid.NewGuid()}.html");
             File.WriteAllText(tempHtmlFilePath, htmlTemplate);
 
-            // Return the path to the saved HTML file
             return tempHtmlFilePath;
+        }
+
+        public static void CleanupTempFiles()
+        {
+            try
+            {
+                string tempDir = Path.Combine(Path.GetTempPath(), "AppiumWizard_Logs");
+                if (Directory.Exists(tempDir))
+                {
+                    var files = Directory.GetFiles(tempDir, "ServerLogs_*.html");
+                    var cutoffTime = DateTime.Now.AddHours(-1); // Delete files older than 1 hour
+
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            if (File.GetCreationTime(file) < cutoffTime)
+                            {
+                                File.Delete(file);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting temp file {file}: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during temp file cleanup: {ex.Message}");
+            }
+        }
+
+        public static void StopAllServers()
+        {
+            var serverNumbers = serverListeners.Keys.ToList();
+            foreach (var serverNumber in serverNumbers)
+            {
+                StopLogsServer(serverNumber);
+            }
+
+            // Final cleanup
+            CleanupTempFiles();
+            GC.Collect();
         }
     }
 

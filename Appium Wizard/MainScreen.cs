@@ -31,10 +31,14 @@ namespace Appium_Wizard
         private Timer uncheckTimer; private Timer highlightTimer;
         public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();
         public static Dictionary<string, float> udidScreenDensity = new Dictionary<string, float>(); // for android
+        private Timer memoryCleanupTimer;
+        private const int MEMORY_CLEANUP_INTERVAL = 300000; // 5 minutes
+
         public MainScreen()
         {
             InitializeComponent();
             main = this;
+            InitializeMemoryCleanupTimer();
             RefreshDeviceListView();
             this.Text = "Appium Wizard " + VersionInfo.VersionNumber;
             USBWatcher usb = new USBWatcher(listView1);
@@ -59,13 +63,22 @@ namespace Appium_Wizard
         private async Task ConfigureWebView(int serverNumber, WebView2 webView, string defaultText)
         {
             serverNumberWebView[serverNumber] = webView;
-            // Ensure the WebView2 environment is initialized
             await webView.EnsureCoreWebView2Async();
 
-            // Attach ContextMenuRequested event to disable right-click
+            // Add these memory optimization settings
+            webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+            webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+            webView.CoreWebView2.Settings.AreHostObjectsAllowed = false;
+            webView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
+            webView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+
+            // Add memory cleanup before navigation
+            webView.CoreWebView2.NavigationStarting += (s, e) => {
+                GC.Collect(); // Force cleanup before navigation
+            };
+
             webView.CoreWebView2.ContextMenuRequested += CoreWebView2_ContextMenuRequested;
 
-            // Set default text using NavigateToString
             if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
             {
                 StartLogsServer(serverNumber);
@@ -1827,7 +1840,7 @@ namespace Appium_Wizard
         }
 
 
-        private void onFormClosing(object sender, FormClosingEventArgs e)
+        private async void onFormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
@@ -1836,6 +1849,33 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 commonProgress.UpdateStepLabel("Closing Appium Wizard", "Please wait while closing all resources and exiting...");
                 List<Form> childFormsToClose = new List<Form>();
+                // Stop the memory cleanup timer
+                memoryCleanupTimer?.Stop();
+                memoryCleanupTimer?.Dispose();
+
+                // Stop all log servers with cleanup
+                Common.StopAllServers(); // This will use your new enhanced method
+
+                // Dispose WebView2 controls properly
+                foreach (var kvp in serverNumberWebView)
+                {
+                    var webView = kvp.Value;
+                    if (webView?.CoreWebView2 != null)
+                    {
+                        try
+                        {
+                            webView.CoreWebView2.Navigate("about:blank");
+                            await Task.Delay(100); // Give it time to navigate
+                        }
+                        catch { }
+                    }
+                    webView?.Dispose();
+                }
+                serverNumberWebView.Clear();
+
+                // Clear server URL loaded tracking
+                serverUrlLoaded.Clear();
+                
                 foreach (var item in runningProcesses)
                 {
                     Common.KillProcessById(item);
@@ -1864,6 +1904,9 @@ namespace Appium_Wizard
                     formToClose.Close();
                 }
                 GoogleAnalytics.SendEvent("App_Closed", "Closed");
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
                 commonProgress.Close();
             }
             catch (Exception ex)
@@ -2067,7 +2110,6 @@ namespace Appium_Wizard
 
 
         public static ConcurrentDictionary<int, bool> serverUrlLoaded = new ConcurrentDictionary<int, bool>();
-
         public void StartLogsServer(int serverNumber)
         {
             try
@@ -2077,6 +2119,7 @@ namespace Appium_Wizard
                     int logsPort = StartServerAndReturnPort(serverNumber);
                     string url = "http://localhost:" + logsPort + "/index.html";
                     WaitForServerToStart(url);
+
                     if (!serverUrlLoaded.GetOrAdd(serverNumber, false))
                     {
                         if (serverNumberWebView.ContainsKey(serverNumber))
@@ -2089,7 +2132,19 @@ namespace Appium_Wizard
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error occured in Starting Server logs, Please report in github with steps. Exception : " + ex.Message, "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Logger.Error($"Error starting logs server for server {serverNumber}: " + ex.Message);
+                MessageBox.Show("Error occurred in Starting Server logs. Exception: " + ex.Message,
+                              "Exception in Starting Server logs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void UpdateWebViewDefaultText(int serverNumber)
+        {
+            if (serverNumberWebView.ContainsKey(serverNumber))
+            {
+                SetDefaultText(serverNumberWebView[serverNumber], defaultText);
+                // Reset the URL loaded flag
+                serverUrlLoaded.TryRemove(serverNumber, out _);
             }
         }
 
@@ -2239,10 +2294,10 @@ namespace Appium_Wizard
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
         }
 
-        public void UpdateWebViewDefaultText(int serverNumber)
-        {
-            SetDefaultText(serverNumberWebView[serverNumber], defaultText);
-        }
+        //public void UpdateWebViewDefaultText(int serverNumber)
+        //{
+        //    SetDefaultText(serverNumberWebView[serverNumber], defaultText);
+        //}
 
         private async void reInitializeDeviceToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2390,6 +2445,48 @@ namespace Appium_Wizard
             EnterPassword enterPassword = new EnterPassword(selectedOS, selectedUDID, selectedDeviceName);
             enterPassword.ShowDialog();
             GoogleAnalytics.SendEvent("unlockDeviceToolStripMenuItem_Click");
+        }
+
+        private void InitializeMemoryCleanupTimer()
+        {
+            memoryCleanupTimer = new Timer();
+            memoryCleanupTimer.Interval = MEMORY_CLEANUP_INTERVAL;
+            memoryCleanupTimer.Tick += MemoryCleanupTimer_Tick;
+            memoryCleanupTimer.Start();
+        }
+
+        private async void MemoryCleanupTimer_Tick(object sender, EventArgs e)
+        {
+            await CleanupWebViewMemory();
+        }
+
+        private async Task CleanupWebViewMemory()
+        {
+            try
+            {
+                foreach (var kvp in serverNumberWebView)
+                {
+                    var webView = kvp.Value;
+                    if (webView?.CoreWebView2 != null)
+                    {
+                        // Clear any accumulated DOM content
+                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
+                            "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
+    
+                    // Trigger garbage collection in WebView2
+                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
+                    }
+                }
+
+                // Force .NET garbage collection
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Memory cleanup failed: " + ex.Message);
+            }
         }
     }
 }

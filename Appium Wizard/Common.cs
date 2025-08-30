@@ -845,7 +845,7 @@ namespace Appium_Wizard
         }
 
 
-        public static void InstallNodeJs(bool showExecution = false)
+        public static void InstallNodeJsOld(bool showExecution = false)
         {
             try
             {
@@ -853,20 +853,107 @@ namespace Appium_Wizard
                 process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
                 process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\" -y";
                 process.StartInfo.UseShellExecute = false;
-                if (showExecution)
-                {
-                    process.StartInfo.CreateNoWindow = false;
-                }
-                else
-                {
-                    process.StartInfo.CreateNoWindow = true;
-                }
+                process.StartInfo.CreateNoWindow = !showExecution;
                 process.Start();
                 process.WaitForExit();
             }
             catch (Exception e)
             {
                 MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static void InstallNodeJs(bool showExecution = false)
+        {
+            string tempPath = null;
+            try
+            {
+                // Create temporary extraction directory
+                tempPath = Path.Combine(Path.GetTempPath(), "NodeJsInstall_" + Guid.NewGuid().ToString());
+                Directory.CreateDirectory(tempPath);
+
+                // Extract to temporary directory
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
+                process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{tempPath}\" -y";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = !showExecution;
+
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"7-Zip extraction failed with exit code: {process.ExitCode}");
+                }
+
+                // Ensure target directory exists
+                Directory.CreateDirectory(serverFolderPath);
+
+                // Handle the extracted content - THIS IS WHERE WE CALL THE METHOD
+                ExtractContentToTarget(tempPath, serverFolderPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Clean up temporary directory
+                if (tempPath != null && Directory.Exists(tempPath))
+                {
+                    try
+                    {
+                        Directory.Delete(tempPath, true);
+                    }
+                    catch
+                    {
+                        // Ignore cleanup errors
+                    }
+                }
+            }
+        }
+
+        // This method determines what to extract and calls CopyDirectoryContents
+        private static void ExtractContentToTarget(string tempPath, string targetPath)
+        {
+            var files = Directory.GetFiles(tempPath);
+            var directories = Directory.GetDirectories(tempPath);
+
+            if (files.Length == 0 && directories.Length == 1)
+            {
+                // Only one directory with no files at root level - copy its contents
+                // THIS IS WHERE CopyDirectoryContents IS CALLED
+                CopyDirectoryContents(directories[0], targetPath);
+            }
+            else
+            {
+                // Copy all items directly
+                // THIS IS WHERE CopyDirectoryContents IS CALLED
+                CopyDirectoryContents(tempPath, targetPath);
+            }
+        }
+
+        // Solution 3: The actual copy method with overwrite capability
+        private static void CopyDirectoryContents(string sourceDir, string targetDir)
+        {
+            // Ensure target directory exists
+            Directory.CreateDirectory(targetDir);
+
+            // Copy all files with overwrite
+            foreach (string sourceFile in Directory.GetFiles(sourceDir))
+            {
+                string fileName = Path.GetFileName(sourceFile);
+                string targetFile = Path.Combine(targetDir, fileName);
+                File.Copy(sourceFile, targetFile, true); // true = overwrite existing
+            }
+
+            // Copy all directories recursively
+            foreach (string sourceSubDir in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(sourceSubDir);
+                string targetSubDir = Path.Combine(targetDir, dirName);
+                CopyDirectoryContents(sourceSubDir, targetSubDir); // Recursive call
             }
         }
 
@@ -2064,6 +2151,119 @@ namespace Appium_Wizard
             // Final cleanup
             CleanupTempFiles();
             GC.Collect();
+        }
+
+        public static async Task<string> GetLatestNodeVersion()
+        {
+            string url = "https://nodejs.org/dist/index.json";
+
+            using HttpClient client = new HttpClient();
+
+            try
+            {
+                var json = await client.GetStringAsync(url);
+                var releases = JsonSerializer.Deserialize<NodeRelease[]>(json);
+
+                if (releases != null && releases.Length > 0)
+                {
+                    return releases[0].version.TrimStart('v').Trim();
+                }
+                else
+                {
+                    return "NA";
+                }
+            }
+            catch
+            {
+                return "NA";
+            }
+        }
+
+        public static async Task DownloadNodeJS()
+        {
+            string indexJsonUrl = "https://nodejs.org/dist/index.json";
+
+            try
+            {
+                using HttpClient client = new HttpClient();
+
+                // Fetch the index.json to get latest release info
+                string json = await client.GetStringAsync(indexJsonUrl);
+                var releases = JsonSerializer.Deserialize<NodeRelease[]>(json);
+
+                if (releases == null || releases.Length == 0)
+                {
+                    return;
+                }
+
+                var latestRelease = releases[0];
+                string versionNoV = latestRelease.version.StartsWith("v") ? latestRelease.version.Substring(1) : latestRelease.version;
+                string zipFileName = $"node-v{versionNoV}-win-x64.zip";
+
+                // Construct download URL
+                string downloadUrl = $"https://nodejs.org/dist/{latestRelease.version}/{zipFileName}";
+
+                // Define paths
+                string downloadFolder = Path.Combine(FilesPath.serverInstalledPath, "Backup");
+                Directory.CreateDirectory(downloadFolder); // Ensure folder exists
+
+                string newFilePath = Path.Combine(downloadFolder, zipFileName);
+                string finalFilePath = Path.Combine(downloadFolder, "node.zip");
+
+                // Download the zip file to newFilePath
+                using (var response = await client.GetAsync(downloadUrl))
+                {
+                    response.EnsureSuccessStatusCode();
+                    using (var fs = new FileStream(newFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await response.Content.CopyToAsync(fs);
+                    }
+                }
+
+                // Delete old node.zip if exists
+                if (File.Exists(finalFilePath))
+                {
+                    File.Delete(finalFilePath);
+                }
+
+                // Rename the downloaded file to node.zip
+                File.Move(newFilePath, finalFilePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        private class NodeRelease
+        {
+            public string version { get; set; }
+            public string[] files { get; set; }
+        }
+
+        public static string GetNodeVersion()
+        {
+            string nodeExePath = FilesPath.nodePath;
+            if (!File.Exists(nodeExePath))
+            {
+                return "NA";
+            }
+
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = nodeExePath,
+                Arguments = "--version",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(psi))
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return output.TrimStart('v').Trim();
+            }
         }
     }
 

@@ -293,6 +293,13 @@ namespace Appium_Wizard
             {
                 MainScreen.main.SelectTab(serverNumber, true);
             }
+            try
+            {
+                ExecuteOnStopServer(serverNumber);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private async void StartButton1_Click(object sender, EventArgs e)

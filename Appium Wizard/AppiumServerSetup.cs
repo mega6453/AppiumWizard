@@ -32,15 +32,15 @@ namespace Appium_Wizard
                     // installedVersion is greater than 3.0.0
                     if (command.Contains("adb_shell") && !command.Contains(":adb_shell"))
                     {
-                        command.Replace("adb_shell", "*:adb_shell");
+                        command = command.Replace("adb_shell", "*:adb_shell");
                     }
                     if (command.Contains("get_server_logs") && !command.Contains(":get_server_logs"))
                     {
-                        command.Replace("get_server_logs", "*:get_server_logs");
+                        command = command.Replace("get_server_logs", "*:get_server_logs");
                     }
                     if (command.Contains("record_audio") && !command.Contains(":record_audio"))
                     {
-                        command.Replace("record_audio", "*:record_audio");
+                        command = command.Replace("record_audio", "*:record_audio");
                     }
                 }
             }

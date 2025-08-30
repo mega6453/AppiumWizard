@@ -868,6 +868,9 @@ namespace Appium_Wizard
             string tempPath = null;
             try
             {
+                // Delete existing node files
+                DeleteNodeFiles();
+
                 // Create temporary extraction directory
                 tempPath = Path.Combine(Path.GetTempPath(), "NodeJsInstall_" + Guid.NewGuid().ToString());
                 Directory.CreateDirectory(tempPath);
@@ -2263,6 +2266,82 @@ namespace Appium_Wizard
                 string output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 return output.TrimStart('v').Trim();
+            }
+        }
+
+        public static void DeleteNodeFiles()
+        {
+            // Keep rules
+            string[] keepFiles = Directory.GetFiles(serverFolderPath)
+                .Select(Path.GetFileName)
+                .Where(f => f.StartsWith("appium", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            // Delete files
+            foreach (var file in Directory.GetFiles(serverFolderPath))
+            {
+                string fileName = Path.GetFileName(file);
+
+                if (!keepFiles.Contains(fileName, StringComparer.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+
+            // Delete folders except Backup and node_modules\appium
+            foreach (var dir in Directory.GetDirectories(serverFolderPath))
+            {
+                string dirName = Path.GetFileName(dir);
+
+                if (dirName.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (dirName.Equals("node_modules", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Inside node_modules, delete everything except "appium"
+                    foreach (var subDir in Directory.GetDirectories(dir))
+                    {
+                        if (!Path.GetFileName(subDir).Equals("appium", StringComparison.OrdinalIgnoreCase))
+                        {
+                            try
+                            {
+                                Directory.Delete(subDir, true);
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                        }
+                    }
+
+                    // Delete stray files in node_modules (not folders)
+                    foreach (var subFile in Directory.GetFiles(dir))
+                    {
+                        try
+                        {
+                            File.Delete(subFile);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
+
+                    continue;
+                }
+
+                // Delete other folders
+                try
+                {
+                    Directory.Delete(dir, true);
+                }
+                catch (Exception ex)
+                {
+                }
             }
         }
     }

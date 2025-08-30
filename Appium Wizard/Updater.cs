@@ -366,6 +366,8 @@ namespace Appium_Wizard
             });
             commonProgress.UpdateStepLabel("Update NodeJS", "Please wait while installing newer version of nodejs...", 90);
             commonProgress.Close();
+            GoogleAnalytics.SendEvent("Update_NodeJS");
+            await GetVersionInformation();
         }
     }
 }

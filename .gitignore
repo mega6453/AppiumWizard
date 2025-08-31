@@ -64,3 +64,8 @@
 /t string ReleaseNotes = User can add now Server args and default capabilities to customize the server as needed in the Server Settings.
 /.gitignore
 /.gitignore
+/Appium Wizard/obj/Appium Wizard.csproj.nuget.g.props
+/Appium Wizard/obj/project.assets.json
+/Appium Wizard/obj/Appium Wizard.csproj.nuget.dgspec.json
+/Appium Wizard/obj/Appium Wizard.csproj.nuget.g.props
+/Appium Wizard/obj/project.assets.json

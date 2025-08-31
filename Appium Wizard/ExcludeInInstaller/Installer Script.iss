@@ -8,14 +8,11 @@
 
 [Setup]
 AlwaysRestart = no 
-; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
-; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
 AppName={#MyAppName}
 UninstallDisplayName = Appium Wizard
 UninstallDisplayIcon={app}\{#MyAppExeName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=yes
@@ -23,7 +20,6 @@ DisableProgramGroupPage=yes
 LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
-; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\output
 OutputBaseFilename=AppiumWizard
@@ -42,7 +38,6 @@ Source: "..\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\*"; DestDir: "{app}"; Flags: ignoreversion
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\*"
@@ -53,7 +48,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: {app}\Resources\Server\Backup\7za.exe; Parameters: "x ""{app}\Resources\Executables\iOSServerPy.zip"" -o""{app}\Resources\Executables"" * -r -aoa"; Flags: runhidden runascurrentuser; StatusMsg: "Extracting iOS Server... This may take sometime, Please wait..."
-Filename: {app}\Resources\Server\Backup\7za.exe; Parameters: "x ""{app}\Resources\Server\Backup\node.zip"" -o""{app}\Resources\Server"" * -r -aoa"; Flags: runhidden runascurrentuser; StatusMsg: "Extracting NodeJS... This may take sometime, Please wait...";
+Filename: {app}\Resources\Server\Backup\7za.exe; Parameters: "x ""{app}\Resources\Server\Backup\node.zip"" -o""{app}\Resources\Server"" * -r -aoa"; Flags: runhidden runascurrentuser; StatusMsg: "Extracting NodeJS... This may take sometime, Please wait..."; Check: CleanNodeAndRun
 Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && cd {app}\Resources\Server && npm list -g appium || npm install -g appium"; Flags: runhidden runascurrentuser; StatusMsg: "Installing appium server... This may take sometime, Please wait..."
 Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && appium driver install xcuitest"; Flags: runhidden runascurrentuser;  StatusMsg: "Installing XCUITest driver... This may take sometime, Please wait..."
 Filename: "{cmd}"; Parameters: "/C set ""PATH=%PATH%;{app}\Resources\Server"" && appium driver install uiautomator2"; Flags: runhidden runascurrentuser; StatusMsg: "Installing UIAutomator2 driver... This may take sometime, Please wait..."
@@ -63,4 +58,71 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 function NeedsNodeExtraction(): Boolean;
 begin
   Result := not FileExists(ExpandConstant('{app}\Resources\Server\node.exe'));
+end;
+
+procedure CleanNode;
+var
+  ServerPath: string;
+  FindRec, SubRec: TFindRec;
+  NodeModulesPath: string;
+begin
+  ServerPath := ExpandConstant('{app}\Resources\Server');
+  NodeModulesPath := ServerPath + '\node_modules';
+
+  if DirExists(ServerPath) then
+  begin
+    if FindFirst(ServerPath + '\*', FindRec) then
+    try
+      repeat
+        if (FindRec.Name = '.') or (FindRec.Name = '..') then
+          continue;
+
+        // keep Backup folder
+        if SameText(FindRec.Name, 'Backup') then
+          continue;
+
+        // keep files starting with appium
+        if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY = 0) and
+           (Pos('appium', LowerCase(FindRec.Name)) = 1) then
+          continue;
+
+        // special handling for node_modules
+        if SameText(FindRec.Name, 'node_modules') then
+        begin
+          if DirExists(NodeModulesPath) then
+          begin
+            if FindFirst(NodeModulesPath + '\*', SubRec) then
+            try
+              repeat
+                if (SubRec.Name = '.') or (SubRec.Name = '..') then
+                  continue;
+
+                if not SameText(SubRec.Name, 'appium') then
+                  DelTree(NodeModulesPath + '\' + SubRec.Name, True, True, True);
+              until not FindNext(SubRec);
+            finally
+              FindClose(SubRec);
+            end;
+          end;
+          continue;
+        end;
+
+        // delete everything else
+        if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY <> 0) then
+          DelTree(ServerPath + '\' + FindRec.Name, True, True, True)
+        else
+          DeleteFile(ServerPath + '\' + FindRec.Name);
+
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+end;
+
+
+function CleanNodeAndRun: Boolean;
+begin
+  CleanNode;      // run cleanup before extracting node.zip
+  Result := True; // continue with extraction
 end;

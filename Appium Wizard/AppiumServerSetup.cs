@@ -23,6 +23,27 @@ namespace Appium_Wizard
         string appiumLogLevel, updatedCommand;
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+            string versionString = Common.InstalledAppiumServerVersion().Replace("\n",string.Empty);
+            if (Version.TryParse(versionString, out Version installedVersion))
+            {
+                Version minimumVersion = new Version(3, 0, 0);
+                if (installedVersion > minimumVersion)
+                {
+                    // installedVersion is greater than 3.0.0
+                    if (command.Contains("adb_shell") && !command.Contains(":adb_shell"))
+                    {
+                        command = command.Replace("adb_shell", "*:adb_shell");
+                    }
+                    if (command.Contains("get_server_logs") && !command.Contains(":get_server_logs"))
+                    {
+                        command = command.Replace("get_server_logs", "*:get_server_logs");
+                    }
+                    if (command.Contains("record_audio") && !command.Contains(":record_audio"))
+                    {
+                        command = command.Replace("record_audio", "*:record_audio");
+                    }
+                }
+            }
             tempFolder = Path.GetTempPath();
             logFilePath = Path.Combine(tempFolder, "AppiumWizard_Log_" + appiumPort + "_" + DateTime.Now.ToString("d-MMM-yyyy_h-mm-ss_tt") + ".txt");
             if (!command.Contains("webDriverAgentProxyPort"))

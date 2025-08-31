@@ -30,6 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Updater));
             tableLayoutPanel1 = new TableLayoutPanel();
+            NodeAvailableVersionLabel = new Label();
+            NodeCurrentVersionLabel = new Label();
+            label7 = new Label();
             label11 = new Label();
             label5 = new Label();
             label4 = new Label();
@@ -46,6 +49,7 @@
             AppiumButton = new Button();
             XCUITestButton = new Button();
             UIAutomatorButton = new Button();
+            NodeUpdateButton = new Button();
             label6 = new Label();
             showExecutionCheckbox = new CheckBox();
             tableLayoutPanel1.SuspendLayout();
@@ -60,39 +64,76 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22.013422F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22.1923943F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30.7829933F));
-            tableLayoutPanel1.Controls.Add(label11, 0, 3);
-            tableLayoutPanel1.Controls.Add(label5, 0, 1);
+            tableLayoutPanel1.Controls.Add(NodeAvailableVersionLabel, 2, 1);
+            tableLayoutPanel1.Controls.Add(NodeCurrentVersionLabel, 1, 1);
+            tableLayoutPanel1.Controls.Add(label7, 0, 1);
+            tableLayoutPanel1.Controls.Add(label11, 0, 4);
+            tableLayoutPanel1.Controls.Add(label5, 0, 2);
             tableLayoutPanel1.Controls.Add(label4, 3, 0);
             tableLayoutPanel1.Controls.Add(label3, 2, 0);
             tableLayoutPanel1.Controls.Add(label2, 1, 0);
             tableLayoutPanel1.Controls.Add(label1, 0, 0);
-            tableLayoutPanel1.Controls.Add(appiumCurrentVersionLabel, 1, 1);
-            tableLayoutPanel1.Controls.Add(AppiumAvailableVersionLabel, 2, 1);
-            tableLayoutPanel1.Controls.Add(label8, 0, 2);
-            tableLayoutPanel1.Controls.Add(XCUITestCurrentVersionLabel, 1, 2);
-            tableLayoutPanel1.Controls.Add(XCUITestAvailableVersionLabel, 2, 2);
-            tableLayoutPanel1.Controls.Add(UIAutomatorCurrentVersionLabel, 1, 3);
-            tableLayoutPanel1.Controls.Add(UIAutomatorAvailableVersionLabel, 2, 3);
-            tableLayoutPanel1.Controls.Add(AppiumButton, 3, 1);
-            tableLayoutPanel1.Controls.Add(XCUITestButton, 3, 2);
-            tableLayoutPanel1.Controls.Add(UIAutomatorButton, 3, 3);
-            tableLayoutPanel1.Location = new Point(7, 8);
+            tableLayoutPanel1.Controls.Add(appiumCurrentVersionLabel, 1, 2);
+            tableLayoutPanel1.Controls.Add(AppiumAvailableVersionLabel, 2, 2);
+            tableLayoutPanel1.Controls.Add(label8, 0, 3);
+            tableLayoutPanel1.Controls.Add(XCUITestCurrentVersionLabel, 1, 3);
+            tableLayoutPanel1.Controls.Add(XCUITestAvailableVersionLabel, 2, 3);
+            tableLayoutPanel1.Controls.Add(UIAutomatorCurrentVersionLabel, 1, 4);
+            tableLayoutPanel1.Controls.Add(UIAutomatorAvailableVersionLabel, 2, 4);
+            tableLayoutPanel1.Controls.Add(AppiumButton, 3, 2);
+            tableLayoutPanel1.Controls.Add(XCUITestButton, 3, 3);
+            tableLayoutPanel1.Controls.Add(UIAutomatorButton, 3, 4);
+            tableLayoutPanel1.Controls.Add(NodeUpdateButton, 3, 1);
+            tableLayoutPanel1.Location = new Point(7, 1);
             tableLayoutPanel1.Margin = new Padding(2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
+            tableLayoutPanel1.RowCount = 5;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.9008055F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 21.7748F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 21.7748F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 21.7748F));
-            tableLayoutPanel1.Size = new Size(474, 202);
+            tableLayoutPanel1.Size = new Size(474, 263);
             tableLayoutPanel1.TabIndex = 0;
+            // 
+            // NodeAvailableVersionLabel
+            // 
+            NodeAvailableVersionLabel.Anchor = AnchorStyles.None;
+            NodeAvailableVersionLabel.AutoSize = true;
+            NodeAvailableVersionLabel.Location = new Point(275, 54);
+            NodeAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
+            NodeAvailableVersionLabel.Name = "NodeAvailableVersionLabel";
+            NodeAvailableVersionLabel.Size = new Size(0, 15);
+            NodeAvailableVersionLabel.TabIndex = 20;
+            // 
+            // NodeCurrentVersionLabel
+            // 
+            NodeCurrentVersionLabel.Anchor = AnchorStyles.None;
+            NodeCurrentVersionLabel.AutoSize = true;
+            NodeCurrentVersionLabel.Location = new Point(170, 54);
+            NodeCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
+            NodeCurrentVersionLabel.Name = "NodeCurrentVersionLabel";
+            NodeCurrentVersionLabel.Size = new Size(0, 15);
+            NodeCurrentVersionLabel.TabIndex = 19;
+            // 
+            // label7
+            // 
+            label7.Anchor = AnchorStyles.None;
+            label7.AutoSize = true;
+            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic);
+            label7.Location = new Point(35, 54);
+            label7.Margin = new Padding(2, 0, 2, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(48, 15);
+            label7.TabIndex = 17;
+            label7.Text = "NodeJS";
             // 
             // label11
             // 
             label11.Anchor = AnchorStyles.None;
             label11.AutoSize = true;
             label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic);
-            label11.Location = new Point(15, 165);
+            label11.Location = new Point(15, 225);
             label11.Margin = new Padding(2, 0, 2, 0);
             label11.Name = "label11";
             label11.Size = new Size(89, 15);
@@ -104,7 +145,7 @@
             label5.Anchor = AnchorStyles.None;
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic);
-            label5.Location = new Point(34, 53);
+            label5.Location = new Point(34, 109);
             label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new Size(51, 15);
@@ -116,7 +157,7 @@
             label4.Anchor = AnchorStyles.None;
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label4.Location = new Point(374, 9);
+            label4.Location = new Point(374, 10);
             label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new Size(53, 15);
@@ -140,19 +181,19 @@
             label2.Anchor = AnchorStyles.None;
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label2.Location = new Point(123, 9);
+            label2.Location = new Point(121, 10);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(94, 15);
+            label2.Size = new Size(98, 15);
             label2.TabIndex = 2;
-            label2.Text = "Current Version";
+            label2.Text = "Installed Version";
             // 
             // label1
             // 
             label1.Anchor = AnchorStyles.None;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label1.Location = new Point(23, 9);
+            label1.Location = new Point(23, 10);
             label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
             label1.Size = new Size(72, 15);
@@ -163,7 +204,7 @@
             // 
             appiumCurrentVersionLabel.Anchor = AnchorStyles.None;
             appiumCurrentVersionLabel.AutoSize = true;
-            appiumCurrentVersionLabel.Location = new Point(170, 53);
+            appiumCurrentVersionLabel.Location = new Point(170, 109);
             appiumCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             appiumCurrentVersionLabel.Name = "appiumCurrentVersionLabel";
             appiumCurrentVersionLabel.Size = new Size(0, 15);
@@ -173,7 +214,7 @@
             // 
             AppiumAvailableVersionLabel.Anchor = AnchorStyles.None;
             AppiumAvailableVersionLabel.AutoSize = true;
-            AppiumAvailableVersionLabel.Location = new Point(275, 53);
+            AppiumAvailableVersionLabel.Location = new Point(275, 109);
             AppiumAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             AppiumAvailableVersionLabel.Name = "AppiumAvailableVersionLabel";
             AppiumAvailableVersionLabel.Size = new Size(0, 15);
@@ -184,7 +225,7 @@
             label8.Anchor = AnchorStyles.None;
             label8.AutoSize = true;
             label8.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic);
-            label8.Location = new Point(30, 108);
+            label8.Location = new Point(30, 166);
             label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
             label8.Size = new Size(59, 15);
@@ -195,7 +236,7 @@
             // 
             XCUITestCurrentVersionLabel.Anchor = AnchorStyles.None;
             XCUITestCurrentVersionLabel.AutoSize = true;
-            XCUITestCurrentVersionLabel.Location = new Point(170, 108);
+            XCUITestCurrentVersionLabel.Location = new Point(170, 166);
             XCUITestCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             XCUITestCurrentVersionLabel.Name = "XCUITestCurrentVersionLabel";
             XCUITestCurrentVersionLabel.Size = new Size(0, 15);
@@ -205,7 +246,7 @@
             // 
             XCUITestAvailableVersionLabel.Anchor = AnchorStyles.None;
             XCUITestAvailableVersionLabel.AutoSize = true;
-            XCUITestAvailableVersionLabel.Location = new Point(275, 108);
+            XCUITestAvailableVersionLabel.Location = new Point(275, 166);
             XCUITestAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             XCUITestAvailableVersionLabel.Name = "XCUITestAvailableVersionLabel";
             XCUITestAvailableVersionLabel.Size = new Size(0, 15);
@@ -215,7 +256,7 @@
             // 
             UIAutomatorCurrentVersionLabel.Anchor = AnchorStyles.None;
             UIAutomatorCurrentVersionLabel.AutoSize = true;
-            UIAutomatorCurrentVersionLabel.Location = new Point(170, 165);
+            UIAutomatorCurrentVersionLabel.Location = new Point(170, 225);
             UIAutomatorCurrentVersionLabel.Margin = new Padding(2, 0, 2, 0);
             UIAutomatorCurrentVersionLabel.Name = "UIAutomatorCurrentVersionLabel";
             UIAutomatorCurrentVersionLabel.Size = new Size(0, 15);
@@ -225,7 +266,7 @@
             // 
             UIAutomatorAvailableVersionLabel.Anchor = AnchorStyles.None;
             UIAutomatorAvailableVersionLabel.AutoSize = true;
-            UIAutomatorAvailableVersionLabel.Location = new Point(275, 165);
+            UIAutomatorAvailableVersionLabel.Location = new Point(275, 225);
             UIAutomatorAvailableVersionLabel.Margin = new Padding(2, 0, 2, 0);
             UIAutomatorAvailableVersionLabel.Name = "UIAutomatorAvailableVersionLabel";
             UIAutomatorAvailableVersionLabel.Size = new Size(0, 15);
@@ -235,7 +276,7 @@
             // 
             AppiumButton.Anchor = AnchorStyles.None;
             AppiumButton.AutoSize = true;
-            AppiumButton.Location = new Point(361, 48);
+            AppiumButton.Location = new Point(361, 104);
             AppiumButton.Margin = new Padding(2);
             AppiumButton.Name = "AppiumButton";
             AppiumButton.Size = new Size(78, 25);
@@ -248,7 +289,7 @@
             // 
             XCUITestButton.Anchor = AnchorStyles.None;
             XCUITestButton.AutoSize = true;
-            XCUITestButton.Location = new Point(361, 103);
+            XCUITestButton.Location = new Point(361, 161);
             XCUITestButton.Margin = new Padding(2);
             XCUITestButton.Name = "XCUITestButton";
             XCUITestButton.Size = new Size(78, 25);
@@ -261,7 +302,7 @@
             // 
             UIAutomatorButton.Anchor = AnchorStyles.None;
             UIAutomatorButton.AutoSize = true;
-            UIAutomatorButton.Location = new Point(361, 160);
+            UIAutomatorButton.Location = new Point(361, 220);
             UIAutomatorButton.Margin = new Padding(2);
             UIAutomatorButton.Name = "UIAutomatorButton";
             UIAutomatorButton.Size = new Size(78, 25);
@@ -270,11 +311,24 @@
             UIAutomatorButton.UseVisualStyleBackColor = true;
             UIAutomatorButton.Click += UIAutomatorButton_Click;
             // 
+            // NodeUpdateButton
+            // 
+            NodeUpdateButton.Anchor = AnchorStyles.None;
+            NodeUpdateButton.AutoSize = true;
+            NodeUpdateButton.Location = new Point(361, 49);
+            NodeUpdateButton.Margin = new Padding(2);
+            NodeUpdateButton.Name = "NodeUpdateButton";
+            NodeUpdateButton.Size = new Size(78, 25);
+            NodeUpdateButton.TabIndex = 18;
+            NodeUpdateButton.Text = "Update";
+            NodeUpdateButton.UseVisualStyleBackColor = true;
+            NodeUpdateButton.Click += NodeUpdateButton_Click;
+            // 
             // label6
             // 
             label6.AutoSize = true;
             label6.ForeColor = Color.Red;
-            label6.Location = new Point(8, 235);
+            label6.Location = new Point(7, 291);
             label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new Size(427, 15);
@@ -284,7 +338,7 @@
             // showExecutionCheckbox
             // 
             showExecutionCheckbox.AutoSize = true;
-            showExecutionCheckbox.Location = new Point(326, 213);
+            showExecutionCheckbox.Location = new Point(325, 269);
             showExecutionCheckbox.Name = "showExecutionCheckbox";
             showExecutionCheckbox.Size = new Size(148, 19);
             showExecutionCheckbox.TabIndex = 2;
@@ -298,7 +352,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(485, 256);
+            ClientSize = new Size(485, 315);
             Controls.Add(showExecutionCheckbox);
             Controls.Add(label6);
             Controls.Add(tableLayoutPanel1);
@@ -340,5 +394,9 @@
         private Button UIAutomatorButton;
         private Label label6;
         private CheckBox showExecutionCheckbox;
+        private Label label7;
+        private Button NodeUpdateButton;
+        private Label NodeCurrentVersionLabel;
+        private Label NodeAvailableVersionLabel;
     }
 }

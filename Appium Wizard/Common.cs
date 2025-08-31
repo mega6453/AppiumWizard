@@ -845,7 +845,7 @@ namespace Appium_Wizard
         }
 
 
-        public static void InstallNodeJs(bool showExecution = false)
+        public static void InstallNodeJsOld(bool showExecution = false)
         {
             try
             {
@@ -853,20 +853,110 @@ namespace Appium_Wizard
                 process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
                 process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{serverFolderPath}\" -y";
                 process.StartInfo.UseShellExecute = false;
-                if (showExecution)
-                {
-                    process.StartInfo.CreateNoWindow = false;
-                }
-                else
-                {
-                    process.StartInfo.CreateNoWindow = true;
-                }
+                process.StartInfo.CreateNoWindow = !showExecution;
                 process.Start();
                 process.WaitForExit();
             }
             catch (Exception e)
             {
                 MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public static void InstallNodeJs(bool showExecution = false)
+        {
+            string tempPath = null;
+            try
+            {
+                // Delete existing node files
+                DeleteNodeFiles();
+
+                // Create temporary extraction directory
+                tempPath = Path.Combine(Path.GetTempPath(), "NodeJsInstall_" + Guid.NewGuid().ToString());
+                Directory.CreateDirectory(tempPath);
+
+                // Extract to temporary directory
+                Process process = new Process();
+                process.StartInfo.FileName = FilesPath.zipExtractorFilePath;
+                process.StartInfo.Arguments = $"x \"{nodeFilePath}\" -o\"{tempPath}\" -y";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = !showExecution;
+
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"7-Zip extraction failed with exit code: {process.ExitCode}");
+                }
+
+                // Ensure target directory exists
+                Directory.CreateDirectory(serverFolderPath);
+
+                // Handle the extracted content - THIS IS WHERE WE CALL THE METHOD
+                ExtractContentToTarget(tempPath, serverFolderPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while installing NodeJs. \nOriginal exception: " + e.Message, "Install NodeJs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Clean up temporary directory
+                if (tempPath != null && Directory.Exists(tempPath))
+                {
+                    try
+                    {
+                        Directory.Delete(tempPath, true);
+                    }
+                    catch
+                    {
+                        // Ignore cleanup errors
+                    }
+                }
+            }
+        }
+
+        // This method determines what to extract and calls CopyDirectoryContents
+        private static void ExtractContentToTarget(string tempPath, string targetPath)
+        {
+            var files = Directory.GetFiles(tempPath);
+            var directories = Directory.GetDirectories(tempPath);
+
+            if (files.Length == 0 && directories.Length == 1)
+            {
+                // Only one directory with no files at root level - copy its contents
+                // THIS IS WHERE CopyDirectoryContents IS CALLED
+                CopyDirectoryContents(directories[0], targetPath);
+            }
+            else
+            {
+                // Copy all items directly
+                // THIS IS WHERE CopyDirectoryContents IS CALLED
+                CopyDirectoryContents(tempPath, targetPath);
+            }
+        }
+
+        // Solution 3: The actual copy method with overwrite capability
+        private static void CopyDirectoryContents(string sourceDir, string targetDir)
+        {
+            // Ensure target directory exists
+            Directory.CreateDirectory(targetDir);
+
+            // Copy all files with overwrite
+            foreach (string sourceFile in Directory.GetFiles(sourceDir))
+            {
+                string fileName = Path.GetFileName(sourceFile);
+                string targetFile = Path.Combine(targetDir, fileName);
+                File.Copy(sourceFile, targetFile, true); // true = overwrite existing
+            }
+
+            // Copy all directories recursively
+            foreach (string sourceSubDir in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(sourceSubDir);
+                string targetSubDir = Path.Combine(targetDir, dirName);
+                CopyDirectoryContents(sourceSubDir, targetSubDir); // Recursive call
             }
         }
 
@@ -1486,9 +1576,16 @@ namespace Appium_Wizard
             }
         }
 
-        public static Dictionary<int,int> serverNumberPortNumber = new Dictionary<int,int>();
+        public static Dictionary<int, int> serverNumberPortNumber = new Dictionary<int, int>();
         private static Dictionary<int, HttpListener> serverListeners = new Dictionary<int, HttpListener>();
         private static Dictionary<int, CancellationTokenSource> serverTokens = new Dictionary<int, CancellationTokenSource>();
+        private static Dictionary<int, string> serverHtmlFiles = new Dictionary<int, string>(); // Track temp files
+
+        // Add these constants for memory management
+        private const int MAX_LOG_LINES = 1000;
+        private const long MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+        private static readonly object fileLock = new object();
+
         public static void StartServer(int serverNumber, int port, string htmlFilePath, string serverLogsFilePath)
         {
             string prefix = "http://localhost:" + port + "/";
@@ -1501,70 +1598,305 @@ namespace Appium_Wizard
 
             serverListeners[serverNumber] = listener;
             serverNumberPortNumber[serverNumber] = port;
+            serverHtmlFiles[serverNumber] = htmlFilePath; // Track HTML file for cleanup
+
             listener.Start();
             Console.WriteLine($"Server {serverNumber} started at {prefix}");
 
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
                     while (!token.IsCancellationRequested)
                     {
-                        HttpListenerContext context = listener.GetContext();
-                        HttpListenerRequest request = context.Request;
-                        HttpListenerResponse response = context.Response;
-
-                        // Set CORS headers
-                        response.Headers.Add("Access-Control-Allow-Origin", prefix);
-                        response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-                        response.Headers.Add("Pragma", "no-cache");
-                        response.Headers.Add("Expires", "0");
-
-                        if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
+                        try
                         {
-                            // Serve the HTML file
-                            string htmlContent = File.ReadAllText(htmlFilePath);
-                            byte[] buffer = Encoding.UTF8.GetBytes(htmlContent);
-                            response.ContentType = "text/html";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
-                        {
-                            // Serve the log file
-                            string fileContent;
-                            using (var fileStream = new FileStream(serverLogsFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                            using (var streamReader = new StreamReader(fileStream))
-                            {
-                                fileContent = streamReader.ReadToEnd();
-                            }
-                            byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
-                            response.ContentType = "text/plain";
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
-                        else
-                        {
-                            // Return 404 if the file is not found
-                            response.StatusCode = (int)HttpStatusCode.NotFound;
-                            byte[] buffer = Encoding.UTF8.GetBytes("File not found");
-                            response.ContentLength64 = buffer.Length;
-                            response.OutputStream.Write(buffer, 0, buffer.Length);
-                        }
+                            HttpListenerContext context = await GetContextAsync(listener, token);
+                            if (context == null) break;
 
-                        response.Close();
+                            _ = Task.Run(() => ProcessRequest(context, htmlFilePath, serverLogsFilePath), token);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            break; // Listener was disposed
+                        }
+                        catch (HttpListenerException)
+                        {
+                            break; // Listener was stopped
+                        }
                     }
-                }
-                catch (HttpListenerException)
-                {
-                    // Listener was stopped, exit gracefully
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error: " + ex.Message);
+                    Console.WriteLine("Server error: " + ex.Message);
                 }
             }, token);
         }
+
+        private static async Task<HttpListenerContext> GetContextAsync(HttpListener listener, CancellationToken token)
+        {
+            try
+            {
+                return await Task.Run(() => listener.GetContext(), token);
+            }
+            catch (OperationCanceledException)
+            {
+                return null;
+            }
+            catch (ObjectDisposedException)
+            {
+                return null;
+            }
+        }
+
+        private static void ProcessRequest(HttpListenerContext context, string htmlFilePath, string serverLogsFilePath)
+        {
+            HttpListenerRequest request = context.Request;
+            HttpListenerResponse response = context.Response;
+            Console.WriteLine($"Requested log file path: {serverLogsFilePath}");
+            Console.WriteLine($"File.Exists: {File.Exists(serverLogsFilePath)}");
+            try
+            {
+                // Set CORS headers
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                response.Headers.Add("Pragma", "no-cache");
+                response.Headers.Add("Expires", "0");
+
+                if (request.Url.AbsolutePath == "/index.html" && File.Exists(htmlFilePath))
+                {
+                    // Serve the HTML file
+                    ServeHtmlFile(response, htmlFilePath);
+                }
+                else if (request.Url.AbsolutePath == "/file" && File.Exists(serverLogsFilePath))
+                {
+                    // Check if full log download requested via query parameter
+                    bool fullLogRequested = false;
+                    var query = request.Url.Query; // e.g., "?full=true"
+                    if (!string.IsNullOrEmpty(query))
+                    {
+                        var queryParams = System.Web.HttpUtility.ParseQueryString(query);
+                        fullLogRequested = queryParams["full"]?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
+                    }
+
+                    if (fullLogRequested)
+                    {
+                        // Serve full log file without truncation
+                        ServeFullLogFile(response, serverLogsFilePath);
+                    }
+                    else
+                    {
+                        // Serve truncated log file as before
+                        ServeLogFile(response, serverLogsFilePath);
+                    }
+                }
+                else
+                {
+                    // Return 404 if the file is not found
+                    Send404Response(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Request processing error: " + ex.Message);
+                try
+                {
+                    response.StatusCode = 500;
+                    response.Close();
+                }
+                catch { }
+            }
+        }
+
+        private static void ServeFullLogFile(HttpListenerResponse response, string serverLogsFilePath)
+        {
+            try
+            {
+                lock (fileLock)
+                {
+                    using (var fs = new FileStream(
+                        serverLogsFilePath,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite))
+                    {
+                        response.ContentType = "text/plain";
+                        response.ContentLength64 = fs.Length;
+
+                        // Set Content-Disposition header with original filename
+                        string fileName = Path.GetFileName(serverLogsFilePath);
+                        response.AddHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+
+                        fs.CopyTo(response.OutputStream);
+                    }
+                }
+                response.OutputStream.Flush();
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error serving full log file: " + ex.Message);
+                Send404Response(response);
+            }
+        }
+
+        private static void ServeHtmlFile(HttpListenerResponse response, string htmlFilePath)
+        {
+            try
+            {
+                byte[] buffer = File.ReadAllBytes(htmlFilePath);
+                response.ContentType = "text/html";
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error serving HTML: " + ex.Message);
+                Send404Response(response);
+            }
+        }
+
+        private static void ServeLogFile(HttpListenerResponse response, string serverLogsFilePath)
+        {
+            try
+            {
+                lock (fileLock)
+                {
+                    FileInfo fileInfo = new FileInfo(serverLogsFilePath);
+
+                    // Check file size limit
+                    if (fileInfo.Length > MAX_FILE_SIZE_BYTES)
+                    {
+                        // Read only the last portion of large files
+                        string limitedContent = ReadLastLinesFromLargeFile(serverLogsFilePath, MAX_LOG_LINES);
+                        byte[] buffer = Encoding.UTF8.GetBytes(limitedContent);
+                        response.ContentType = "text/plain";
+                        response.ContentLength64 = buffer.Length;
+                        response.OutputStream.Write(buffer, 0, buffer.Length);
+                    }
+                    else
+                    {
+                        // For smaller files, read last N lines efficiently
+                        string fileContent = ReadLastLines(serverLogsFilePath, MAX_LOG_LINES);
+                        byte[] buffer = Encoding.UTF8.GetBytes(fileContent);
+                        response.ContentType = "text/plain";
+                        response.ContentLength64 = buffer.Length;
+                        response.OutputStream.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                response.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error serving log file: " + ex.Message);
+                Send404Response(response);
+            }
+        }
+
+        private static string ReadLastLines(string filePath, int maxLines)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    var lines = new List<string>();
+                    string line;
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        lines.Add(line);
+                        if (lines.Count > maxLines)
+                        {
+                            lines.RemoveAt(0); // Remove oldest line
+                        }
+                    }
+                    return string.Join("\n", lines);
+                }
+            }
+            catch
+            {
+                return "Error reading log file";
+            }
+        }
+
+        private static string ReadLastLinesFromLargeFile(string filePath, int maxLines)
+        {
+            try
+            {
+                const int bufferSize = 8192;
+                var lines = new List<string>();
+
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    // Start from the end of file and read backwards
+                    long position = fileStream.Length;
+                    byte[] buffer = new byte[bufferSize];
+                    StringBuilder currentLine = new StringBuilder();
+
+                    while (position > 0 && lines.Count < maxLines)
+                    {
+                        int bytesToRead = (int)Math.Min(bufferSize, position);
+                        position -= bytesToRead;
+                        fileStream.Seek(position, SeekOrigin.Begin);
+                        fileStream.Read(buffer, 0, bytesToRead);
+
+                        // Process buffer in reverse
+                        for (int i = bytesToRead - 1; i >= 0; i--)
+                        {
+                            if (buffer[i] == '\n')
+                            {
+                                if (currentLine.Length > 0)
+                                {
+                                    // Reverse the characters in currentLine
+                                    char[] chars = currentLine.ToString().ToCharArray();
+                                    Array.Reverse(chars);
+                                    lines.Add(new string(chars));
+                                    currentLine.Clear();
+
+                                    if (lines.Count >= maxLines)
+                                        break;
+                                }
+                            }
+                            else if (buffer[i] != '\r')
+                            {
+                                currentLine.Append((char)buffer[i]);
+                            }
+                        }
+                    }
+
+                    // Add any remaining content
+                    if (currentLine.Length > 0 && lines.Count < maxLines)
+                    {
+                        char[] chars = currentLine.ToString().ToCharArray();
+                        Array.Reverse(chars);
+                        lines.Add(new string(chars));
+                    }
+                }
+
+                // Reverse the lines list to get correct order
+                lines.Reverse();
+                return string.Join("\n", lines);
+            }
+            catch
+            {
+                return "Error reading large log file";
+            }
+        }
+
+        private static void Send404Response(HttpListenerResponse response)
+        {
+            try
+            {
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                byte[] buffer = Encoding.UTF8.GetBytes("File not found");
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+            }
+            catch { }
+        }
+
 
         public static void StopLogsServer(int serverNumber)
         {
@@ -1572,14 +1904,43 @@ namespace Appium_Wizard
             {
                 try
                 {
+                    // Cancel the token first
                     serverTokens[serverNumber].Cancel();
-                    serverListeners[serverNumber].Stop();
+
+                    // Stop and close the listener
+                    if (serverListeners[serverNumber].IsListening)
+                    {
+                        serverListeners[serverNumber].Stop();
+                    }
                     serverListeners[serverNumber].Close();
 
+                    // Clean up temporary HTML file
+                    if (serverHtmlFiles.ContainsKey(serverNumber))
+                    {
+                        try
+                        {
+                            if (File.Exists(serverHtmlFiles[serverNumber]))
+                            {
+                                File.Delete(serverHtmlFiles[serverNumber]);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting temp HTML file: {ex.Message}");
+                        }
+                        serverHtmlFiles.Remove(serverNumber);
+                    }
+
+                    // Remove from dictionaries
                     serverListeners.Remove(serverNumber);
                     serverTokens.Remove(serverNumber);
+                    serverNumberPortNumber.Remove(serverNumber);
 
                     Console.WriteLine($"Server {serverNumber} stopped.");
+
+                    // Force garbage collection
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
                 catch (Exception ex)
                 {
@@ -1591,72 +1952,397 @@ namespace Appium_Wizard
                 Console.WriteLine($"Server {serverNumber} is not running.");
             }
         }
+
         public static string GenerateHtmlWithFilePath(string filePath, int appiumPort, int interval)
         {
             string htmlTemplate = @"
-            <!DOCTYPE html>
-            <html lang=""en"">
-            <head>
-                <meta charset=""UTF-8"">
-                <title>Appium Wizard Server Logs</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-                    #container { position: relative; height: 100vh; overflow: hidden; }
-                    #header { position: relative; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 4px; }
-                    #content { padding: 20px; overflow-y: auto; height: calc(100% - 50px); white-space: pre-wrap; background-color: #f4f4f4; }
-                    #title { text-align: center; font-size: 18px; font-weight: bold; background-color: #0078d7; color: white; flex-grow: 1; }
-                </style>
-            </head>
-            <body>
-                <div id=""container"">
-                    <div id=""header"">
-                        <div id=""title"">Appium Wizard Server Logs</div>
-                        <div>
-                            <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
-                            <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
-                        </div>
-                    </div>
-                    <pre id=""content""></pre>
-                </div>
-                <script>
-                    const contentElement = document.getElementById('content');
-                    const autoScrollCheckbox = document.getElementById('autoScroll');
-                    const pauseFetchCheckbox = document.getElementById('pauseFetch');
+                                 <!DOCTYPE html>
+                                <html lang=""en"">
+                                <head>
+                                    <meta charset=""UTF-8"">
+                                    <title>Appium Wizard Server Logs - {PORT}</title>
+                                    <style>
+                                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+                                        #container { position: relative; height: 100vh; overflow: hidden; }
+                                        #header {
+                                            position: relative;
+                                            display: flex;
+                                            justify-content: space-between;
+                                            align-items: center;
+                                            background: rgba(255, 255, 255, 0.8);
+                                            padding: 5px 10px;
+                                            border-radius: 4px;
+                                        }
+                                        #controls {
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 10px;
+                                        }
+                                        #content {
+                                            padding: 20px;
+                                            overflow-y: auto;
+                                            height: calc(100% - 50px);
+                                            white-space: pre-wrap;
+                                            background-color: #f4f4f4;
+                                        }
+                                        #title {
+                                            text-align: center;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            background-color: #0078d7;
+                                            color: white;
+                                            flex-grow: 1;
+                                            margin-right: 10px;
+                                            padding: 5px 10px;
+                                            border-radius: 4px;
+                                        }
+                                        button {
+                                            cursor: pointer;
+                                            padding: 5px 10px;
+                                            border-radius: 3px;
+                                            border: 1px solid #0078d7;
+                                            background-color: white;
+                                            color: #0078d7;
+                                            font-weight: bold;
+                                        }
+                                        button:hover {
+                                            background-color: #0078d7;
+                                            color: white;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div id=""container"">
+                                        <div id=""header"">
+                                            <div id=""title"">Appium Wizard Server Logs</div>
+                                            <div id=""controls"">
+                                                <button id=""downloadBtn"" style=""position: relative;"">
+                                                  Download full logs
+                                                  <span 
+                                                    style=""margin-left: 6px; cursor: pointer; font-weight: bold; color: #555;"" 
+                                                    title=""Only the last 1000 lines are shown in the viewer. Click to download the complete log file."">
+                                                    &#9432;
+                                                  </span>
+                                                </button>
+                                                <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
+                                                <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
+                                            </div>
+                                        </div>
+                                        <pre id=""content"">Loading logs...</pre>
+                                    </div>
+                                    <script>
+                                        const contentElement = document.getElementById('content');
+                                        const autoScrollCheckbox = document.getElementById('autoScroll');
+                                        const pauseFetchCheckbox = document.getElementById('pauseFetch');
+                                        const downloadBtn = document.getElementById('downloadBtn');
 
-                    function fetchTextFile() {
-                        if (pauseFetchCheckbox.checked) {
-                            return; // Do not fetch if pause is checked
-                        }
-                        fetch('/file') // Fetch the file from the server's /file endpoint
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
-                                return response.text();
-                            })
-                            .then(text => {
-                                contentElement.textContent = text;
-                                if (autoScrollCheckbox.checked) {
-                                    contentElement.scrollTop = contentElement.scrollHeight;
-                                }
-                            })
-                            .catch(error => {
-                                contentElement.textContent = 'Error loading file: ' + error;
-                            });
-                    }
-                    fetchTextFile();
-                    setInterval(fetchTextFile, interval);
-                </script>
-            </body>
-            </html>";
+                                        function fetchTextFile() {
+                                            if (pauseFetchCheckbox.checked) {
+                                                return;
+                                            }
+                                            fetch('/file')
+                                                .then(response => {
+                                                    if (!response.ok) {
+                                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                                    }
+                                                    return response.text();
+                                                })
+                                                .then(text => {
+                                                    contentElement.textContent = text;
+                                                    if (autoScrollCheckbox.checked) {
+                                                        contentElement.scrollTop = contentElement.scrollHeight;
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    contentElement.textContent = 'Error loading file: ' + error;
+                                                });
+                                        }
+
+                                        async function downloadFullLogs() {
+                                                try {
+                                                    const response = await fetch('/file?full=true');
+                                                    if (!response.ok) {
+                                                        alert('Error downloading logs: ' + response.statusText);
+                                                        return;
+                                                    }
+                                                    const blob = await response.blob();
+
+                                                    // Get filename from Content-Disposition header
+                                                    const contentDisposition = response.headers.get('Content-Disposition');
+                                                    let fileName = 'logs.txt'; // fallback filename
+                                                    if (contentDisposition) {
+                                                        const fileNameMatch = contentDisposition.match(/filename=""(.+)""/);
+                                                        if (fileNameMatch.length === 2) {
+                                                            fileName = fileNameMatch[1];
+                                                        }
+                                                    }
+
+                                                    const url = window.URL.createObjectURL(blob);
+                                                    const a = document.createElement('a');
+                                                    a.href = url;
+                                                    a.download = fileName;  // use filename from server
+                                                    document.body.appendChild(a);
+                                                    a.click();
+                                                    a.remove();
+                                                    window.URL.revokeObjectURL(url);
+                                                } catch (err) {
+                                                    alert('Failed to download logs: ' + err);
+                                                }
+                                            }
+
+                                        downloadBtn.addEventListener('click', downloadFullLogs);
+
+                                        // Initial fetch and interval
+                                        fetchTextFile();
+                                        setInterval(fetchTextFile, {INTERVAL});
+                                    </script>
+                                </body>
+                                </html>";
+
+            // Replace placeholders
             htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");
-            htmlTemplate = htmlTemplate.Replace("setInterval(fetchTextFile, interval)", $"setInterval(fetchTextFile, {interval})");
-            // Save the updated HTML content to a temporary file
+            htmlTemplate = htmlTemplate.Replace("{PORT}", appiumPort.ToString());
+            htmlTemplate = htmlTemplate.Replace("setInterval(fetchTextFile, {INTERVAL})", $"setInterval(fetchTextFile, {interval})");
+
+            // Save temp file
             string tempHtmlFilePath = Path.Combine(Path.GetTempPath(), $"GeneratedHtml_{Guid.NewGuid()}.html");
             File.WriteAllText(tempHtmlFilePath, htmlTemplate);
 
-            // Return the path to the saved HTML file
             return tempHtmlFilePath;
+        }
+
+        public static void CleanupTempFiles()
+        {
+            try
+            {
+                string tempDir = Path.Combine(Path.GetTempPath(), "AppiumWizard_Logs");
+                if (Directory.Exists(tempDir))
+                {
+                    var files = Directory.GetFiles(tempDir, "ServerLogs_*.html");
+                    var cutoffTime = DateTime.Now.AddHours(-1); // Delete files older than 1 hour
+
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            if (File.GetCreationTime(file) < cutoffTime)
+                            {
+                                File.Delete(file);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting temp file {file}: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during temp file cleanup: {ex.Message}");
+            }
+        }
+
+        public static void StopAllServers()
+        {
+            var serverNumbers = serverListeners.Keys.ToList();
+            foreach (var serverNumber in serverNumbers)
+            {
+                StopLogsServer(serverNumber);
+            }
+
+            // Final cleanup
+            CleanupTempFiles();
+            GC.Collect();
+        }
+
+        public static async Task<string> GetLatestNodeVersion()
+        {
+            string url = "https://nodejs.org/dist/index.json";
+
+            using HttpClient client = new HttpClient();
+
+            try
+            {
+                var json = await client.GetStringAsync(url);
+                var releases = JsonSerializer.Deserialize<NodeRelease[]>(json);
+
+                if (releases != null && releases.Length > 0)
+                {
+                    return releases[0].version.TrimStart('v').Trim();
+                }
+                else
+                {
+                    return "NA";
+                }
+            }
+            catch
+            {
+                return "NA";
+            }
+        }
+
+        public static async Task DownloadNodeJS()
+        {
+            string indexJsonUrl = "https://nodejs.org/dist/index.json";
+
+            try
+            {
+                using HttpClient client = new HttpClient();
+
+                // Fetch the index.json to get latest release info
+                string json = await client.GetStringAsync(indexJsonUrl);
+                var releases = JsonSerializer.Deserialize<NodeRelease[]>(json);
+
+                if (releases == null || releases.Length == 0)
+                {
+                    return;
+                }
+
+                var latestRelease = releases[0];
+                string versionNoV = latestRelease.version.StartsWith("v") ? latestRelease.version.Substring(1) : latestRelease.version;
+                string zipFileName = $"node-v{versionNoV}-win-x64.zip";
+
+                // Construct download URL
+                string downloadUrl = $"https://nodejs.org/dist/{latestRelease.version}/{zipFileName}";
+
+                // Define paths
+                string downloadFolder = Path.Combine(FilesPath.serverInstalledPath, "Backup");
+                Directory.CreateDirectory(downloadFolder); // Ensure folder exists
+
+                string newFilePath = Path.Combine(downloadFolder, zipFileName);
+                string finalFilePath = Path.Combine(downloadFolder, "node.zip");
+
+                // Download the zip file to newFilePath
+                using (var response = await client.GetAsync(downloadUrl))
+                {
+                    response.EnsureSuccessStatusCode();
+                    using (var fs = new FileStream(newFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await response.Content.CopyToAsync(fs);
+                    }
+                }
+
+                // Delete old node.zip if exists
+                if (File.Exists(finalFilePath))
+                {
+                    File.Delete(finalFilePath);
+                }
+
+                // Rename the downloaded file to node.zip
+                File.Move(newFilePath, finalFilePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        private class NodeRelease
+        {
+            public string version { get; set; }
+            public string[] files { get; set; }
+        }
+
+        public static string GetNodeVersion()
+        {
+            string nodeExePath = FilesPath.nodePath;
+            if (!File.Exists(nodeExePath))
+            {
+                return "NA";
+            }
+
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = nodeExePath,
+                Arguments = "--version",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(psi))
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                return output.TrimStart('v').Trim();
+            }
+        }
+
+        public static void DeleteNodeFiles()
+        {
+            // Keep rules
+            string[] keepFiles = Directory.GetFiles(serverFolderPath)
+                .Select(Path.GetFileName)
+                .Where(f => f.StartsWith("appium", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            // Delete files
+            foreach (var file in Directory.GetFiles(serverFolderPath))
+            {
+                string fileName = Path.GetFileName(file);
+
+                if (!keepFiles.Contains(fileName, StringComparer.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+
+            // Delete folders except Backup and node_modules\appium
+            foreach (var dir in Directory.GetDirectories(serverFolderPath))
+            {
+                string dirName = Path.GetFileName(dir);
+
+                if (dirName.Equals("Backup", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (dirName.Equals("node_modules", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Inside node_modules, delete everything except "appium"
+                    foreach (var subDir in Directory.GetDirectories(dir))
+                    {
+                        if (!Path.GetFileName(subDir).Equals("appium", StringComparison.OrdinalIgnoreCase))
+                        {
+                            try
+                            {
+                                Directory.Delete(subDir, true);
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                        }
+                    }
+
+                    // Delete stray files in node_modules (not folders)
+                    foreach (var subFile in Directory.GetFiles(dir))
+                    {
+                        try
+                        {
+                            File.Delete(subFile);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
+
+                    continue;
+                }
+
+                // Delete other folders
+                try
+                {
+                    Directory.Delete(dir, true);
+                }
+                catch (Exception ex)
+                {
+                }
+            }
         }
     }
 

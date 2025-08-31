@@ -41,6 +41,7 @@
             clearAppDataToolStripMenuItem = new ToolStripMenuItem();
             copyContextMenuStrip = new ContextMenuStrip(components);
             copyPackageNameToolStripMenuItem = new ToolStripMenuItem();
+            copyActivityNameToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             copyContextMenuStrip.SuspendLayout();
             SuspendLayout();
@@ -143,9 +144,9 @@
             // 
             // copyContextMenuStrip
             // 
-            copyContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyPackageNameToolStripMenuItem });
+            copyContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyPackageNameToolStripMenuItem, copyActivityNameToolStripMenuItem });
             copyContextMenuStrip.Name = "copyContextMenuStrip";
-            copyContextMenuStrip.Size = new Size(185, 26);
+            copyContextMenuStrip.Size = new Size(185, 70);
             // 
             // copyPackageNameToolStripMenuItem
             // 
@@ -154,6 +155,14 @@
             copyPackageNameToolStripMenuItem.Size = new Size(184, 22);
             copyPackageNameToolStripMenuItem.Text = "Copy Package Name";
             copyPackageNameToolStripMenuItem.Click += copyPackageNameToolStripMenuItem_Click;
+            // 
+            // copyActivityNameToolStripMenuItem
+            // 
+            copyActivityNameToolStripMenuItem.Image = Properties.Resources.files;
+            copyActivityNameToolStripMenuItem.Name = "copyActivityNameToolStripMenuItem";
+            copyActivityNameToolStripMenuItem.Size = new Size(184, 22);
+            copyActivityNameToolStripMenuItem.Text = "Copy Activity Name";
+            copyActivityNameToolStripMenuItem.Click += copyActivityNameToolStripMenuItem_Click;
             // 
             // InstalledAppsList
             // 
@@ -194,5 +203,6 @@
         private ToolStripMenuItem clearAppDataToolStripMenuItem;
         private ContextMenuStrip copyContextMenuStrip;
         private ToolStripMenuItem copyPackageNameToolStripMenuItem;
+        private ToolStripMenuItem copyActivityNameToolStripMenuItem;
     }
 }

@@ -65,19 +65,44 @@ namespace Appium_Wizard
             serverNumberWebView[serverNumber] = webView;
             await webView.EnsureCoreWebView2Async();
 
-            // Add these memory optimization settings
             webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
             webView.CoreWebView2.Settings.AreHostObjectsAllowed = false;
             webView.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
             webView.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
 
-            // Add memory cleanup before navigation
-            webView.CoreWebView2.NavigationStarting += (s, e) => {
-                GC.Collect(); // Force cleanup before navigation
+            webView.CoreWebView2.NavigationStarting += (s, e) => GC.Collect();
+            webView.CoreWebView2.ContextMenuRequested += CoreWebView2_ContextMenuRequested;
+
+            // 👇 Add blank-page detection with timer
+            var reloadTimer = new Timer { Interval = 3000 }; // check every 3s
+            reloadTimer.Tick += async (s, e) =>
+            {
+                try
+                {
+                    string content = await webView.CoreWebView2.ExecuteScriptAsync("document.body.innerText");
+                    if (string.IsNullOrWhiteSpace(content) || content == "\"\"")
+                    {
+                        webView.Reload();
+                    }
+                    else
+                    {
+                        reloadTimer.Stop(); // stop once valid content is loaded
+                    }
+                }
+                catch
+                {
+                    // ignore errors (can happen if not ready)
+                }
             };
 
-            webView.CoreWebView2.ContextMenuRequested += CoreWebView2_ContextMenuRequested;
+            webView.CoreWebView2.NavigationCompleted += (s, e) =>
+            {
+                if (e.IsSuccess)
+                {
+                    reloadTimer.Start();
+                }
+            };
 
             if (AppiumServerSetup.portServerNumberAndFilePath.ContainsKey(serverNumber))
             {
@@ -88,6 +113,7 @@ namespace Appium_Wizard
                 SetDefaultText(webView, defaultText);
             }
         }
+
 
         private void SetDefaultText(WebView2 webView, string defaultText)
         {

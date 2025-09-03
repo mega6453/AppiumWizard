@@ -2344,6 +2344,38 @@ namespace Appium_Wizard
                 }
             }
         }
-    }
 
+        public static void KillExeRunningFromAppiumWizardFolder(string ExePath, string processName)
+        {
+            Process[] ProcessesList = Process.GetProcessesByName(processName); //example: adb (without .exe)
+
+            foreach (var process in ProcessesList)
+            {
+                try
+                {
+                    // Get the main module's file path
+                    string processPath = process.MainModule.FileName;
+
+                    // Compare paths (case-insensitive)
+                    if (string.Equals(Path.GetFullPath(processPath), Path.GetFullPath(ExePath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        process.Kill();
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+        }
+
+        public static void KillExeRunningFromAppiumWizardFolder()
+        {
+            KillExeRunningFromAppiumWizardFolder(FilesPath.adbFilePath, "adb");
+            KillExeRunningFromAppiumWizardFolder(FilesPath.iProxyFilePath, "iproxy");
+            KillExeRunningFromAppiumWizardFolder(FilesPath.iOSServerFilePath, "iOSServer");
+            KillExeRunningFromAppiumWizardFolder(FilesPath.nodePath, "node");
+            KillExeRunningFromAppiumWizardFolder(FilesPath.pymd3FilePath, "iOSServerPy");
+        }
+    }
 }

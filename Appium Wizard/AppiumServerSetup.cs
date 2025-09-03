@@ -23,10 +23,11 @@ namespace Appium_Wizard
         string appiumLogLevel, updatedCommand;
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
+            Logger.Info("Appium server initial command : " + command);
             string versionString = Common.InstalledAppiumServerVersion().Replace("\n",string.Empty);
             if (Version.TryParse(versionString, out Version installedVersion))
             {
-                Version minimumVersion = new Version(3, 0, 0);
+                Version minimumVersion = new Version(2, 12, 3);
                 if (installedVersion > minimumVersion)
                 {
                     // installedVersion is greater than 3.0.0
@@ -89,6 +90,7 @@ namespace Appium_Wizard
                 serverNumberWDAPortNumber.Add(serverNumber, webDriverAgentProxyPort);
             }
             updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
+            Logger.Info("Appium server final updated command : "+updatedCommand);
             string startingText = "\t\t------------------------------Starting Appium Server------------------------------\n\n";
             InitializeLogWriter(serverNumber,logFilePath);
             WriteLog(serverNumber, startingText);

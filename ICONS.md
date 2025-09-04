@@ -1,4 +1,7 @@
-## Icons
+# Icons
+This project uses icons from [Flaticon](https://www.flaticon.com/).  
+Below is the full attribution list as required by the license.
+
 * <a href="https://www.flaticon.com/free-icons/left-arrow" title="left arrow icons">Left arrow icons created by Lizel Arina - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/homepage" title="homepage icons">Homepage icons created by Md Tanvirul Haque - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/search" title="search icons">Search icons created by Maxim Basinski Premium - Flaticon</a>
@@ -46,3 +49,8 @@
 * <a href="https://www.flaticon.com/free-icons/log" title="log icons">Log icons created by Iconjam - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/wifi" title="wifi icons">Wifi icons created by Ilham Fitrotul Hayat - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/brands-and-logotypes" title="brands and logotypes icons">Brands and logotypes icons created by Freepik - Flaticon</a>
+
+---
+
+🙏 Thanks to all the amazing creators on [Flaticon](https://www.flaticon.com/) for providing these icons.
+

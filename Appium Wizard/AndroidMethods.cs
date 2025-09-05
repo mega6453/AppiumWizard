@@ -1318,16 +1318,26 @@ namespace Appium_Wizard
             }
         }
 
-        public async static void DragDrop(int port, int startX, int startY, int endX, int endY, int speed=1000)
+        public async static void DragDrop(string udid, string sessionId, int port, int startX, int startY, int endX, int endY, int speed=1000)
         {
             try
             {
-                string sessionId = GetSessionID(port);
-                if (sessionId.Equals("nosession"))
+
+                float dpi = 0;
+                if (MainScreen.udidScreenDensity.ContainsKey(udid))
                 {
-                    CreateSession(port);
-                    sessionId = GetSessionID(port);
+                    dpi = MainScreen.udidScreenDensity[udid];
                 }
+                else
+                {
+                    dpi = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    MainScreen.udidScreenDensity[udid] = dpi;
+                }
+                startX = AndroidMethods.DpToPixels(startX, dpi);
+                startY = AndroidMethods.DpToPixels(startY, dpi);
+                endX = AndroidMethods.DpToPixels(endX, dpi);
+                endY = AndroidMethods.DpToPixels(endY, dpi);
+
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
                     Timeout = TimeSpan.FromSeconds(10)

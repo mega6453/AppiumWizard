@@ -889,7 +889,6 @@ namespace Appium_Wizard
             string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
             string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
             string filePath = Path.Combine(downloadPath, $"Screenshot_{deviceName}_{timestamp}.png");
-            filePath = "\"" + filePath + "\"";
             if (OSType.Equals("Android"))
             {
                 try

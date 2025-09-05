@@ -516,7 +516,7 @@ namespace Appium_Wizard
 
         public void TakeScreenshot(string udid, string path)
         {
-            ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > " + path);
+            ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > \"" + path + "\"");
         }
 
         public void OpenNotification(string udid)

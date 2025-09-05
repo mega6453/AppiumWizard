@@ -582,6 +582,23 @@ namespace Appium_Wizard
             ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 22");
         }
 
+        public void LongPress(string udid,  int x, int y)
+        {
+            float dpi = 0;
+            if (MainScreen.udidScreenDensity.ContainsKey(udid))
+            {
+                dpi = MainScreen.udidScreenDensity[udid];
+            }
+            else
+            {
+                dpi = GetScreenDensity(udid);
+                MainScreen.udidScreenDensity[udid] = dpi;
+            }
+            x = DpToPixels(x, dpi);
+            y = DpToPixels(y, dpi);
+            ExecuteCommandWithCmd("-s " + udid + " shell input touchscreen swipe "+x+" "+y+ " "+x+" "+y+" 1000");
+        }
+
         public List<string> GetListOfInstalledApps(string udid)
         {
             var output = ExecuteCommand("-s " + udid + " shell pm list packages -3 --user 0");

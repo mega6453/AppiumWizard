@@ -375,30 +375,54 @@ namespace Appium_Wizard
             try
             {
                 int swipeThreshold = 50; // Minimum distance in pixels to qualify as a swipe
+                int longPressThresholdMs = 800; // Duration in milliseconds to qualify as a long press
 
                 // Calculate deltas
                 int deltaX = moveToX - pressX;
                 int deltaY = moveToY - pressY;
 
+                // Calculate press duration
+                var pressDuration = (DateTime.Now - pressStartTime).TotalMilliseconds;
+
                 // Check if the movement qualifies as a swipe
                 if (Math.Abs(deltaX) < swipeThreshold && Math.Abs(deltaY) < swipeThreshold)
                 {
-                    // Handle tap
-                    if (isAndroid)
+                    if (pressDuration >= longPressThresholdMs)
                     {
-                        await Task.Run(() =>
+                        // Handle long press
+                        if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
-                        });
-                        GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().LongPress(udid, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("LongPress_Screen", "Android");
+                        }
+                        else
+                        {
+                             await Task.Run(() => iOSAPIMethods.LongPress(URL, sessionId, pressX, pressY));
+                            GoogleAnalytics.SendEvent("LongPress_Screen", "iOS");
+                        }
                     }
                     else
                     {
-                        await Task.Run(() =>
+                        // Handle tap
+                        if (isAndroid)
                         {
-                            iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
-                        });
-                        GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                        }
+                        else
+                        {
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                        }
                     }
                     return;
                 }

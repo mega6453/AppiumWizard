@@ -405,7 +405,10 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            // iOS long press call if available
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.LongPress(URL, sessionId, pressX, pressY);
+                            });
                             GoogleAnalytics.SendEvent("LongPress_Screen", "iOS");
                         }
                     }
@@ -448,7 +451,10 @@ namespace Appium_Wizard
                         }
                         else
                         {
-                            // Add iOS drag-drop method if available
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.DragDrop(URL, sessionId, pressX, pressY, moveToX, moveToY);
+                            });
                             GoogleAnalytics.SendEvent("DragDrop_Screen", "iOS");
                         }
                     }

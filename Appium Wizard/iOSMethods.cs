@@ -2586,5 +2586,20 @@ namespace Appium_Wizard
             }
             return keyValuePairs;
         }
+
+        public static string DragDrop(string URL, string sessionId, int pressX, int pressY, int moveToX, int moveToY)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/"+sessionId+"/wda/dragfromtoforduration", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            var body = $@"{{""fromX"":{pressX},""fromY"":{pressY},""toX"":{moveToX},""toY"":{moveToY},""duration"":2}}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            return response.Content;
+        }
     }
 }

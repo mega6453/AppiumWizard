@@ -1,4 +1,5 @@
 ﻿using NLog;
+using Windows.UI.Composition;
 namespace Appium_Wizard
 {
     public partial class LoadingScreen : Form
@@ -125,12 +126,12 @@ namespace Appium_Wizard
                 });
                 firstTimeRunLabel.Text = "";
             }
+            UpdateStepLabel("Scanning and Stopping any detached Appium Wizard processes...");
+            Common.KillExeRunningFromAppiumWizardFolder();
             UpdateStepLabel("Starting Appium Server...");
             Database.UpdateDataIntoFirstTimeRunTable("No");
             await ExecuteBackgroundMethod();
-            UpdateStepLabel("Scanning for detached Appium Wizard processes...");
-            Common.ScanForDetachedProcesses();
-            UpdateStepLabel("Loading Modules...");
+            UpdateStepLabel("Loading Modules...");            
             AndroidMethods.GetInstance().StopAdbServer();
             AndroidMethods.GetInstance().StartAdbServer();
             Common.DeleteLogFiles();

@@ -372,62 +372,114 @@ namespace Appium_Wizard
         {
             moveToX = e.Location.X;
             moveToY = e.Location.Y;
+
             try
             {
-                int swipeThreshold = 50; // Minimum distance in pixels to qualify as a swipe
+                int swipeThreshold = 50; // Minimum distance in pixels to qualify as a swipe or drag-drop
+                int longPressThresholdMs = 800; // Duration in ms to qualify as long press
+                int dragDropThresholdMs = 1000; // Duration in ms to qualify as drag-drop
 
                 // Calculate deltas
                 int deltaX = moveToX - pressX;
                 int deltaY = moveToY - pressY;
 
-                // Check if the movement qualifies as a swipe
-                if (Math.Abs(deltaX) < swipeThreshold && Math.Abs(deltaY) < swipeThreshold)
+                // Calculate press duration
+                var pressDuration = (DateTime.Now - pressStartTime).TotalMilliseconds;
+
+                // Calculate distance moved (Euclidean)
+                double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                if (distance < swipeThreshold)
                 {
-                    // Handle tap
-                    if (isAndroid)
+                    // Movement small enough for tap or long press
+                    if (pressDuration >= longPressThresholdMs)
                     {
-                        await Task.Run(() =>
+                        // Long press
+                        if (isAndroid)
                         {
-                            AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
-                        });
-                        GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().LongPress(udid, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("LongPress_Screen", "Android");
+                        }
+                        else
+                        {
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.LongPress(URL, sessionId, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("LongPress_Screen", "iOS");
+                        }
                     }
                     else
                     {
-                        await Task.Run(() =>
+                        // Tap
+                        if (isAndroid)
                         {
-                            iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
-                        });
-                        GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().Tap(udid, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("Tap_Screen", "Android");
+                        }
+                        else
+                        {
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Tap(URL, sessionId, pressX, pressY);
+                            });
+                            GoogleAnalytics.SendEvent("Tap_Screen", "iOS");
+                        }
                     }
                     return;
                 }
-
-                // Use actual mouse coordinates for swipe
-                int waitDuration = 300;
-
-                if (isAndroid)
-                {
-                    await Task.Run(() =>
-                    {
-                        AndroidMethods.GetInstance().SwipeForScreenControl(udid, pressX, pressY, moveToX, moveToY, waitDuration);
-                    });
-                }
                 else
                 {
-                    await Task.Run(() =>
-                    {
-                        iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
-                    });
-                }
+                    // Movement exceeds swipe threshold - decide swipe or drag-drop based on duration
 
-                if (isAndroid)
-                {
-                    GoogleAnalytics.SendEvent("SwipeScreen", "Android");
-                }
-                else
-                {
-                    GoogleAnalytics.SendEvent("SwipeScreen", "iOS");
+                    if (pressDuration >= dragDropThresholdMs)
+                    {
+                        // Treat as drag-drop
+                        if (isAndroid)
+                        {
+                            await Task.Run(() =>
+                            {
+                                AndroidAPIMethods.DragDrop(udid, sessionId, proxyPort, pressX, pressY, moveToX, moveToY, speed: 1000);
+                            });
+                            GoogleAnalytics.SendEvent("DragDrop_Screen", "Android");
+                        }
+                        else
+                        {
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.DragDrop(URL, sessionId, pressX, pressY, moveToX, moveToY);
+                            });
+                            GoogleAnalytics.SendEvent("DragDrop_Screen", "iOS");
+                        }
+                    }
+                    else
+                    {
+                        // Treat as swipe
+                        int waitDuration = 300;
+
+                        if (isAndroid)
+                        {
+                            await Task.Run(() =>
+                            {
+                                AndroidMethods.GetInstance().SwipeForScreenControl(udid, pressX, pressY, moveToX, moveToY, waitDuration);
+                            });
+                            GoogleAnalytics.SendEvent("SwipeScreen", "Android");
+                        }
+                        else
+                        {
+                            await Task.Run(() =>
+                            {
+                                iOSAPIMethods.Swipe(URL, sessionId, pressX, pressY, moveToX, moveToY, waitDuration);
+                            });
+                            GoogleAnalytics.SendEvent("SwipeScreen", "iOS");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -843,7 +895,6 @@ namespace Appium_Wizard
             string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
             string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
             string filePath = Path.Combine(downloadPath, $"Screenshot_{deviceName}_{timestamp}.png");
-            filePath = "\"" + filePath + "\"";
             if (OSType.Equals("Android"))
             {
                 try

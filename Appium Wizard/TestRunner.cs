@@ -891,7 +891,7 @@ namespace Appium_Wizard
                             string TakeScreenshotStatusDescription = "-";
                             if (isAndroid)
                             {
-                                TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, screenshotFilePath);
+                                 AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, screenshotFilePath);
                             }
                             else
                             {
@@ -938,7 +938,7 @@ namespace Appium_Wizard
                         string TakeScreenshotStatusDescription = "-";
                         if (isAndroid)
                         {
-                            TakeScreenshotStatusDescription = AndroidAPIMethods.TakeScreenshot(port, screenshotFilePath);
+                            AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, screenshotFilePath);
                         }
                         else
                         {

@@ -1974,6 +1974,25 @@ namespace Appium_Wizard
             return response.StatusDescription;
         }
 
+        public static string LongPress(string URL, string sessionId, int pressX, int pressY)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL);
+                var client = new RestClient(options);
+                var request = new RestRequest("/session/" + sessionId + "/wda/touchAndHold", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                var body = $@"{{ ""x"": {pressX}, ""y"": {pressY}, ""duration"":2.0}}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = client.Execute(request);
+                return response.StatusDescription;
+            }
+            catch (Exception)
+            {
+                return "Exception";
+            }
+        }
+
         public static string SendText(string URL, string sessionId, string text)
         {
             var options = new RestClientOptions(URL)
@@ -2566,6 +2585,21 @@ namespace Appium_Wizard
             {
             }
             return keyValuePairs;
+        }
+
+        public static string DragDrop(string URL, string sessionId, int pressX, int pressY, int moveToX, int moveToY)
+        {
+            var options = new RestClientOptions(URL)
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("/session/"+sessionId+"/wda/dragfromtoforduration", Method.Post);
+            request.AddHeader("Content-Type", "application/json");
+            var body = $@"{{""fromX"":{pressX},""fromY"":{pressY},""toX"":{moveToX},""toY"":{moveToY},""duration"":2}}";
+            request.AddStringBody(body, DataFormat.Json);
+            RestResponse response = client.Execute(request);
+            return response.Content;
         }
     }
 }

@@ -1496,8 +1496,7 @@ namespace Appium_Wizard
                     commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Owner = this;
                     commonProgress.Show();
-                    string filePath = saveFileDialog.FileName;
-                    filePath = "\"" + filePath + "\"";
+                    string filePath = saveFileDialog.FileName;                   
                     try
                     {
                         await Task.Run(() =>

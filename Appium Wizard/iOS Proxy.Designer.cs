@@ -267,7 +267,7 @@
             // pyRadioButton
             // 
             pyRadioButton.AutoSize = true;
-            pyRadioButton.Location = new Point(332, 22);
+            pyRadioButton.Location = new Point(332, 18);
             pyRadioButton.Name = "pyRadioButton";
             pyRadioButton.Size = new Size(76, 19);
             pyRadioButton.TabIndex = 18;
@@ -278,7 +278,7 @@
             // goRadioButton
             // 
             goRadioButton.AutoSize = true;
-            goRadioButton.Location = new Point(241, 22);
+            goRadioButton.Location = new Point(241, 18);
             goRadioButton.Name = "goRadioButton";
             goRadioButton.Size = new Size(76, 19);
             goRadioButton.TabIndex = 17;

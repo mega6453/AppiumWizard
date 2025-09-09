@@ -516,7 +516,7 @@ namespace Appium_Wizard
 
         public void TakeScreenshot(string udid, string path)
         {
-            ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > " + path);
+            ExecuteCommandWithCmd("-s " + udid + " exec-out screencap -p > \"" + path + "\"");
         }
 
         public void OpenNotification(string udid)
@@ -580,6 +580,23 @@ namespace Appium_Wizard
         public void RightArrow(string udid)
         {
             ExecuteCommandWithCmd("-s " + udid + " shell input keyevent 22");
+        }
+
+        public void LongPress(string udid,  int x, int y)
+        {
+            float dpi = 0;
+            if (MainScreen.udidScreenDensity.ContainsKey(udid))
+            {
+                dpi = MainScreen.udidScreenDensity[udid];
+            }
+            else
+            {
+                dpi = GetScreenDensity(udid);
+                MainScreen.udidScreenDensity[udid] = dpi;
+            }
+            x = DpToPixels(x, dpi);
+            y = DpToPixels(y, dpi);
+            ExecuteCommandWithCmd("-s " + udid + " shell input touchscreen swipe "+x+" "+y+ " "+x+" "+y+" 1000");
         }
 
         public List<string> GetListOfInstalledApps(string udid)
@@ -1301,16 +1318,26 @@ namespace Appium_Wizard
             }
         }
 
-        public async static void DragDrop(int port, int startX, int startY, int endX, int endY, int speed=1000)
+        public async static void DragDrop(string udid, string sessionId, int port, int startX, int startY, int endX, int endY, int speed=1000)
         {
             try
             {
-                string sessionId = GetSessionID(port);
-                if (sessionId.Equals("nosession"))
+
+                float dpi = 0;
+                if (MainScreen.udidScreenDensity.ContainsKey(udid))
                 {
-                    CreateSession(port);
-                    sessionId = GetSessionID(port);
+                    dpi = MainScreen.udidScreenDensity[udid];
                 }
+                else
+                {
+                    dpi = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    MainScreen.udidScreenDensity[udid] = dpi;
+                }
+                startX = AndroidMethods.DpToPixels(startX, dpi);
+                startY = AndroidMethods.DpToPixels(startY, dpi);
+                endX = AndroidMethods.DpToPixels(endX, dpi);
+                endY = AndroidMethods.DpToPixels(endY, dpi);
+
                 var options = new RestClientOptions("http://localhost:" + port)
                 {
                     Timeout = TimeSpan.FromSeconds(10)

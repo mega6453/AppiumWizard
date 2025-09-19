@@ -593,6 +593,7 @@ namespace Appium_Wizard
                             deviceDetails.Add(udid, keyValuePairs);
                         }
                     }
+                    Thread.Sleep(2000);
                 }
                 catch (Exception e)
                 {

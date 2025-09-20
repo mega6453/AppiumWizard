@@ -2377,5 +2377,39 @@ namespace Appium_Wizard
             KillExeRunningFromAppiumWizardFolder(FilesPath.nodePath, "node");
             KillExeRunningFromAppiumWizardFolder(FilesPath.pymd3FilePath, "iOSServerPy");
         }
+
+
+        public static string GetAppiumPeerDependencyVersionForInstalledUIAutomator(string version)
+        {
+            string packageName = "appium-uiautomator2-driver";
+            string url = $"https://registry.npmjs.org/{packageName}/{version}";
+
+            using HttpClient client = new HttpClient();
+
+            try
+            {
+                // Synchronously wait for the response
+                var response = client.GetAsync(url).Result;
+                response.EnsureSuccessStatusCode();
+
+                // Synchronously read the content
+                string json = response.Content.ReadAsStringAsync().Result;
+
+                using JsonDocument doc = JsonDocument.Parse(json);
+                JsonElement root = doc.RootElement;
+
+                if (root.TryGetProperty("peerDependencies", out JsonElement peerDeps) &&
+                    peerDeps.TryGetProperty("appium", out JsonElement appiumVersion))
+                {
+                    return new string(appiumVersion.GetString().SkipWhile(c => !char.IsDigit(c)).ToArray());
+                }
+            }
+            catch
+            {
+                // Handle exceptions or log if necessary
+            }
+
+            return null; // Return null if not found or error
+        }
     }
 }

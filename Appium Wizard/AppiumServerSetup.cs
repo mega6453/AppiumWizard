@@ -56,10 +56,10 @@ namespace Appium_Wizard
                 command = command + " --port " + appiumPort;
             }
             appiumLogLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
-            if (!command.Contains(" --log "))
-            {
-                command = command + " --log " + logFilePath;
-            }
+            //if (!command.Contains(" --log "))
+            //{
+            //    command = command + " --log " + logFilePath;
+            //}
             if (!command.Contains("--log-level"))
             {
                 if (appiumLogLevel.Equals("info"))
@@ -166,10 +166,20 @@ namespace Appium_Wizard
         private DateTime lastExecutionTime = DateTime.MinValue;
         public void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
+           
             try
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
+                    try
+                    {
+                        File.AppendAllText(logFilePath, e.Data + Environment.NewLine);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle exceptions if needed
+                        Console.Error.WriteLine($"Failed to write log: {ex.Message}");
+                    }
                     if (MainScreen.main != null)
                     {
                         MainScreen.main.StartLogsServer(serverNumber);

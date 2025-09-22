@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <None Remove="ExcludeInInstaller\appiumlogo.ico" />
+    <None Remove="Form1.cs~RFe7ba71e.TMP" />
     <None Remove="Resources\Data\appiumwizard.db" />
   </ItemGroup>
 

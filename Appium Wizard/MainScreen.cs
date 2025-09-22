@@ -2258,6 +2258,7 @@ namespace Appium_Wizard
             }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
+            serverNumberWebView[serverNumber].Reload();
         }
 
 
@@ -2293,6 +2294,7 @@ namespace Appium_Wizard
                     openLogsButton.Visible = false;
                 }
             }
+            serverNumberWebView[serverNumber].Reload();
         }
 
         public void UpdateTabText(int serverNumber, int portNumber, bool start)

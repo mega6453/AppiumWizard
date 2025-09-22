@@ -170,91 +170,98 @@ namespace Appium_Wizard
 
         private async Task StartServer(TextBox portTextbox, Label statusLabel, int serverNumber)
         {
-            int portNumber = int.Parse(portTextbox.Text);
-            if (!isValidPortNumber(portNumber))
+            try
             {
-                MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            serverSetup = new AppiumServerSetup();
-            CommonProgress commonProgress = new CommonProgress();
-            commonProgress.Owner = this;
-            commonProgress.Show();
-            bool result = false;
-            await Task.Run(() =>
-            {
-                commonProgress.UpdateStepLabel("Start Server", "Please wait while checking the availability of the port " + portNumber + "...", 10);
-                result = Common.IsPortBeingUsed(portNumber);
-            });
-            if (result)
-            {
-                statusLabel.Text = "Not Running";
-                var confirmationResult = MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\n\nDo you want to kill that process and start appium server in that port?\n\nIf No, then please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                if (confirmationResult == DialogResult.Yes)
+                int portNumber = int.Parse(portTextbox.Text);
+                if (!isValidPortNumber(portNumber))
                 {
-                    Common.KillProcessByPortNumber(portNumber);
-                }
-                else
-                {
-                    commonProgress.Close();
+                    MessageBox.Show("Please enter a valid port number. For starting an Appium server, you can use any port in the range 1 to 65535.\n\nCommonly used ports for Appium server is from 4723 to 4730.", "Invalid Port Number", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-            }
-            commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
-            await Task.Run(() =>
-            {
-                string command = Database.QueryDataFromServerFinalCommandTable()["Server" + serverNumber];
-                serverSetup.StartAppiumServer(portNumber, serverNumber, command);
-            });
-            int count = 1;
-            while (!serverSetup.serverStarted)
-            {
-                if (!string.IsNullOrEmpty(serverSetup.statusText))
+                serverSetup = new AppiumServerSetup();
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                bool result = false;
+                await Task.Run(() =>
                 {
-                    if (serverSetup.statusText.Equals("address already in use"))
+                    commonProgress.UpdateStepLabel("Start Server", "Please wait while checking the availability of the port " + portNumber + "...", 10);
+                    result = Common.IsPortBeingUsed(portNumber);
+                });
+                if (result)
+                {
+                    statusLabel.Text = "Not Running";
+                    var confirmationResult = MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(LoadingScreen.appiumPort).Item2 + ".\n\nDo you want to kill that process and start appium server in that port?\n\nIf No, then please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    if (confirmationResult == DialogResult.Yes)
                     {
-                        statusLabel.Text = "Not Running";
-                        MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
+                        Common.KillProcessByPortNumber(portNumber);
                     }
-                    else if (serverSetup.statusText.Equals("NodeJS not installed"))
+                    else
                     {
-                        statusLabel.Text = "Not Running";
-                        MessageBox.Show("NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
+                        commonProgress.Close();
+                        return;
                     }
-                    else if (count == 20)
+                }
+                commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10);
+                await Task.Run(() =>
+                {
+                    string command = Database.QueryDataFromServerFinalCommandTable()["Server" + serverNumber];
+                    serverSetup.StartAppiumServer(portNumber, serverNumber, command);
+                });
+                int count = 1;
+                while (!serverSetup.serverStarted)
+                {
+                    if (!string.IsNullOrEmpty(serverSetup.statusText))
+                    {
+                        if (serverSetup.statusText.Equals("address already in use"))
+                        {
+                            statusLabel.Text = "Not Running";
+                            MessageBox.Show("Port " + portNumber + " is being used by " + Common.RunNetstatAndFindProcessByPort(4723).Item2 + ".Please try to configure in different port.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        }
+                        else if (serverSetup.statusText.Equals("NodeJS not installed"))
+                        {
+                            statusLabel.Text = "Not Running";
+                            MessageBox.Show("NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        }
+                        else if (count == 20)
+                        {
+                            MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
+                            break;
+                        }
+                    }
+                    commonProgress.Invoke((System.Windows.Forms.MethodInvoker)(() =>
+                    {
+                        commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10 * count);
+                    }));
+                    count++;
+                    if (count == 20)
                     {
                         MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
                         break;
                     }
+                    await Task.Delay(3000);
                 }
-                commonProgress.Invoke((System.Windows.Forms.MethodInvoker)(() =>
+                if (serverSetup.serverStarted)
                 {
-                    commonProgress.UpdateStepLabel("Start Server", "Please wait while starting Appium server on port " + portNumber + ".This may take 30+ seconds...", 10 * count);
-                }));
-                count++;
-                if (count == 20)
-                {
-                    MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
-                    break;
+                    if (MainScreen.main != null)
+                    {
+                        MainScreen.main.UpdateTabText(serverNumber, portNumber, true);
+                        MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
+                    }
+                    statusLabel.Text = "Running";
+                    Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
+                    GoogleAnalytics.SendEvent("ServerStarted");
                 }
-                await Task.Delay(3000);
+                commonProgress.Close();
             }
-            if (serverSetup.serverStarted)
+            catch (Exception e)
             {
-                if (MainScreen.main != null)
-                {
-                    MainScreen.main.UpdateTabText(serverNumber, portNumber, true);
-                    MainScreen.main.UpdateOpenLogsButtonText(serverNumber,true);
-                }
-                statusLabel.Text = "Running";
-                Database.UpdateDataIntoPortNumberTable("PortNumber" + serverNumber, portNumber);
-                GoogleAnalytics.SendEvent("ServerStarted");
-            }
-            commonProgress.Close();
+                MessageBox.Show("Unhandled Exception - "+e.Message,"Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }            
         }
 
         private async Task StopServer(int serverNumber, TextBox portTextbox, Label statusLabel)

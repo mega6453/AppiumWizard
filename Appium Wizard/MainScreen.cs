@@ -1874,48 +1874,54 @@ namespace Appium_Wizard
                 commonProgress.Show();
                 commonProgress.UpdateStepLabel("Closing Appium Wizard", "Please wait while closing all resources and exiting...");
                 List<Form> childFormsToClose = new List<Form>();
-                // Stop the memory cleanup timer
-                memoryCleanupTimer?.Stop();
-                memoryCleanupTimer?.Dispose();
-
-                // Stop all log servers with cleanup
-                Common.StopAllServers(); // This will use your new enhanced method
-
-                // Dispose WebView2 controls properly
-                foreach (var kvp in serverNumberWebView)
+                try
                 {
-                    var webView = kvp.Value;
-                    if (webView?.CoreWebView2 != null)
+                    // Stop the memory cleanup timer
+                    memoryCleanupTimer?.Stop();
+                    memoryCleanupTimer?.Dispose();
+
+                    // Stop all log servers with cleanup
+                    Common.StopAllServers(); // This will use your new enhanced method
+
+                    // Dispose WebView2 controls properly
+                    foreach (var kvp in serverNumberWebView)
                     {
-                        try
+                        var webView = kvp.Value;
+                        if (webView?.CoreWebView2 != null)
                         {
-                            webView.CoreWebView2.Navigate("about:blank");
-                            await Task.Delay(100); // Give it time to navigate
+                            try
+                            {
+                                webView.CoreWebView2.Navigate("about:blank");
+                                await Task.Delay(100); // Give it time to navigate
+                            }
+                            catch { }
                         }
-                        catch { }
+                        webView?.Dispose();
                     }
-                    webView?.Dispose();
-                }
-                serverNumberWebView.Clear();
+                    serverNumberWebView.Clear();
 
-                // Clear server URL loaded tracking
-                serverUrlLoaded.Clear();
-                
-                foreach (var item in runningProcesses)
-                {
-                    Common.KillProcessById(item);
+                    // Clear server URL loaded tracking
+                    serverUrlLoaded.Clear();
+                    foreach (var item in runningProcesses)
+                    {
+                        Common.KillProcessById(item);
+                    }
+                    foreach (var item in runningProcessesPortNumbers)
+                    {
+                        Common.KillProcessByPortNumber(item);
+                    }
+                    foreach (var item in udidProxyPort)
+                    {
+                        Common.KillProcessByPortNumber(item.Value);
+                    }
+                    foreach (var item in udidScreenPort)
+                    {
+                        Common.KillProcessByPortNumber(item.Value);
+                    }
+                    Common.KillExeRunningFromAppiumWizardFolder();
                 }
-                foreach (var item in runningProcessesPortNumbers)
+                catch (Exception)
                 {
-                    Common.KillProcessByPortNumber(item);
-                }
-                foreach (var item in udidProxyPort)
-                {
-                    Common.KillProcessByPortNumber(item.Value);
-                }
-                foreach (var item in udidScreenPort)
-                {
-                    Common.KillProcessByPortNumber(item.Value);
                 }
                 foreach (Form form in Application.OpenForms)
                 {
@@ -2252,6 +2258,7 @@ namespace Appium_Wizard
             }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
+            serverNumberWebView[serverNumber].Reload();
         }
 
 
@@ -2287,6 +2294,7 @@ namespace Appium_Wizard
                     openLogsButton.Visible = false;
                 }
             }
+            serverNumberWebView[serverNumber].Reload();
         }
 
         public void UpdateTabText(int serverNumber, int portNumber, bool start)

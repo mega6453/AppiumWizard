@@ -64,7 +64,7 @@
             // 
             pictureBox1.Location = new Point(12, 3);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(275, 459);
+            pictureBox1.Size = new Size(275, 571);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -76,9 +76,9 @@
             // treeView1
             // 
             treeView1.HideSelection = false;
-            treeView1.Location = new Point(326, 35);
+            treeView1.Location = new Point(361, 35);
             treeView1.Name = "treeView1";
-            treeView1.Size = new Size(483, 426);
+            treeView1.Size = new Size(483, 470);
             treeView1.TabIndex = 1;
             treeView1.AfterSelect += TreeView_AfterSelect;
             treeView1.MouseUp += treeView1_MouseUp;
@@ -89,9 +89,9 @@
             listView1.FullRowSelect = true;
             listView1.GridLines = true;
             listView1.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            listView1.Location = new Point(815, 35);
+            listView1.Location = new Point(850, 35);
             listView1.Name = "listView1";
-            listView1.Size = new Size(354, 426);
+            listView1.Size = new Size(358, 470);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -109,7 +109,7 @@
             // 
             // filterTextbox
             // 
-            filterTextbox.Location = new Point(328, 484);
+            filterTextbox.Location = new Point(361, 524);
             filterTextbox.Name = "filterTextbox";
             filterTextbox.Size = new Size(642, 50);
             filterTextbox.TabIndex = 4;
@@ -119,7 +119,7 @@
             // refreshButton
             // 
             refreshButton.AutoSize = true;
-            refreshButton.Location = new Point(326, 7);
+            refreshButton.Location = new Point(361, 7);
             refreshButton.Name = "refreshButton";
             refreshButton.Size = new Size(97, 25);
             refreshButton.TabIndex = 5;
@@ -130,7 +130,7 @@
             // elementNumberTextbox
             // 
             elementNumberTextbox.BorderStyle = BorderStyle.None;
-            elementNumberTextbox.Location = new Point(976, 485);
+            elementNumberTextbox.Location = new Point(1009, 525);
             elementNumberTextbox.Name = "elementNumberTextbox";
             elementNumberTextbox.RightToLeft = RightToLeft.Yes;
             elementNumberTextbox.Size = new Size(26, 16);
@@ -140,7 +140,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1003, 484);
+            label1.Location = new Point(1036, 524);
             label1.Name = "label1";
             label1.Size = new Size(12, 15);
             label1.TabIndex = 7;
@@ -149,7 +149,7 @@
             // TotalElementCount
             // 
             TotalElementCount.AutoSize = true;
-            TotalElementCount.Location = new Point(1011, 484);
+            TotalElementCount.Location = new Point(1044, 524);
             TotalElementCount.Name = "TotalElementCount";
             TotalElementCount.Size = new Size(12, 15);
             TotalElementCount.TabIndex = 8;
@@ -158,7 +158,7 @@
             // previousButton
             // 
             previousButton.AutoSize = true;
-            previousButton.Location = new Point(1038, 480);
+            previousButton.Location = new Point(1071, 520);
             previousButton.Name = "previousButton";
             previousButton.Size = new Size(25, 25);
             previousButton.TabIndex = 9;
@@ -169,7 +169,7 @@
             // nextButton
             // 
             nextButton.AutoSize = true;
-            nextButton.Location = new Point(1064, 480);
+            nextButton.Location = new Point(1097, 520);
             nextButton.Name = "nextButton";
             nextButton.Size = new Size(25, 25);
             nextButton.TabIndex = 10;
@@ -221,7 +221,7 @@
             // 
             filterLabel.AutoSize = true;
             filterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            filterLabel.Location = new Point(326, 468);
+            filterLabel.Location = new Point(359, 508);
             filterLabel.Name = "filterLabel";
             filterLabel.Size = new Size(132, 15);
             filterLabel.TabIndex = 13;
@@ -250,14 +250,14 @@
             // coordLabel
             // 
             coordLabel.AutoSize = true;
-            coordLabel.Location = new Point(452, 9);
+            coordLabel.Location = new Point(487, 9);
             coordLabel.Name = "coordLabel";
             coordLabel.Size = new Size(0, 15);
             coordLabel.TabIndex = 14;
             // 
             // helpButton
             // 
-            helpButton.Location = new Point(1094, 5);
+            helpButton.Location = new Point(1133, 9);
             helpButton.Name = "helpButton";
             helpButton.Size = new Size(75, 23);
             helpButton.TabIndex = 15;
@@ -269,8 +269,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1181, 562);
+            ClientSize = new Size(1214, 592);
             Controls.Add(helpButton);
             Controls.Add(coordLabel);
             Controls.Add(filterLabel);
@@ -285,9 +287,10 @@
             Controls.Add(treeView1);
             Controls.Add(pictureBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Object_Spy";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Object Spy - BETA";
-            WindowState = FormWindowState.Maximized;
             Load += Object_Spy_Load;
             Shown += Object_Spy_Shown;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

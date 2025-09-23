@@ -91,8 +91,9 @@ namespace Appium_Wizard
             }
             updatedCommand = "/C " + command.Replace("webDriverAgentProxyPort", webDriverAgentProxyPort.ToString());
             Logger.Info("Appium server final updated command : "+updatedCommand);
-            string startingText = "\t\t------------------------------Starting Appium Server------------------------------\n\n";
+            string startingText = "\n\t\t------------------------------Starting Appium Server------------------------------\n\n";
             InitializeLogWriter(serverNumber,logFilePath);
+            WriteLog(serverNumber, "Running following command : "+updatedCommand.Replace("/C ",string.Empty));
             WriteLog(serverNumber, startingText);
             CloseLogWriter(serverNumber);
             if (!Common.IsNodeInstalled())
@@ -121,12 +122,12 @@ namespace Appium_Wizard
                 appiumServerProcess.StartInfo = startInfo;
                 appiumServerProcess.OutputDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
                 appiumServerProcess.ErrorDataReceived += (sender, e) => AppiumServer_OutputDataReceived(sender, e, serverNumber, webDriverAgentProxyPort);
-
+                appiumServerProcess.Exited += (sender, e) => AppiumServer_ProcessExited(sender, e, serverNumber);
                 appiumServerProcess.EnableRaisingEvents = true;
 
                 appiumServerProcess.Start();
                 appiumServerProcess.BeginOutputReadLine();
-
+                appiumServerProcess.BeginErrorReadLine();
                 if (listOfProcess.ContainsKey(appiumPort))
                 {
                     listOfProcess[appiumPort] = Tuple.Create(appiumServerProcess, logFilePath);
@@ -164,6 +165,7 @@ namespace Appium_Wizard
         ExecutionStatus executionStatus = new ExecutionStatus();
         string proxiedUDID = "";
         private DateTime lastExecutionTime = DateTime.MinValue;
+        
         public void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             try
@@ -180,6 +182,7 @@ namespace Appium_Wizard
                     {
                         if (data.Contains("No plugins have been installed.") || data.Contains("No plugins activated."))
                         {
+                            serverStarted = true;
                             InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
                             if (appiumLogLevel.Contains("error"))
                             {
@@ -195,6 +198,12 @@ namespace Appium_Wizard
                                 MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
                             }
                         }
+                    }
+                    if (!serverStarted && data.Contains("[ERROR]"))
+                    {
+                        InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
+                        WriteLog(serverNumber, data);
+                        CloseLogWriter(serverNumber);
                     }
                     if (data.Contains("Appium REST http interface listener started"))
                     {
@@ -422,6 +431,15 @@ namespace Appium_Wizard
             }
         }
 
+        public bool processExited;
+        private void AppiumServer_ProcessExited(object sender, EventArgs e, int serverNumber)
+        {
+            string exitedText = "\n\t\t<<<----------Failed to Start Appium Server, Please check if there's any issue in the server command---------->>>\n\n";
+            processExited = true;
+            InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
+            WriteLog(serverNumber, exitedText);
+            CloseLogWriter(serverNumber);
+        }
         private readonly Dictionary<int, StreamWriter> serverLogWriters = new Dictionary<int, StreamWriter>();
         private void InitializeLogWriter(int serverNumber, string filePath)
         {

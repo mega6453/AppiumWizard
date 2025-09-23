@@ -211,6 +211,11 @@ namespace Appium_Wizard
                 int count = 1;
                 while (!serverSetup.serverStarted)
                 {
+                    if (serverSetup.processExited)
+                    {
+                        MessageBox.Show("Process exited.\nPlease check the Final command in the Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
                     if (!string.IsNullOrEmpty(serverSetup.statusText))
                     {
                         if (serverSetup.statusText.Equals("address already in use"))

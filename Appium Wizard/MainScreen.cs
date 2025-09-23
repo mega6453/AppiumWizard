@@ -1496,7 +1496,7 @@ namespace Appium_Wizard
                     commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Owner = this;
                     commonProgress.Show();
-                    string filePath = saveFileDialog.FileName;                   
+                    string filePath = saveFileDialog.FileName;
                     try
                     {
                         await Task.Run(() =>
@@ -2505,8 +2505,8 @@ namespace Appium_Wizard
                         // Clear any accumulated DOM content
                         await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
                             "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
-    
-                    // Trigger garbage collection in WebView2
+
+                        // Trigger garbage collection in WebView2
                         await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
                     }
                 }
@@ -2520,6 +2520,29 @@ namespace Appium_Wizard
             {
                 Logger.Error("Memory cleanup failed: " + ex.Message);
             }
+        }
+
+        private void showCMDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string serverInstalledPath = FilesPath.serverInstalledPath;
+                string windowTitle = "Appium Wizard Server";
+                string cmdArguments = $"/K \"title {windowTitle} && set PATH={serverInstalledPath};%PATH% && cd /d \"{serverInstalledPath}\"\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    WorkingDirectory = serverInstalledPath
+                };
+                Process.Start(psi);
+            }
+            catch (Exception)
+            {
+            }        
         }
     }
 }

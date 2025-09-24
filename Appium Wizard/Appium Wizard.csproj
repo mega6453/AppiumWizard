@@ -15,6 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Resources\Logs\**" />
+    <EmbeddedResource Remove="Resources\Logs\**" />
+    <None Remove="Resources\Logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="ExcludeInInstaller\appiumlogo.ico" />
     <None Remove="Resources\Data\appiumwizard.db" />
   </ItemGroup>
@@ -70,12 +76,6 @@
     </None>
     <None Update="Resources\appiumwizardlogo.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Docs\Appium Wizard Troubleshooting Guide.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Docs\appium Wizard Splash Screen.jpg">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Executables\aapt.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -188,10 +188,6 @@
     <None Update="Resources\Server\Backup\node.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Logs\" />
   </ItemGroup>
 
 </Project>

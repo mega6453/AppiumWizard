@@ -40,7 +40,7 @@ namespace Appium_Wizard
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed NodeJS version information. This may take sometime...", 10);
                     InstalledNodeJSVersion = Common.GetNodeVersion();
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed Appium server version information. This may take sometime...", 20);
-                    InstalledAppiumServerVersion = Common.InstalledAppiumServerVersion();
+                    InstalledAppiumServerVersion = Common.InstalledAppiumServerVersionFromPackageJson();
                     commonProgress.UpdateStepLabel("Check for Server updates", "Please wait while getting installed driver version information. This may take sometime...", 30);
                     driverVersion = Common.InstalledDriverVersion();
                     if (driverVersion.ContainsKey("xcuitest"))

@@ -355,7 +355,7 @@ namespace Appium_Wizard
             showCMDToolStripMenuItem.Name = "showCMDToolStripMenuItem";
             showCMDToolStripMenuItem.Size = new Size(188, 30);
             showCMDToolStripMenuItem.Text = "Open CMD";
-            showCMDToolStripMenuItem.ToolTipText = "Opens CMD in Appium server installed path";
+            showCMDToolStripMenuItem.ToolTipText = "Opens CMD in Appium server installed path, so that you can run custom command.";
             showCMDToolStripMenuItem.Click += showCMDToolStripMenuItem_Click;
             // 
             // toolsToolStripMenuItem

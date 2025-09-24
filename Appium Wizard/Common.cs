@@ -657,6 +657,33 @@ namespace Appium_Wizard
             }
         }
 
+        public static string InstalledAppiumServerVersionFromPackageJson()
+        {
+            try
+            {
+                string appiumPath = Path.Combine(serverFolderPath, "node_modules", "appium");
+                string packageJsonPath = Path.Combine(appiumPath, "package.json");
+                if (!File.Exists(packageJsonPath))
+                    return "";
+
+                string jsonContent = File.ReadAllText(packageJsonPath);
+
+                using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+                {
+                    if (doc.RootElement.TryGetProperty("version", out JsonElement versionElement))
+                    {
+                        return versionElement.GetString() ?? "";
+                    }
+                }
+
+                return "";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
         public static string AvailableAppiumVersion()
         {
             try

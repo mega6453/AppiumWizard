@@ -213,7 +213,7 @@ namespace Appium_Wizard
                 {
                     if (serverSetup.processExited)
                     {
-                        MessageBox.Show("Process exited.\nPlease check the Final command in the Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Process exited.Try following:\n1.Please check the appium server logs for any errors and fix if command has any issue in the server settings.\n2.Use troubleshooter to fix any installation issues.\n3.Re-Install everything using Troubleshooter.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         break;
                     }
                     if (!string.IsNullOrEmpty(serverSetup.statusText))

@@ -24,7 +24,7 @@ namespace Appium_Wizard
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
             Logger.Info("Appium server initial command : " + command);
-            string versionString = Common.InstalledAppiumServerVersion().Replace("\n",string.Empty);
+            string versionString = Common.InstalledAppiumServerVersionFromPackageJson();
             if (Version.TryParse(versionString, out Version installedVersion))
             {
                 Version minimumVersion = new Version(2, 12, 3);
@@ -199,9 +199,10 @@ namespace Appium_Wizard
                             }
                         }
                     }
-                    if (!serverStarted && data.Contains("[ERROR]"))
+                    if (!serverStarted && (data.Contains("[ERROR]") || data.Contains("Fatal Error:") || data.Contains("Error: listen EADDRINUSE") || data.Contains("Could not find 'node' executable") || data.Contains("Error: adb not found") || data.Contains("Error: Instruments crashed") || data.Contains("Error: Unable to find a matching device") || data.Contains("Error: bootstrap failed")))
                     {
                         InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
+                        WriteLog(serverNumber, "\n\n");
                         WriteLog(serverNumber, data);
                         CloseLogWriter(serverNumber);
                     }
@@ -434,7 +435,7 @@ namespace Appium_Wizard
         public bool processExited;
         private void AppiumServer_ProcessExited(object sender, EventArgs e, int serverNumber)
         {
-            string exitedText = "\n\t\t<<<----------Failed to Start Appium Server, Please check if there's any issue in the server command---------->>>\n\n";
+            string exitedText = "\n\t\t<<<-------------------------Failed to Start Appium Server------------------------->>>\n\n";
             processExited = true;
             InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
             WriteLog(serverNumber, exitedText);

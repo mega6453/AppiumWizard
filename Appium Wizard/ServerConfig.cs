@@ -53,8 +53,7 @@ namespace Appium_Wizard
                 StartButton5.Enabled = false;
             }
 
-
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
@@ -67,14 +66,14 @@ namespace Appium_Wizard
                             {
                                 Invoke(new Action(() => StatusLabel1.Text = "Running"));
                                 GoogleAnalytics.SendEvent("ServerRunningInFirstPort");
-                                break;
                             }
                             catch (Exception)
                             {
                             }
+                            break;
                         }
                     }
-                    Task.Delay(2000);
+                    await Task.Delay(2000);
                 }
             });
         }
@@ -230,10 +229,10 @@ namespace Appium_Wizard
                             MessageBox.Show("NodeJS not installed. Go to Server -> Troubleshooter to fix the issue and start the appium server.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             break;
                         }
-                        else if (count == 20)
+                        else if (count == 30)
                         {
-                            MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
+                            MessageBox.Show("Timed out after 90 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            GoogleAnalytics.SendEvent("StartServer_90Sec_Timedout");
                             break;
                         }
                     }
@@ -244,8 +243,8 @@ namespace Appium_Wizard
                     count++;
                     if (count == 20)
                     {
-                        MessageBox.Show("Timed out after 60 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        GoogleAnalytics.SendEvent("StartServer_45Sec_Timedout");
+                        MessageBox.Show("Timed out after 90 seconds:\nPlease check the Final command in the Server Setup -> Settings and fix if command has any issue.", "Error on Starting Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        GoogleAnalytics.SendEvent("StartServer_90Sec_Timedout");
                         break;
                     }
                     await Task.Delay(3000);

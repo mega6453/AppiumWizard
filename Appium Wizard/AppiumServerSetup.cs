@@ -165,7 +165,8 @@ namespace Appium_Wizard
         ExecutionStatus executionStatus = new ExecutionStatus();
         string proxiedUDID = "";
         private DateTime lastExecutionTime = DateTime.MinValue;
-        
+        bool isWelcomeDisplayed;
+        string appiumWarning;
         public void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
             try
@@ -198,6 +199,23 @@ namespace Appium_Wizard
                                 MainScreen.main.UpdateOpenLogsButtonText(serverNumber, true);
                             }
                         }
+                    }
+                    if (data.Contains("[Appium] Welcome to Appium"))
+                    {
+                        isWelcomeDisplayed = true;
+                    }
+                    if (data.Contains("WARN Appium"))
+                    {
+                        appiumWarning = appiumWarning + "\n\n" +data;
+                    }
+                    if (isWelcomeDisplayed && !string.IsNullOrEmpty(appiumWarning))
+                    {
+                        InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
+                        WriteLog(serverNumber, "\n\n\t\t------------------------------Appium WARNING------------------------------");
+                        WriteLog(serverNumber, appiumWarning);
+                        WriteLog(serverNumber, "\n\n\t\t--------------------------------------------------------------------------\n\n");
+                        CloseLogWriter(serverNumber);
+                        isWelcomeDisplayed = false;
                     }
                     if (!serverStarted && (data.Contains("WARN Appium") || data.Contains("[ERROR]") || data.Contains("Fatal Error:") || data.Contains("Error: listen EADDRINUSE") || data.Contains("Could not find 'node' executable") || data.Contains("Error: adb not found") || data.Contains("Error: Instruments crashed") || data.Contains("Error: Unable to find a matching device") || data.Contains("Error: bootstrap failed")))
                     {

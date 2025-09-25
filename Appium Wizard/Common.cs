@@ -1666,11 +1666,7 @@ namespace Appium_Wizard
             {
                 return await Task.Run(() => listener.GetContext(), token);
             }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-            catch (ObjectDisposedException)
+            catch (Exception)
             {
                 return null;
             }
@@ -1983,148 +1979,168 @@ namespace Appium_Wizard
         public static string GenerateHtmlWithFilePath(string filePath, int appiumPort, int interval)
         {
             string htmlTemplate = @"
-                                 <!DOCTYPE html>
-                                <html lang=""en"">
-                                <head>
-                                    <meta charset=""UTF-8"">
-                                    <title>Appium Wizard Server Logs - {PORT}</title>
-                                    <style>
-                                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-                                        #container { position: relative; height: 100vh; overflow: hidden; }
-                                        #header {
-                                            position: relative;
-                                            display: flex;
-                                            justify-content: space-between;
-                                            align-items: center;
-                                            background: rgba(255, 255, 255, 0.8);
-                                            padding: 5px 10px;
-                                            border-radius: 4px;
-                                        }
-                                        #controls {
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 10px;
-                                        }
-                                        #content {
-                                            padding: 20px;
-                                            overflow-y: auto;
-                                            height: calc(100% - 50px);
-                                            white-space: pre-wrap;
-                                            background-color: #f4f4f4;
-                                        }
-                                        #title {
-                                            text-align: center;
-                                            font-size: 18px;
-                                            font-weight: bold;
-                                            background-color: #0078d7;
-                                            color: white;
-                                            flex-grow: 1;
-                                            margin-right: 10px;
-                                            padding: 5px 10px;
-                                            border-radius: 4px;
-                                        }
-                                        button {
-                                            cursor: pointer;
-                                            padding: 5px 10px;
-                                            border-radius: 3px;
-                                            border: 1px solid #0078d7;
-                                            background-color: white;
-                                            color: #0078d7;
-                                            font-weight: bold;
-                                        }
-                                        button:hover {
-                                            background-color: #0078d7;
-                                            color: white;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div id=""container"">
-                                        <div id=""header"">
-                                            <div id=""title"">Appium Wizard Server Logs</div>
-                                            <div id=""controls"">
-                                                <button id=""downloadBtn"" style=""position: relative;"">
-                                                  Download full logs
-                                                  <span 
-                                                    style=""margin-left: 6px; cursor: pointer; font-weight: bold; color: #555;"" 
-                                                    title=""Only the last 1000 lines are shown in the viewer. Click to download the complete log file."">
-                                                    &#9432;
-                                                  </span>
-                                                </button>
-                                                <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
-                                                <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
-                                            </div>
-                                        </div>
-                                        <pre id=""content"">Loading logs...</pre>
+                         <!DOCTYPE html>
+                        <html lang=""en"">
+                        <head>
+                            <meta charset=""UTF-8"">
+                            <title>Appium Wizard Server Logs - {PORT}</title>
+                            <style>
+                                body { 
+                                    font-family: Arial, sans-serif; 
+                                    margin: 0; 
+                                    padding: 0; 
+                                    height: 100vh;
+                                    overflow: hidden;
+                                }
+                                #container { 
+                                    display: flex;
+                                    flex-direction: column;
+                                    height: 100vh; 
+                                }
+                                #header {
+                                    flex-shrink: 0;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    background: rgba(255, 255, 255, 0.8);
+                                    padding: 5px 10px;
+                                    border-radius: 4px;
+                                    min-height: 40px;
+                                }
+                                #controls {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 10px;
+                                }
+                                #content {
+                                    flex: 1;
+                                    padding: 20px;
+                                    overflow-y: auto;
+                                    overflow-x: auto;
+                                    white-space: pre-wrap;
+                                    background-color: #f4f4f4;
+                                    word-wrap: break-word;
+                                    box-sizing: border-box;
+                                    font-family: Monaco, 'Lucida Console', monospace;
+                                    font-size: 12px;
+                                    line-height: 1.4;
+                                }
+                                #title {
+                                    text-align: center;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                    background-color: #0078d7;
+                                    color: white;
+                                    flex-grow: 1;
+                                    margin-right: 10px;
+                                    padding: 5px 10px;
+                                    border-radius: 4px;
+                                }
+                                button {
+                                    cursor: pointer;
+                                    padding: 5px 10px;
+                                    border-radius: 3px;
+                                    border: 1px solid #0078d7;
+                                    background-color: white;
+                                    color: #0078d7;
+                                    font-weight: bold;
+                                }
+                                button:hover {
+                                    background-color: #0078d7;
+                                    color: white;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div id=""container"">
+                                <div id=""header"">
+                                    <div id=""title"">Appium Wizard Server Logs</div>
+                                    <div id=""controls"">
+                                        <button id=""downloadBtn"" style=""position: relative;"">
+                                          Download full logs
+                                          <span 
+                                            style=""margin-left: 6px; cursor: pointer; font-weight: bold; color: #555;"" 
+                                            title=""Only the last 1000 lines are shown in the viewer. Click to download the complete log file."">
+                                            &#9432;
+                                          </span>
+                                        </button>
+                                        <label><input type=""checkbox"" id=""pauseFetch""> Pause Logs</label>
+                                        <label><input type=""checkbox"" id=""autoScroll"" checked> Auto-scroll</label>
                                     </div>
-                                    <script>
-                                        const contentElement = document.getElementById('content');
-                                        const autoScrollCheckbox = document.getElementById('autoScroll');
-                                        const pauseFetchCheckbox = document.getElementById('pauseFetch');
-                                        const downloadBtn = document.getElementById('downloadBtn');
+                                </div>
+                                <pre id=""content"">Loading logs...</pre>
+                            </div>
+                            <script>
+                                const contentElement = document.getElementById('content');
+                                const autoScrollCheckbox = document.getElementById('autoScroll');
+                                const pauseFetchCheckbox = document.getElementById('pauseFetch');
+                                const downloadBtn = document.getElementById('downloadBtn');
 
-                                        function fetchTextFile() {
-                                            if (pauseFetchCheckbox.checked) {
+                                function fetchTextFile() {
+                                    if (pauseFetchCheckbox.checked) {
+                                        return;
+                                    }
+                                    fetch('/file')
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error(`HTTP error! status: ${response.status}`);
+                                            }
+                                            return response.text();
+                                        })
+                                        .then(text => {
+                                            contentElement.textContent = text;
+                                            if (autoScrollCheckbox.checked) {
+                                                // Use requestAnimationFrame to ensure DOM is updated before scrolling
+                                                requestAnimationFrame(() => {
+                                                    contentElement.scrollTop = contentElement.scrollHeight;
+                                                });
+                                            }
+                                        })
+                                        .catch(error => {
+                                            contentElement.textContent = 'Error loading file: ' + error;
+                                        });
+                                }
+
+                                async function downloadFullLogs() {
+                                        try {
+                                            const response = await fetch('/file?full=true');
+                                            if (!response.ok) {
+                                                alert('Error downloading logs: ' + response.statusText);
                                                 return;
                                             }
-                                            fetch('/file')
-                                                .then(response => {
-                                                    if (!response.ok) {
-                                                        throw new Error(`HTTP error! status: ${response.status}`);
-                                                    }
-                                                    return response.text();
-                                                })
-                                                .then(text => {
-                                                    contentElement.textContent = text;
-                                                    if (autoScrollCheckbox.checked) {
-                                                        contentElement.scrollTop = contentElement.scrollHeight;
-                                                    }
-                                                })
-                                                .catch(error => {
-                                                    contentElement.textContent = 'Error loading file: ' + error;
-                                                });
-                                        }
+                                            const blob = await response.blob();
 
-                                        async function downloadFullLogs() {
-                                                try {
-                                                    const response = await fetch('/file?full=true');
-                                                    if (!response.ok) {
-                                                        alert('Error downloading logs: ' + response.statusText);
-                                                        return;
-                                                    }
-                                                    const blob = await response.blob();
-
-                                                    // Get filename from Content-Disposition header
-                                                    const contentDisposition = response.headers.get('Content-Disposition');
-                                                    let fileName = 'logs.txt'; // fallback filename
-                                                    if (contentDisposition) {
-                                                        const fileNameMatch = contentDisposition.match(/filename=""(.+)""/);
-                                                        if (fileNameMatch.length === 2) {
-                                                            fileName = fileNameMatch[1];
-                                                        }
-                                                    }
-
-                                                    const url = window.URL.createObjectURL(blob);
-                                                    const a = document.createElement('a');
-                                                    a.href = url;
-                                                    a.download = fileName;  // use filename from server
-                                                    document.body.appendChild(a);
-                                                    a.click();
-                                                    a.remove();
-                                                    window.URL.revokeObjectURL(url);
-                                                } catch (err) {
-                                                    alert('Failed to download logs: ' + err);
+                                            // Get filename from Content-Disposition header
+                                            const contentDisposition = response.headers.get('Content-Disposition');
+                                            let fileName = 'logs.txt'; // fallback filename
+                                            if (contentDisposition) {
+                                                const fileNameMatch = contentDisposition.match(/filename=""(.+)""/);
+                                                if (fileNameMatch.length === 2) {
+                                                    fileName = fileNameMatch[1];
                                                 }
                                             }
 
-                                        downloadBtn.addEventListener('click', downloadFullLogs);
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = fileName;  // use filename from server
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            a.remove();
+                                            window.URL.revokeObjectURL(url);
+                                        } catch (err) {
+                                            alert('Failed to download logs: ' + err);
+                                        }
+                                    }
 
-                                        // Initial fetch and interval
-                                        fetchTextFile();
-                                        setInterval(fetchTextFile, {INTERVAL});
-                                    </script>
-                                </body>
-                                </html>";
+                                downloadBtn.addEventListener('click', downloadFullLogs);
+
+                                // Initial fetch and interval
+                                fetchTextFile();
+                                setInterval(fetchTextFile, {INTERVAL});
+                            </script>
+                        </body>
+                        </html>";
 
             // Replace placeholders
             htmlTemplate = htmlTemplate.Replace("Appium Wizard Server Logs", $"Appium Wizard Server Logs - {appiumPort}");

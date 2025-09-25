@@ -2450,18 +2450,25 @@ namespace Appium_Wizard
             }
         }
 
-        private void restartADBServerToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void restartADBServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var result = MessageBox.Show("Restarting the ADB server may help fix issues related to Android execution. However, any tests currently running on the Android device may be interrupted.\n\nAre you sure you want to restart the ADB server ? ", "Restart ADB Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Show();
+                commonProgress.Owner = this;
+                commonProgress.UpdateStepLabel("Restart ADB Server", "Restarting ADB Server. Please wait...",50);
                 var isStopped = AndroidMethods.GetInstance().StopAdbServer();
                 if (!isStopped)
                 {
+                    commonProgress.Close();
                     MessageBox.Show("Failed to stop ADB Server", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                commonProgress.UpdateStepLabel("Restart ADB Server", "Restarting ADB Server. Please wait...", 75);
                 var isRunning = AndroidMethods.GetInstance().StartAdbServer();
+                commonProgress.Close();
                 if (isRunning)
                 {
                     MessageBox.Show("ADB Server restarted successfully.", "Restart ADB Server", MessageBoxButtons.OK, MessageBoxIcon.Information);

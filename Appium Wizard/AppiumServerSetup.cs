@@ -199,11 +199,10 @@ namespace Appium_Wizard
                             }
                         }
                     }
-                    if (!serverStarted && (data.Contains("[ERROR]") || data.Contains("Fatal Error:") || data.Contains("Error: listen EADDRINUSE") || data.Contains("Could not find 'node' executable") || data.Contains("Error: adb not found") || data.Contains("Error: Instruments crashed") || data.Contains("Error: Unable to find a matching device") || data.Contains("Error: bootstrap failed")))
+                    if (!serverStarted && (data.Contains("WARN Appium") || data.Contains("[ERROR]") || data.Contains("Fatal Error:") || data.Contains("Error: listen EADDRINUSE") || data.Contains("Could not find 'node' executable") || data.Contains("Error: adb not found") || data.Contains("Error: Instruments crashed") || data.Contains("Error: Unable to find a matching device") || data.Contains("Error: bootstrap failed")))
                     {
                         InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);
-                        WriteLog(serverNumber, "\n\n");
-                        WriteLog(serverNumber, data);
+                        WriteLog(serverNumber, "\n"+data);
                         CloseLogWriter(serverNumber);
                     }
                     if (data.Contains("Appium REST http interface listener started"))

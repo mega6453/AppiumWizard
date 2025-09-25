@@ -1666,11 +1666,7 @@ namespace Appium_Wizard
             {
                 return await Task.Run(() => listener.GetContext(), token);
             }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-            catch (ObjectDisposedException)
+            catch (Exception)
             {
                 return null;
             }

@@ -1,3 +1,8 @@
+## Appium Server not starting?
+* Go to Server->Troubleshooter and fix if there's any issue shown.
+* If you have installed appium manually other than appium wizard, there's a chance that it may conflict with the custom installed server/drivers. In that case, try Re-Installing everything using Troubleshooter(Enable Show progress window, to see what's the actual issue while installing).
+* Go to Server -> Configuration -> Settings and see if the Final command is valid as per the installed server version.
+
 ## Android Device not detecting?
 Enable Developer options in your Android phone. Follow https://developer.android.com/studio/debug/dev-options
 

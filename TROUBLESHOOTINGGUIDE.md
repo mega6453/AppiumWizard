@@ -4,7 +4,8 @@
 * Go to Server -> Configuration -> Settings and see if the Final command is valid as per the installed server version.
 
 ## Android Device not detecting?
-Enable Developer options in your Android phone. Follow https://developer.android.com/studio/debug/dev-options
+* Enable Developer options in your Android phone. Follow https://developer.android.com/studio/debug/dev-options
+* Authorize the device when connecting to the PC.
 
 ## Issues while running android execution?
 * Go to the phone's Developer Options. Disable all permission and security related settings, and grant permissions such as "Install apps over USB," etc. It is not possible to cover all options since they differ based on device brands.

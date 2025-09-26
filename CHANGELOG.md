@@ -1,3 +1,16 @@
+# v8.3.0:
+1. Long press, Drag and Drop added on screen control
+2. Appium server logs improvement in the main screen
+3. Open cmd (option added under Server) in server path to run custom command 
+
+# v8.2.0:
+1. Appium 3.0 Support
+2. Appium server logs improvement in the main screen
+3. Android click, swipe delay reduced on screen control
+4. Update NodeJS from Updater
+5. Copy android app activity name from installed apps list
+6. Other improvements
+
 # v8.1.0:
 1. Restart ADB Server option added under Server
 2. Backspace, Delete handled in screen control

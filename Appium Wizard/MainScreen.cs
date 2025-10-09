@@ -2458,7 +2458,7 @@ namespace Appium_Wizard
                 CommonProgress commonProgress = new CommonProgress();
                 commonProgress.Show();
                 commonProgress.Owner = this;
-                commonProgress.UpdateStepLabel("Restart ADB Server", "Restarting ADB Server. Please wait...",50);
+                commonProgress.UpdateStepLabel("Restart ADB Server", "Restarting ADB Server. Please wait...", 50);
                 var isStopped = AndroidMethods.GetInstance().StopAdbServer();
                 if (!isStopped)
                 {
@@ -2549,7 +2549,18 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-            }        
+            }
+        }
+
+        private void showDeviceInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string deviceName = "Device Name - " + selectedDeviceName;
+            string deviceOS = "Device OS - " + selectedOS;
+            string deviceOSVersion = "OS Version - " + selectedDeviceVersion;
+            string deviceModel = "Model - " + selectedDeviceModel;
+            string udid = "UDID - " + selectedUDID;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
+            MessageBox.Show(deviceDetails, "Device Info - " + selectedDeviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

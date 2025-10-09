@@ -108,6 +108,7 @@ namespace Appium_Wizard
             contextMenuStrip2 = new ContextMenuStrip(components);
             copyUDIDToolStripMenuItem = new ToolStripMenuItem();
             copyDeviceDetailsToolStripMenuItem = new ToolStripMenuItem();
+            showDeviceInfoToolStripMenuItem = new ToolStripMenuItem();
             usePreInstalledWDAToolStripMenuItem = new ToolStripMenuItem();
             panel1 = new Panel();
             capabilityCopyButton = new Button();
@@ -313,7 +314,7 @@ namespace Appium_Wizard
             // 
             serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
-            serverSetupToolStripMenuItem.Size = new Size(188, 30);
+            serverSetupToolStripMenuItem.Size = new Size(171, 22);
             serverSetupToolStripMenuItem.Text = "Configuration";
             serverSetupToolStripMenuItem.Click += serverSetupToolStripMenuItem_Click;
             // 
@@ -321,7 +322,7 @@ namespace Appium_Wizard
             // 
             fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
-            fixInstallationToolStripMenuItem.Size = new Size(188, 30);
+            fixInstallationToolStripMenuItem.Size = new Size(171, 22);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
             fixInstallationToolStripMenuItem.Click += fixInstallationToolStripMenuItem_Click;
             // 
@@ -329,7 +330,7 @@ namespace Appium_Wizard
             // 
             updaterToolStripMenuItem.Image = Properties.Resources.update;
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
-            updaterToolStripMenuItem.Size = new Size(188, 30);
+            updaterToolStripMenuItem.Size = new Size(171, 22);
             updaterToolStripMenuItem.Text = "Updater";
             updaterToolStripMenuItem.Click += updaterToolStripMenuItem_Click;
             // 
@@ -337,7 +338,7 @@ namespace Appium_Wizard
             // 
             pluginsToolStripMenuItem1.Image = Properties.Resources.plug_in;
             pluginsToolStripMenuItem1.Name = "pluginsToolStripMenuItem1";
-            pluginsToolStripMenuItem1.Size = new Size(188, 30);
+            pluginsToolStripMenuItem1.Size = new Size(171, 22);
             pluginsToolStripMenuItem1.Text = "Plugins Manager";
             pluginsToolStripMenuItem1.Click += pluginsToolStripMenuItem1_Click;
             // 
@@ -345,7 +346,7 @@ namespace Appium_Wizard
             // 
             restartADBServerToolStripMenuItem.Image = Properties.Resources.adb;
             restartADBServerToolStripMenuItem.Name = "restartADBServerToolStripMenuItem";
-            restartADBServerToolStripMenuItem.Size = new Size(188, 30);
+            restartADBServerToolStripMenuItem.Size = new Size(171, 22);
             restartADBServerToolStripMenuItem.Text = "Restart ADB Server";
             restartADBServerToolStripMenuItem.Click += restartADBServerToolStripMenuItem_Click;
             // 
@@ -353,7 +354,7 @@ namespace Appium_Wizard
             // 
             showCMDToolStripMenuItem.Image = Properties.Resources.terminal;
             showCMDToolStripMenuItem.Name = "showCMDToolStripMenuItem";
-            showCMDToolStripMenuItem.Size = new Size(188, 30);
+            showCMDToolStripMenuItem.Size = new Size(171, 22);
             showCMDToolStripMenuItem.Text = "Open CMD";
             showCMDToolStripMenuItem.ToolTipText = "Opens CMD in Appium server installed path, so that you can run custom command.";
             showCMDToolStripMenuItem.Click += showCMDToolStripMenuItem_Click;
@@ -408,7 +409,7 @@ namespace Appium_Wizard
             // 
             iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
             iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
-            iOSProxyToolStripMenuItem.Size = new Size(188, 30);
+            iOSProxyToolStripMenuItem.Size = new Size(152, 22);
             iOSProxyToolStripMenuItem.Text = "iOS Proxy";
             iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
             // 
@@ -416,7 +417,7 @@ namespace Appium_Wizard
             // 
             iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(188, 30);
+            iOSExecutorToolStripMenuItem.Size = new Size(152, 22);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
@@ -424,7 +425,7 @@ namespace Appium_Wizard
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(188, 30);
+            notificationsToolStripMenuItem.Size = new Size(152, 22);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
@@ -433,7 +434,7 @@ namespace Appium_Wizard
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(188, 30);
+            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 
@@ -789,9 +790,9 @@ namespace Appium_Wizard
             // contextMenuStrip2
             // 
             contextMenuStrip2.ImageScalingSize = new Size(24, 24);
-            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { copyUDIDToolStripMenuItem, copyDeviceDetailsToolStripMenuItem, usePreInstalledWDAToolStripMenuItem });
+            contextMenuStrip2.Items.AddRange(new ToolStripItem[] { copyUDIDToolStripMenuItem, copyDeviceDetailsToolStripMenuItem, showDeviceInfoToolStripMenuItem, usePreInstalledWDAToolStripMenuItem });
             contextMenuStrip2.Name = "contextMenuStrip2";
-            contextMenuStrip2.Size = new Size(201, 94);
+            contextMenuStrip2.Size = new Size(201, 124);
             contextMenuStrip2.Opening += contextMenuStrip2_Opening;
             // 
             // copyUDIDToolStripMenuItem
@@ -809,6 +810,14 @@ namespace Appium_Wizard
             copyDeviceDetailsToolStripMenuItem.Size = new Size(200, 30);
             copyDeviceDetailsToolStripMenuItem.Text = "Copy Device Details";
             copyDeviceDetailsToolStripMenuItem.Click += copyDeviceDetailsToolStripMenuItem_Click;
+            // 
+            // showDeviceInfoToolStripMenuItem
+            // 
+            showDeviceInfoToolStripMenuItem.Image = Properties.Resources.Discussion;
+            showDeviceInfoToolStripMenuItem.Name = "showDeviceInfoToolStripMenuItem";
+            showDeviceInfoToolStripMenuItem.Size = new Size(200, 30);
+            showDeviceInfoToolStripMenuItem.Text = "Show Device Info";
+            showDeviceInfoToolStripMenuItem.Click += showDeviceInfoToolStripMenuItem_Click;
             // 
             // usePreInstalledWDAToolStripMenuItem
             // 
@@ -1169,5 +1178,6 @@ namespace Appium_Wizard
         private ToolStripMenuItem showCMDToolStripMenuItem;
         private ToolStripMenuItem iOSProxyToolStripMenuItem;
         private ToolStripMenuItem iOSExecutorToolStripMenuItem;
+        private ToolStripMenuItem showDeviceInfoToolStripMenuItem;
     }
 }

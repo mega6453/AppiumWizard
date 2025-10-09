@@ -5,6 +5,7 @@
         public string udid;
         List<Dictionary<string, string>> devicesList;
         public static string selectediOSProxyMethod = "iproxy";
+        bool formShown;
         public iOS_Proxy()
         {
             InitializeComponent();
@@ -181,7 +182,7 @@
             {
                 iOSAsyncMethods.GetInstance().StartiProxyServer(udid, localPort, 8100);
             }
-            GoogleAnalytics.SendEvent("StartProxyServer_"+method);
+            GoogleAnalytics.SendEvent("StartProxyServer_" + method);
             await Task.Delay(3000);
         }
 
@@ -208,6 +209,44 @@
                 selectediOSProxyMethod = "iproxy";
             }
             Close();
+        }
+
+        private void goRadioButtonAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formShown && goRadioButtonAuto.Checked)
+            {
+                MessageBox.Show("Method 1 is recommended always(fast execution). Do NOT change unless if you see any issue with Method 1.", "iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void pyRadioButtonAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formShown && pyRadioButtonAuto.Checked)
+            {
+                MessageBox.Show("Method 1 is recommended always(fast execution). Do NOT change unless if you see any issue with Method 1.", "iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void goRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formShown && goRadioButton.Checked)
+            {
+                MessageBox.Show("Method 1 is recommended always(fast execution). Do NOT change unless if you see any issue with Method 1.", "iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void pyRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formShown && pyRadioButton.Checked)
+            {
+                MessageBox.Show("Method 1 is recommended always(fast execution). Do NOT change unless if you see any issue with Method 1.", "iOS Proxy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void iOS_Proxy_Shown(object sender, EventArgs e)
+        {
+            formShown = true;
+            GoogleAnalytics.SendEvent("iOS_Proxy_Shown");
         }
     }
 }

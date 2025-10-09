@@ -132,6 +132,7 @@
             goRadioButtonAuto.TabStop = true;
             goRadioButtonAuto.Text = "Method 2";
             goRadioButtonAuto.UseVisualStyleBackColor = true;
+            goRadioButtonAuto.CheckedChanged += goRadioButtonAuto_CheckedChanged;
             // 
             // pyRadioButtonAuto
             // 
@@ -143,6 +144,7 @@
             pyRadioButtonAuto.TabStop = true;
             pyRadioButtonAuto.Text = "Method 3";
             pyRadioButtonAuto.UseVisualStyleBackColor = true;
+            pyRadioButtonAuto.CheckedChanged += pyRadioButtonAuto_CheckedChanged;
             // 
             // iProxyRadioButtonAuto
             // 
@@ -274,6 +276,7 @@
             pyRadioButton.TabStop = true;
             pyRadioButton.Text = "Method 3";
             pyRadioButton.UseVisualStyleBackColor = true;
+            pyRadioButton.CheckedChanged += pyRadioButton_CheckedChanged;
             // 
             // goRadioButton
             // 
@@ -285,6 +288,7 @@
             goRadioButton.TabStop = true;
             goRadioButton.Text = "Method 2";
             goRadioButton.UseVisualStyleBackColor = true;
+            goRadioButton.CheckedChanged += goRadioButton_CheckedChanged;
             // 
             // iOS_Proxy
             // 
@@ -303,6 +307,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "iOS Proxy";
             Load += iOS_Proxy_Load;
+            Shown += iOS_Proxy_Shown;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);

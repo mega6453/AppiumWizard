@@ -60,11 +60,11 @@ namespace Appium_Wizard
             toolsToolStripMenuItem = new ToolStripMenuItem();
             inspectorToolStripMenuItem1 = new ToolStripMenuItem();
             iOSProfileManagementToolStripMenuItem = new ToolStripMenuItem();
-            iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
-            iOSProxyToolStripMenuItem = new ToolStripMenuItem();
             signIPAToolStripMenuItem = new ToolStripMenuItem();
             testRunnerToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
+            iOSProxyToolStripMenuItem = new ToolStripMenuItem();
+            iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
             notificationsToolStripMenuItem = new ToolStripMenuItem();
             alwaysOnTopToolStripMenuItem = new ToolStripMenuItem();
             yesToolStripMenuItem = new ToolStripMenuItem();
@@ -360,7 +360,7 @@ namespace Appium_Wizard
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, iOSExecutorToolStripMenuItem, iOSProxyToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(46, 20);
             toolsToolStripMenuItem.Text = "Tools";
@@ -381,22 +381,6 @@ namespace Appium_Wizard
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
-            // iOSExecutorToolStripMenuItem
-            // 
-            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
-            iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(203, 22);
-            iOSExecutorToolStripMenuItem.Text = "iOS Executor";
-            iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
-            // 
-            // iOSProxyToolStripMenuItem
-            // 
-            iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
-            iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
-            iOSProxyToolStripMenuItem.Size = new Size(203, 22);
-            iOSProxyToolStripMenuItem.Text = "iOS Proxy";
-            iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
-            // 
             // signIPAToolStripMenuItem
             // 
             signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
@@ -415,16 +399,32 @@ namespace Appium_Wizard
             // 
             // settingsToolStripMenuItem
             // 
-            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { notificationsToolStripMenuItem, alwaysOnTopToolStripMenuItem });
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSProxyToolStripMenuItem, iOSExecutorToolStripMenuItem, notificationsToolStripMenuItem, alwaysOnTopToolStripMenuItem });
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(61, 20);
             settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // iOSProxyToolStripMenuItem
+            // 
+            iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
+            iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
+            iOSProxyToolStripMenuItem.Size = new Size(188, 30);
+            iOSProxyToolStripMenuItem.Text = "iOS Proxy";
+            iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
+            // 
+            // iOSExecutorToolStripMenuItem
+            // 
+            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
+            iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
+            iOSExecutorToolStripMenuItem.Size = new Size(188, 30);
+            iOSExecutorToolStripMenuItem.Text = "iOS Executor";
+            iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
             // notificationsToolStripMenuItem
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(152, 22);
+            notificationsToolStripMenuItem.Size = new Size(188, 30);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
@@ -433,7 +433,7 @@ namespace Appium_Wizard
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
+            alwaysOnTopToolStripMenuItem.Size = new Size(188, 30);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 
@@ -1139,10 +1139,8 @@ namespace Appium_Wizard
         private ToolStripMenuItem sessionSettingsToolStripMenuItem;
         private ToolStripMenuItem xCUITestSettingsToolStripMenuItem;
         private ToolStripMenuItem uIAutomator2SettingsToolStripMenuItem;
-        private ToolStripMenuItem iOSExecutorToolStripMenuItem;
         private ToolStripMenuItem otherDocsToolStripMenuItem;
         private ToolStripMenuItem iOSNativeAppsBundleToolStripMenuItem;
-        private ToolStripMenuItem iOSProxyToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem notificationsToolStripMenuItem;
         private ToolStripMenuItem alwaysOnTopToolStripMenuItem;
@@ -1169,5 +1167,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem restartADBServerToolStripMenuItem;
         private ToolStripMenuItem unlockDeviceToolStripMenuItem;
         private ToolStripMenuItem showCMDToolStripMenuItem;
+        private ToolStripMenuItem iOSProxyToolStripMenuItem;
+        private ToolStripMenuItem iOSExecutorToolStripMenuItem;
     }
 }

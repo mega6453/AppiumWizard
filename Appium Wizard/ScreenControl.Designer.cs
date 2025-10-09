@@ -51,6 +51,7 @@
             copyModelNumberToolStripMenuItem = new ToolStripMenuItem();
             copyOSVersionToolStripMenuItem = new ToolStripMenuItem();
             copyAllInfoToolStripMenuItem = new ToolStripMenuItem();
+            showDeviceInfoToolStripMenuItem = new ToolStripMenuItem();
             infoToolStripMenuItem = new ToolStripMenuItem();
             copyProxyPortToolStripMenuItem1 = new ToolStripMenuItem();
             copyScreenPortToolStripMenuItem1 = new ToolStripMenuItem();
@@ -224,7 +225,7 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(149, 22);
+            UnlockScreen.Size = new Size(188, 30);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -232,86 +233,103 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(149, 22);
+            manageAppsToolStripMenuItem.Size = new Size(188, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
             // 
             // deviceInfoToolStripMenuItem
             // 
-            deviceInfoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copySerialNumberToolStripMenuItem, copyUDIDToolStripMenuItem, copyModelNumberToolStripMenuItem, copyOSVersionToolStripMenuItem, copyAllInfoToolStripMenuItem });
+            deviceInfoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copySerialNumberToolStripMenuItem, copyUDIDToolStripMenuItem, copyModelNumberToolStripMenuItem, copyOSVersionToolStripMenuItem, copyAllInfoToolStripMenuItem, showDeviceInfoToolStripMenuItem });
             deviceInfoToolStripMenuItem.Image = Properties.Resources.information;
             deviceInfoToolStripMenuItem.Name = "deviceInfoToolStripMenuItem";
-            deviceInfoToolStripMenuItem.Size = new Size(149, 22);
+            deviceInfoToolStripMenuItem.Size = new Size(188, 30);
             deviceInfoToolStripMenuItem.Text = "Device Info";
             // 
             // copySerialNumberToolStripMenuItem
             // 
+            copySerialNumberToolStripMenuItem.Image = Properties.Resources.files;
             copySerialNumberToolStripMenuItem.Name = "copySerialNumberToolStripMenuItem";
-            copySerialNumberToolStripMenuItem.Size = new Size(186, 22);
+            copySerialNumberToolStripMenuItem.Size = new Size(194, 30);
             copySerialNumberToolStripMenuItem.Text = "Copy Serial Number";
             copySerialNumberToolStripMenuItem.Click += copySerialNumberToolStripMenuItem_Click;
             // 
             // copyUDIDToolStripMenuItem
             // 
+            copyUDIDToolStripMenuItem.Image = Properties.Resources.files;
             copyUDIDToolStripMenuItem.Name = "copyUDIDToolStripMenuItem";
-            copyUDIDToolStripMenuItem.Size = new Size(186, 22);
+            copyUDIDToolStripMenuItem.Size = new Size(194, 30);
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
             copyUDIDToolStripMenuItem.Click += copyUDIDToolStripMenuItem_Click;
             // 
             // copyModelNumberToolStripMenuItem
             // 
+            copyModelNumberToolStripMenuItem.Image = Properties.Resources.files;
             copyModelNumberToolStripMenuItem.Name = "copyModelNumberToolStripMenuItem";
-            copyModelNumberToolStripMenuItem.Size = new Size(186, 22);
+            copyModelNumberToolStripMenuItem.Size = new Size(194, 30);
             copyModelNumberToolStripMenuItem.Text = "Copy Model Number";
             copyModelNumberToolStripMenuItem.Click += copyModelNumberToolStripMenuItem_Click;
             // 
             // copyOSVersionToolStripMenuItem
             // 
+            copyOSVersionToolStripMenuItem.Image = Properties.Resources.files;
             copyOSVersionToolStripMenuItem.Name = "copyOSVersionToolStripMenuItem";
-            copyOSVersionToolStripMenuItem.Size = new Size(186, 22);
+            copyOSVersionToolStripMenuItem.Size = new Size(194, 30);
             copyOSVersionToolStripMenuItem.Text = "Copy OS Version";
             copyOSVersionToolStripMenuItem.Click += copyOSVersionToolStripMenuItem_Click;
             // 
             // copyAllInfoToolStripMenuItem
             // 
+            copyAllInfoToolStripMenuItem.Image = Properties.Resources.files;
             copyAllInfoToolStripMenuItem.Name = "copyAllInfoToolStripMenuItem";
-            copyAllInfoToolStripMenuItem.Size = new Size(186, 22);
+            copyAllInfoToolStripMenuItem.Size = new Size(194, 30);
             copyAllInfoToolStripMenuItem.Text = "Copy All Info";
             copyAllInfoToolStripMenuItem.Click += copyAllInfoToolStripMenuItem_Click;
+            // 
+            // showDeviceInfoToolStripMenuItem
+            // 
+            showDeviceInfoToolStripMenuItem.Image = Properties.Resources.Discussion;
+            showDeviceInfoToolStripMenuItem.Name = "showDeviceInfoToolStripMenuItem";
+            showDeviceInfoToolStripMenuItem.Size = new Size(194, 30);
+            showDeviceInfoToolStripMenuItem.Text = "Show Device Info";
+            showDeviceInfoToolStripMenuItem.Click += showDeviceInfoToolStripMenuItem_Click;
             // 
             // infoToolStripMenuItem
             // 
             infoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyProxyPortToolStripMenuItem1, copyScreenPortToolStripMenuItem1, copySessionIDToolStripMenuItem1, copySessionURLToolStripMenuItem1 });
             infoToolStripMenuItem.Image = Properties.Resources.information;
             infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            infoToolStripMenuItem.Size = new Size(149, 22);
+            infoToolStripMenuItem.Size = new Size(188, 30);
             infoToolStripMenuItem.Text = "Other Info";
             // 
             // copyProxyPortToolStripMenuItem1
             // 
+            copyProxyPortToolStripMenuItem1.Image = Properties.Resources.files;
             copyProxyPortToolStripMenuItem1.Name = "copyProxyPortToolStripMenuItem1";
-            copyProxyPortToolStripMenuItem1.Size = new Size(168, 22);
+            copyProxyPortToolStripMenuItem1.Size = new Size(188, 30);
             copyProxyPortToolStripMenuItem1.Text = "Copy Proxy Port";
             copyProxyPortToolStripMenuItem1.Click += copyProxyPortToolStripMenuItem_Click;
             // 
             // copyScreenPortToolStripMenuItem1
             // 
+            copyScreenPortToolStripMenuItem1.Image = Properties.Resources.files;
             copyScreenPortToolStripMenuItem1.Name = "copyScreenPortToolStripMenuItem1";
-            copyScreenPortToolStripMenuItem1.Size = new Size(168, 22);
+            copyScreenPortToolStripMenuItem1.Size = new Size(188, 30);
             copyScreenPortToolStripMenuItem1.Text = "Copy Screen Port";
             copyScreenPortToolStripMenuItem1.Click += copyScreenPortToolStripMenuItem_Click;
             // 
             // copySessionIDToolStripMenuItem1
             // 
+            copySessionIDToolStripMenuItem1.Image = Properties.Resources.files;
             copySessionIDToolStripMenuItem1.Name = "copySessionIDToolStripMenuItem1";
-            copySessionIDToolStripMenuItem1.Size = new Size(168, 22);
+            copySessionIDToolStripMenuItem1.Size = new Size(188, 30);
             copySessionIDToolStripMenuItem1.Text = "Copy Session ID";
             copySessionIDToolStripMenuItem1.Click += copySessionIDToolStripMenuItem_Click;
             // 
             // copySessionURLToolStripMenuItem1
             // 
+            copySessionURLToolStripMenuItem1.Image = Properties.Resources.files;
             copySessionURLToolStripMenuItem1.Name = "copySessionURLToolStripMenuItem1";
-            copySessionURLToolStripMenuItem1.Size = new Size(168, 22);
+            copySessionURLToolStripMenuItem1.Size = new Size(188, 30);
             copySessionURLToolStripMenuItem1.Text = "Copy Session URL";
             copySessionURLToolStripMenuItem1.Click += copySessionURLToolStripMenuItem_Click;
             // 
@@ -447,5 +465,6 @@
         private ToolStripMenuItem copyOSVersionToolStripMenuItem;
         private ToolStripMenuItem copyAllInfoToolStripMenuItem;
         private ToolStripMenuItem copyUDIDToolStripMenuItem;
+        private ToolStripMenuItem showDeviceInfoToolStripMenuItem;
     }
 }

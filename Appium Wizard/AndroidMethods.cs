@@ -104,6 +104,12 @@ namespace Appium_Wizard
             }
         }
 
+        public void RestartADBServer()
+        {
+            StopAdbServer();
+            StartAdbServer();
+        }
+
         public bool IsAdbServerRunning()
         {
             try

@@ -81,7 +81,8 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel(title, "Initializing...", 5);
                 if (OSType.Equals("Android"))
                 {
-                    await ExecuteAndroid();
+                    //await ExecuteAndroid();
+                    isScreenServerStarted = true;
                 }
                 else
                 {
@@ -609,7 +610,8 @@ namespace Appium_Wizard
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, deviceName, deviceModel);
+                //screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
             }
             else
             {

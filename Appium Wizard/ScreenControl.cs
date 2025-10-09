@@ -1,4 +1,5 @@
-﻿using Appium_Wizard.Properties;
+﻿using Appium_Wizard.Appium_Wizard;
+using Appium_Wizard.Properties;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using NLog;
@@ -37,6 +38,19 @@ namespace Appium_Wizard
         public int screenDensity = 0;
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private ScrcpyEmbedder scrcpyEmbedder;
+
+        public ScreenControl(string os, string Version, string udid, int width, int height, string selectedDeviceName, string deviceModel)
+        {
+            InitializeComponent();
+            this.OSType = os;
+            this.udid = udid;
+            this.width = width;
+            this.height = height;
+            this.deviceModel = deviceModel;
+            this.deviceName = selectedDeviceName;
+            scrcpyEmbedder = new ScrcpyEmbedder(@"C:\Users\mc\Desktop\scrcpy\scrcpy.exe");
+        }
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
@@ -158,17 +172,24 @@ namespace Appium_Wizard
             this.ClientSize = new Size(width, height + toolStrip1.Height + statusStrip1.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Text = deviceName + "[v" + OSVersion + "]";
-            InitializeWebView();
             if (OSType.Equals("iOS"))
             {
+                InitializeWebView();
                 BackToolStripButton.Visible = false;
+            }
+            else 
+            {
+                await scrcpyEmbedder.StartAsync();
             }
             toolStrip1.Refresh();
             statusStrip1.Refresh();
             Activate();
             Logger.Info("Before loading screen...");
             // Await the asynchronous LoadScreen method
-            await LoadScreen(udid, screenPort);
+            if (OSType.Equals("iOS"))
+            {
+                await LoadScreen(udid, screenPort);
+            }
         }
 
         public async Task LoadScreen(string udid, int screenPort)

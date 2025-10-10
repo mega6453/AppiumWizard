@@ -1054,6 +1054,8 @@ namespace Appium_Wizard
             FormClosing += onFormClosing;
             Load += onFormLoad;
             Shown += MainScreen_Shown;
+            DpiChanged += MainScreen_DpiChanged;
+            LocationChanged += MainScreen_LocationChanged;
             contextMenuStrip1.ResumeLayout(false);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

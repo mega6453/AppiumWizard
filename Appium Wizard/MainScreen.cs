@@ -33,11 +33,27 @@ namespace Appium_Wizard
         public static Dictionary<string, float> udidScreenDensity = new Dictionary<string, float>(); // for android
         private Timer memoryCleanupTimer;
         private const int MEMORY_CLEANUP_INTERVAL = 300000; // 5 minutes
+        private Screen currentScreen;
+        private float currentDpi = 96f;
+        private bool isInitialized = false;
+        private Size lastFormSize = Size.Empty;
+        private Timer resizeDebounceTimer;
 
         public MainScreen()
         {
             InitializeComponent();
+            // Setup debounce timer
+            resizeDebounceTimer = new Timer();
+            resizeDebounceTimer.Interval = 200; // 200 ms debounce
+            resizeDebounceTimer.Tick += ResizeDebounceTimer_Tick;
+
             main = this;
+            // Initialize current screen tracking
+            currentScreen = Screen.FromControl(this);
+            using (Graphics g = this.CreateGraphics())
+            {
+                currentDpi = g.DpiX;
+            }
             InitializeMemoryCleanupTimer();
             RefreshDeviceListView();
             this.Text = "Appium Wizard " + VersionInfo.VersionNumber;
@@ -186,6 +202,8 @@ namespace Appium_Wizard
                 }
 
                 UDIDPreInstalledWDA = Database.QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList().ToDictionary();
+                PerformInitialLayout();
+                isInitialized = true;
             }
             catch (Exception ex)
             {
@@ -231,6 +249,68 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
         }
 
+        private void PerformInitialLayout()
+        {
+            using (Graphics g = this.CreateGraphics())
+            {
+                float dpiX = g.DpiX / 96.0f;
+                currentDpi = g.DpiX;
+
+                // Calculate sizes based on DPI
+                int baseListViewWidth = 405;
+                int newListViewWidth = (int)(baseListViewWidth * dpiX);
+                int totalColumnWidth = (int)((150 + 50 + 80 + 60 + 60) * dpiX);
+
+                // Ensure ListView width is enough to fit all columns without scroll bar
+                listView1.Width = Math.Max(newListViewWidth, totalColumnWidth);
+
+                // Adjust Form width accordingly
+                int newFormWidth = listView1.Width + (this.Width - this.ClientSize.Width) + 50;
+                this.Width = Math.Max(this.Width, newFormWidth);
+
+                // Set column widths
+                SetListViewColumnWidths(dpiX);
+
+                // Calculate and set tab control size and position
+                var size = new Size(this.ClientSize.Width - listView1.Width - 100, this.ClientSize.Height - 150);
+                tabControl1.Left = listView1.Right + 20;
+                tabControl1.Size = size;
+
+                // Set WebView sizes within tab pages
+                SetWebViewSizes(size);
+
+                // Position the open logs button
+                openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+            }
+        }
+
+        private void SetListViewColumnWidths(float dpiScale)
+        {
+            listView1.Columns[0].Width = (int)(150 * dpiScale);
+            listView1.Columns[1].Width = (int)(50 * dpiScale);
+            listView1.Columns[2].Width = (int)(80 * dpiScale);
+            listView1.Columns[3].Width = (int)(60 * dpiScale);
+            listView1.Columns[4].Width = 0;
+            listView1.Columns[5].Width = (int)(60 * dpiScale);
+            listView1.Columns[6].Width = 0;
+        }
+
+        private void SetWebViewSizes(Size size)
+        {
+            // Ensure all WebView2 controls are properly sized
+            server1WebView.Size = size;
+            server2WebView.Size = size;
+            server3WebView.Size = size;
+            server4WebView.Size = size;
+            server5WebView.Size = size;
+
+            // Force layout update
+            tabControl1.PerformLayout();
+            foreach (TabPage tabPage in tabControl1.TabPages)
+            {
+                tabPage.PerformLayout();
+            }
+        }
         private void ShowMessage(string message)
         {
             tableLayoutPanel1.Visible = true;
@@ -2317,10 +2397,10 @@ namespace Appium_Wizard
             }
         }
 
-        private void tabControl1_Resize(object sender, EventArgs e)
-        {
-            openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
-        }
+        //private void tabControl1_Resize(object sender, EventArgs e)
+        //{
+        //    openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+        //}
 
         private void openLogsButton_Resize(object sender, EventArgs e)
         {
@@ -2561,6 +2641,197 @@ namespace Appium_Wizard
             string udid = "UDID - " + selectedUDID;
             string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + udid;
             MessageBox.Show(deviceDetails, "Device Info - " + selectedDeviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+
+        private void MainScreen_LocationChanged(object sender, EventArgs e)
+        {
+            resizeDebounceTimer.Stop();
+            resizeDebounceTimer.Start();
+        }
+        private void ResizeDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            resizeDebounceTimer.Stop();
+            ResizeWebViewToCurrentScreen();
+        }
+
+        private void RefreshLayout()
+        {
+            try
+            {
+                // Ensure tab control is positioned correctly
+                tabControl1.Left = listView1.Right + 20;
+
+                // Recalculate tab control size
+                var size = new Size(this.ClientSize.Width - listView1.Width - 100, this.ClientSize.Height - 150);
+                tabControl1.Size = size;
+
+                // Update WebView sizes
+                SetWebViewSizes(size);
+
+                // Reposition open logs button
+                openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+
+                // Force refresh of all controls
+                this.Invalidate(true);
+                this.Update();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("RefreshLayout error: " + ex.Message);
+            }
+        }
+
+        // Enhanced DpiChanged event handler
+        private void MainScreen_DpiChanged(object sender, DpiChangedEventArgs e)
+        {
+            currentDpi = e.DeviceDpiNew;
+            ResizeWebViewToCurrentScreen();
+        }
+
+
+        private void ResizeWebViewToCurrentScreen()
+        {
+            try
+            {
+                using (Graphics g = this.CreateGraphics())
+                {
+                    float dpiX = g.DpiX / 96f;
+                    currentDpi = g.DpiX;
+
+                    // Use screen working area for absolute sizing
+                    Screen currentScreen = Screen.FromControl(this);
+                    Rectangle workingArea = currentScreen.WorkingArea;
+
+                    int baseListViewWidth = 405;
+                    int listViewWidth = (int)(baseListViewWidth * dpiX);
+                    int totalColumnWidth = (int)((150 + 50 + 80 + 60 + 60) * dpiX);
+
+                    listView1.Width = Math.Max(listViewWidth, totalColumnWidth);
+                    SetListViewColumnWidths(dpiX);
+
+                    // Calculate ideal form size absolutely based on screen working area and DPI
+                    int idealFormWidth = Math.Max(800, listView1.Width + (int)(400 * dpiX));
+                    int idealFormHeight = Math.Max(600, (int)(workingArea.Height * 0.6f));
+
+                    Size idealSize = new Size(idealFormWidth, idealFormHeight);
+
+                    // Only resize if size changed significantly (avoid tiny oscillations)
+                    if (lastFormSize == Size.Empty || (Math.Abs(lastFormSize.Width - idealSize.Width) > 5 || Math.Abs(lastFormSize.Height - idealSize.Height) > 5))
+                    {
+                        lastFormSize = idealSize;
+                        this.Size = idealSize;
+                    }
+
+                    // Resize and reposition tab control and other controls relative to client size
+                    var tabControlSize = new Size(
+                        Math.Max(300, this.ClientSize.Width - listView1.Width - 60),
+                        Math.Max(200, this.ClientSize.Height - 100)
+                    );
+
+                    tabControl1.Left = listView1.Right + 20;
+                    tabControl1.Size = tabControlSize;
+
+                    SetWebViewSizes(tabControlSize);
+
+                    openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+
+                    this.PerformLayout();
+                    this.Invalidate(true);
+                    this.Update();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ResizeWebViewToCurrentScreen error: " + ex.Message);
+            }
+        }
+
+        // This is overrided method so no reference. But this is needed for screen resizing in different screens. Don't delete.
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            if (isInitialized && this.WindowState != FormWindowState.Minimized)
+            {
+                // Use BeginInvoke to ensure this happens after the resize is complete
+                this.BeginInvoke(new Action(() =>
+                {
+                    RefreshLayout();
+                }));
+            }
+        }
+
+        // This is overrided method so no reference. But this is needed for screen resizing in different screens. Don't delete.
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_DPICHANGED = 0x02E0;
+            if (m.Msg == WM_DPICHANGED)
+            {
+                var suggestedRect = (RECT)System.Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, typeof(RECT));
+
+                // Apply the suggested bounds from Windows (clamped by SetBoundsCore)
+                this.SetBounds(suggestedRect.Left, suggestedRect.Top,
+                               suggestedRect.Right - suggestedRect.Left,
+                               suggestedRect.Bottom - suggestedRect.Top);
+
+                // Update current DPI from Graphics
+                using (Graphics g = this.CreateGraphics())
+                {
+                    currentDpi = g.DpiX;
+                }
+
+                // Schedule resize after DPI change
+                this.BeginInvoke(new Action(() =>
+                {
+                    ResizeWebViewToCurrentScreen();
+                }));
+
+                m.Result = IntPtr.Zero;
+                return;
+            }
+            base.WndProc(ref m);
+        }
+
+        // This is overrided method so no reference. But this is needed for screen resizing in different screens. Don't delete.
+        protected override void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+        {
+            // Clamp minimum and maximum size to prevent shrinking or growing too much
+            int minWidth = 800;
+            int minHeight = 600;
+
+            // Optionally clamp maximum size to current screen working area
+            Screen screen = Screen.FromControl(this);
+            int maxWidth = screen.WorkingArea.Width;
+            int maxHeight = screen.WorkingArea.Height;
+
+            width = Math.Max(minWidth, Math.Min(width, maxWidth));
+            height = Math.Max(minHeight, Math.Min(height, maxHeight));
+
+            base.SetBoundsCore(x, y, width, height, specified);
+        }
+
+        // Add this method to handle tab control resize
+        private void tabControl1_Resize(object sender, EventArgs e)
+        {
+            if (isInitialized)
+            {
+                // Update WebView sizes when tab control is resized
+                var size = new Size(tabControl1.Width, tabControl1.Height);
+                SetWebViewSizes(size);
+
+                // Update open logs button position
+                openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+            }
+        }
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
         }
     }
 }

@@ -1408,6 +1408,18 @@ namespace Appium_Wizard
                 e.IsInputKey = true;
             }
         }
+
+        private void showDeviceInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string deviceName = "Device Name - " + this.deviceName;
+            string deviceOS = "Device OS - " + OSType;
+            string deviceOSVersion = "OS Version - " + OSVersion;
+            string deviceModel = "Model - " + this.deviceModel;
+            string deviceSerialNumber = "Serial Number - " + this.deviceSerialNumber;
+            string udid = "UDID - " + this.udid;
+            string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + deviceSerialNumber + "\n" + udid;
+            MessageBox.Show(deviceDetails,"Device Info - "+ this.deviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 
     public class ScreenAction

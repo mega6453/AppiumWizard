@@ -96,12 +96,12 @@
             Controls.Add(label2);
             Controls.Add(cancelButton);
             Controls.Add(PasswordTextbox);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "EnterPassword";
             ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Unlock Screen";
             ResumeLayout(false);
             PerformLayout();

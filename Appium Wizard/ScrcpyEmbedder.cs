@@ -93,7 +93,7 @@
 
                 hostPanel = new Panel
                 {
-                    Dock = DockStyle.Fill,
+                    //Dock = DockStyle.Fill,
                     BackColor = Color.Black
                 };
             }
@@ -199,9 +199,22 @@
                         int borderWidth = windowArea.Width - clientArea.Width;
                         int borderHeight = windowArea.Height - clientArea.Height;
 
+                        // Calculate total height of docked controls
+                        int dockedControlsHeight = 0;
+                        foreach (Control control in parentForm.Controls)
+                        {
+                            if (control.Dock == DockStyle.Top || control.Dock == DockStyle.Bottom)
+                            {
+                                dockedControlsHeight += control.Height;
+                            }
+                        }
+
                         parentForm.Invoke((Action)(() =>
                         {
-                            parentForm.Size = new Size(scrcpyWidth + borderWidth, scrcpyHeight + borderHeight);
+                            parentForm.Size = new Size(
+                                scrcpyWidth + borderWidth,
+                                scrcpyHeight + borderHeight + dockedControlsHeight
+                            );
                             CenterFormOnScreen(parentForm);
                         }));
                     }

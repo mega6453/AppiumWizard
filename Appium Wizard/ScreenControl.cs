@@ -44,14 +44,25 @@ namespace Appium_Wizard
         {
             InitializeComponent();
             this.OSType = os;
+            this.OSVersion = Version;
             this.udid = udid;
             this.width = width;
             this.height = height;
             this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
-            scrcpyEmbedder = new ScrcpyEmbedder(@"C:\Users\mc\Desktop\scrcpy\scrcpy.exe");
-        }
 
+            if (os.Equals("Android"))
+            {
+                // Remove WebView2 for Android
+                //Controls.Remove(ScreenWebView);
+                isAndroid = true;
+                // Don't create scrcpyEmbedder here - do it after form is shown
+            }
+            else
+            {
+                isAndroid = false;
+            }
+        }
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
             this.OSType = os;
@@ -172,23 +183,153 @@ namespace Appium_Wizard
             this.ClientSize = new Size(width, height + toolStrip1.Height + statusStrip1.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Text = deviceName + "[v" + OSVersion + "]";
+
+            toolStrip1.Refresh();
+            statusStrip1.Refresh();
             if (OSType.Equals("iOS"))
             {
                 InitializeWebView();
                 BackToolStripButton.Visible = false;
-            }
-            else 
-            {
-                await scrcpyEmbedder.StartAsync();
-            }
-            toolStrip1.Refresh();
-            statusStrip1.Refresh();
-            Activate();
-            Logger.Info("Before loading screen...");
-            // Await the asynchronous LoadScreen method
-            if (OSType.Equals("iOS"))
-            {
+                Logger.Info("Before loading screen...");
                 await LoadScreen(udid, screenPort);
+            }
+            else // Android - defer scrcpy initialization
+            {
+                // Show the form first, then start scrcpy
+                this.Show(); // Show form to ensure handle is created
+                Application.DoEvents(); // Process pending events
+
+                await InitializeScrcpy();
+            }
+
+            Activate();
+        }
+
+        private async Task InitializeScrcpy()
+        {
+            try
+            {
+                Logger.Info("Initializing scrcpy for Android device...");
+
+                // Create scrcpy embedder
+                scrcpyEmbedder = new ScrcpyEmbedder(@"C:\Users\mc\Desktop\scrcpy\scrcpy.exe");
+
+                // Force handle creation by accessing Handle property
+                var formHandle = this.Handle;
+
+                // Configure the host panel - Position it from top, accounting for any top controls
+                int topOffset = 0;
+                int bottomOffset = 0;
+
+                // Check for controls docked at top (like menu strips, toolbars at top, etc.)
+                //foreach (Control control in this.Controls)
+                //{
+                //    if (control.Dock == DockStyle.Top)
+                //    {
+                //        topOffset += control.Height;
+                //    }
+                //}
+
+                // Check for controls docked at bottom (toolstrip1, statusstrip1)
+                //foreach (Control control in this.Controls)
+                //{
+                //    if (control.Dock == DockStyle.Bottom)
+                //    {
+                //        bottomOffset += control.Height;
+                //    }
+                //}
+
+                // Position the panel in the available client area
+                scrcpyEmbedder.HostPanel.Location = new Point(0, topOffset);
+                scrcpyEmbedder.HostPanel.Size = new Size(width, height - bottomOffset);
+                scrcpyEmbedder.HostPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+                scrcpyEmbedder.HostPanel.BackColor = Color.Black;
+
+                // Add to form
+                this.Controls.Add(scrcpyEmbedder.HostPanel);
+
+                // Force panel handle creation
+                var panelHandle = scrcpyEmbedder.HostPanel.Handle;
+
+                // Add event handlers
+                scrcpyEmbedder.HostPanel.MouseDown += WebView_MouseDown;
+                scrcpyEmbedder.HostPanel.MouseUp += WebView_MouseUp;
+                scrcpyEmbedder.HostPanel.MouseMove += GetMouseCoordinate;
+
+                // Ensure proper Z-order - bring panel to front
+                scrcpyEmbedder.HostPanel.BringToFront();
+
+                this.Refresh();
+                Application.DoEvents();
+
+                // Now start scrcpy
+                bool scrcpyStarted = await scrcpyEmbedder.StartAsync();
+                if (!scrcpyStarted)
+                {
+                    Logger.Error("Failed to start scrcpy");
+                    MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                screenControlButtons(true);
+                Logger.Info("Scrcpy started successfully");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error initializing scrcpy");
+                MessageBox.Show($"Error starting screen mirroring: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task InitializeScrcpyOld()
+        {
+            try
+            {
+                Logger.Info("Initializing scrcpy for Android device...");
+
+                // Create scrcpy embedder
+                scrcpyEmbedder = new ScrcpyEmbedder(@"C:\Users\mc\Desktop\scrcpy\scrcpy.exe");
+
+                // Force handle creation by accessing Handle property
+                var formHandle = this.Handle; // This creates the handle if it doesn't exist
+
+                // Configure the host panel
+                scrcpyEmbedder.HostPanel.Location = new Point(0, toolStrip1.Height);
+                scrcpyEmbedder.HostPanel.Size = new Size(width, height);
+                scrcpyEmbedder.HostPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+                scrcpyEmbedder.HostPanel.BackColor = Color.Black;
+
+                // Add to form first
+                this.Controls.Add(scrcpyEmbedder.HostPanel);
+
+                // Force panel handle creation by accessing Handle property
+                var panelHandle = scrcpyEmbedder.HostPanel.Handle;
+
+                // Add event handlers after panel is added
+                scrcpyEmbedder.HostPanel.MouseDown += WebView_MouseDown;
+                scrcpyEmbedder.HostPanel.MouseUp += WebView_MouseUp;
+                scrcpyEmbedder.HostPanel.MouseMove += GetMouseCoordinate;
+
+                // Refresh to ensure everything is properly displayed
+                this.Refresh();
+                Application.DoEvents();
+
+                // Now start scrcpy
+                bool scrcpyStarted = await scrcpyEmbedder.StartAsync();
+                if (!scrcpyStarted)
+                {
+                    Logger.Error("Failed to start scrcpy");
+                    MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                screenControlButtons(true);
+                Logger.Info("Scrcpy started successfully");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error initializing scrcpy");
+                MessageBox.Show($"Error starting screen mirroring: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1428,6 +1569,12 @@ namespace Appium_Wizard
             {
                 e.IsInputKey = true;
             }
+        }
+
+        private void ScreenControl_Load(object sender, EventArgs e)
+        {
+
+            statusStrip1.Visible = false;
         }
     }
 

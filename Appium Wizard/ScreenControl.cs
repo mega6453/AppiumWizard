@@ -250,7 +250,7 @@ namespace Appium_Wizard
                     MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
+                await Task.Delay(1000);
                 screenControlButtons(true);
                 Logger.Info("Scrcpy started successfully");
 

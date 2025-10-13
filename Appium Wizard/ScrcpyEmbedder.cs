@@ -12,6 +12,18 @@
     {
         public class ScrcpyEmbedder : IDisposable
         {
+            // Add these Win32 API calls at the top of ScrcpyEmbedder class
+            [DllImport("user32.dll")]
+            static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll")]
+            static extern bool UpdateWindow(IntPtr hWnd);
+
+            // Constants for ShowWindow
+            const int SW_HIDE = 0;
+            const int SW_SHOW = 5;
+
+            const int SW_SHOWNOACTIVATE = 4;
             // Win32 API constants
             const int GWL_STYLE = -16;
             const int WS_CAPTION = 0x00C00000;
@@ -82,7 +94,8 @@
             /// <summary>
             /// Additional arguments for scrcpy.
             /// </summary>
-            public string ScrcpyArguments { get; set; } = "--max-size 1080 --window-title=\"scrcpy_embed\" --stay-awake --disable-screensaver";
+            //public string ScrcpyArguments { get; set; } = "--max-size 1080 --window-title=\"scrcpy_embed\" --stay-awake --disable-screensaver";
+            public string ScrcpyArguments { get; set; } = "--max-size 1080 --window-title=\"scrcpy_embed\" --stay-awake --disable-screensaver --window-x=-2000 --window-y=-2000";
 
             public ScrcpyEmbedder(string scrcpyExePath)
             {
@@ -333,6 +346,49 @@
             }
 
             private void EmbedWindow(IntPtr windowHandle)
+            {
+                // Hide the window first to prevent flashing
+                ShowWindow(windowHandle, SW_HIDE);
+
+                // Remove window decorations and make it a child
+                int currentStyle = GetWindowLong(windowHandle, GWL_STYLE);
+                int newStyle = currentStyle;
+
+                newStyle &= ~WS_CAPTION;
+                newStyle &= ~WS_THICKFRAME;
+                newStyle &= ~WS_MINIMIZEBOX;
+                newStyle &= ~WS_MAXIMIZEBOX;
+                newStyle &= ~WS_SYSMENU;
+
+                newStyle |= WS_CHILD;
+
+                SetWindowLong(windowHandle, GWL_STYLE, newStyle);
+
+                // Set the panel as the parent
+                SetParent(windowHandle, hostPanel.Handle);
+
+                // Resize and position the window to fill the panel exactly
+                SetWindowPos(windowHandle, IntPtr.Zero, 0, 0,
+                    hostPanel.Width, hostPanel.Height,
+                    SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+
+                // Now show the window in its embedded state
+                ShowWindow(windowHandle, SW_SHOWNOACTIVATE);
+                UpdateWindow(windowHandle);
+
+                // Handle panel resize to keep the embedded window sized correctly
+                hostPanel.Resize += (s, e) =>
+                {
+                    SetWindowPos(windowHandle, IntPtr.Zero, 0, 0,
+                        hostPanel.Width, hostPanel.Height,
+                        SWP_NOZORDER | SWP_NOACTIVATE);
+                };
+
+                // Change panel color to indicate success (optional)
+                hostPanel.BackColor = Color.Black; // Keep it black instead of DarkBlue
+            }
+
+            private void EmbedWindowOld(IntPtr windowHandle)
             {
                 // Remove window decorations and make it a child
                 int currentStyle = GetWindowLong(windowHandle, GWL_STYLE);

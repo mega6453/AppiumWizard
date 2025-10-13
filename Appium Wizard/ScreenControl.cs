@@ -50,7 +50,7 @@ namespace Appium_Wizard
             this.height = height;
             this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
-
+            toolStripStatusLabel.Text = "this is a test text";
             if (os.Equals("Android"))
             {
                 // Remove WebView2 for Android
@@ -62,6 +62,7 @@ namespace Appium_Wizard
             {
                 isAndroid = false;
             }
+            udidScreenControl.Add(udid, this);
         }
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {

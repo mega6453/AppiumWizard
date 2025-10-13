@@ -622,7 +622,10 @@ namespace Appium_Wizard
             await screenForm.SetupScreenSharing();
             commonProgress.UpdateStepLabel(title, "Screen sharing started...", 100);
             commonProgress.Close();
-            screenForm.Show();
+            if (OSType.Equals("iOS"))
+            {
+                screenForm.Show();
+            }
         }
     }
 }

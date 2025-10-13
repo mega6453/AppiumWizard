@@ -50,7 +50,6 @@ namespace Appium_Wizard
             this.height = height;
             this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
-            toolStripStatusLabel.Text = "this is a test text";
             if (os.Equals("Android"))
             {
                 // Remove WebView2 for Android
@@ -197,8 +196,8 @@ namespace Appium_Wizard
             else // Android - defer scrcpy initialization
             {
                 // Show the form first, then start scrcpy
-                this.Show(); // Show form to ensure handle is created
-                Application.DoEvents(); // Process pending events
+                //this.Show(); // Show form to ensure handle is created
+                //Application.DoEvents(); // Process pending events
 
                 await InitializeScrcpy();
             }
@@ -207,6 +206,67 @@ namespace Appium_Wizard
         }
 
         private async Task InitializeScrcpy()
+        {
+            try
+            {
+                Logger.Info("Initializing scrcpy for Android device...");
+
+                // Create scrcpy embedder
+                scrcpyEmbedder = new ScrcpyEmbedder(@"C:\Users\mc\Desktop\scrcpy\scrcpy.exe");
+
+                // Create the form but don't show it yet
+                this.CreateHandle(); // Force handle creation without showing
+
+                // Configure the host panel
+                int topOffset = 0;
+                int bottomOffset = 0;
+
+                // Position the panel in the available client area
+                scrcpyEmbedder.HostPanel.Location = new Point(0, topOffset);
+                scrcpyEmbedder.HostPanel.Size = new Size(width, height - bottomOffset);
+                scrcpyEmbedder.HostPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+                scrcpyEmbedder.HostPanel.BackColor = Color.Black;
+
+                // Add to form
+                this.Controls.Add(scrcpyEmbedder.HostPanel);
+
+                // Force panel handle creation
+                var panelHandle = scrcpyEmbedder.HostPanel.Handle;
+
+                // Add event handlers
+                scrcpyEmbedder.HostPanel.MouseDown += WebView_MouseDown;
+                scrcpyEmbedder.HostPanel.MouseUp += WebView_MouseUp;
+                scrcpyEmbedder.HostPanel.MouseMove += GetMouseCoordinate;
+
+                // Ensure proper Z-order
+                scrcpyEmbedder.HostPanel.BringToFront();
+
+                // Now start scrcpy (this happens hidden)
+                bool scrcpyStarted = await scrcpyEmbedder.StartAsync();
+                if (!scrcpyStarted)
+                {
+                    Logger.Error("Failed to start scrcpy");
+                    this.Show(); // Show form even on error
+                    MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                screenControlButtons(true);
+                Logger.Info("Scrcpy started successfully");
+
+                // NOW show the form after everything is ready
+                this.Show();
+                this.Activate();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error initializing scrcpy");
+                this.Show(); // Show form even on error
+                MessageBox.Show($"Error starting screen mirroring: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async Task InitializeScrcpyOld()
         {
             try
             {
@@ -282,7 +342,7 @@ namespace Appium_Wizard
             }
         }
 
-        private async Task InitializeScrcpyOld()
+        private async Task InitializeScrcpyOld2()
         {
             try
             {

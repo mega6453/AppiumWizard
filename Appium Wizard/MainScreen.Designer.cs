@@ -66,6 +66,9 @@ namespace Appium_Wizard
             iOSProxyToolStripMenuItem = new ToolStripMenuItem();
             iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
             notificationsToolStripMenuItem = new ToolStripMenuItem();
+            androidScreenMirroringToolStripMenuItem = new ToolStripMenuItem();
+            useScrcpyMenuItem = new ToolStripMenuItem();
+            useUiAutomator2ToolStripMenuItem = new ToolStripMenuItem();
             alwaysOnTopToolStripMenuItem = new ToolStripMenuItem();
             yesToolStripMenuItem = new ToolStripMenuItem();
             noToolStripMenuItem = new ToolStripMenuItem();
@@ -400,7 +403,7 @@ namespace Appium_Wizard
             // 
             // settingsToolStripMenuItem
             // 
-            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSProxyToolStripMenuItem, iOSExecutorToolStripMenuItem, notificationsToolStripMenuItem, alwaysOnTopToolStripMenuItem });
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSProxyToolStripMenuItem, iOSExecutorToolStripMenuItem, notificationsToolStripMenuItem, androidScreenMirroringToolStripMenuItem, alwaysOnTopToolStripMenuItem });
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(61, 20);
             settingsToolStripMenuItem.Text = "Settings";
@@ -409,7 +412,7 @@ namespace Appium_Wizard
             // 
             iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
             iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
-            iOSProxyToolStripMenuItem.Size = new Size(152, 22);
+            iOSProxyToolStripMenuItem.Size = new Size(208, 22);
             iOSProxyToolStripMenuItem.Text = "iOS Proxy";
             iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
             // 
@@ -417,7 +420,7 @@ namespace Appium_Wizard
             // 
             iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(152, 22);
+            iOSExecutorToolStripMenuItem.Size = new Size(208, 22);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
@@ -425,16 +428,38 @@ namespace Appium_Wizard
             // 
             notificationsToolStripMenuItem.Image = Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(152, 22);
+            notificationsToolStripMenuItem.Size = new Size(208, 22);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
+            // 
+            // androidScreenMirroringToolStripMenuItem
+            // 
+            androidScreenMirroringToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { useScrcpyMenuItem, useUiAutomator2ToolStripMenuItem });
+            androidScreenMirroringToolStripMenuItem.Image = Properties.Resources.screen_mirroring;
+            androidScreenMirroringToolStripMenuItem.Name = "androidScreenMirroringToolStripMenuItem";
+            androidScreenMirroringToolStripMenuItem.Size = new Size(208, 22);
+            androidScreenMirroringToolStripMenuItem.Text = "Android Screen Mirroring";
+            // 
+            // useScrcpyMenuItem
+            // 
+            useScrcpyMenuItem.Name = "useScrcpyMenuItem";
+            useScrcpyMenuItem.Size = new Size(171, 22);
+            useScrcpyMenuItem.Text = "Use scrcpy";
+            useScrcpyMenuItem.Click += useScrcpyMenuItem_Click;
+            // 
+            // useUiAutomator2ToolStripMenuItem
+            // 
+            useUiAutomator2ToolStripMenuItem.Name = "useUiAutomator2ToolStripMenuItem";
+            useUiAutomator2ToolStripMenuItem.Size = new Size(171, 22);
+            useUiAutomator2ToolStripMenuItem.Text = "Use UiAutomator2";
+            useUiAutomator2ToolStripMenuItem.Click += useUiAutomator2ToolStripMenuItem_Click;
             // 
             // alwaysOnTopToolStripMenuItem
             // 
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
             alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(152, 22);
+            alwaysOnTopToolStripMenuItem.Size = new Size(208, 22);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 
@@ -1181,5 +1206,8 @@ namespace Appium_Wizard
         private ToolStripMenuItem iOSProxyToolStripMenuItem;
         private ToolStripMenuItem iOSExecutorToolStripMenuItem;
         private ToolStripMenuItem showDeviceInfoToolStripMenuItem;
+        private ToolStripMenuItem androidScreenMirroringToolStripMenuItem;
+        private ToolStripMenuItem useScrcpyMenuItem;
+        private ToolStripMenuItem useUiAutomator2ToolStripMenuItem;
     }
 }

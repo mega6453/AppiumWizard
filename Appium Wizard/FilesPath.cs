@@ -23,5 +23,6 @@
         public static string pymd3FilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\iOSServerPy\\iOSServerPy.exe";
         public static string FFMpegFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\FFMpeg\\";
         public static string logsFilesPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Logs\\";
+        public static string scrcpy = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\scrcpy\\scrcpy.exe";
     }
 }

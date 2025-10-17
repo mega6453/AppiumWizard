@@ -1,13 +1,12 @@
-﻿using Appium_Wizard.Properties;
+﻿using Appium_Wizard.Appium_Wizard;
+using Appium_Wizard.Properties;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using NLog;
 using System.Diagnostics;
-using System.Diagnostics.SymbolStore;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Appium_Wizard
 {
@@ -28,7 +27,7 @@ namespace Appium_Wizard
         public static Dictionary<string, Tuple<int, int>> devicePorts = new Dictionary<string, Tuple<int, int>>();
         string canvasFunction = string.Empty;
         string canvasFunctionID = string.Empty;
-        string color = ColorTranslator.ToHtml(Color.Red);
+        string color = "#FF0000";
         int lineWidth = 2;
         public bool isAndroid;
         private List<ScreenAction> recordedActions = new List<ScreenAction>();
@@ -37,6 +36,23 @@ namespace Appium_Wizard
         public int screenDensity = 0;
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        public bool useScrcpy = false;
+        public ScreenControl(string os, string Version, string udid, int width, int height, string selectedDeviceName, string deviceModel)
+        {
+            InitializeComponent();
+            this.OSType = os;
+            this.OSVersion = Version;
+            this.udid = udid;
+            this.width = width;
+            this.height = height;
+            this.deviceModel = deviceModel;
+            this.deviceName = selectedDeviceName;
+            isAndroid = true;
+            screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
+            deviceSerialNumber = udid;
+            udidScreenControl.Add(udid, this);
+            useScrcpy = true;
+        }
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
@@ -173,6 +189,11 @@ namespace Appium_Wizard
 
         public async Task LoadScreen(string udid, int screenPort)
         {
+            if (useScrcpy)
+            {
+                await InitializeScrcpy();
+                return;
+            }
             ScreenWebView = webview2[udid];
             if (Controls.Contains(ScreenWebView))
             {
@@ -318,6 +339,10 @@ namespace Appium_Wizard
 
         private async void InitializeWebView()
         {
+            if (useScrcpy)
+            {
+                return;
+            }
             SetWebViewSize(width, height);
             canvasFunction = JavaScripts.DrawRectangleOnCanvas();
             var env = await CoreWebView2Environment.CreateAsync(null, null, null);
@@ -843,15 +868,24 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent(MethodBase.GetCurrentMethod().Name, OS);
         }
 
-        public void DrawRectangle(ScreenControl screenControl, int x, int y, int width, int height)
+        public async void DrawRectangle(ScreenControl screenControl, int x, int y, int width, int height)
         {
             try
             {
-                BeginInvoke(new Action(() =>
+                if (useScrcpy)
                 {
-                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawRectangle({x}, {y}, {width}, {height}, {lineWidth}, '{color}', true)");
-                    //screenControl.ScreenWebView.ExecuteScriptAsync("drawRectangle(0, 0, 0, 0, 0, '', true)");
-                }));
+                    DrawRectangleOnScrcpy(x, y, width, height);
+                    await Task.Delay(1000);
+                    ClearDrawing();
+                }
+                else
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        screenControl.ScreenWebView.ExecuteScriptAsync($"drawRectangle({x}, {y}, {width}, {height}, {lineWidth}, '{color}', true)");
+                        //screenControl.ScreenWebView.ExecuteScriptAsync("drawRectangle(0, 0, 0, 0, 0, '', true)");
+                    }));
+                }
             }
             catch (Exception)
             {
@@ -859,30 +893,47 @@ namespace Appium_Wizard
         }
 
 
-        public void DrawArrow(ScreenControl screenControl, int startX, int startY, int endX, int endY)
+        public async void DrawArrow(ScreenControl screenControl, int startX, int startY, int endX, int endY)
         {
             try
             {
-                BeginInvoke(new Action(() =>
+                if (useScrcpy) 
                 {
-                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawArrow({startX}, {startY}, {endX}, {endY}, 10, '{color}', true)");
-                }));
+                    DrawArrowOnScrcpy(startX, startY, endX, endY, 10);
+                    await Task.Delay(1000);
+                    ClearDrawing();
+                }
+                else
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        screenControl.ScreenWebView.ExecuteScriptAsync($"drawArrow({startX}, {startY}, {endX}, {endY}, 10, '{color}', true)");
+                    }));
+                }
             }
             catch (Exception)
             {
             }
         }
 
-        public void DrawDot(ScreenControl screenControl, int x, int y)
+        public async void DrawDot(ScreenControl screenControl, int x, int y)
         {
             try
             {
-                BeginInvoke(new Action(() =>
+                if (useScrcpy)
                 {
-                    screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot({x}, {y}, 5, 'red', true)");
-                    //screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot(0, 0, 0, '',true)");
-
-                }));
+                    DrawDotOnScrcpy(x, y, 5);
+                    await Task.Delay(500);
+                    ClearDrawing();
+                }
+                else
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot({x}, {y}, 5, 'red', true)");
+                        //screenControl.ScreenWebView.ExecuteScriptAsync($"drawDot(0, 0, 0, '',true)");
+                    }));
+                }
             }
             catch (Exception)
             {
@@ -1420,6 +1471,227 @@ namespace Appium_Wizard
             string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + deviceSerialNumber + "\n" + udid;
             MessageBox.Show(deviceDetails,"Device Info - "+ this.deviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        //<<<------------------------------------------scrcpy embedding methods------------------------------------------>>>
+        private ScrcpyEmbedder scrcpyEmbedder;
+        private OverlayForm scrcpyOverlayForm;
+        private async Task InitializeScrcpy()
+        {
+            try
+            {
+                Logger.Info("Initializing scrcpy for Android device...");
+
+                // Create scrcpy embedder
+                scrcpyEmbedder = new ScrcpyEmbedder(FilesPath.scrcpy);
+
+                // Create the form but don't show it yet
+                this.CreateHandle(); // Force handle creation without showing
+
+                // Configure the host panel
+                int topOffset = 0;
+                int bottomOffset = 0;
+
+                // Position the panel in the available client area
+                scrcpyEmbedder.HostPanel.Location = new Point(0, topOffset);
+                scrcpyEmbedder.HostPanel.Size = new Size(width, height - bottomOffset);
+                scrcpyEmbedder.HostPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+                scrcpyEmbedder.HostPanel.BackColor = Color.Black;
+
+                // Add to form
+                this.Controls.Add(scrcpyEmbedder.HostPanel);
+
+                // Force panel handle creation
+                var panelHandle = scrcpyEmbedder.HostPanel.Handle;
+
+                // Add event handlers
+                scrcpyEmbedder.HostPanel.MouseDown += WebView_MouseDown;
+                scrcpyEmbedder.HostPanel.MouseUp += WebView_MouseUp;
+                scrcpyEmbedder.HostPanel.MouseMove += GetMouseCoordinate;
+
+                // Create and show the overlay (top-level window) to avoid flicker
+                CreateAndShowOverlay();
+                // Position overlay to cover the scrcpy panel
+                UpdateOverlayBounds();
+                // Initialize overlay with a blank rectangle (none yet)
+                scrcpyOverlayForm?.SetRectangle(null);
+
+                // Ensure proper Z-order
+                scrcpyEmbedder.HostPanel.BringToFront();
+
+                // Now start scrcpy (this happens hidden)
+                bool scrcpyStarted = await scrcpyEmbedder.StartAsync();
+                if (!scrcpyStarted)
+                {
+                    Logger.Error("Failed to start scrcpy");
+                    this.Show(); // Show form even on error
+                    MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // small delay to stabilize
+                await Task.Delay(1000);
+
+                screenControlButtons(true);
+                Logger.Info("Scrcpy started successfully");
+
+                // NOW show the form after everything is ready
+                this.Show();
+                this.Activate();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error initializing scrcpy");
+                this.Show(); // Show form even on error
+                MessageBox.Show($"Error starting screen mirroring: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CreateAndShowOverlay()
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed)
+            {
+                scrcpyOverlayForm = new OverlayForm
+                {
+                    LineColor = Color.Red,
+                    LineWidth = 2,
+                    DebugVisible = false  // <-- CHANGE THIS TO FALSE!
+                };
+
+                // Position BEFORE showing
+                AttachOverlayPositioning();
+                UpdateOverlayBounds();
+
+                // Now show
+                scrcpyOverlayForm.Show(this);
+                scrcpyOverlayForm.BringToFront();
+            }
+        }
+
+        private void UpdateOverlayBounds()
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed) return;
+
+            var panelScreenPos = scrcpyEmbedder.HostPanel.PointToScreen(Point.Empty);
+            scrcpyOverlayForm.Bounds = new Rectangle(panelScreenPos, scrcpyEmbedder.HostPanel.Size);
+            scrcpyOverlayForm.BringToFront();
+        }
+
+        private void AttachOverlayPositioning()
+        {
+            if (scrcpyEmbedder != null && scrcpyEmbedder.HostPanel != null)
+            {
+                scrcpyEmbedder.HostPanel.SizeChanged += (s, e) => UpdateOverlayBounds();
+                scrcpyEmbedder.HostPanel.LocationChanged += (s, e) => UpdateOverlayBounds();
+            }
+            this.Move += (s, e) => UpdateOverlayBounds();
+            this.Resize += (s, e) => UpdateOverlayBounds();
+        }
+
+        private Color GetCurrentColor()
+        {
+            try
+            {
+                // This handles both hex codes (#FF0000) and named colors (Red)
+                return ColorTranslator.FromHtml(color);
+            }
+            catch
+            {
+                // If conversion fails, use pure red
+                return Color.FromArgb(255, 0, 0); // Pure red: R=255, G=0, B=0
+            }
+        }
+
+        public void DrawRectangleOnScrcpy(int x, int y, int w, int h)
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed)
+                return;
+
+            var rect = new Rectangle(x, y, w, h);
+            var drawColor = GetCurrentColor(); // Use same color as WebView2
+            if (scrcpyOverlayForm.InvokeRequired)
+            {
+                scrcpyOverlayForm.BeginInvoke(new Action(() =>
+                {
+                    scrcpyOverlayForm.LineColor = drawColor;      // Same color as WebView2
+                    scrcpyOverlayForm.LineWidth = lineWidth;      // Same lineWidth as WebView2 (should be 2)
+                    scrcpyOverlayForm.SetRectangle(rect);
+                }));
+            }
+            else
+            {
+                scrcpyOverlayForm.LineColor = drawColor;
+                scrcpyOverlayForm.LineWidth = lineWidth;
+                scrcpyOverlayForm.SetRectangle(rect);
+            }
+        }
+
+        // Update DrawDotOnScrcpy to use the color field
+        public void DrawDotOnScrcpy(int x, int y, int radius = 5)
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed)
+                return;
+
+            var point = new Point(x, y);
+            var drawColor = GetCurrentColor(); // Use the same color as WebView2
+
+            if (scrcpyOverlayForm.InvokeRequired)
+            {
+                scrcpyOverlayForm.BeginInvoke(new Action(() =>
+                {
+                    scrcpyOverlayForm.LineColor = drawColor;
+                    scrcpyOverlayForm.SetDot(point, radius);
+                }));
+            }
+            else
+            {
+                scrcpyOverlayForm.LineColor = drawColor;
+                scrcpyOverlayForm.SetDot(point, radius);
+            }
+        }
+
+        // Update DrawArrowOnScrcpy to use the color field
+        public void DrawArrowOnScrcpy(int startX, int startY, int endX, int endY, int arrowHeadSize = 10)
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed)
+                return;
+
+            var drawColor = GetCurrentColor(); // Use the same color as WebView2
+
+            if (scrcpyOverlayForm.InvokeRequired)
+            {
+                scrcpyOverlayForm.BeginInvoke(new Action(() =>
+                {
+                    scrcpyOverlayForm.LineColor = drawColor;
+                    scrcpyOverlayForm.LineWidth = lineWidth; // Use the lineWidth field
+                    scrcpyOverlayForm.SetArrow(startX, startY, endX, endY, arrowHeadSize);
+                }));
+            }
+            else
+            {
+                scrcpyOverlayForm.LineColor = drawColor;
+                scrcpyOverlayForm.LineWidth = lineWidth;
+                scrcpyOverlayForm.SetArrow(startX, startY, endX, endY, arrowHeadSize);
+            }
+        }
+
+        public void ClearDrawing()
+        {
+            if (scrcpyOverlayForm == null || scrcpyOverlayForm.IsDisposed)
+                return;
+
+            if (scrcpyOverlayForm.InvokeRequired)
+            {
+                scrcpyOverlayForm.BeginInvoke(new Action(() =>
+                {
+                    scrcpyOverlayForm.SetRectangle(null);
+                }));
+            }
+            else
+            {
+                scrcpyOverlayForm.SetRectangle(null);
+            }
+        }
+        //<<<------------------------------------------------------------------------------------------------------------>>>
     }
 
     public class ScreenAction
@@ -1428,5 +1700,215 @@ namespace Appium_Wizard
         public int X { get; set; }
         public int Y { get; set; }
         public string Text { get; set; } // For send keys
+    }
+
+    public class OverlayForm : Form
+    {
+        private Rectangle? rectToDraw;
+        private Point? dotToDraw;
+        private Arrow? arrowToDraw;
+
+        public Color LineColor { get; set; } = Color.Red;
+        public int LineWidth { get; set; } = 2;
+        public int DotRadius { get; set; } = 5;
+        public bool DebugVisible { get; set; } = false;
+
+        public OverlayForm()
+        {
+            FormBorderStyle = FormBorderStyle.None;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.Manual;
+            DoubleBuffered = true;
+            TopMost = true;
+
+            BackColor = Color.Lime;
+            TransparencyKey = Color.Lime;
+
+            this.Load += (s, e) => ApplyClickThroughStyles();
+        }
+
+        private void ApplyClickThroughStyles()
+        {
+            const int WS_EX_TRANSPARENT = 0x20;
+            const int WS_EX_LAYERED = 0x00080000;
+
+            IntPtr hWnd = this.Handle;
+            IntPtr ex = NativeMethods.GetWindowLongPtrFallback(hWnd, NativeMethods.GWL_EXSTYLE);
+            long exLong = ex == IntPtr.Zero ? 0 : ex.ToInt64();
+            exLong |= (WS_EX_TRANSPARENT | WS_EX_LAYERED);
+            NativeMethods.SetWindowLongPtrFallback(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exLong));
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                var cp = base.CreateParams;
+                cp.ExStyle |= NativeMethods.WS_EX_TRANSPARENT | NativeMethods.WS_EX_LAYERED;
+                return cp;
+            }
+        }
+
+        public void SetRectangle(Rectangle? r)
+        {
+            rectToDraw = r;
+            dotToDraw = null;
+            arrowToDraw = null;
+            Invalidate();
+            Update();
+        }
+
+        public void SetDot(Point? p, int radius = 5)
+        {
+            dotToDraw = p;
+            DotRadius = radius;
+            rectToDraw = null;
+            arrowToDraw = null;
+            Invalidate();
+            Update();
+        }
+
+        public void SetArrow(int startX, int startY, int endX, int endY, int arrowHeadSize = 10)
+        {
+            arrowToDraw = new Arrow
+            {
+                StartX = startX,
+                StartY = startY,
+                EndX = endX,
+                EndY = endY,
+                ArrowHeadSize = arrowHeadSize
+            };
+            rectToDraw = null;
+            dotToDraw = null;
+            Invalidate();
+            Update();
+        }
+
+        public void ClearAll()
+        {
+            rectToDraw = null;
+            dotToDraw = null;
+            arrowToDraw = null;
+            Invalidate();
+            Update();
+        }
+
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.Clear(BackColor);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            // Add these for better rendering
+            e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+            e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+
+            if (DebugVisible)
+            {
+                using (var br = new SolidBrush(Color.FromArgb(80, Color.Yellow)))
+                {
+                    e.Graphics.FillRectangle(br, ClientRectangle);
+                }
+            }
+
+            // Draw Rectangle
+            if (rectToDraw.HasValue)
+            {
+                var r = rectToDraw.Value;
+                r.Intersect(new Rectangle(0, 0, Width, Height));
+
+                if (r.Width > 0 && r.Height > 0)
+                {
+                    using (var pen = new Pen(LineColor, LineWidth))
+                    {
+                        // REMOVE Inset alignment - this was causing the darker color!
+                        // pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Inset;
+
+                        // Use Center alignment for clearer, brighter color
+                        pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
+                        e.Graphics.DrawRectangle(pen, r);
+                    }
+                }
+            }
+
+            // Draw Dot
+            if (dotToDraw.HasValue)
+            {
+                var p = dotToDraw.Value;
+                if (p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height)
+                {
+                    using (var brush = new SolidBrush(LineColor))
+                    {
+                        int diameter = DotRadius * 2;
+                        e.Graphics.FillEllipse(brush, p.X - DotRadius, p.Y - DotRadius, diameter, diameter);
+                    }
+                }
+            }
+
+            // Draw Arrow
+            if (arrowToDraw.HasValue)
+            {
+                var arrow = arrowToDraw.Value;
+                using (var pen = new Pen(LineColor, LineWidth))
+                {
+                    pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; // Same as rectangle
+
+                    // Draw the main line
+                    e.Graphics.DrawLine(pen, arrow.StartX, arrow.StartY, arrow.EndX, arrow.EndY);
+
+                    // Calculate arrow head
+                    double angle = Math.Atan2(arrow.EndY - arrow.StartY, arrow.EndX - arrow.StartX);
+                    double arrowAngle = Math.PI / 6;
+
+                    int arrowHead1X = (int)(arrow.EndX - arrow.ArrowHeadSize * Math.Cos(angle - arrowAngle));
+                    int arrowHead1Y = (int)(arrow.EndY - arrow.ArrowHeadSize * Math.Sin(angle - arrowAngle));
+                    int arrowHead2X = (int)(arrow.EndX - arrow.ArrowHeadSize * Math.Cos(angle + arrowAngle));
+                    int arrowHead2Y = (int)(arrow.EndY - arrow.ArrowHeadSize * Math.Sin(angle + arrowAngle));
+
+                    e.Graphics.DrawLine(pen, arrow.EndX, arrow.EndY, arrowHead1X, arrowHead1Y);
+                    e.Graphics.DrawLine(pen, arrow.EndX, arrow.EndY, arrowHead2X, arrowHead2Y);
+                }
+            }
+        }
+
+    
+        public struct Arrow
+        {
+            public int StartX;
+            public int StartY;
+            public int EndX;
+            public int EndY;
+            public int ArrowHeadSize;
+        }
+
+        internal static class NativeMethods
+        {
+            public const int GWL_EXSTYLE = -20;
+            public const int WS_EX_TRANSPARENT = 0x20;
+            public const int WS_EX_LAYERED = 0x00080000;
+
+            [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
+            public static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
+            [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+            public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+            [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
+            public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
+
+            [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+            public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+            public static IntPtr GetWindowLongPtrFallback(IntPtr hWnd, int nIndex)
+            {
+                return IntPtr.Size == 8 ? GetWindowLongPtr(hWnd, nIndex) : GetWindowLong(hWnd, nIndex);
+            }
+
+            public static IntPtr SetWindowLongPtrFallback(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+            {
+                return IntPtr.Size == 8 ? SetWindowLongPtr(hWnd, nIndex, dwNewLong) : SetWindowLong(hWnd, nIndex, dwNewLong);
+            }
+        }
     }
 }

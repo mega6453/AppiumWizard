@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Appium_Wizard.Appium_Wizard;
+using NLog;
 
 namespace Appium_Wizard
 {
@@ -81,7 +82,14 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel(title, "Initializing...", 5);
                 if (OSType.Equals("Android"))
                 {
-                    await ExecuteAndroid();
+                    if (!MainScreen.useScrcpy)
+                    {
+                        await SetupAndroidScreenMirroringUsingUiAutomator();
+                    }
+                    else
+                    {
+                        isScreenServerStarted = true; //use scrcpy
+                    }
                 }
                 else
                 {
@@ -90,7 +98,7 @@ namespace Appium_Wizard
                 if (isScreenServerStarted)
                 {
                     commonProgress.UpdateStepLabel(title, "Screen server started...", 90);
-                    ExecuteBackgroundMethod2(commonProgress);
+                    InitializeScreenControl(commonProgress);
                 }
                 else
                 {
@@ -469,7 +477,7 @@ namespace Appium_Wizard
         }
 
         public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        private async Task ExecuteAndroid()
+        private async Task SetupAndroidScreenMirroringUsingUiAutomator()
         {
             await Task.Run(() =>
             {
@@ -604,12 +612,19 @@ namespace Appium_Wizard
         }
 
 
-        private async void ExecuteBackgroundMethod2(CommonProgress commonProgress)
+        private async void InitializeScreenControl(CommonProgress commonProgress)
         {
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                if (MainScreen.useScrcpy)
+                {
+                    screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, deviceName, deviceModel);
+                }
+                else
+                {
+                    screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                }
             }
             else
             {

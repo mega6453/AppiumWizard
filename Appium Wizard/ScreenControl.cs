@@ -52,6 +52,7 @@ namespace Appium_Wizard
             deviceSerialNumber = udid;
             udidScreenControl.Add(udid, this);
             useScrcpy = true;
+            infoToolStripMenuItem.Visible = false;
         }
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)

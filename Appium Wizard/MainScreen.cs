@@ -193,6 +193,7 @@ namespace Appium_Wizard
                 ScreenRecordingNotification = result["ScreenRecording"].Equals("Enable");
 
                 alwaysOnTop = Database.QueryDataFromAlwaysOnTopTable().Equals("Yes");
+                useScrcpy = Database.QueryDataFromAndroidScreenMirroringTable();
                 if (alwaysOnTop)
                 {
                     yesToolStripMenuItem.Image = Resources.check_mark;
@@ -201,7 +202,14 @@ namespace Appium_Wizard
                 {
                     noToolStripMenuItem.Image = Resources.check_mark;
                 }
-
+                if (useScrcpy)
+                {
+                    useScrcpyMenuItem.Image = Resources.check_mark;
+                }
+                else
+                {
+                    useUiAutomator2ToolStripMenuItem.Image = Resources.check_mark;
+                }
                 UDIDPreInstalledWDA = Database.QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList().ToDictionary();
                 PerformInitialLayout();
                 isInitialized = true;
@@ -2829,11 +2837,32 @@ namespace Appium_Wizard
         private void useScrcpyMenuItem_Click(object sender, EventArgs e)
         {
             useScrcpy = true;
+            useUiAutomator2ToolStripMenuItem.Image = null;
+            useScrcpyMenuItem.Image = Resources.check_mark;
+            Database.UpdateDataIntoAndroidScreenMirroringTable(true);
         }
 
         private void useUiAutomator2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            useScrcpy = false; // use uiautomator2
+            var message = "Using scrcpy is recommended. Do not change unless you encounter issues.\n" +
+                          "Press Yes to set UiAutomator2, or press No to reset back to scrcpy.";
+            var result = MessageBox.Show(message, "Use UiAutomator2", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                useScrcpy = false; // use uiautomator2
+                useScrcpyMenuItem.Image = null;
+                useUiAutomator2ToolStripMenuItem.Image = Resources.check_mark;
+                Database.UpdateDataIntoAndroidScreenMirroringTable(false);
+            }
+            else
+            {
+                // Reset back to scrcpy if user presses No
+                useScrcpy = true;
+                useUiAutomator2ToolStripMenuItem.Image = null;
+                useScrcpyMenuItem.Image = Resources.check_mark;
+                Database.UpdateDataIntoAndroidScreenMirroringTable(true);
+            }
         }
 
         [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]

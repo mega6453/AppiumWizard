@@ -1525,7 +1525,7 @@ namespace Appium_Wizard
                 {
                     Logger.Error("Failed to start scrcpy");
                     this.Show(); // Show form even on error
-                    MessageBox.Show("Failed to start screen mirroring", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to start screen mirroring. Go to Menu->Settings->Android Screen Mirroring->Use UiAutomator2", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 

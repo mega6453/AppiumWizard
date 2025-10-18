@@ -2414,7 +2414,7 @@ namespace Appium_Wizard
 
         public static void KillExeRunningFromAppiumWizardFolder()
         {
-            KillExeRunningFromAppiumWizardFolder(FilesPath.adbFilePath, "adb");
+            //KillExeRunningFromAppiumWizardFolder(FilesPath.adbFilePath, "adb"); 
             KillExeRunningFromAppiumWizardFolder(FilesPath.iProxyFilePath, "iproxy");
             KillExeRunningFromAppiumWizardFolder(FilesPath.iOSServerFilePath, "iOSServer");
             KillExeRunningFromAppiumWizardFolder(FilesPath.nodePath, "node");

@@ -899,7 +899,7 @@ namespace Appium_Wizard
         {
             try
             {
-                if (useScrcpy) 
+                if (useScrcpy)
                 {
                     DrawArrowOnScrcpy(startX, startY, endX, endY, 10);
                     await Task.Delay(1000);
@@ -1289,6 +1289,11 @@ namespace Appium_Wizard
 
         private void RecordAndStopRecordingSteps_ButtonClick(object sender, EventArgs e)
         {
+            if (useScrcpy && isAndroid)
+            {
+                MessageBox.Show("Record and playback feature supported only with UiAutomator2 screen mirroring for now.\n\nClose this screen mirroring window. Go to Settings -> Android Screen Mirroring -> Use UiAutomator2 -> Open device -> Try Recording again.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             isRecordingSteps = !isRecordingSteps;
             if (isRecordingSteps)
             {
@@ -1471,7 +1476,7 @@ namespace Appium_Wizard
             string deviceSerialNumber = "Serial Number - " + this.deviceSerialNumber;
             string udid = "UDID - " + this.udid;
             string deviceDetails = deviceName + "\n" + deviceOS + "\n" + deviceOSVersion + "\n" + deviceModel + "\n" + deviceSerialNumber + "\n" + udid;
-            MessageBox.Show(deviceDetails,"Device Info - "+ this.deviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(deviceDetails, "Device Info - " + this.deviceName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         //<<<------------------------------------------scrcpy embedding methods------------------------------------------>>>
@@ -1874,7 +1879,7 @@ namespace Appium_Wizard
             }
         }
 
-    
+
         public struct Arrow
         {
             public int StartX;

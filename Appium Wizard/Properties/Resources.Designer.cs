@@ -143,6 +143,16 @@ namespace Appium_Wizard.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap cast {
+            get {
+                object obj = ResourceManager.GetObject("cast", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap changelog {
             get {
                 object obj = ResourceManager.GetObject("changelog", resourceCulture);
@@ -476,16 +486,6 @@ namespace Appium_Wizard.Properties {
         internal static System.Drawing.Bitmap runner {
             get {
                 object obj = ResourceManager.GetObject("runner", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap screen_mirroring {
-            get {
-                object obj = ResourceManager.GetObject("screen_mirroring", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

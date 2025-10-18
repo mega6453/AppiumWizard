@@ -232,7 +232,7 @@ namespace Appium_Wizard
             // 
             // iOSToolStripMenuItem
             // 
-            iOSToolStripMenuItem.Image = Properties.Resources.apple;
+            iOSToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.apple;
             iOSToolStripMenuItem.Name = "iOSToolStripMenuItem";
             iOSToolStripMenuItem.Size = new Size(156, 30);
             iOSToolStripMenuItem.Text = "iOS";
@@ -240,7 +240,7 @@ namespace Appium_Wizard
             // 
             // androidToolStripMenuItem
             // 
-            androidToolStripMenuItem.Image = Properties.Resources.android;
+            androidToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.android;
             androidToolStripMenuItem.Name = "androidToolStripMenuItem";
             androidToolStripMenuItem.Size = new Size(156, 30);
             androidToolStripMenuItem.Text = "Android";
@@ -248,7 +248,7 @@ namespace Appium_Wizard
             // 
             // androidWiFiToolStripMenuItem
             // 
-            androidWiFiToolStripMenuItem.Image = Properties.Resources.wifi;
+            androidWiFiToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.wifi;
             androidWiFiToolStripMenuItem.Name = "androidWiFiToolStripMenuItem";
             androidWiFiToolStripMenuItem.Size = new Size(156, 30);
             androidWiFiToolStripMenuItem.Text = "Android Wi-Fi";
@@ -315,7 +315,7 @@ namespace Appium_Wizard
             // 
             // serverSetupToolStripMenuItem
             // 
-            serverSetupToolStripMenuItem.Image = Properties.Resources.gear;
+            serverSetupToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.gear;
             serverSetupToolStripMenuItem.Name = "serverSetupToolStripMenuItem";
             serverSetupToolStripMenuItem.Size = new Size(171, 22);
             serverSetupToolStripMenuItem.Text = "Configuration";
@@ -323,7 +323,7 @@ namespace Appium_Wizard
             // 
             // fixInstallationToolStripMenuItem
             // 
-            fixInstallationToolStripMenuItem.Image = Properties.Resources.troubleshooting;
+            fixInstallationToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.troubleshooting;
             fixInstallationToolStripMenuItem.Name = "fixInstallationToolStripMenuItem";
             fixInstallationToolStripMenuItem.Size = new Size(171, 22);
             fixInstallationToolStripMenuItem.Text = "Troubleshooter";
@@ -331,7 +331,7 @@ namespace Appium_Wizard
             // 
             // updaterToolStripMenuItem
             // 
-            updaterToolStripMenuItem.Image = Properties.Resources.update;
+            updaterToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.update;
             updaterToolStripMenuItem.Name = "updaterToolStripMenuItem";
             updaterToolStripMenuItem.Size = new Size(171, 22);
             updaterToolStripMenuItem.Text = "Updater";
@@ -339,7 +339,7 @@ namespace Appium_Wizard
             // 
             // pluginsToolStripMenuItem1
             // 
-            pluginsToolStripMenuItem1.Image = Properties.Resources.plug_in;
+            pluginsToolStripMenuItem1.Image = Appium_Wizard.Properties.Resources.plug_in;
             pluginsToolStripMenuItem1.Name = "pluginsToolStripMenuItem1";
             pluginsToolStripMenuItem1.Size = new Size(171, 22);
             pluginsToolStripMenuItem1.Text = "Plugins Manager";
@@ -347,7 +347,7 @@ namespace Appium_Wizard
             // 
             // restartADBServerToolStripMenuItem
             // 
-            restartADBServerToolStripMenuItem.Image = Properties.Resources.adb;
+            restartADBServerToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.adb;
             restartADBServerToolStripMenuItem.Name = "restartADBServerToolStripMenuItem";
             restartADBServerToolStripMenuItem.Size = new Size(171, 22);
             restartADBServerToolStripMenuItem.Text = "Restart ADB Server";
@@ -355,7 +355,7 @@ namespace Appium_Wizard
             // 
             // showCMDToolStripMenuItem
             // 
-            showCMDToolStripMenuItem.Image = Properties.Resources.terminal;
+            showCMDToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.terminal;
             showCMDToolStripMenuItem.Name = "showCMDToolStripMenuItem";
             showCMDToolStripMenuItem.Size = new Size(171, 22);
             showCMDToolStripMenuItem.Text = "Open CMD";
@@ -371,7 +371,7 @@ namespace Appium_Wizard
             // 
             // inspectorToolStripMenuItem1
             // 
-            inspectorToolStripMenuItem1.Image = Properties.Resources.inspector;
+            inspectorToolStripMenuItem1.Image = Appium_Wizard.Properties.Resources.inspector;
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
             inspectorToolStripMenuItem1.Size = new Size(203, 22);
             inspectorToolStripMenuItem1.Text = "Inspector";
@@ -379,7 +379,7 @@ namespace Appium_Wizard
             // 
             // iOSProfileManagementToolStripMenuItem
             // 
-            iOSProfileManagementToolStripMenuItem.Image = Properties.Resources.management;
+            iOSProfileManagementToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.management;
             iOSProfileManagementToolStripMenuItem.Name = "iOSProfileManagementToolStripMenuItem";
             iOSProfileManagementToolStripMenuItem.Size = new Size(203, 22);
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
@@ -387,7 +387,7 @@ namespace Appium_Wizard
             // 
             // signIPAToolStripMenuItem
             // 
-            signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
+            signIPAToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.digital_signature;
             signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
             signIPAToolStripMenuItem.Size = new Size(203, 22);
             signIPAToolStripMenuItem.Text = "IPA Signer";
@@ -395,7 +395,7 @@ namespace Appium_Wizard
             // 
             // testRunnerToolStripMenuItem
             // 
-            testRunnerToolStripMenuItem.Image = Properties.Resources.runner;
+            testRunnerToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.runner;
             testRunnerToolStripMenuItem.Name = "testRunnerToolStripMenuItem";
             testRunnerToolStripMenuItem.Size = new Size(203, 22);
             testRunnerToolStripMenuItem.Text = "Test Runner";
@@ -410,56 +410,59 @@ namespace Appium_Wizard
             // 
             // iOSProxyToolStripMenuItem
             // 
-            iOSProxyToolStripMenuItem.Image = Properties.Resources.proxy;
+            iOSProxyToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.proxy;
             iOSProxyToolStripMenuItem.Name = "iOSProxyToolStripMenuItem";
-            iOSProxyToolStripMenuItem.Size = new Size(208, 22);
+            iOSProxyToolStripMenuItem.Size = new Size(216, 30);
             iOSProxyToolStripMenuItem.Text = "iOS Proxy";
             iOSProxyToolStripMenuItem.Click += iOSProxyToolStripMenuItem_Click;
             // 
             // iOSExecutorToolStripMenuItem
             // 
-            iOSExecutorToolStripMenuItem.Image = Properties.Resources.execute;
+            iOSExecutorToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.execute;
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
-            iOSExecutorToolStripMenuItem.Size = new Size(208, 22);
+            iOSExecutorToolStripMenuItem.Size = new Size(216, 30);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
             // notificationsToolStripMenuItem
             // 
-            notificationsToolStripMenuItem.Image = Properties.Resources.notification;
+            notificationsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.notification;
             notificationsToolStripMenuItem.Name = "notificationsToolStripMenuItem";
-            notificationsToolStripMenuItem.Size = new Size(208, 22);
+            notificationsToolStripMenuItem.Size = new Size(216, 30);
             notificationsToolStripMenuItem.Text = "Notifications";
             notificationsToolStripMenuItem.Click += notificationsToolStripMenuItem_Click;
             // 
             // androidScreenMirroringToolStripMenuItem
             // 
             androidScreenMirroringToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { useScrcpyMenuItem, useUiAutomator2ToolStripMenuItem });
-            androidScreenMirroringToolStripMenuItem.Image = Properties.Resources.screen_mirroring;
+            androidScreenMirroringToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.cast;
             androidScreenMirroringToolStripMenuItem.Name = "androidScreenMirroringToolStripMenuItem";
-            androidScreenMirroringToolStripMenuItem.Size = new Size(208, 22);
+            androidScreenMirroringToolStripMenuItem.Size = new Size(216, 30);
             androidScreenMirroringToolStripMenuItem.Text = "Android Screen Mirroring";
+            androidScreenMirroringToolStripMenuItem.ToolTipText = "Configure Android screen mirroring settings";
             // 
             // useScrcpyMenuItem
             // 
             useScrcpyMenuItem.Name = "useScrcpyMenuItem";
-            useScrcpyMenuItem.Size = new Size(171, 22);
+            useScrcpyMenuItem.Size = new Size(180, 22);
             useScrcpyMenuItem.Text = "Use scrcpy";
+            useScrcpyMenuItem.ToolTipText = "Use scrcpy for Android screen mirroring. It provides low-latency mirroring.";
             useScrcpyMenuItem.Click += useScrcpyMenuItem_Click;
             // 
             // useUiAutomator2ToolStripMenuItem
             // 
             useUiAutomator2ToolStripMenuItem.Name = "useUiAutomator2ToolStripMenuItem";
-            useUiAutomator2ToolStripMenuItem.Size = new Size(171, 22);
+            useUiAutomator2ToolStripMenuItem.Size = new Size(180, 22);
             useUiAutomator2ToolStripMenuItem.Text = "Use UiAutomator2";
+            useUiAutomator2ToolStripMenuItem.ToolTipText = "UiAutomator2 is an alternative to scrcpy. Enable only if you encounter issues with scrcpy.";
             useUiAutomator2ToolStripMenuItem.Click += useUiAutomator2ToolStripMenuItem_Click;
             // 
             // alwaysOnTopToolStripMenuItem
             // 
             alwaysOnTopToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { yesToolStripMenuItem, noToolStripMenuItem });
-            alwaysOnTopToolStripMenuItem.Image = Properties.Resources.pin;
+            alwaysOnTopToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.pin;
             alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
-            alwaysOnTopToolStripMenuItem.Size = new Size(208, 22);
+            alwaysOnTopToolStripMenuItem.Size = new Size(216, 30);
             alwaysOnTopToolStripMenuItem.Text = "Always On Top";
             alwaysOnTopToolStripMenuItem.ToolTipText = "\"Always On Top\" setting for Screen Mirroring window.";
             // 
@@ -487,7 +490,7 @@ namespace Appium_Wizard
             // appiumDocsToolStripMenuItem
             // 
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, pluginsToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
-            appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
+            appiumDocsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
             appiumDocsToolStripMenuItem.Size = new Size(247, 22);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
@@ -495,14 +498,14 @@ namespace Appium_Wizard
             // capabilitiesToolStripMenuItem
             // 
             capabilitiesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionCapsToolStripMenuItem, xCUITestCapsToolStripMenuItem, uIAutomator2CapsToolStripMenuItem });
-            capabilitiesToolStripMenuItem.Image = Properties.Resources.link;
+            capabilitiesToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             capabilitiesToolStripMenuItem.Name = "capabilitiesToolStripMenuItem";
             capabilitiesToolStripMenuItem.Size = new Size(188, 22);
             capabilitiesToolStripMenuItem.Text = "Capabilities";
             // 
             // sessionCapsToolStripMenuItem
             // 
-            sessionCapsToolStripMenuItem.Image = Properties.Resources.link;
+            sessionCapsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             sessionCapsToolStripMenuItem.Name = "sessionCapsToolStripMenuItem";
             sessionCapsToolStripMenuItem.Size = new Size(178, 22);
             sessionCapsToolStripMenuItem.Text = "Session Caps";
@@ -510,7 +513,7 @@ namespace Appium_Wizard
             // 
             // xCUITestCapsToolStripMenuItem
             // 
-            xCUITestCapsToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestCapsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             xCUITestCapsToolStripMenuItem.Name = "xCUITestCapsToolStripMenuItem";
             xCUITestCapsToolStripMenuItem.Size = new Size(178, 22);
             xCUITestCapsToolStripMenuItem.Text = "XCUITest Caps";
@@ -518,7 +521,7 @@ namespace Appium_Wizard
             // 
             // uIAutomator2CapsToolStripMenuItem
             // 
-            uIAutomator2CapsToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2CapsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             uIAutomator2CapsToolStripMenuItem.Name = "uIAutomator2CapsToolStripMenuItem";
             uIAutomator2CapsToolStripMenuItem.Size = new Size(178, 22);
             uIAutomator2CapsToolStripMenuItem.Text = "UIAutomator2 Caps";
@@ -527,14 +530,14 @@ namespace Appium_Wizard
             // settingsAPIToolStripMenuItem
             // 
             settingsAPIToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sessionSettingsToolStripMenuItem, xCUITestSettingsToolStripMenuItem, uIAutomator2SettingsToolStripMenuItem });
-            settingsAPIToolStripMenuItem.Image = Properties.Resources.link;
+            settingsAPIToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             settingsAPIToolStripMenuItem.Name = "settingsAPIToolStripMenuItem";
             settingsAPIToolStripMenuItem.Size = new Size(188, 22);
             settingsAPIToolStripMenuItem.Text = "Settings API";
             // 
             // sessionSettingsToolStripMenuItem
             // 
-            sessionSettingsToolStripMenuItem.Image = Properties.Resources.link;
+            sessionSettingsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             sessionSettingsToolStripMenuItem.Name = "sessionSettingsToolStripMenuItem";
             sessionSettingsToolStripMenuItem.Size = new Size(194, 22);
             sessionSettingsToolStripMenuItem.Text = "Session Settings";
@@ -542,7 +545,7 @@ namespace Appium_Wizard
             // 
             // xCUITestSettingsToolStripMenuItem
             // 
-            xCUITestSettingsToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestSettingsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             xCUITestSettingsToolStripMenuItem.Name = "xCUITestSettingsToolStripMenuItem";
             xCUITestSettingsToolStripMenuItem.Size = new Size(194, 22);
             xCUITestSettingsToolStripMenuItem.Text = "XCUITest Settings";
@@ -550,7 +553,7 @@ namespace Appium_Wizard
             // 
             // uIAutomator2SettingsToolStripMenuItem
             // 
-            uIAutomator2SettingsToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2SettingsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             uIAutomator2SettingsToolStripMenuItem.Name = "uIAutomator2SettingsToolStripMenuItem";
             uIAutomator2SettingsToolStripMenuItem.Size = new Size(194, 22);
             uIAutomator2SettingsToolStripMenuItem.Text = "UIAutomator2 Settings";
@@ -558,7 +561,7 @@ namespace Appium_Wizard
             // 
             // pluginsToolStripMenuItem
             // 
-            pluginsToolStripMenuItem.Image = Properties.Resources.link;
+            pluginsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             pluginsToolStripMenuItem.Name = "pluginsToolStripMenuItem";
             pluginsToolStripMenuItem.Size = new Size(188, 22);
             pluginsToolStripMenuItem.Text = "Plugins";
@@ -566,7 +569,7 @@ namespace Appium_Wizard
             // 
             // xCUITestToolStripMenuItem
             // 
-            xCUITestToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             xCUITestToolStripMenuItem.Name = "xCUITestToolStripMenuItem";
             xCUITestToolStripMenuItem.Size = new Size(188, 22);
             xCUITestToolStripMenuItem.Text = "XCUITest";
@@ -574,7 +577,7 @@ namespace Appium_Wizard
             // 
             // uIAutomatorToolStripMenuItem
             // 
-            uIAutomatorToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomatorToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             uIAutomatorToolStripMenuItem.Name = "uIAutomatorToolStripMenuItem";
             uIAutomatorToolStripMenuItem.Size = new Size(188, 22);
             uIAutomatorToolStripMenuItem.Text = "UIAutomator";
@@ -582,7 +585,7 @@ namespace Appium_Wizard
             // 
             // serverSecurityToolStripMenuItem
             // 
-            serverSecurityToolStripMenuItem.Image = Properties.Resources.link;
+            serverSecurityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             serverSecurityToolStripMenuItem.Name = "serverSecurityToolStripMenuItem";
             serverSecurityToolStripMenuItem.Size = new Size(188, 22);
             serverSecurityToolStripMenuItem.Text = "Server Security";
@@ -590,7 +593,7 @@ namespace Appium_Wizard
             // 
             // cLIArgumentsToolStripMenuItem
             // 
-            cLIArgumentsToolStripMenuItem.Image = Properties.Resources.link;
+            cLIArgumentsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             cLIArgumentsToolStripMenuItem.Name = "cLIArgumentsToolStripMenuItem";
             cLIArgumentsToolStripMenuItem.Size = new Size(188, 22);
             cLIArgumentsToolStripMenuItem.Text = "Server CLI Arguments";
@@ -599,14 +602,14 @@ namespace Appium_Wizard
             // otherDocsToolStripMenuItem
             // 
             otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
-            otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
+            otherDocsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.doc;
             otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
             otherDocsToolStripMenuItem.Size = new Size(247, 22);
             otherDocsToolStripMenuItem.Text = "Other Docs";
             // 
             // iOSNativeAppsBundleToolStripMenuItem
             // 
-            iOSNativeAppsBundleToolStripMenuItem.Image = Properties.Resources.link;
+            iOSNativeAppsBundleToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             iOSNativeAppsBundleToolStripMenuItem.Name = "iOSNativeAppsBundleToolStripMenuItem";
             iOSNativeAppsBundleToolStripMenuItem.Size = new Size(218, 22);
             iOSNativeAppsBundleToolStripMenuItem.Text = "iOS Native Apps Bundle IDs";
@@ -614,7 +617,7 @@ namespace Appium_Wizard
             // 
             // troubleshootToolStripMenuItem
             // 
-            troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
+            troubleshootToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
             troubleshootToolStripMenuItem.Size = new Size(247, 22);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
@@ -622,7 +625,7 @@ namespace Appium_Wizard
             // 
             // reportAnIssueToolStripMenuItem
             // 
-            reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
+            reportAnIssueToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
             reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
@@ -630,7 +633,7 @@ namespace Appium_Wizard
             // 
             // openLogsFolderToolstripMenuItem
             // 
-            openLogsFolderToolstripMenuItem.Image = Properties.Resources.log;
+            openLogsFolderToolstripMenuItem.Image = Appium_Wizard.Properties.Resources.log;
             openLogsFolderToolstripMenuItem.Name = "openLogsFolderToolstripMenuItem";
             openLogsFolderToolstripMenuItem.Size = new Size(247, 22);
             openLogsFolderToolstripMenuItem.Text = "Open Logs folder";
@@ -638,7 +641,7 @@ namespace Appium_Wizard
             // 
             // startADiscussionToolStripMenuItem
             // 
-            startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
+            startADiscussionToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
             startADiscussionToolStripMenuItem.Size = new Size(247, 22);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
@@ -646,7 +649,7 @@ namespace Appium_Wizard
             // 
             // checkForUpdatesToolStripMenuItem
             // 
-            checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
+            checkForUpdatesToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
             checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
@@ -654,7 +657,7 @@ namespace Appium_Wizard
             // 
             // changeLogToolStripMenuItem
             // 
-            changeLogToolStripMenuItem.Image = Properties.Resources.changelog;
+            changeLogToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.changelog;
             changeLogToolStripMenuItem.Name = "changeLogToolStripMenuItem";
             changeLogToolStripMenuItem.Size = new Size(247, 22);
             changeLogToolStripMenuItem.Text = "Changelog";
@@ -662,7 +665,7 @@ namespace Appium_Wizard
             // 
             // readMeToolStripMenuItem
             // 
-            readMeToolStripMenuItem.Image = Properties.Resources.readme;
+            readMeToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
             readMeToolStripMenuItem.Size = new Size(247, 22);
             readMeToolStripMenuItem.Text = "Read me";
@@ -670,7 +673,7 @@ namespace Appium_Wizard
             // 
             // aboutToolStripMenuItem
             // 
-            aboutToolStripMenuItem.Image = Properties.Resources.information;
+            aboutToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(247, 22);
             aboutToolStripMenuItem.Text = "About";
@@ -822,7 +825,7 @@ namespace Appium_Wizard
             // 
             // copyUDIDToolStripMenuItem
             // 
-            copyUDIDToolStripMenuItem.Image = Properties.Resources.files;
+            copyUDIDToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.files;
             copyUDIDToolStripMenuItem.Name = "copyUDIDToolStripMenuItem";
             copyUDIDToolStripMenuItem.Size = new Size(200, 30);
             copyUDIDToolStripMenuItem.Text = "Copy UDID";
@@ -830,7 +833,7 @@ namespace Appium_Wizard
             // 
             // copyDeviceDetailsToolStripMenuItem
             // 
-            copyDeviceDetailsToolStripMenuItem.Image = Properties.Resources.files;
+            copyDeviceDetailsToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.files;
             copyDeviceDetailsToolStripMenuItem.Name = "copyDeviceDetailsToolStripMenuItem";
             copyDeviceDetailsToolStripMenuItem.Size = new Size(200, 30);
             copyDeviceDetailsToolStripMenuItem.Text = "Copy Device Details";
@@ -838,7 +841,7 @@ namespace Appium_Wizard
             // 
             // showDeviceInfoToolStripMenuItem
             // 
-            showDeviceInfoToolStripMenuItem.Image = Properties.Resources.Discussion;
+            showDeviceInfoToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Discussion;
             showDeviceInfoToolStripMenuItem.Name = "showDeviceInfoToolStripMenuItem";
             showDeviceInfoToolStripMenuItem.Size = new Size(200, 30);
             showDeviceInfoToolStripMenuItem.Text = "Show Device Info";
@@ -867,7 +870,7 @@ namespace Appium_Wizard
             // capabilityCopyButton
             // 
             capabilityCopyButton.BackColor = SystemColors.ControlLightLight;
-            capabilityCopyButton.BackgroundImage = Properties.Resources.files;
+            capabilityCopyButton.BackgroundImage = Appium_Wizard.Properties.Resources.files;
             capabilityCopyButton.BackgroundImageLayout = ImageLayout.Stretch;
             capabilityCopyButton.Location = new Point(368, -2);
             capabilityCopyButton.Margin = new Padding(2);
@@ -896,7 +899,7 @@ namespace Appium_Wizard
             // 
             // copyIPAddressToolStripMenuItem
             // 
-            copyIPAddressToolStripMenuItem.Image = Properties.Resources.files;
+            copyIPAddressToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.files;
             copyIPAddressToolStripMenuItem.Name = "copyIPAddressToolStripMenuItem";
             copyIPAddressToolStripMenuItem.Size = new Size(168, 30);
             copyIPAddressToolStripMenuItem.Text = "Copy IP Address";
@@ -910,7 +913,7 @@ namespace Appium_Wizard
             // 
             // installAppToolStripMenuItem
             // 
-            installAppToolStripMenuItem.Image = Properties.Resources.Install;
+            installAppToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Install;
             installAppToolStripMenuItem.Name = "installAppToolStripMenuItem";
             installAppToolStripMenuItem.Size = new Size(239, 30);
             installAppToolStripMenuItem.Text = "Install App";
@@ -918,7 +921,7 @@ namespace Appium_Wizard
             // 
             // launchAppToolStripMenuItem
             // 
-            launchAppToolStripMenuItem.Image = Properties.Resources.application;
+            launchAppToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.application;
             launchAppToolStripMenuItem.Name = "launchAppToolStripMenuItem";
             launchAppToolStripMenuItem.Size = new Size(239, 30);
             launchAppToolStripMenuItem.Text = "Apps - Launch | Kill | Uninstall";
@@ -926,7 +929,7 @@ namespace Appium_Wizard
             // 
             // refreshStatusToolStripMenuItem
             // 
-            refreshStatusToolStripMenuItem.Image = Properties.Resources.Refresh;
+            refreshStatusToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Refresh;
             refreshStatusToolStripMenuItem.Name = "refreshStatusToolStripMenuItem";
             refreshStatusToolStripMenuItem.Size = new Size(239, 30);
             refreshStatusToolStripMenuItem.Text = "Refresh Status";
@@ -934,7 +937,7 @@ namespace Appium_Wizard
             // 
             // takeScreenshotToolStripMenuItem
             // 
-            takeScreenshotToolStripMenuItem.Image = Properties.Resources.screenshot;
+            takeScreenshotToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.screenshot;
             takeScreenshotToolStripMenuItem.Name = "takeScreenshotToolStripMenuItem";
             takeScreenshotToolStripMenuItem.Size = new Size(239, 30);
             takeScreenshotToolStripMenuItem.Text = "Take Screenshot";
@@ -942,7 +945,7 @@ namespace Appium_Wizard
             // 
             // unlockDeviceToolStripMenuItem
             // 
-            unlockDeviceToolStripMenuItem.Image = Properties.Resources.Unlock;
+            unlockDeviceToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Unlock;
             unlockDeviceToolStripMenuItem.Name = "unlockDeviceToolStripMenuItem";
             unlockDeviceToolStripMenuItem.Size = new Size(239, 30);
             unlockDeviceToolStripMenuItem.Text = "Unlock Device";
@@ -950,7 +953,7 @@ namespace Appium_Wizard
             // 
             // rebootDeviceToolStripMenuItem
             // 
-            rebootDeviceToolStripMenuItem.Image = Properties.Resources.Reboot;
+            rebootDeviceToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Reboot;
             rebootDeviceToolStripMenuItem.Name = "rebootDeviceToolStripMenuItem";
             rebootDeviceToolStripMenuItem.Size = new Size(239, 30);
             rebootDeviceToolStripMenuItem.Text = "Reboot Device";
@@ -1044,7 +1047,7 @@ namespace Appium_Wizard
             // 
             // reInitializeDeviceToolStripMenuItem
             // 
-            reInitializeDeviceToolStripMenuItem.Image = Properties.Resources.Refresh;
+            reInitializeDeviceToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.Refresh;
             reInitializeDeviceToolStripMenuItem.Name = "reInitializeDeviceToolStripMenuItem";
             reInitializeDeviceToolStripMenuItem.Size = new Size(173, 22);
             reInitializeDeviceToolStripMenuItem.Text = "Re-Initialize Device";

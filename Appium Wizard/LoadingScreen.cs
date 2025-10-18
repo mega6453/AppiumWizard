@@ -132,7 +132,6 @@ namespace Appium_Wizard
             Database.UpdateDataIntoFirstTimeRunTable("No");
             await ExecuteBackgroundMethod();
             UpdateStepLabel("Loading Modules...");            
-            AndroidMethods.GetInstance().RestartADBServer();
             Common.DeleteLogFiles();
             MainScreen mainForm = new MainScreen();
             UpdateStepLabel("Initializing User Interface...");

@@ -57,6 +57,7 @@ namespace Appium_Wizard
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
         {
+            useScrcpy = false;
             this.OSType = os;
             this.OSVersion = Version;
             this.udid = udid;

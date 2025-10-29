@@ -37,7 +37,7 @@ namespace Appium_Wizard
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool useScrcpy = false;
-        public ScreenControl(string os, string Version, string udid, int width, int height, string selectedDeviceName, string deviceModel)
+        public ScreenControl(string os, string Version, string udid, int width, int height, string UIAutomatorSessionId, string selectedDeviceName, int proxyPort, string deviceModel)
         {
             InitializeComponent();
             this.OSType = os;
@@ -47,6 +47,8 @@ namespace Appium_Wizard
             this.height = height;
             this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
+            sessionId = UIAutomatorSessionId;
+            this.proxyPort = proxyPort;
             isAndroid = true;
             screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
             deviceSerialNumber = udid;
@@ -1116,7 +1118,7 @@ namespace Appium_Wizard
 
         private void objectSpyButton_Click(object sender, EventArgs e)
         {
-            Object_Spy object_Spy = new Object_Spy(OSType, proxyPort, width, height, sessionId);
+            Object_Spy object_Spy = new Object_Spy(OSType, proxyPort, width, height, sessionId, deviceName, udid);
             object_Spy.Show();
         }
 

@@ -2840,6 +2840,7 @@ namespace Appium_Wizard
             useUiAutomator2ToolStripMenuItem.Image = null;
             useScrcpyMenuItem.Image = Resources.check_mark;
             Database.UpdateDataIntoAndroidScreenMirroringTable(true);
+            GoogleAnalytics.SendEvent("UseScrcpy");
         }
 
         private void useUiAutomator2ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2854,6 +2855,7 @@ namespace Appium_Wizard
                 useScrcpyMenuItem.Image = null;
                 useUiAutomator2ToolStripMenuItem.Image = Resources.check_mark;
                 Database.UpdateDataIntoAndroidScreenMirroringTable(false);
+                GoogleAnalytics.SendEvent("UseUiAutomator2");
             }
             else
             {
@@ -2862,6 +2864,7 @@ namespace Appium_Wizard
                 useUiAutomator2ToolStripMenuItem.Image = null;
                 useScrcpyMenuItem.Image = Resources.check_mark;
                 Database.UpdateDataIntoAndroidScreenMirroringTable(true);
+                GoogleAnalytics.SendEvent("UseScrcpy");
             }
         }
 

@@ -37,100 +37,20 @@ namespace Appium_Wizard
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool useScrcpy = false;
-        public ScreenControl(string os, string Version, string udid, int width, int height, string UIAutomatorSessionId, string selectedDeviceName, int proxyPort, string deviceModel)
+
+        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy=true)
         {
             InitializeComponent();
-            this.OSType = os;
-            this.OSVersion = Version;
-            this.udid = udid;
-            this.width = width;
-            this.height = height;
-            this.deviceModel = deviceModel;
-            this.deviceName = selectedDeviceName;
-            sessionId = UIAutomatorSessionId;
-            this.proxyPort = proxyPort;
-            isAndroid = true;
-            screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
-            deviceSerialNumber = udid;
-            udidScreenControl.Add(udid, this);
-            useScrcpy = true;
-            infoToolStripMenuItem.Visible = false;
-        }
-
-        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel)
-        {
-            useScrcpy = false;
             this.OSType = os;
             this.OSVersion = Version;
             this.udid = udid;
             this.width = width;
             this.height = height;
             sessionId = session;
-            tempSessionId = session;
-            this.deviceModel = deviceModel;
             this.deviceName = selectedDeviceName;
             this.proxyPort = proxyPort;
-            this.screenPort = screenPort;
-            if (devicePorts.ContainsKey(udid))
-            {
-                devicePorts[udid] = new Tuple<int, int>(screenPort, proxyPort);
-            }
-            else
-            {
-                devicePorts.Add(udid, new Tuple<int, int>(screenPort, proxyPort));
-            }
-            URL = "http://" + IPAddress + ":" + proxyPort;
-            InitializeComponent();
-            ScreenWebView = new WebView2();
-            if (deviceSessionId.ContainsKey(udid))
-            {
-                deviceSessionId[udid] = session;
-            }
-            else
-            {
-                deviceSessionId.Add(udid, session);
-            }
-            if (!webview2.ContainsKey(udid))
-            {
-                webview2.Add(udid, ScreenWebView);
-            }
-            else
-            {
-                webview2[udid] = ScreenWebView;
-            }
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    sessionId = GetSessionID();
-                    sessionURL = URL + "/session/" + sessionId;
-                    if (OSType.Equals("Android"))
-                    {
-                        try
-                        {
-                            BeginInvoke(new Action(() =>
-                            {
-                                if (tempSessionId != sessionId)
-                                {
-                                    try
-                                    {
-                                        ScreenWebView.EnsureCoreWebView2Async();
-                                        ScreenWebView.Reload();
-                                        tempSessionId = sessionId;
-                                    }
-                                    catch (Exception)
-                                    {
-                                    }
-                                }
-                            }));
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                    Thread.Sleep(1000);
-                }
-            });
+            this.deviceModel = deviceModel;
+            this.useScrcpy = useScrcpy;
             udidScreenControl.Add(udid, this);
             if (OSType.Equals("Android"))
             {
@@ -143,8 +63,76 @@ namespace Appium_Wizard
                 isAndroid = false;
                 deviceSerialNumber = iOSMethods.GetInstance().GetDeviceSerialNumber(udid);
             }
-            Logger.Info("Initialization completed");
-            this.KeyPreview = true;
+            if (isAndroid && useScrcpy)
+            {
+                infoToolStripMenuItem.Visible = false;
+            }
+            else
+            {
+                tempSessionId = session;            
+                this.screenPort = screenPort;
+                if (devicePorts.ContainsKey(udid))
+                {
+                    devicePorts[udid] = new Tuple<int, int>(screenPort, proxyPort);
+                }
+                else
+                {
+                    devicePorts.Add(udid, new Tuple<int, int>(screenPort, proxyPort));
+                }
+                URL = "http://" + IPAddress + ":" + proxyPort;
+                ScreenWebView = new WebView2();
+                if (deviceSessionId.ContainsKey(udid))
+                {
+                    deviceSessionId[udid] = session;
+                }
+                else
+                {
+                    deviceSessionId.Add(udid, session);
+                }
+                if (!webview2.ContainsKey(udid))
+                {
+                    webview2.Add(udid, ScreenWebView);
+                }
+                else
+                {
+                    webview2[udid] = ScreenWebView;
+                }
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        sessionId = GetSessionID();
+                        sessionURL = URL + "/session/" + sessionId;
+                        if (OSType.Equals("Android"))
+                        {
+                            try
+                            {
+                                BeginInvoke(new Action(() =>
+                                {
+                                    if (tempSessionId != sessionId)
+                                    {
+                                        try
+                                        {
+                                            ScreenWebView.EnsureCoreWebView2Async();
+                                            ScreenWebView.Reload();
+                                            tempSessionId = sessionId;
+                                        }
+                                        catch (Exception)
+                                        {
+                                        }
+                                    }
+                                }));
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
+                        Thread.Sleep(1000);
+                    }
+                });
+                Logger.Info("Initialization completed");
+                this.KeyPreview = true;
+            }            
         }
 
         public void UpdateStatusLabel(ScreenControl screenControl, string actualText)

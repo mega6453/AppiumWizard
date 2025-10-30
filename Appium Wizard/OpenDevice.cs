@@ -676,18 +676,12 @@ namespace Appium_Wizard
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                if (MainScreen.useScrcpy)
-                {
-                    screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, deviceModel);
-                }
-                else
-                {
-                    screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
-                }
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel, MainScreen.useScrcpy);
+
             }
             else
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel, false);
             }
             screenForm.Name = udid;
             commonProgress.UpdateStepLabel(title, "Loading the screen...", 95);

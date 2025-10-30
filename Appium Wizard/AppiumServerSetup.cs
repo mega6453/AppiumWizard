@@ -380,7 +380,7 @@ namespace Appium_Wizard
                                         string text = "Session Deleted for " + udid;
                                         UpdateScreenControl(udid, text);
                                     }
-                                    if (MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
+                                    if (MainScreen.useScrcpy && MainScreen.DeviceInfo[udid].Item2.Equals("Android")) // if android
                                     {
                                         try
                                         {

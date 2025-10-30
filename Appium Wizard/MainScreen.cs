@@ -25,6 +25,7 @@ namespace Appium_Wizard
         public static Dictionary<string, int> udidScreenPort = new Dictionary<string, int>();
         public static bool DeviceConnectedNotification, DeviceDisconnectedNotification, ScreenshotNotification, ScreenRecordingNotification;
         public static bool alwaysOnTop;
+        public static bool useScrcpy;
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -192,6 +193,7 @@ namespace Appium_Wizard
                 ScreenRecordingNotification = result["ScreenRecording"].Equals("Enable");
 
                 alwaysOnTop = Database.QueryDataFromAlwaysOnTopTable().Equals("Yes");
+                useScrcpy = Database.QueryDataFromAndroidScreenMirroringTable();
                 if (alwaysOnTop)
                 {
                     yesToolStripMenuItem.Image = Resources.check_mark;
@@ -200,7 +202,14 @@ namespace Appium_Wizard
                 {
                     noToolStripMenuItem.Image = Resources.check_mark;
                 }
-
+                if (useScrcpy)
+                {
+                    useScrcpyMenuItem.Image = Resources.check_mark;
+                }
+                else
+                {
+                    useUiAutomator2ToolStripMenuItem.Image = Resources.check_mark;
+                }
                 UDIDPreInstalledWDA = Database.QueryUDIDsAndBundleIdsFromUsePreInstalledWDAList().ToDictionary();
                 PerformInitialLayout();
                 isInitialized = true;
@@ -2822,6 +2831,40 @@ namespace Appium_Wizard
 
                 // Update open logs button position
                 openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
+            }
+        }
+
+        private void useScrcpyMenuItem_Click(object sender, EventArgs e)
+        {
+            useScrcpy = true;
+            useUiAutomator2ToolStripMenuItem.Image = null;
+            useScrcpyMenuItem.Image = Resources.check_mark;
+            Database.UpdateDataIntoAndroidScreenMirroringTable(true);
+            GoogleAnalytics.SendEvent("UseScrcpy");
+        }
+
+        private void useUiAutomator2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var message = "Using scrcpy is recommended. Do not change unless you encounter issues.\n" +
+                          "Press Yes to set UiAutomator2, or press No to reset back to scrcpy.";
+            var result = MessageBox.Show(message, "Use UiAutomator2", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                useScrcpy = false; // use uiautomator2
+                useScrcpyMenuItem.Image = null;
+                useUiAutomator2ToolStripMenuItem.Image = Resources.check_mark;
+                Database.UpdateDataIntoAndroidScreenMirroringTable(false);
+                GoogleAnalytics.SendEvent("UseUiAutomator2");
+            }
+            else
+            {
+                // Reset back to scrcpy if user presses No
+                useScrcpy = true;
+                useUiAutomator2ToolStripMenuItem.Image = null;
+                useScrcpyMenuItem.Image = Resources.check_mark;
+                Database.UpdateDataIntoAndroidScreenMirroringTable(true);
+                GoogleAnalytics.SendEvent("UseScrcpy");
             }
         }
 

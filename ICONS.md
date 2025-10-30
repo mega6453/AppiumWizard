@@ -50,6 +50,7 @@ Below is the full attribution list as required by the license.
 * <a href="https://www.flaticon.com/free-icons/wifi" title="wifi icons">Wifi icons created by Ilham Fitrotul Hayat - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/brands-and-logotypes" title="brands and logotypes icons">Brands and logotypes icons created by Freepik - Flaticon</a>
 * <a href="https://www.flaticon.com/free-icons/terminal" title="terminal icons">Terminal icons created by Assetwave - Flaticon</a>
+* <a href="https://www.flaticon.com/free-icons/mirror" title="mirror icons">Mirror icons created by meaicon - Flaticon</a>
 
 ---
 

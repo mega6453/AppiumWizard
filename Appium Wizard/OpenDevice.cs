@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Appium_Wizard.Appium_Wizard;
+using NLog;
 
 namespace Appium_Wizard
 {
@@ -48,7 +49,7 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
-            }           
+            }
             return (0, 0);
         }
 
@@ -81,7 +82,15 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel(title, "Initializing...", 5);
                 if (OSType.Equals("Android"))
                 {
-                    await ExecuteAndroid();
+                    if (!MainScreen.useScrcpy)
+                    {
+                        await SetupAndroidScreenMirroringUsingUiAutomator();
+                    }
+                    else
+                    {
+                        await SetupAndroidScreenMirroringUsingScrcpy();
+                        isScreenServerStarted = true; //use scrcpy
+                    }
                 }
                 else
                 {
@@ -90,7 +99,7 @@ namespace Appium_Wizard
                 if (isScreenServerStarted)
                 {
                     commonProgress.UpdateStepLabel(title, "Screen server started...", 90);
-                    ExecuteBackgroundMethod2(commonProgress);
+                    InitializeScreenControl(commonProgress);
                 }
                 else
                 {
@@ -125,7 +134,7 @@ namespace Appium_Wizard
                     }
                     if (deviceDetails.ContainsKey(udid))
                     {
-                        Logger.Info("deviceDetails.ContainsKey : "+udid);
+                        Logger.Info("deviceDetails.ContainsKey : " + udid);
                         proxyPort = (int)deviceDetails[udid]["proxyPort"];
                         screenServerPort = (int)deviceDetails[udid]["screenPort"];
                         width = (int)deviceDetails[udid]["width"];
@@ -189,14 +198,14 @@ namespace Appium_Wizard
                                 wdaCheck = false;
                                 Logger.Info("wda not installed");
                                 profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
-                                Logger.Info("isProfileAvailableToSign: "+profileCheck);
+                                Logger.Info("isProfileAvailableToSign: " + profileCheck);
                             }
                         }
                         else
                         {
                             //commonProgress.UpdateStepLabel(title, "Checking if latest version of WebDriverAgent installed...", 10);
                             wdaCheck = iOSMethods.GetInstance().isLatestVersionWDAInstalled(udid);
-                            Logger.Info("isLatestVersionWDAInstalled:"+wdaCheck);
+                            Logger.Info("isLatestVersionWDAInstalled:" + wdaCheck);
                             commonProgress.UpdateStepLabel(title, "Checking if provisioning profile available to sign WDA...", 25);
                             profileCheck = iOSMethods.GetInstance().isProfileAvailableToSign(udid).Item1;
                             if (isInstalled && !wdaCheck && !profileCheck) // WDA installed but not latest version and profile not available to sign.
@@ -362,7 +371,7 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.", 70);
                                 WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
-                                Logger.Info("WDAsessionId:"+ WDAsessionId);
+                                Logger.Info("WDAsessionId:" + WDAsessionId);
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
                                     commonProgress.Close();
@@ -469,7 +478,7 @@ namespace Appium_Wizard
         }
 
         public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        private async Task ExecuteAndroid()
+        private async Task SetupAndroidScreenMirroringUsingUiAutomator()
         {
             await Task.Run(() =>
             {
@@ -490,7 +499,7 @@ namespace Appium_Wizard
                     AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 15);
                     bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
-                    Logger.Info("isUIAutomatorInstalled : "+ isUIAutomatorInstalled);
+                    Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
                     if (!isUIAutomatorInstalled)
                     {
                         commonProgress.UpdateStepLabel(title, "Installing UIAutomator...", 30);
@@ -542,7 +551,7 @@ namespace Appium_Wizard
                         bool isSessionCreated = false, isItValidSession = false;
                         if (deviceSessionId.ContainsKey(udid))
                         {
-                            Logger.Info("deviceSessionId.ContainsKey(udid) : "+udid);
+                            Logger.Info("deviceSessionId.ContainsKey(udid) : " + udid);
                             AndroidAPIMethods.DeleteSession(proxyPort);
                         }
                         else
@@ -603,17 +612,76 @@ namespace Appium_Wizard
             });
         }
 
+        private async Task SetupAndroidScreenMirroringUsingScrcpy()
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    string message = "Please wait while setting up screen mirroring...";
+                    commonProgress.UpdateStepLabel(title, message, 10);
+                    try
+                    {
+                        MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    commonProgress.UpdateStepLabel(title, message, 20);
+                    AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
+                    commonProgress.UpdateStepLabel(title, message, 30);
+                    bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
+                    Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
+                    if (!isUIAutomatorInstalled)
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 40);
+                        AndroidMethods.GetInstance().InstallUIAutomator(udid);
+                        commonProgress.UpdateStepLabel(title, message, 45);
+                    }
+                    commonProgress.UpdateStepLabel(title, message, 50);
+                    proxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
+                    if (proxyPort == -1)
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 55);
+                        proxyPort = Common.GetFreePort(8221, 8299);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                    }
+                    commonProgress.UpdateStepLabel(title, message, 60);
+                    bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                    if (!isRunning)
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 70);
+                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                        Task.Delay(1000);
+                    }
+                    commonProgress.UpdateStepLabel(title, message, 80);
+                    UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+                    if (UIAutomatorSessionId.Equals("nosession"))
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 90);
+                        UIAutomatorSessionId = AndroidAPIMethods.CreateSession(proxyPort);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Error installing uiautomator");
+                    MessageBox.Show(e.Message, "Screen mirroring will work but Object spy won't work.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            });
+        }
 
-        private async void ExecuteBackgroundMethod2(CommonProgress commonProgress)
+        private async void InitializeScreenControl(CommonProgress commonProgress)
         {
             ScreenControl screenForm;
             if (OSType.Equals("Android"))
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, UIAutomatorSessionId, deviceName, proxyPort, screenServerPort, deviceModel, MainScreen.useScrcpy);
+
             }
             else
             {
-                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel);
+                screenForm = new ScreenControl(OSType, OSVersion, udid, width, height, WDAsessionId, deviceName, proxyPort, screenServerPort, deviceModel, false);
             }
             screenForm.Name = udid;
             commonProgress.UpdateStepLabel(title, "Loading the screen...", 95);

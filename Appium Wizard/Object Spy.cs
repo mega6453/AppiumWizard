@@ -11,15 +11,18 @@ namespace Appium_Wizard
         bool isAndroid;
         string os, sessionId;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        string deviceName, udid;
+        public static Dictionary<string, string> UDIDSessionId = new Dictionary<string, string>();
 
-
-        public Object_Spy(string os, int port, int width, int height, string sessionId)
+        public Object_Spy(string os, int port, int width, int height, string sessionId, string deviceName, string udid)
         {
             this.os = os;
             this.port = port;
             this.width = width;
             this.height = height;
             this.sessionId = sessionId;
+            this.deviceName = deviceName;
+            this.udid = udid;
             InitializeComponent();
             if (os.Equals("Android"))
             {
@@ -29,10 +32,19 @@ namespace Appium_Wizard
             {
                 isAndroid = false;
             }
+            this.Text = "Object Spy - "+deviceName;
         }
 
         private async void Object_Spy_Load(object sender, EventArgs e)
         {
+            if (isAndroid)
+            {
+                sessionId = AndroidAPIMethods.GetSessionID(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    UDIDSessionId[udid] = sessionId;
+                }
+            }
             await FetchScreen();
         }
 
@@ -242,17 +254,19 @@ namespace Appium_Wizard
 
         private async Task FetchScreen()
         {
-            string messageTitle = "Object Spy - BETA";
+            string messageTitle = "Object Spy - "+deviceName;
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 20);
+            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 25);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
             await Task.Run(() => {
                 if (isAndroid)
                 {
-                    screenshot = AndroidAPIMethods.TakeScreenshotWithSessionId(port, sessionId);
+                    var result = AndroidAPIMethods.TakeScreenshotWithSessionId(port, sessionId);
+                    screenshot = result.Item1;
+                    sessionId = result.Item2;
                 }
                 else
                 {
@@ -264,7 +278,7 @@ namespace Appium_Wizard
             if (screenshot == null)
             {
                 commonProgress.Close();
-                MessageBox.Show("Failed to retrieve screenshot.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to retrieve screenshot.\n\n1.Try closing and re-opening the screen control once.\n2.Try restarting the device once.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
                 return;
             }
@@ -274,7 +288,9 @@ namespace Appium_Wizard
                 await Task.Run(() => {
                     if (isAndroid)
                     {
-                        xmlContent = AndroidAPIMethods.GetPageSource(port, sessionId);
+                        var result = AndroidAPIMethods.GetPageSource(port, sessionId);
+                        xmlContent = result.Item1;
+                        sessionId = result.Item2;
                     }
                     else
                     {

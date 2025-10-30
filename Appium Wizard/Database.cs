@@ -562,6 +562,45 @@ namespace Appium_Wizard
             }
         }
 
+        public static void UpdateDataIntoAndroidScreenMirroringTable(bool usescrcpy)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand(connection))
+                {
+                    // store boolean as integer 0/1 in SQLite
+                    command.CommandText = "UPDATE AndroidScreenMirroring SET usescrcpy = @usescrcpy;";
+                    command.Parameters.AddWithValue("@usescrcpy", usescrcpy ? 1 : 0);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+            }
+        }
+
+        // Query the SetTop column and return a bool (defaults to false if no rows)
+        public static bool QueryDataFromAndroidScreenMirroringTable()
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("SELECT usescrcpy FROM AndroidScreenMirroring LIMIT 1;", connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        // SQLite stores booleans as integers 0/1, so read as int and convert
+                        int intVal = reader.IsDBNull(0) ? 0 : Convert.ToInt32(reader.GetValue(0));
+                        return intVal != 0;
+                    }
+                }
+            }
+
+            // No rows -> default false
+            return false;
+        }
+
         // Method to insert a single UDID
         public static void InsertUDIDIntoUsePreInstalledWDAList(string udid)
         {

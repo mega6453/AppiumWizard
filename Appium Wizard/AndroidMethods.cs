@@ -1136,26 +1136,16 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetPageSource(int port, string sessionId="")
+        public static (string,string) GetPageSource(int port, string sessionId="")
         {
             string value = "empty";
             try
             {
                 string URL = "http://localhost:" + port;
-                if (string.IsNullOrEmpty(sessionId))
-                {
-                    sessionId = GetSessionID(port);
-                }
-
-                // Attempt to get the page source with the retrieved session ID
                 value = AttemptGetPageSource(URL, sessionId);
-
-                // If the value indicates an invalid session, create a new session and retry
                 if (value == "Invalid session")
                 {
-                    CreateSession(port);
                     sessionId = GetSessionID(port);
-
                     if (!sessionId.Equals("nosession"))
                     {
                         value = AttemptGetPageSource(URL, sessionId);
@@ -1165,12 +1155,11 @@ namespace Appium_Wizard
                         value = "Failed to create a new session.";
                     }
                 }
-
-                return value;
+                return (value,sessionId);
             }
             catch (Exception ex)
             {
-                return "Exception while getting page source : " + ex.Message;
+                return ("Exception while getting page source : " + ex.Message, value);
             }
         }
 
@@ -1210,49 +1199,33 @@ namespace Appium_Wizard
             }
         }
 
-        public static Image TakeScreenshotWithSessionId(int port, string sessionId = "")
+        public static (Image,string) TakeScreenshotWithSessionId(int port, string sessionId = "")
         {
             Image image = null;
             try
             {
                 string URL = "http://localhost:" + port;
-
-                // If sessionId is not provided or invalid, get a new session ID
-                if (string.IsNullOrEmpty(sessionId))
+                var result = AttemptTakeScreenshot(URL, sessionId);
+                image = result.Item1;
+                string message = result.Item2;
+                if (image == null && !message.Contains("unable to capture screen"))
                 {
-                    sessionId = GetSessionID(port);
-                }
-
-                // Attempt to take a screenshot with the provided or new sessionId
-                image = AttemptTakeScreenshot(URL, sessionId);
-
-                // If the image is null, it indicates an invalid session, create a new session and retry
-                if (image == null)
-                {
-                    Console.WriteLine("Session is invalid. Creating a new session...");
-                    CreateSession(port);
-                    sessionId = GetSessionID(port);
-
+                    sessionId = GetSessionID(port);                    
                     if (!sessionId.Equals("nosession"))
                     {
-                        image = AttemptTakeScreenshot(URL, sessionId);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Failed to create a new session.");
+                        image = AttemptTakeScreenshot(URL, sessionId).Item1;
                     }
                 }
-
-                return image;
+                return (image,sessionId);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
-                return image;
+                return (image, sessionId);
             }
         }
 
-        private static Image AttemptTakeScreenshot(string URL, string sessionId)
+        private static (Image,string) AttemptTakeScreenshot(string URL, string sessionId)
         {
             try
             {
@@ -1265,11 +1238,16 @@ namespace Appium_Wizard
                 RestResponse response = client.Execute(request);
 
                 string jsonString = response.Content;
+                if (jsonString.Contains("unable to capture screen"))
+                {
+                    MessageBox.Show("Unable to capture screen. Make sure the current view does not have 'secure' flag on. If not, try restarting device.", "Unable to capture screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, "unable to capture screen");
+                }
 
                 if (!response.IsSuccessful || jsonString.Contains("invalid session id"))
                 {
                     // Check if the response indicates an invalid session
-                    return null;
+                    return (null, "invalid session id");
                 }
 
                 JsonDocument doc = JsonDocument.Parse(jsonString);
@@ -1278,12 +1256,12 @@ namespace Appium_Wizard
                 byte[] imageBytes = Convert.FromBase64String(base64String);
                 using (MemoryStream ms = new MemoryStream(imageBytes))
                 {
-                    return Image.FromStream(ms);
+                    return (Image.FromStream(ms),"");
                 }
             }
             catch
             {
-                return null;
+                return (null,"Exception");
             }
         }
 

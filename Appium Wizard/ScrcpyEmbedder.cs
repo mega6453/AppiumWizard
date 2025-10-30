@@ -111,12 +111,14 @@
                 };
             }
 
-            public async Task<bool> StartAsync()
+            public async Task<bool> StartAsync(string udid)
             {
                 try
                 {
                     if (scrcpyProcess != null && !scrcpyProcess.HasExited)
                         throw new InvalidOperationException("Scrcpy is already running.");
+
+                    ScrcpyArguments = ScrcpyArguments + " -s "+udid;
 
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
@@ -174,71 +176,6 @@
                 }
             }
 
-            /// <summary>
-            /// Starts scrcpy and embeds its window into the host panel.
-            /// </summary>
-            public async Task<bool> StartAsyncOld()
-            {
-                try
-                {
-                    if (scrcpyProcess != null && !scrcpyProcess.HasExited)
-                        throw new InvalidOperationException("Scrcpy is already running.");
-
-                    ProcessStartInfo psi = new ProcessStartInfo
-                    {
-                        FileName = ScrcpyPath,
-                        Arguments = ScrcpyArguments,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    };
-
-                    scrcpyProcess = new Process { StartInfo = psi };
-
-                    bool started = scrcpyProcess.Start();
-                    if (!started)
-                        throw new InvalidOperationException("Failed to start scrcpy process.");
-
-                    // Wait for scrcpy to initialize and create its window
-                    IntPtr scrcpyHandle = IntPtr.Zero;
-                    for (int attempts = 0; attempts < 50; attempts++) // Wait up to 10 seconds
-                    {
-                        await Task.Delay(200);
-
-                        if (scrcpyProcess.HasExited)
-                        {
-                            string error = "";
-                            try { error = await scrcpyProcess.StandardError.ReadToEndAsync(); }
-                            catch { }
-
-                            throw new InvalidOperationException($"Scrcpy exited with code: {scrcpyProcess.ExitCode}\nError: {error}");
-                        }
-
-                        scrcpyHandle = FindScrcpyWindow();
-                        if (scrcpyHandle != IntPtr.Zero)
-                            break;
-                    }
-
-                    if (scrcpyHandle == IntPtr.Zero)
-                    {
-                        throw new InvalidOperationException("Could not find scrcpy window. Make sure your device is connected and USB debugging is enabled.");
-                    }
-
-                    // Resize host panel's parent form if available
-                    await ResizeParentFormToScrcpyWindow(scrcpyHandle);
-
-                    // Embed the scrcpy window inside the panel
-                    EmbedWindow(scrcpyHandle);
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    ShowError(ex.Message);
-                    return false;
-                }
-            }
 
             /// <summary>
             /// Stops the scrcpy process and cleans up.

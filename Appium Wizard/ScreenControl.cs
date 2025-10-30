@@ -718,6 +718,10 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (useScrcpy)
+            {
+                scrcpyEmbedder.Dispose();
+            }
             udidScreenControl.Remove(udid);
             webview2.Remove(udid);
             //Hide();
@@ -1516,7 +1520,7 @@ namespace Appium_Wizard
                 scrcpyEmbedder.HostPanel.BringToFront();
 
                 // Now start scrcpy (this happens hidden)
-                bool scrcpyStarted = await scrcpyEmbedder.StartAsync();
+                bool scrcpyStarted = await scrcpyEmbedder.StartAsync(udid);
                 if (!scrcpyStarted)
                 {
                     Logger.Error("Failed to start scrcpy");

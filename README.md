@@ -71,14 +71,6 @@ to install it during the first time launch which may take sometime to complete i
 * Test Runner (**New**)
 * Record and Playback (**New**)
 
-## Features/Improvements in Queue
-* Add cancel button for progress window
-* Status bar for Element interaction (WaitForElement, Swipe, etc.)
-* Performance and Reliability Improvements
-* Error handling
-* Use devices remotely
-* and more...
-
 ## Built With
 * .Net C# & Windows Forms
 * NodeJS
@@ -88,6 +80,7 @@ to install it during the first time launch which may take sometime to complete i
 * imobiledevice-net
 * zsign
 * adb
+* scrcpy
 * FFMpeg
 * Newtonsoft.Json
 * RestSharp
@@ -99,6 +92,7 @@ to install it during the first time launch which may take sometime to complete i
 * [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS device features in windows. 
 * [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
 * [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
+* [Genymobile](https://github.com/Genymobile/scrcpy) - For scrcpy to screen mirror android device.
 
 ## Icons
 This project uses icons from external providers.  
@@ -117,10 +111,11 @@ PLEASE CREATE AN ISSUE UNDER ISSUES SECTION(WITH LOGS FROM APPIUM WIZARD->HELP->
 
 ## License
 
-This project is dual-licensed under the MIT and GPL 3.0 licenses.
+This project is licensed under MIT, GPL-3.0, or Apache-2.0.
 
 - [MIT License](./LICENSE-MIT)
 - [GPL 3.0 License](./LICENSE-GPL)
+- [Apache License 2.0](./LICENSE-Apache)
   
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

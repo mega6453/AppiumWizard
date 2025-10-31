@@ -144,7 +144,7 @@ namespace Appium_Wizard
                 if (v1.Major != v2.Major)
                 {
                     var result = MessageBox.Show("The driver 'uiautomator2' has a major revision update (" + v1.Major + ".x.x => " + v2.Major + ".x.x), which could include breaking changes. " +
-                        "\n\nPresss Yes to apply this update.\nPress No to apply next minor version update(if there's any).\nPress Cancel to cancel the update.", "UIAutomator2 Update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                        "\n\nPress Yes to apply this update.\nPress No to apply next minor version update(if there's any).\nPress Cancel to cancel the update.", "UIAutomator2 Update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         CommonProgress commonProgress = new CommonProgress();
@@ -218,7 +218,7 @@ namespace Appium_Wizard
                 if (v1.Major != v2.Major)
                 {
                     var result = MessageBox.Show("The driver 'xcuitest' has a major revision update (" + v1.Major + ".x.x => " + v2.Major + ".x.x), which could include breaking changes. " +
-                        "\n\nPresss Yes to apply this update.\nPress No to apply next minor version update(if there's any).\nPress Cancel to cancel the update.", "XCUITest Update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                        "\n\nPress Yes to apply this update.\nPress No to apply next minor version update(if there's any).\nPress Cancel to cancel the update.", "XCUITest Update", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         commonProgress.Show();

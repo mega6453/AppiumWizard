@@ -263,6 +263,11 @@ namespace Appium_Wizard
                                     var control = ScreenControl.udidScreenControl[udid];
                                     control.LoadDeviceDisconnected(udid);
                                 }
+                                else if (ScreenControl.udidScreenControl.ContainsKey(udid))
+                                {
+                                    var control = ScreenControl.udidScreenControl[udid];
+                                    control.Close();
+                                }
                                 GoogleAnalytics.SendEvent("UsbDeviceDisconnected", OSVersion);
                             }
                         }

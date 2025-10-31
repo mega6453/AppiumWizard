@@ -52,6 +52,16 @@ namespace Appium_Wizard
             this.deviceModel = deviceModel;
             this.useScrcpy = useScrcpy;
             udidScreenControl.Add(udid, this);
+            this.screenPort = screenPort;
+            if (devicePorts.ContainsKey(udid))
+            {
+                devicePorts[udid] = new Tuple<int, int>(screenPort, proxyPort);
+            }
+            else
+            {
+                devicePorts.Add(udid, new Tuple<int, int>(screenPort, proxyPort));
+            }
+
             if (OSType.Equals("Android"))
             {
                 screenDensity = (int)AndroidMethods.GetInstance().GetScreenDensity(udid);
@@ -70,15 +80,6 @@ namespace Appium_Wizard
             else
             {
                 tempSessionId = session;            
-                this.screenPort = screenPort;
-                if (devicePorts.ContainsKey(udid))
-                {
-                    devicePorts[udid] = new Tuple<int, int>(screenPort, proxyPort);
-                }
-                else
-                {
-                    devicePorts.Add(udid, new Tuple<int, int>(screenPort, proxyPort));
-                }
                 URL = "http://" + IPAddress + ":" + proxyPort;
                 ScreenWebView = new WebView2();
                 if (deviceSessionId.ContainsKey(udid))

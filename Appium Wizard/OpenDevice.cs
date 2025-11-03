@@ -642,9 +642,16 @@ namespace Appium_Wizard
                     proxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
                     if (proxyPort == -1)
                     {
-                        commonProgress.UpdateStepLabel(title, message, 55);
+                        commonProgress.UpdateStepLabel(title, message, 53);
                         proxyPort = Common.GetFreePort(8221, 8299);
                         AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                    }
+                    screenServerPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                    if (screenServerPort == -1)
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 55);
+                        screenServerPort = Common.GetFreePort(8221, 8299);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                     }
                     commonProgress.UpdateStepLabel(title, message, 60);
                     bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);

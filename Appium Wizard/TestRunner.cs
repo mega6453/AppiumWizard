@@ -456,7 +456,8 @@ namespace Appium_Wizard
                 // Stop execution
                 cancellationTokenSource?.Cancel();
                 runOnceButton.Text = "Run Once";
-                repeatButton.Enabled = true;
+                repeatCountButton.Enabled = true;
+                repeatDurationButton.Enabled = true;
                 isRunning = false;
                 UpdateScreenControl("");
                 return;
@@ -465,7 +466,8 @@ namespace Appium_Wizard
             // Start execution
             isRunning = true;
             runOnceButton.Text = "Stop";
-            repeatButton.Enabled = false;
+            repeatCountButton.Enabled = false;
+            repeatDurationButton.Enabled = false;
             cancellationTokenSource = new CancellationTokenSource();
 
             try
@@ -475,7 +477,8 @@ namespace Appium_Wizard
                 {
                     MessageBox.Show("Please check the rows with errors and fix it.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     runOnceButton.Text = "Run Once";
-                    repeatButton.Enabled = true;
+                    repeatCountButton.Enabled = true;
+                    repeatDurationButton.Enabled = true;
                     isRunning = false;
                     UpdateScreenControl("");
                     return;
@@ -484,7 +487,7 @@ namespace Appium_Wizard
                 string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                 string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                 htmlReportPath = filePath;
-                CreateHtmlReport();
+                CreateHtmlReport("1 run");
                 await performActions(cancellationTokenSource.Token);
                 Common.ShowNotification("Test Runner", "Execution completed.");
                 FinalizeHtmlReport();
@@ -496,7 +499,8 @@ namespace Appium_Wizard
             finally
             {
                 runOnceButton.Text = "Run Once";
-                repeatButton.Enabled = true;
+                repeatCountButton.Enabled = true;
+                repeatDurationButton.Enabled = true;
                 isRunning = false;
                 UpdateScreenControl("");
             }
@@ -509,8 +513,9 @@ namespace Appium_Wizard
             {
                 // Stop execution
                 cancellationTokenSource?.Cancel();
-                repeatButton.Text = "Repeat";
+                repeatCountButton.Text = "Repeat Count";
                 runOnceButton.Enabled = true;
+                repeatDurationButton.Enabled = true;
                 isRunning = false;
                 UpdateScreenControl("");
                 return;
@@ -518,8 +523,9 @@ namespace Appium_Wizard
 
             // Start execution
             isRunning = true;
-            repeatButton.Text = "Stop";
+            repeatCountButton.Text = "Stop";
             runOnceButton.Enabled = false;
+            repeatDurationButton.Enabled = false;
             cancellationTokenSource = new CancellationTokenSource();
 
             try
@@ -528,8 +534,9 @@ namespace Appium_Wizard
                 if (isAnyError)
                 {
                     MessageBox.Show("Please check the rows with errors and fix it.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    repeatButton.Text = "Repeat";
+                    repeatCountButton.Text = "Repeat Count";
                     runOnceButton.Enabled = true;
+                    repeatDurationButton.Enabled = true;
                     isRunning = false;
                     UpdateScreenControl("");
                     return;
@@ -553,7 +560,7 @@ namespace Appium_Wizard
                         {
                             var activeActionCount = actionActiveStates.Count(isActive => isActive);
                             var screenshotCount = activeActionCount * repetitions;
-                            var result = MessageBox.Show("Take Screenshot after every step is enabled. So, this execution will take totally "+screenshotCount+" screenshots. Do you want to keep it enabled and continue?", "Take Screenshot after every step",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                            var result = MessageBox.Show("Take Screenshot after every step is enabled. So, this execution will take totally " + screenshotCount + " screenshots. Do you want to keep it enabled and continue?", "Take Screenshot after every step", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                             if (result == DialogResult.No)
                             {
                                 return;
@@ -563,7 +570,7 @@ namespace Appium_Wizard
                         string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
                         string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
                         htmlReportPath = filePath;
-                        CreateHtmlReport(repetitions);
+                        CreateHtmlReport(repetitions.ToString() + " runs");
                         repeatCountLabel.Text = $"0/{repetitions}";
                         for (int i = 1; i <= repetitions; i++)
                         {
@@ -585,8 +592,9 @@ namespace Appium_Wizard
             }
             finally
             {
-                repeatButton.Text = "Repeat";
+                repeatCountButton.Text = "Repeat Count";
                 runOnceButton.Enabled = true;
+                repeatDurationButton.Enabled = true;
                 isRunning = false;
                 UpdateScreenControl("");
             }
@@ -695,7 +703,7 @@ namespace Appium_Wizard
                             }
                             else
                             {
-                                sendTextResponse = iOSAPIMethods.SendText(selectedUDID,URL, sessionId, properties["XPath"], properties["Text to Enter"]);
+                                sendTextResponse = iOSAPIMethods.SendText(selectedUDID, URL, sessionId, properties["XPath"], properties["Text to Enter"]);
                             }
                             AppendToHtmlReport(sendTextCommand, sendTextResponse);
                             break;
@@ -891,7 +899,7 @@ namespace Appium_Wizard
                             string TakeScreenshotStatusDescription = "-";
                             if (isAndroid)
                             {
-                                 AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, screenshotFilePath);
+                                AndroidMethods.GetInstance().TakeScreenshot(selectedUDID, screenshotFilePath);
                             }
                             else
                             {
@@ -1348,7 +1356,7 @@ namespace Appium_Wizard
             }
         }
 
-        private void CreateHtmlReport(int repetitions = 1)
+        private void CreateHtmlReport(string repetitions)
         {
             string htmlContent = $@"
                              <!DOCTYPE html>
@@ -1366,7 +1374,7 @@ namespace Appium_Wizard
                                  </style>
                              </head>
                              <body>
-                                 <h1>Appium Wizard Test Runner Execution Report - {repetitions} run(s)</h1>
+                                 <h1>Appium Wizard Test Runner Execution Report - {repetitions}</h1>
                                  <table>
                                      <thead>
                                          <tr>
@@ -1550,5 +1558,147 @@ namespace Appium_Wizard
                 { "X", "Enter the X Coordinate for the click location" },
                 { "Y", "Enter the Y Coordinate for the click location" }
             };
+
+        private async void repeatDurationButton_Click(object sender, EventArgs e)
+        {
+            if (isRunning)
+            {
+                // Stop execution
+                cancellationTokenSource?.Cancel();
+                repeatDurationButton.Text = "Repeat Duration";
+                runOnceButton.Enabled = true;
+                repeatCountButton.Enabled = true;
+                isRunning = false;
+                UpdateScreenControl("");
+                return;
+            }
+
+            // Start execution
+            isRunning = true;
+            repeatDurationButton.Text = "Stop";
+            runOnceButton.Enabled = false;
+            repeatCountButton.Enabled = false;
+            cancellationTokenSource = new CancellationTokenSource();
+
+            try
+            {
+                var isAnyError = checkIfAnyErrors();
+                if (isAnyError)
+                {
+                    MessageBox.Show("Please check the rows with errors and fix it.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    repeatDurationButton.Text = "Repeat Duration";
+                    runOnceButton.Enabled = true;
+                    repeatCountButton.Enabled = true;
+                    isRunning = false;
+                    UpdateScreenControl("");
+                    return;
+                }
+
+                // Ask user for duration in minutes (explicit)
+                string input = Microsoft.VisualBasic.Interaction.InputBox(
+                    "Enter duration to run in minutes (e.g. 60 for 1 hour):",
+                    "Repeat Duration (minutes)",
+                    "60");
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    // User clicked Cancel or left input empty
+                    repeatDurationButton.Text = "Repeat Duration";
+                    runOnceButton.Enabled = true;
+                    repeatCountButton.Enabled = true;
+                    isRunning = false;
+                    UpdateScreenControl("");
+                    return;
+                }
+
+                // Parse minutes
+                if (!double.TryParse(input.Trim(), out double minutes) || minutes <= 0)
+                {
+                    MessageBox.Show("Please enter a valid positive number of minutes.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    repeatDurationButton.Text = "Repeat Duration";
+                    runOnceButton.Enabled = true;
+                    repeatCountButton.Enabled = true;
+                    isRunning = false;
+                    UpdateScreenControl("");
+                    return;
+                }
+
+                TimeSpan duration = TimeSpan.FromMinutes(minutes);
+
+                // If screenshots after every step are enabled, warn user (total screenshots unknown)
+                if (screenshotCheckBox.Checked)
+                {
+                    var result = MessageBox.Show(
+                        "Take Screenshot after every step is enabled. The total number of screenshots is unknown because execution runs for a duration. Do you want to keep it enabled and continue?",
+                        "Take Screenshot after every step",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.No)
+                    {
+                        repeatDurationButton.Text = "Repeat Duration";
+                        runOnceButton.Enabled = true;
+                        repeatCountButton.Enabled = true;
+                        isRunning = false;
+                        UpdateScreenControl("");
+                        return;
+                    }
+                }
+
+                // Analytics (optional)
+                GoogleAnalytics.SendEvent("Repeat_TestRunner_Duration_Minutes", minutes.ToString());
+
+                string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mm.ss_tt");
+                string filePath = Path.Combine(reportsFolderPath, $"TestRunner_{selectedDeviceName}_{timestamp}.html");
+                htmlReportPath = filePath;
+
+                // Update CreateHtmlReport signature if needed; here we pass the duration for reporting
+                CreateHtmlReport(minutes.ToString() + " minutes");
+
+                // Run loop until duration reached or cancelled
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                int iteration = 0;
+                repeatCountLabel.Text = $"0 / {duration:hh\\:mm\\:ss}";
+
+                while (sw.Elapsed < duration)
+                {
+                    // Respect cancellation
+                    cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                    if (!erroShown)
+                    {
+                        iteration++;
+                        await performActions(cancellationTokenSource.Token);
+                        // Update the label to show iteration count and elapsed time
+                        repeatCountLabel.Text = $"{iteration} / {duration:hh\\:mm\\:ss} (Elapsed: {sw.Elapsed:hh\\:mm\\:ss})";
+                    }
+
+                    // Optional small delay to avoid tight loop if performActions returns immediately
+                    // await Task.Delay(50, cancellationTokenSource.Token);
+                }
+
+                sw.Stop();
+
+                Common.ShowNotification("Test Runner", "Execution completed.");
+                erroShown = false;
+                FinalizeHtmlReport();
+            }
+            catch (OperationCanceledException)
+            {
+                MessageBox.Show("Execution stopped.", "Stopped", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                repeatDurationButton.Text = "Repeat Duration";
+                runOnceButton.Enabled = true;
+                repeatCountButton.Enabled = true;
+                isRunning = false;
+                UpdateScreenControl("");
+            }
+        }
     }
 }

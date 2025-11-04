@@ -37,7 +37,7 @@
             Property = new DataGridViewTextBoxColumn();
             Value = new DataGridViewTextBoxColumn();
             comboBoxActions = new ComboBox();
-            repeatButton = new Button();
+            repeatCountButton = new Button();
             runOnceButton = new Button();
             saveButton = new Button();
             loadButton = new Button();
@@ -59,6 +59,7 @@
             currentExecution = new Label();
             label2 = new Label();
             screenshotCheckBox = new CheckBox();
+            repeatDurationButton = new Button();
             ((System.ComponentModel.ISupportInitialize)commandGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)propertyGridView).BeginInit();
             contextMenuStrip1.SuspendLayout();
@@ -147,21 +148,21 @@
             comboBoxActions.TabIndex = 2;
             comboBoxActions.SelectedIndexChanged += ComboBoxActions_SelectedIndexChanged;
             // 
-            // repeatButton
+            // repeatCountButton
             // 
-            repeatButton.AutoSize = true;
-            repeatButton.Location = new Point(486, 437);
-            repeatButton.Name = "repeatButton";
-            repeatButton.Size = new Size(75, 25);
-            repeatButton.TabIndex = 4;
-            repeatButton.Text = "Repeat";
-            repeatButton.UseVisualStyleBackColor = true;
-            repeatButton.Click += repeatButton_Click;
+            repeatCountButton.AutoSize = true;
+            repeatCountButton.Location = new Point(328, 437);
+            repeatCountButton.Name = "repeatCountButton";
+            repeatCountButton.Size = new Size(89, 25);
+            repeatCountButton.TabIndex = 4;
+            repeatCountButton.Text = "Repeat Count";
+            repeatCountButton.UseVisualStyleBackColor = true;
+            repeatCountButton.Click += repeatButton_Click;
             // 
             // runOnceButton
             // 
             runOnceButton.AutoSize = true;
-            runOnceButton.Location = new Point(395, 437);
+            runOnceButton.Location = new Point(237, 437);
             runOnceButton.Name = "runOnceButton";
             runOnceButton.Size = new Size(75, 25);
             runOnceButton.TabIndex = 3;
@@ -219,7 +220,7 @@
             // 
             repeatCountLabel.AutoSize = true;
             repeatCountLabel.ForeColor = Color.FromArgb(192, 0, 0);
-            repeatCountLabel.Location = new Point(567, 442);
+            repeatCountLabel.Location = new Point(561, 442);
             repeatCountLabel.Name = "repeatCountLabel";
             repeatCountLabel.Size = new Size(0, 15);
             repeatCountLabel.TabIndex = 12;
@@ -343,12 +344,23 @@
             // screenshotCheckBox
             // 
             screenshotCheckBox.AutoSize = true;
-            screenshotCheckBox.Location = new Point(171, 443);
+            screenshotCheckBox.Location = new Point(13, 443);
             screenshotCheckBox.Name = "screenshotCheckBox";
             screenshotCheckBox.Size = new Size(193, 19);
             screenshotCheckBox.TabIndex = 20;
             screenshotCheckBox.Text = "Take Screenshot after every step";
             screenshotCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // repeatDurationButton
+            // 
+            repeatDurationButton.AutoSize = true;
+            repeatDurationButton.Location = new Point(435, 437);
+            repeatDurationButton.Name = "repeatDurationButton";
+            repeatDurationButton.Size = new Size(102, 25);
+            repeatDurationButton.TabIndex = 21;
+            repeatDurationButton.Text = "Repeat Duration";
+            repeatDurationButton.UseVisualStyleBackColor = true;
+            repeatDurationButton.Click += repeatDurationButton_Click;
             // 
             // TestRunner
             // 
@@ -356,6 +368,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1114, 474);
+            Controls.Add(repeatDurationButton);
             Controls.Add(screenshotCheckBox);
             Controls.Add(label2);
             Controls.Add(newButton);
@@ -367,7 +380,7 @@
             Controls.Add(helpButton);
             Controls.Add(loadButton);
             Controls.Add(saveButton);
-            Controls.Add(repeatButton);
+            Controls.Add(repeatCountButton);
             Controls.Add(runOnceButton);
             Controls.Add(comboBoxActions);
             Controls.Add(propertyGridView);
@@ -398,7 +411,7 @@
         private DataGridView commandGridView;
         private DataGridView propertyGridView;
         private ComboBox comboBoxActions;
-        private Button repeatButton;
+        private Button repeatCountButton;
         private Button runOnceButton;
         private DataGridViewTextBoxColumn Property;
         private DataGridViewTextBoxColumn Value;
@@ -426,5 +439,6 @@
         private Label currentExecution;
         private Label label2;
         private CheckBox screenshotCheckBox;
+        private Button repeatDurationButton;
     }
 }

@@ -39,11 +39,20 @@ namespace Appium_Wizard
         {
             if (isAndroid)
             {
-                sessionId = AndroidAPIMethods.GetSessionID(port);
+                string messageTitle = "Object Spy - " + deviceName;
+                CommonProgress commonProgress = new CommonProgress();
+                commonProgress.Owner = this;
+                commonProgress.Show();
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 5);
+                await Task.Run(() => {
+                    sessionId = AndroidAPIMethods.GetSessionID(port);
+                });
+                commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 15);
                 if (!sessionId.Equals("nosession"))
                 {
                     UDIDSessionId[udid] = sessionId;
                 }
+                commonProgress.Close();
             }
             await FetchScreen();
         }
@@ -258,7 +267,7 @@ namespace Appium_Wizard
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Object Spy", "Please wait while fetching screen...", 25);
+            commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 25);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
             await Task.Run(() => {
@@ -294,7 +303,9 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        xmlContent = iOSAPIMethods.GetPageSource(port, sessionId);
+                        var result = iOSAPIMethods.GetPageSource(port, sessionId);
+                        xmlContent = result.Item1;
+                        sessionId = result.Item2;
                     }
                 });
 

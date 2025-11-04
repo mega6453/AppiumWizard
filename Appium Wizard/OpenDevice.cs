@@ -619,7 +619,6 @@ namespace Appium_Wizard
                 try
                 {
                     string message = "Please wait while setting up screen mirroring...";
-                    commonProgress.UpdateStepLabel(title, message, 10);
                     try
                     {
                         MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
@@ -627,40 +626,51 @@ namespace Appium_Wizard
                     catch (Exception)
                     {
                     }
-                    commonProgress.UpdateStepLabel(title, message, 20);
-                    AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
-                    commonProgress.UpdateStepLabel(title, message, 30);
-                    bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
-                    Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
-                    if (!isUIAutomatorInstalled)
-                    {
-                        commonProgress.UpdateStepLabel(title, message, 40);
-                        AndroidMethods.GetInstance().InstallUIAutomator(udid);
-                        commonProgress.UpdateStepLabel(title, message, 45);
-                    }
-                    commonProgress.UpdateStepLabel(title, message, 50);
+                    commonProgress.UpdateStepLabel(title, message, 5);
                     proxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
                     if (proxyPort == -1)
                     {
-                        commonProgress.UpdateStepLabel(title, message, 55);
+                        commonProgress.UpdateStepLabel(title, message, 10);
                         proxyPort = Common.GetFreePort(8221, 8299);
                         AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                     }
-                    commonProgress.UpdateStepLabel(title, message, 60);
-                    bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                    if (!isRunning)
+                    screenServerPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                    if (screenServerPort == -1)
                     {
-                        commonProgress.UpdateStepLabel(title, message, 70);
-                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                        Task.Delay(1000);
+                        commonProgress.UpdateStepLabel(title, message, 15);
+                        screenServerPort = Common.GetFreePort(8221, 8299);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                     }
-                    commonProgress.UpdateStepLabel(title, message, 80);
+                    commonProgress.UpdateStepLabel(title, message, 20);
                     UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
                     if (UIAutomatorSessionId.Equals("nosession"))
                     {
-                        commonProgress.UpdateStepLabel(title, message, 90);
-                        UIAutomatorSessionId = AndroidAPIMethods.CreateSession(proxyPort);
+                        commonProgress.UpdateStepLabel(title, message, 30);
+                        bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
+                        Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
+                        if (!isUIAutomatorInstalled)
+                        {
+                            commonProgress.UpdateStepLabel(title, message, 40);
+                            AndroidMethods.GetInstance().InstallUIAutomator(udid);
+                            commonProgress.UpdateStepLabel(title, message, 50);
+                        }
+                        commonProgress.UpdateStepLabel(title, message, 60);
+                        bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
+                        if (!isRunning)
+                        {
+                            commonProgress.UpdateStepLabel(title, message, 70);
+                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                            Task.Delay(1000);
+                        }
+                        commonProgress.UpdateStepLabel(title, message, 80);
+                        UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
+                        if (UIAutomatorSessionId.Equals("nosession"))
+                        {
+                            UIAutomatorSessionId = AndroidAPIMethods.CreateSession(proxyPort);
+                        }
                     }
+                    commonProgress.UpdateStepLabel(title, message, 90);
+
                 }
                 catch (Exception e)
                 {

@@ -2355,7 +2355,7 @@ namespace Appium_Wizard
             }
         }
 
-        public static string GetPageSource(int port, string sessionId = "")
+        public static (string,string) GetPageSource(int port, string sessionId = "")
         {
             string value = "empty";
             try
@@ -2386,11 +2386,11 @@ namespace Appium_Wizard
                     }
                 }
 
-                return value;
+                return (value,sessionId);
             }
             catch (Exception ex)
             {
-                return "Exception while getting page source : " + ex.Message;
+                return ("Exception","Exception while getting page source : " + ex.Message);
             }
         }
 

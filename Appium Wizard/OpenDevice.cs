@@ -634,6 +634,13 @@ namespace Appium_Wizard
                         proxyPort = Common.GetFreePort(8221, 8299);
                         AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                     }
+                    screenServerPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                    if (screenServerPort == -1)
+                    {
+                        commonProgress.UpdateStepLabel(title, message, 15);
+                        screenServerPort = Common.GetFreePort(8221, 8299);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
+                    }
                     commonProgress.UpdateStepLabel(title, message, 20);
                     UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
                     if (UIAutomatorSessionId.Equals("nosession"))
@@ -645,14 +652,7 @@ namespace Appium_Wizard
                         {
                             commonProgress.UpdateStepLabel(title, message, 40);
                             AndroidMethods.GetInstance().InstallUIAutomator(udid);
-                            commonProgress.UpdateStepLabel(title, message, 45);
-                        }
-                        screenServerPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
-                        if (screenServerPort == -1)
-                        {
                             commonProgress.UpdateStepLabel(title, message, 50);
-                            screenServerPort = Common.GetFreePort(8221, 8299);
-                            AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                         }
                         commonProgress.UpdateStepLabel(title, message, 60);
                         bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);

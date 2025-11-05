@@ -1,3 +1,8 @@
+# v8.4.0:
+1. Scrcpy will be used for android screen mirroring by default for better performance and usability (Can change in settings).
+2. Test runner now supports repeating the steps execution for given duration.
+3. Different Screen size compatibility
+
 # v8.3.0:
 1. Long press, Drag and Drop added on screen control
 2. Appium server logs improvement in the main screen

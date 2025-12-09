@@ -187,13 +187,18 @@ namespace Appium_Wizard
             string arguments = $"x509 -in \"{certificatePath}\" -noout -enddate";
             string output = ExecuteCommand(opensslFilePath, arguments, false);
 
-            string pattern = @"notAfter=(\w{3} \d{1,2} \d{2}:\d{2}:\d{2} \d{4}) GMT";
+            // Use \s+ to handle variable whitespace (1 or more spaces)
+            string pattern = @"notAfter=(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4})\s+GMT";
             Match match = Regex.Match(output, pattern);
 
             if (match.Success)
             {
                 string dateString = match.Groups[1].Value;
-                DateTime date = DateTime.ParseExact(dateString, "MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+
+                // Normalize multiple spaces to single space before parsing
+                dateString = Regex.Replace(dateString, @"\s+", " ");
+
+                DateTime date = DateTime.ParseExact(dateString, "MMM d HH:mm:ss yyyy", CultureInfo.InvariantCulture);
                 string formattedDate = date.ToString("MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
                 return formattedDate;
             }

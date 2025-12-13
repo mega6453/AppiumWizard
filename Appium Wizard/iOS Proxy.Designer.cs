@@ -144,6 +144,7 @@
             pyRadioButtonAuto.TabStop = true;
             pyRadioButtonAuto.Text = "Method 3";
             pyRadioButtonAuto.UseVisualStyleBackColor = true;
+            pyRadioButtonAuto.Visible = false;
             pyRadioButtonAuto.CheckedChanged += pyRadioButtonAuto_CheckedChanged;
             // 
             // iProxyRadioButtonAuto
@@ -210,7 +211,7 @@
             label7.ForeColor = Color.IndianRed;
             label7.Location = new Point(38, 82);
             label7.Name = "label7";
-            label7.Size = new Size(353, 15);
+            label7.Size = new Size(354, 15);
             label7.TabIndex = 0;
             label7.Text = "This setting will be applied when a new appium session is created.";
             // 
@@ -276,6 +277,7 @@
             pyRadioButton.TabStop = true;
             pyRadioButton.Text = "Method 3";
             pyRadioButton.UseVisualStyleBackColor = true;
+            pyRadioButton.Visible = false;
             pyRadioButton.CheckedChanged += pyRadioButton_CheckedChanged;
             // 
             // goRadioButton

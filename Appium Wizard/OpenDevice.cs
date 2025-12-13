@@ -306,30 +306,34 @@ namespace Appium_Wizard
                                     else
                                     {
                                         Logger.Info("tunnel not started");
-                                        var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                                        if (result == DialogResult.Yes)
-                                        {
-                                            Logger.Info("Clicked yes to create tunnel with admin rights.");
-                                            isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnel();
-                                            Logger.Info("isTunnelStarted - " + isTunnelStarted);
-                                            if (isTunnelStarted)
-                                            {
-                                                iOSMethods.isGo = false;
-                                                iOSAsyncMethods.isGo = false;
-                                            }
-                                            else
-                                            {
-                                                commonProgress.Close();
-                                                isScreenServerStarted = false;
-                                                MessageBox.Show("Tunnel creation failed.\n\nIf Admin permission not given, Please provide admin permission when system prompts.\n\nIf Admin permission given, Please try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                                return;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            isScreenServerStarted = false;
-                                            return;
-                                        }
+                                        MessageBox.Show("Tunnel creation failed.\n\nPlease try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        isScreenServerStarted = false;
+                                        return;
+                                        //Pymd3 removed from project, so commenting this for now.
+                                        //var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                                        //if (result == DialogResult.Yes)
+                                        //{
+                                        //    Logger.Info("Clicked yes to create tunnel with admin rights.");
+                                        //    isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnel();
+                                        //    Logger.Info("isTunnelStarted - " + isTunnelStarted);
+                                        //    if (isTunnelStarted)
+                                        //    {
+                                        //        iOSMethods.isGo = false;
+                                        //        iOSAsyncMethods.isGo = false;
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        commonProgress.Close();
+                                        //        isScreenServerStarted = false;
+                                        //        MessageBox.Show("Tunnel creation failed.\n\nIf Admin permission not given, Please provide admin permission when system prompts.\n\nIf Admin permission given, Please try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        //        return;
+                                        //    }
+                                        //}
+                                        //else
+                                        //{
+                                        //    isScreenServerStarted = false;
+                                        //    return;
+                                        //}
                                     }
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);

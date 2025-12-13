@@ -1,13 +1,14 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NLog;
-using RestSharp;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NLog;
+using RestSharp;
 
 namespace Appium_Wizard
 {
@@ -66,6 +67,11 @@ namespace Appium_Wizard
                 {
                     Logger.Info("GetListOfDevicesUDID - execute with py...");
                     string deviceListString = ExecuteCommandPy("usbmux list");
+                    if (deviceListString.Equals("pymd3 does not exist"))
+                    {
+                        Logger.Info("pymd3 does not exist");
+                        return list;
+                    }
                     List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(deviceListString);
                     foreach (dynamic device in devices)
                     {
@@ -106,6 +112,11 @@ namespace Appium_Wizard
                 {
                     Logger.Info("GetDeviceInformation - execute with py...");
                     string output = ExecuteCommandPy("usbmux list");
+                    if (output.Equals("pymd3 does not exist"))
+                    {
+                        Logger.Info("pymd3 does not exist");
+                        return deviceValues;
+                    }
                     List<dynamic> devices = JsonConvert.DeserializeObject<List<dynamic>>(output);
 
                     foreach (dynamic device in devices)
@@ -180,6 +191,11 @@ namespace Appium_Wizard
                 {
                     Logger.Info("GetListOfInstalledApps - execute with py...");
                     var output = ExecuteCommandPy("apps list -t User", udid);
+                    if (output.Equals("pymd3 does not exist"))
+                    {
+                        Logger.Info("pymd3 does not exist");
+                        return packageList;
+                    }
                     JObject data = JObject.Parse(output);
                     var keys = data.Properties().Select(p => p.Name);
 
@@ -293,7 +309,13 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("amfi developer-mode-status", udid).Contains("true");
+                string output = ExecuteCommandPy("amfi developer-mode-status", udid);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                    return false;
+                }
+                return output.Contains("true");
             }
         }
 
@@ -312,7 +334,12 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    ExecuteCommandPy("diagnostics restart", udid);
+                    string output = ExecuteCommandPy("diagnostics restart", udid);
+                    if (output.Equals("pymd3 does not exist"))
+                    {
+                        Logger.Info("pymd3 does not exist");
+                        return false;
+                    }
                     return true; //Need to verify and fix
                 }
             }
@@ -330,7 +357,12 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("developer core-device uninstall " + bundleId, udid);
+                string output = ExecuteCommandPy("developer core-device uninstall " + bundleId, udid);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                    return;
+                }
             }
         }
 
@@ -378,7 +410,12 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("developer dvt screenshot " + path, udid);
+                string output = ExecuteCommandPy("developer dvt screenshot " + path, udid);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                    return;
+                }
             }
         }
 
@@ -772,12 +809,21 @@ namespace Appium_Wizard
                 {
                     if (MainScreen.UDIDPreInstalledWDA.ContainsKey(udid) && iSAppInstalled(udid, MainScreen.UDIDPreInstalledWDA[udid]))
                     {
-                        return ExecuteCommandPy("developer dvt launch " + MainScreen.UDIDPreInstalledWDA[udid], udid, false);
-
+                        string output = ExecuteCommandPy("developer dvt launch " + MainScreen.UDIDPreInstalledWDA[udid], udid, false);
+                        if (output.Equals("pymd3 does not exist"))
+                        {
+                            Logger.Info("pymd3 does not exist");
+                        }
+                        return output;
                     }
                     else
                     {
-                        return ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                        string output = ExecuteCommandPy("developer dvt launch com.facebook.WebDriverAgentRunner.xctrunner", udid, false);
+                        if (output.Equals("pymd3 does not exist"))
+                        {
+                            Logger.Info("pymd3 does not exist");
+                        }
+                        return output;
                     }
                 }
             }
@@ -851,6 +897,11 @@ namespace Appium_Wizard
                 else
                 {
                     output = ExecuteCommandPy("developer core-device list-processes");
+                    if (output.Equals("pymd3 does not exist"))
+                    {
+                        Logger.Info("pymd3 does not exist");
+                        return false;
+                    }
                 }
                 if (output.Contains("WebDriverAgentRunner-Runner"))
                 {
@@ -872,7 +923,12 @@ namespace Appium_Wizard
             }
             else
             {
-                return ExecuteCommandPy("mounter auto-mount", udid, false);
+                string output = ExecuteCommandPy("mounter auto-mount", udid, false);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                }
+                return output;
             }
         }
 
@@ -1012,7 +1068,12 @@ namespace Appium_Wizard
             else
             {
 
-                return ExecuteCommandPy("developer dvt launch " + bundleId, udid);
+                string output = ExecuteCommandPy("developer dvt launch " + bundleId, udid);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                }
+                return output;
             }
         }
 
@@ -1065,7 +1126,12 @@ namespace Appium_Wizard
             }
             else
             {
-                ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
+                string output = ExecuteCommandPy("developer dvt pkill --bundle " + bundleId, udid);
+                if (output.Equals("pymd3 does not exist"))
+                {
+                    Logger.Info("pymd3 does not exist");
+                    return;
+                }
             }
         }
 
@@ -1134,13 +1200,17 @@ namespace Appium_Wizard
 
         public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
+            if (!File.Exists(FilesPath.pymd3FilePath))
+            {
+                return "pymd3 does not exist";
+            }
             try
             {
                 Logger.Info("ExecuteCommandPy : " + command);
                 bool isTunnelRunning = false;
                 if (command.Contains("developer"))
                 {
-                    isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnel();
+                    isTunnelRunning = iOSAsyncMethods.GetInstance().CreateTunnelPy();
                     if (!isTunnelRunning)
                     {
                         Logger.Info("tunnel not created");
@@ -1700,7 +1770,7 @@ namespace Appium_Wizard
         }
 
         Process tunnelProcess;
-        public bool CreateTunnel()
+        public bool CreateTunnelPy()
         {
             string errorMessage = "As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission or try setting Method 1 in Tools->iOS Executor.";
             CommonProgress commonProgress = new CommonProgress();

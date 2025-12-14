@@ -1,6 +1,6 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mega6453/AppiumWizard/total)
 ![GitHub Release](https://img.shields.io/github/v/release/mega6453/AppiumWizard)
-![License: MIT/GPL-3.0](https://img.shields.io/badge/license-MIT%2FGPL--3.0-blue)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/mega6453/AppiumWizard?style=plastic&color=green)
 
 
@@ -68,9 +68,9 @@ to install it during the first time launch which may take sometime to complete i
 * Record Screen from Screen Control
 * Notifications - Enable/Disable Notifications for few events 
 * Object Spy - Beta version
-* Test Runner (**New**)
-* Record and Playback (**New**)
-
+* Test Runner
+* Record and Playback
+  
 ## Built With
 * .Net C# & Windows Forms
 * NodeJS
@@ -98,23 +98,8 @@ to install it during the first time launch which may take sometime to complete i
 This project uses icons from external providers.  
 Full list and attributions are in [ICONS.md](./ICONS.md).
 
-## NOTE
-Appium Wizard is in it's early stage of development. So,expect 
-* Unhandled exceptions
-* Crashes 
-* Performance issues
-* Reliability issues
-  
-The above issues are expected in Appium Wizard software and not in your mobile app under test.
-
-PLEASE CREATE AN ISSUE UNDER ISSUES SECTION(WITH LOGS FROM APPIUM WIZARD->HELP->OPEN LOGS FOLDER), IF YOU ARE OBSERVING ANY ISSUE WHICH WILL HELP TO IMPROVE THE QUALITY OF APPIUM WIZARD. THANKS !
-
 ## License
-
-This project is licensed under MIT, GPL-3.0, or Apache-2.0.
-
-- [MIT License](./LICENSE-MIT)
-- [GPL 3.0 License](./LICENSE-GPL)
+This project is licensed under Apache-2.0.
 - [Apache License 2.0](./LICENSE-Apache)
   
 ## Developed By

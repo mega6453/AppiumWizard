@@ -1812,7 +1812,6 @@ namespace Appium_Wizard
             if (!File.Exists(FilesPath.pymd3FilePath))
             {
                 iOSMethods.GetInstance().ShowPymd3MissingMessage();
-                Logger.Error("pymd3 executable not found at: " + FilesPath.pymd3FilePath);
                 return false;
             }
             string errorMessage = "As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission or try setting Method 1 in Tools->iOS Executor.";

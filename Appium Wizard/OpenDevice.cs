@@ -305,12 +305,18 @@ namespace Appium_Wizard
                                     }
                                     else
                                     {
-                                        Logger.Info("tunnel not started");
                                         var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                                         if (result == DialogResult.Yes)
                                         {
                                             Logger.Info("Clicked yes to create tunnel with admin rights.");
-                                            isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnel();
+                                            if (!File.Exists(FilesPath.pymd3FilePath))
+                                            {
+                                                iOSMethods.GetInstance().ShowPymd3MissingMessage();
+                                                isScreenServerStarted = false;
+                                                MessageBox.Show("Please try again after extracting the fallback tool.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                return;
+                                            }
+                                            isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelPy();
                                             Logger.Info("isTunnelStarted - " + isTunnelStarted);
                                             if (isTunnelStarted)
                                             {

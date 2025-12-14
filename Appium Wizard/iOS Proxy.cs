@@ -143,6 +143,9 @@
 
         private void iOS_Proxy_Load(object sender, EventArgs e)
         {
+            bool ispymd3Installed = File.Exists(FilesPath.pymd3FilePath);
+            pyRadioButton.Visible = ispymd3Installed;
+            pyRadioButtonAuto.Visible = ispymd3Installed;
             devicesList = Database.QueryDataFromDevicesTable();
             foreach (var device in devicesList)
             {
@@ -157,7 +160,7 @@
             {
                 goRadioButtonAuto.Checked = true;
             }
-            else if (output.Contains("py"))
+            else if (ispymd3Installed && output.Contains("py"))
             {
                 pyRadioButtonAuto.Checked = true;
             }

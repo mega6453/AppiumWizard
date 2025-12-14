@@ -366,7 +366,7 @@ namespace Appium_Wizard
             // 
             toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            toolsToolStripMenuItem.Size = new Size(46, 20);
+            toolsToolStripMenuItem.Size = new Size(47, 20);
             toolsToolStripMenuItem.Text = "Tools";
             // 
             // inspectorToolStripMenuItem1
@@ -422,6 +422,7 @@ namespace Appium_Wizard
             iOSExecutorToolStripMenuItem.Name = "iOSExecutorToolStripMenuItem";
             iOSExecutorToolStripMenuItem.Size = new Size(216, 30);
             iOSExecutorToolStripMenuItem.Text = "iOS Executor";
+            iOSExecutorToolStripMenuItem.Visible = false;
             iOSExecutorToolStripMenuItem.Click += iOSExecutorToolStripMenuItem_Click;
             // 
             // notificationsToolStripMenuItem
@@ -444,7 +445,7 @@ namespace Appium_Wizard
             // useScrcpyMenuItem
             // 
             useScrcpyMenuItem.Name = "useScrcpyMenuItem";
-            useScrcpyMenuItem.Size = new Size(180, 22);
+            useScrcpyMenuItem.Size = new Size(171, 22);
             useScrcpyMenuItem.Text = "Use scrcpy";
             useScrcpyMenuItem.ToolTipText = "Use scrcpy for Android screen mirroring. It provides low-latency mirroring.";
             useScrcpyMenuItem.Click += useScrcpyMenuItem_Click;
@@ -452,7 +453,7 @@ namespace Appium_Wizard
             // useUiAutomator2ToolStripMenuItem
             // 
             useUiAutomator2ToolStripMenuItem.Name = "useUiAutomator2ToolStripMenuItem";
-            useUiAutomator2ToolStripMenuItem.Size = new Size(180, 22);
+            useUiAutomator2ToolStripMenuItem.Size = new Size(171, 22);
             useUiAutomator2ToolStripMenuItem.Text = "Use UiAutomator2";
             useUiAutomator2ToolStripMenuItem.ToolTipText = "UiAutomator2 is an alternative to scrcpy. Enable only if you encounter issues with scrcpy.";
             useUiAutomator2ToolStripMenuItem.Click += useUiAutomator2ToolStripMenuItem_Click;

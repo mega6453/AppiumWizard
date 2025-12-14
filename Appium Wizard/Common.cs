@@ -2418,7 +2418,7 @@ namespace Appium_Wizard
             KillExeRunningFromAppiumWizardFolder(FilesPath.iProxyFilePath, "iproxy");
             KillExeRunningFromAppiumWizardFolder(FilesPath.iOSServerFilePath, "iOSServer");
             KillExeRunningFromAppiumWizardFolder(FilesPath.nodePath, "node");
-            KillExeRunningFromAppiumWizardFolder(FilesPath.pymd3FilePath, "iOSServerPy");
+            //KillExeRunningFromAppiumWizardFolder(FilesPath.pymd3FilePath, "iOSServerPy");
         }
 
 

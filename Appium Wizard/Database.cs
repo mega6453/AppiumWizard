@@ -429,6 +429,10 @@ namespace Appium_Wizard
                     }
                 }
                 connection.Close();
+                if (output.Contains("py") && !File.Exists(FilesPath.pymd3FilePath))
+                {
+                    output = "go";
+                }
                 return output;
             }
         }
@@ -465,6 +469,10 @@ namespace Appium_Wizard
                     }
                 }
                 connection.Close();
+                if (output.Contains("py") && !File.Exists(FilesPath.pymd3FilePath))
+                {
+                    output = "iproxy";
+                }
                 return output;
             }
         }

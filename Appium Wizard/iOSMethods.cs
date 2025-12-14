@@ -926,7 +926,7 @@ namespace Appium_Wizard
                 string output = ExecuteCommandPy("mounter auto-mount", udid, false);
                 if (output.Equals("pymd3 does not exist"))
                 {
-                    Logger.Info("pymd3 does not exist");
+                    Logger.Info("MountImage : pymd3 does not exist");
                 }
                 return output;
             }
@@ -1235,6 +1235,7 @@ namespace Appium_Wizard
 
         public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
+            Logger.Info("ExecuteCommandPy : " + command);
             if (!File.Exists(FilesPath.pymd3FilePath))
             {
                 ShowPymd3MissingMessage();
@@ -1243,7 +1244,6 @@ namespace Appium_Wizard
             }
             try
             {
-                Logger.Info("ExecuteCommandPy : " + command);
                 bool isTunnelRunning = false;
                 if (command.Contains("developer"))
                 {

@@ -617,6 +617,7 @@ namespace Appium_Wizard
         {
             if (OS.Equals("iOS", StringComparison.InvariantCultureIgnoreCase) | OS.Equals("iPhone OS", StringComparison.InvariantCultureIgnoreCase))
             {
+                SetiOSTool(true);
                 OS = "iOS";
                 if (IsIt17PlusVersion(OSVersion))
                 {

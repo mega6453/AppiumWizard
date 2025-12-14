@@ -191,7 +191,7 @@ namespace Appium_Wizard
                 DeviceDisconnectedNotification = result["DeviceDisconnected"].Equals("Enable");
                 ScreenshotNotification = result["Screenshot"].Equals("Enable");
                 ScreenRecordingNotification = result["ScreenRecording"].Equals("Enable");
-
+                iOSExecutorToolStripMenuItem.Visible = File.Exists(FilesPath.pymd3FilePath);
                 alwaysOnTop = Database.QueryDataFromAlwaysOnTopTable().Equals("Yes");
                 useScrcpy = Database.QueryDataFromAndroidScreenMirroringTable();
                 if (alwaysOnTop)

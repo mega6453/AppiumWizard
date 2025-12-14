@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "8.4.1";
-        public const string ReleaseNotes = "import profile hotfix";
+        public const string VersionNumber = "8.5.0";
+        public const string ReleaseNotes = "License update";
     }
 }

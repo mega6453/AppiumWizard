@@ -1198,10 +1198,47 @@ namespace Appium_Wizard
             }
         }
 
+        public void ShowPymd3MissingMessage()
+        {
+            string url = "https://github.com/mega6453/pymd3exe/releases/latest";
+
+            var fallbackResult = MessageBox.Show(
+                                        "The fallback tool (pymobiledevice3) is not bundled with Appium Wizard due to its GPL license.\n\n" +
+                                        "If the primary connection method does not work, please restart Appium Wizard or your system and try again. " +
+                                        "If the issue persists, you can download this tool separately and use it as a fallback.\n\n" +
+                                        "After downloading, extract the iOSServerpy folder into the Appium Wizard executables folder.\n" +
+                                        "This folder will be opened automatically for your convenience.\n\n" +
+                                        url + "\n\n" +
+                                        "Do you want to continue?",
+                                        "Fallback Tool Required",
+                                        MessageBoxButtons.YesNo,
+                                        MessageBoxIcon.Information
+                                     );
+
+            if (fallbackResult == DialogResult.Yes)
+            {
+                try
+                {
+                    Process.Start("explorer.exe", FilesPath.executablesFolderPath);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to open pymd3 folder or download page");
+                }
+            }
+        }
+
         public string ExecuteCommandPy(string command, string udid = "", bool closeTunnel = false, int timeout = 30000)
         {
             if (!File.Exists(FilesPath.pymd3FilePath))
             {
+                ShowPymd3MissingMessage();
+                Logger.Error("pymd3 executable not found at: " + FilesPath.pymd3FilePath);
                 return "pymd3 does not exist";
             }
             try
@@ -1772,6 +1809,12 @@ namespace Appium_Wizard
         Process tunnelProcess;
         public bool CreateTunnelPy()
         {
+            if (!File.Exists(FilesPath.pymd3FilePath))
+            {
+                iOSMethods.GetInstance().ShowPymd3MissingMessage();
+                Logger.Error("pymd3 executable not found at: " + FilesPath.pymd3FilePath);
+                return false;
+            }
             string errorMessage = "As admin permission has not been given, unable to continue with the request. Please try again by providing admin permission or try setting Method 1 in Tools->iOS Executor.";
             CommonProgress commonProgress = new CommonProgress();
             int counter = 1;

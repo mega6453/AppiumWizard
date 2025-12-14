@@ -101,6 +101,9 @@ Full list and attributions are in [ICONS.md](./ICONS.md).
 ## License
 This project is licensed under Apache-2.0.
 - [Apache License 2.0](./LICENSE-Apache)
+
+## Third Party Licenses
+- [See here](./THIRD_PARTY_LICENSES.md)
   
 ## Developed By
 * [**Meganathan C**](https://mega6453.carrd.co)

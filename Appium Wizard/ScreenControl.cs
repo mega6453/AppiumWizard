@@ -674,6 +674,12 @@ namespace Appium_Wizard
             this.TopMost = !this.TopMost;
             //buttonAlwaysOnTop.Text = this.TopMost ? "Disable Always on Top" : "Enable Always on Top";
             AlwaysOnTopToolStripButton.BackColor = this.TopMost ? Color.DarkGreen : SystemColors.Control;
+
+            // Synchronize overlay TopMost state
+            if (scrcpyOverlayForm != null && !scrcpyOverlayForm.IsDisposed)
+            {
+                scrcpyOverlayForm.TopMost = this.TopMost;
+            }
             GoogleAnalytics.SendEvent("AlwaysOnTop_Click");
         }
 
@@ -1559,6 +1565,10 @@ namespace Appium_Wizard
                     DebugVisible = false  // <-- CHANGE THIS TO FALSE!
                 };
 
+                // Synchronize TopMost state with parent form
+                scrcpyOverlayForm.TopMost = this.TopMost;
+
+
                 // Position BEFORE showing
                 AttachOverlayPositioning();
                 UpdateOverlayBounds();
@@ -1721,7 +1731,6 @@ namespace Appium_Wizard
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.Manual;
             DoubleBuffered = true;
-            TopMost = true;
 
             BackColor = Color.Lime;
             TransparencyKey = Color.Lime;

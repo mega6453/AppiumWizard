@@ -2414,13 +2414,28 @@ namespace Appium_Wizard
 
         public static void KillExeRunningFromAppiumWizardFolder()
         {
-            //KillExeRunningFromAppiumWizardFolder(FilesPath.adbFilePath, "adb"); 
+            KillExeRunningFromAppiumWizardFolder(FilesPath.adbFilePath, "adb");
             KillExeRunningFromAppiumWizardFolder(FilesPath.iProxyFilePath, "iproxy");
             KillExeRunningFromAppiumWizardFolder(FilesPath.iOSServerFilePath, "iOSServer");
             KillExeRunningFromAppiumWizardFolder(FilesPath.nodePath, "node");
             //KillExeRunningFromAppiumWizardFolder(FilesPath.pymd3FilePath, "iOSServerPy");
         }
 
+        public static void KillAllExeFromAppiumWizardFolder()
+        {
+            string folderPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\";
+            if (!Directory.Exists(folderPath))
+                return;
+
+            // Get all .exe files from the folder and subfolders
+            string[] exeFiles = Directory.GetFiles(folderPath, "*.exe", SearchOption.AllDirectories);
+
+            foreach (string exePath in exeFiles)
+            {
+                string processName = Path.GetFileNameWithoutExtension(exePath);
+                KillExeRunningFromAppiumWizardFolder(exePath, processName);
+            }
+        }
 
         public static string GetAppiumPeerDependencyVersionForInstalledUIAutomator(string version)
         {

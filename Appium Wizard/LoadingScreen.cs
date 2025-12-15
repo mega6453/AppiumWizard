@@ -127,7 +127,7 @@ namespace Appium_Wizard
                 firstTimeRunLabel.Text = "";
             }
             UpdateStepLabel("Scanning and Stopping any detached Appium Wizard processes...");
-            Common.KillExeRunningFromAppiumWizardFolder();
+            Common.KillAllExeFromAppiumWizardFolder();
             UpdateStepLabel("Starting Appium Server...");
             Database.UpdateDataIntoFirstTimeRunTable("No");
             await ExecuteBackgroundMethod();

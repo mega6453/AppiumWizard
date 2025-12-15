@@ -2008,7 +2008,7 @@ namespace Appium_Wizard
                     {
                         Common.KillProcessByPortNumber(item.Value);
                     }
-                    Common.KillExeRunningFromAppiumWizardFolder();
+                    Common.KillAllExeFromAppiumWizardFolder();
                 }
                 catch (Exception)
                 {

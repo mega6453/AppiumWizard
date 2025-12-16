@@ -90,7 +90,7 @@ to install it during the first time launch which may take sometime to complete i
 * [Appium](https://github.com/appium) - Without Appium, there's no Appium Wizard.
 * [danielpaulus](https://github.com/danielpaulus) - For iOS device features in windows.
 * [doronz88](https://github.com/doronz88/pymobiledevice3) - For iOS device features in windows. Used as an external executable, not bundled.
-* [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. 
+* [libimobiledevice-win32](https://github.com/libimobiledevice-win32) - For iOS device features in windows. Uses as an external executable invoked at runtime. 
 * [zhlynn](https://github.com/zhlynn) - For zsign which helps in iOS app signing.
 * [Genymobile](https://github.com/Genymobile/scrcpy) - For scrcpy to screen mirror android device.
 

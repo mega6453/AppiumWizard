@@ -1,4 +1,5 @@
 ﻿using NLog;
+using System.Security.Policy;
 using System.Xml;
 
 namespace Appium_Wizard
@@ -32,7 +33,7 @@ namespace Appium_Wizard
             {
                 isAndroid = false;
             }
-            this.Text = "Object Spy - "+deviceName;
+            this.Text = "Object Spy - " + deviceName;
         }
 
         private async void Object_Spy_Load(object sender, EventArgs e)
@@ -44,7 +45,8 @@ namespace Appium_Wizard
                 commonProgress.Owner = this;
                 commonProgress.Show();
                 commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 5);
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     sessionId = AndroidAPIMethods.GetSessionID(port);
                 });
                 commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 15);
@@ -260,20 +262,127 @@ namespace Appium_Wizard
         }
 
 
-
         private async Task FetchScreen()
         {
-            string messageTitle = "Object Spy - "+deviceName;
+            string messageTitle = "Object Spy - " + deviceName;
+            CommonProgress commonProgress = new CommonProgress();
+            commonProgress.Owner = this;
+            commonProgress.Show();
+            commonProgress.UpdateStepLabel(messageTitle, "Fetching screen...", 10);
+            string url = "http://localhost:" + port;
+            try
+            {
+                pictureBox1.Size = new Size(width, height);
+
+                // Step 1: Take screenshot
+                commonProgress.UpdateStepLabel(messageTitle, "Capturing screenshot...", 25);
+
+                if (isAndroid)
+                {
+                    var result = await AndroidAPIMethods.TakeScreenshotWithSessionIdAsync(port, sessionId);
+                    screenshot = result.Item1;
+                    sessionId = result.Item2;
+                }
+                else
+                {
+                    var result = await iOSAPIMethods.TakeScreenshotAsync(port, sessionId);
+                    screenshot = result.Item1;
+                    sessionId = result.Item2;
+                }
+
+                commonProgress.UpdateStepLabel(messageTitle, "Processing screenshot...", 40);
+
+                if (screenshot == null)
+                {
+                    commonProgress.Close();
+                    MessageBox.Show(
+                        "Failed to retrieve screenshot.\n" +
+                        "1. Try closing and re-opening the screen control once.\n" +
+                        "2. Try restarting the device once.\n" +
+                        "3. Try setting Uiautomator as screen mirroring in Settings.",
+                        messageTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
+
+                pictureBox1.Image = screenshot;
+
+                // Step 2: Get page source (AFTER screenshot, not parallel)
+                commonProgress.UpdateStepLabel(messageTitle, "Fetching page source...", 55);
+
+                if (isAndroid)
+                {
+                    var result = await AndroidAPIMethods.GetPageSourceAsync(port, sessionId);
+                    xmlContent = result.Item1;
+                    sessionId = result.Item2;
+                }
+                else
+                {
+                    var result = await iOSAPIMethods.GetPageSourceAsync(port, sessionId);
+                    xmlContent = result.Item1;
+                    sessionId = result.Item2;
+                }
+
+                commonProgress.UpdateStepLabel(messageTitle, "Validating page source...", 70);
+
+                if (string.IsNullOrEmpty(xmlContent) ||
+                    xmlContent.Equals("Invalid session") ||
+                    xmlContent.Equals("empty") ||
+                    xmlContent.Contains("Exception while getting page source") ||
+                    xmlContent.Contains("Failed to create a new session."))
+                {
+                    Logger.Info("xmlContent : " + xmlContent);
+                    commonProgress.Close();
+                    MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
+
+                // Step 3: Load tree view
+                commonProgress.UpdateStepLabel(messageTitle, "Loading element tree...", 80);
+
+                await Task.Run(() => LoadXmlToTreeView(xmlContent));
+
+                commonProgress.UpdateStepLabel(messageTitle, "Finalizing...", 90);
+
+                listView1.Items.Clear();
+
+                // Expand only the root node, not all nodes
+                if (treeView1.Nodes.Count > 0)
+                {
+                    treeView1.Nodes[0].Expand();
+                }
+
+                commonProgress.UpdateStepLabel(messageTitle, "Complete", 100);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("FetchScreen failed", ex);
+                MessageBox.Show($"Error fetching screen: {ex.Message}", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
+            finally
+            {
+                commonProgress.Close();
+            }
+        }
+
+        private async Task FetchScreenOld()
+        {
+            string messageTitle = "Object Spy - " + deviceName;
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
             commonProgress.Show();
             commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 25);
             pictureBox1.Size = new Size(width, height);
             string url = "http://localhost:" + port;
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (isAndroid)
                 {
-                    var result = AndroidAPIMethods.TakeScreenshotWithSessionId(port, sessionId);
+                    var result = AndroidAPIMethods.TakeScreenshotWithSessionIdOld(port, sessionId);
                     screenshot = result.Item1;
                     sessionId = result.Item2;
                 }
@@ -294,10 +403,11 @@ namespace Appium_Wizard
             else
             {
                 pictureBox1.Image = screenshot;
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     if (isAndroid)
                     {
-                        var result = AndroidAPIMethods.GetPageSource(port, sessionId);
+                        var result = AndroidAPIMethods.GetPageSourceOld(port, sessionId);
                         xmlContent = result.Item1;
                         sessionId = result.Item2;
                     }
@@ -312,7 +422,7 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel(messageTitle, "Please wait while fetching screen...", 75);
                 if (xmlContent.Equals("Invalid session") | xmlContent.Equals("empty") | xmlContent.Contains("Exception while getting page source") | xmlContent.Contains("Failed to create a new session."))
                 {
-                    Logger.Info("xmlContent : "+xmlContent);
+                    Logger.Info("xmlContent : " + xmlContent);
                     commonProgress.Close();
                     MessageBox.Show("Failed to fetch page source.", messageTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
@@ -563,14 +673,14 @@ namespace Appium_Wizard
                 XmlNodeList selectedXmlNodes;
                 try
                 {
-                     selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
                 }
                 catch (Exception ex)
                 {
                     filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
                     selectedXmlNodes = xmlDoc.SelectNodes(filterText);
                 }
-               
+
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -1099,6 +1209,18 @@ namespace Appium_Wizard
                 - This feature is in Beta. If you encounter any issues, please report them on the GitHub page.";
 
             MessageBox.Show(message, "Object Spy - BETA", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void Object_Spy_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isAndroid)
+            {
+                AndroidAPIMethods.DisposeClients();
+            }
+            else
+            {
+                iOSAPIMethods.DisposeClients();
+            }
         }
     }
 }

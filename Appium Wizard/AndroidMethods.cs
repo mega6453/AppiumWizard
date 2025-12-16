@@ -1136,19 +1136,19 @@ namespace Appium_Wizard
             }
         }
 
-        public static (string,string) GetPageSource(int port, string sessionId="")
+        public static (string,string) GetPageSourceOld(int port, string sessionId="")
         {
             string value = "empty";
             try
             {
                 string URL = "http://localhost:" + port;
-                value = AttemptGetPageSource(URL, sessionId);
+                value = AttemptGetPageSourceOld(URL, sessionId);
                 if (value == "Invalid session")
                 {
                     sessionId = GetSessionID(port);
                     if (!sessionId.Equals("nosession"))
                     {
-                        value = AttemptGetPageSource(URL, sessionId);
+                        value = AttemptGetPageSourceOld(URL, sessionId);
                     }
                     else
                     {
@@ -1164,7 +1164,7 @@ namespace Appium_Wizard
         }
 
         // Helper method to attempt to get the page source
-        private static string AttemptGetPageSource(string URL, string sessionId)
+        private static string AttemptGetPageSourceOld(string URL, string sessionId)
         {
             try
             {
@@ -1199,13 +1199,13 @@ namespace Appium_Wizard
             }
         }
 
-        public static (Image,string) TakeScreenshotWithSessionId(int port, string sessionId = "")
+        public static (Image,string) TakeScreenshotWithSessionIdOld(int port, string sessionId = "")
         {
             Image image = null;
             try
             {
                 string URL = "http://localhost:" + port;
-                var result = AttemptTakeScreenshot(URL, sessionId);
+                var result = AttemptTakeScreenshotOld(URL, sessionId);
                 image = result.Item1;
                 string message = result.Item2;
                 if (image == null && !message.Contains("unable to capture screen"))
@@ -1213,7 +1213,7 @@ namespace Appium_Wizard
                     sessionId = GetSessionID(port);                    
                     if (!sessionId.Equals("nosession"))
                     {
-                        image = AttemptTakeScreenshot(URL, sessionId).Item1;
+                        image = AttemptTakeScreenshotOld(URL, sessionId).Item1;
                     }
                 }
                 return (image,sessionId);
@@ -1225,7 +1225,7 @@ namespace Appium_Wizard
             }
         }
 
-        private static (Image,string) AttemptTakeScreenshot(string URL, string sessionId)
+        private static (Image,string) AttemptTakeScreenshotOld(string URL, string sessionId)
         {
             try
             {
@@ -1504,6 +1504,211 @@ namespace Appium_Wizard
             catch (Exception)
             {
             }
+        }
+
+        // Reusable RestClient (create once, reuse)
+        private static RestClient _screenshotClient;
+        private static RestClient _pageSourceClient;
+
+        private static RestClient GetScreenshotClient(int port)
+        {
+            if (_screenshotClient == null || _screenshotClient.Options.BaseUrl.Port != port)
+            {
+                _screenshotClient?.Dispose();
+                var options = new RestClientOptions($"http://localhost:{port}")
+                {
+                    Timeout = TimeSpan.FromSeconds(10), // Reduced timeout
+                };
+                _screenshotClient = new RestClient(options);
+            }
+            return _screenshotClient;
+        }
+
+        private static RestClient GetPageSourceClient(int port)
+        {
+            if (_pageSourceClient == null || _pageSourceClient.Options.BaseUrl.Port != port)
+            {
+                _pageSourceClient?.Dispose();
+                var options = new RestClientOptions($"http://localhost:{port}")
+                {
+                    Timeout = TimeSpan.FromSeconds(15),
+                };
+                _pageSourceClient = new RestClient(options);
+            }
+            return _pageSourceClient;
+        }
+
+        public static async Task<(Image, string)> TakeScreenshotWithSessionIdAsync(int port, string sessionId = "")
+        {
+            Image image = null;
+            try
+            {
+                var result = await AttemptTakeScreenshotAsync(port, sessionId);
+                image = result.Item1;
+                string message = result.Item2;
+
+                if (image == null && !message.Contains("unable to capture screen"))
+                {
+                    sessionId = await GetSessionIDAsync(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        image = (await AttemptTakeScreenshotAsync(port, sessionId)).Item1;
+                    }
+                }
+                return (image, sessionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return (image, sessionId);
+            }
+        }
+
+        private static async Task<(Image, string)> AttemptTakeScreenshotAsync(int port, string sessionId)
+        {
+            try
+            {
+                var client = GetScreenshotClient(port);
+                var request = new RestRequest($"/session/{sessionId}/screenshot", Method.Get);
+
+                // THIS IS THE KEY CHANGE: ExecuteAsync instead of Execute
+                RestResponse response = await client.ExecuteAsync(request);
+
+                string jsonString = response.Content;
+
+                if (jsonString.Contains("unable to capture screen"))
+                {
+                    MessageBox.Show("Unable to capture screen. Make sure the current view does not have 'secure' flag on. If not, try restarting device.",
+                        "Unable to capture screen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return (null, "unable to capture screen");
+                }
+
+                if (!response.IsSuccessful || jsonString.Contains("invalid session id"))
+                {
+                    return (null, "invalid session id");
+                }
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    // Create Image on background thread to avoid UI blocking
+                    return (Image.FromStream(ms), "");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Screenshot error: {ex.Message}");
+                return (null, "Exception");
+            }
+        }
+
+        public static async Task<(string, string)> GetPageSourceAsync(int port, string sessionId = "")
+        {
+            string value = "empty";
+            try
+            {
+                value = await AttemptGetPageSourceAsync(port, sessionId);
+
+                if (value == "Invalid session")
+                {
+                    sessionId = await GetSessionIDAsync(port);
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = await AttemptGetPageSourceAsync(port, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
+                }
+                return (value, sessionId);
+            }
+            catch (Exception ex)
+            {
+                return ("Exception while getting page source : " + ex.Message, sessionId);
+            }
+        }
+
+        private static async Task<string> AttemptGetPageSourceAsync(int port, string sessionId)
+        {
+            try
+            {
+                var client = GetPageSourceClient(port);
+                var request = new RestRequest($"/session/{sessionId}/source", Method.Get);
+
+                // THIS IS THE KEY CHANGE: ExecuteAsync instead of Execute
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful || response.Content.Contains("invalid session id"))
+                {
+                    return "Invalid session";
+                }
+
+                if (response.Content != null)
+                {
+                    using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                    {
+                        JsonElement root = doc.RootElement;
+                        return root.GetProperty("value").GetString() ?? "empty";
+                    }
+                }
+
+                return "empty";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Page source error: {ex.Message}");
+                return "Invalid session";
+            }
+        }
+
+        public static async Task<string> GetSessionIDAsync(int proxyPort)
+        {
+            try
+            {
+                var options = new RestClientOptions("http://localhost:" + proxyPort)
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/sessions", Method.Get);
+
+                // Use ExecuteAsync instead of Execute
+                RestResponse response = await client.ExecuteAsync(request);
+
+                Console.WriteLine(response.Content);
+                string sessionId = "nosession";
+
+                if (response.Content != null)
+                {
+                    JObject obj = JObject.Parse(response.Content);
+                    sessionId = (string?)obj["value"]?[0]?["id"] ?? string.Empty;
+                }
+
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = "nosession";
+                }
+
+                return sessionId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetSessionID error: {ex.Message}");
+                return "nosession";
+            }
+        }
+
+        public static void DisposeClients()
+        {
+            _screenshotClient?.Dispose();
+            _screenshotClient = null;
+
+            _pageSourceClient?.Dispose();
+            _pageSourceClient = null;
         }
     }
 }

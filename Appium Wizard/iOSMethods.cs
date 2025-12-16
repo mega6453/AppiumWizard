@@ -2713,5 +2713,264 @@ namespace Appium_Wizard
             RestResponse response = client.Execute(request);
             return response.Content;
         }
+
+
+        // Reusable RestClient instances
+        private static RestClient _screenshotClient;
+        private static RestClient _pageSourceClient;
+        private static RestClient _sessionClient;
+
+        private static RestClient GetScreenshotClient(int port)
+        {
+            if (_screenshotClient == null || _screenshotClient.Options.BaseUrl.Port != port)
+            {
+                _screenshotClient?.Dispose();
+                var options = new RestClientOptions($"http://localhost:{port}")
+                {
+                    Timeout = TimeSpan.FromSeconds(10),
+                };
+                _screenshotClient = new RestClient(options);
+            }
+            return _screenshotClient;
+        }
+
+        private static RestClient GetPageSourceClient(int port)
+        {
+            if (_pageSourceClient == null || _pageSourceClient.Options.BaseUrl.Port != port)
+            {
+                _pageSourceClient?.Dispose();
+                var options = new RestClientOptions($"http://localhost:{port}")
+                {
+                    Timeout = TimeSpan.FromSeconds(30),
+                };
+                _pageSourceClient = new RestClient(options);
+            }
+            return _pageSourceClient;
+        }
+
+        private static RestClient GetSessionClient(int port)
+        {
+            if (_sessionClient == null || _sessionClient.Options.BaseUrl.Port != port)
+            {
+                _sessionClient?.Dispose();
+                var options = new RestClientOptions($"http://localhost:{port}")
+                {
+                    Timeout = TimeSpan.FromSeconds(10),
+                };
+                _sessionClient = new RestClient(options);
+            }
+            return _sessionClient;
+        }
+
+        // Cleanup method
+        public static void DisposeClients()
+        {
+            _screenshotClient?.Dispose();
+            _screenshotClient = null;
+
+            _pageSourceClient?.Dispose();
+            _pageSourceClient = null;
+
+            _sessionClient?.Dispose();
+            _sessionClient = null;
+        }
+
+        public static async Task<(Image, string)> TakeScreenshotAsync(int port, string sessionId = "")
+        {
+            Image image = null;
+            try
+            {
+                var client = GetScreenshotClient(port);
+                var request = new RestRequest("/screenshot", Method.Get);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful || string.IsNullOrEmpty(response.Content))
+                {
+                    Console.WriteLine($"Screenshot failed: {response.ErrorMessage}");
+                    return (null, sessionId);
+                }
+
+                string jsonString = response.Content;
+
+                JsonDocument doc = JsonDocument.Parse(jsonString);
+                string base64String = doc.RootElement.GetProperty("value").GetString();
+
+                if (string.IsNullOrEmpty(base64String))
+                {
+                    return (null, sessionId);
+                }
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+
+                // Decode image on background thread
+                image = await Task.Run(() =>
+                {
+                    using (MemoryStream ms = new MemoryStream(imageBytes))
+                    {
+                        return Image.FromStream(ms);
+                    }
+                });
+
+                return (image, sessionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"TakeScreenshot exception: {ex.Message}");
+                return (image, sessionId);
+            }
+        }
+
+        public static async Task<(string, string)> GetPageSourceAsync(int port, string sessionId = "")
+        {
+            string value = "empty";
+            try
+            {
+                string URL = $"http://localhost:{port}";
+
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = await GetWDASessionIDAsync(URL);
+                }
+
+                // Attempt to get the page source with the provided or new sessionId
+                value = await AttemptGetPageSourceAsync(port, sessionId);
+
+                // If the value indicates an invalid session, create a new session and retry
+                if (value == "Invalid session")
+                {
+                    Console.WriteLine("Session is invalid. Creating a new session...");
+                    await CreateWDASessionAsync(URL);
+                    sessionId = await GetWDASessionIDAsync(URL);
+
+                    if (!sessionId.Equals("nosession"))
+                    {
+                        value = await AttemptGetPageSourceAsync(port, sessionId);
+                    }
+                    else
+                    {
+                        value = "Failed to create a new session.";
+                    }
+                }
+
+                return (value, sessionId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetPageSource exception: {ex.Message}");
+                return ("Exception while getting page source : " + ex.Message, sessionId);
+            }
+        }
+
+        private static async Task<string> AttemptGetPageSourceAsync(int port, string sessionId)
+        {
+            try
+            {
+                var client = GetPageSourceClient(port);
+                var request = new RestRequest($"/session/{sessionId}/source?format=xml&scope=AppiumAUT", Method.Get);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful ||
+                    string.IsNullOrEmpty(response.Content) ||
+                    response.Content.Contains("invalid session id"))
+                {
+                    return "Invalid session";
+                }
+
+                using (JsonDocument doc = JsonDocument.Parse(response.Content))
+                {
+                    JsonElement root = doc.RootElement;
+                    return root.GetProperty("value").GetString() ?? "empty";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"AttemptGetPageSource error: {ex.Message}");
+                return "Invalid session";
+            }
+        }
+
+        public static async Task<string> GetWDASessionIDAsync(string URL)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/sessions", Method.Get);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                Console.WriteLine(response.Content);
+
+                if (string.IsNullOrEmpty(response.Content))
+                {
+                    return "nosession";
+                }
+
+                dynamic jsonObject = JsonConvert.DeserializeObject(response.Content);
+                string sessionId = jsonObject?.sessionId != null ? jsonObject.sessionId.ToString() : "nosession";
+
+                if (response.Content.Contains("unknown command") && sessionId.Equals("nosession"))
+                {
+                    sessionId = await CreateWDASessionAsync(URL);
+                }
+
+                return sessionId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetWDASessionID error: {ex.Message}");
+                return "nosession";
+            }
+        }
+
+        public static async Task<string> CreateWDASessionAsync(string URL)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/session", Method.Post);
+
+                // Add capabilities if needed
+                var body = new
+                {
+                    capabilities = new
+                    {
+                        alwaysMatch = new { },
+                        firstMatch = new[] { new { } }
+                    }
+                };
+
+                request.AddJsonBody(body);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful || string.IsNullOrEmpty(response.Content))
+                {
+                    Console.WriteLine($"Failed to create WDA session: {response.ErrorMessage}");
+                    return "nosession";
+                }
+
+                Console.WriteLine(response.Content);
+
+                dynamic jsonObject = JsonConvert.DeserializeObject(response.Content);
+                string sessionId = jsonObject?.sessionId != null ? jsonObject.sessionId.ToString() : "nosession";
+
+                return sessionId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CreateWDASession error: {ex.Message}");
+                return "nosession";
+            }
+        }
     }
 }

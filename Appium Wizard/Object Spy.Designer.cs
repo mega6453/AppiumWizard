@@ -291,6 +291,7 @@
             Name = "Object_Spy";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Object Spy - BETA";
+            FormClosing += Object_Spy_FormClosing;
             Load += Object_Spy_Load;
             Shown += Object_Spy_Shown;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

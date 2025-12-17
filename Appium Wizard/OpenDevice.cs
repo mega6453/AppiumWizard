@@ -1,5 +1,4 @@
-﻿using Appium_Wizard.Appium_Wizard;
-using NLog;
+﻿using NLog;
 
 namespace Appium_Wizard
 {

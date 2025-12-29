@@ -17,11 +17,12 @@ namespace Appium_Wizard
         private async void About_Load(object sender, EventArgs e)
         {
             label1.Text = "Version : " + VersionInfo.VersionNumber;
-
             try
             {
                 string licenseText = await AboutText.GetLicenseText();
                 LicenseRichTextBox.Text = licenseText;
+                string thirdPartyText = await AboutText.GetThirdPartyLicenseText();
+                ThirdPartyRichTextBox.Text = thirdPartyText;
                 var thanksTo = await AboutText.ExtractSections();
                 ThanksToRichTextBox.Text = thanksTo;
             }
@@ -143,6 +144,25 @@ namespace Appium_Wizard
         public static async Task<string> GetLicenseText()
         {
             string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/LICENSE";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return responseBody;
+                }
+                catch (HttpRequestException)
+                {
+                    return url;
+                }
+            }
+        }
+
+        public static async Task<string> GetThirdPartyLicenseText()
+        {
+            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/THIRD_PARTY_LICENSES.md";
             using (HttpClient client = new HttpClient())
             {
                 try

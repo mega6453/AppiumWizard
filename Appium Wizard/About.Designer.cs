@@ -30,21 +30,24 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(About));
             pictureBox1 = new PictureBox();
-            tabControl1 = new TabControl();
+            ThirdPartytabPage = new TabPage();
+            ThanksToTabPage = new TabPage();
+            ThanksToRichTextBox = new RichTextBox();
+            LicenseTabPage = new TabPage();
+            LicenseRichTextBox = new RichTextBox();
             AboutTabPage = new TabPage();
             gitHubRepoLinkLabel = new LinkLabel();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            LicenseTabPage = new TabPage();
-            LicenseRichTextBox = new RichTextBox();
-            ThanksToTabPage = new TabPage();
-            ThanksToRichTextBox = new RichTextBox();
+            tabControl1 = new TabControl();
+            ThirdPartyRichTextBox = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            tabControl1.SuspendLayout();
-            AboutTabPage.SuspendLayout();
-            LicenseTabPage.SuspendLayout();
+            ThirdPartytabPage.SuspendLayout();
             ThanksToTabPage.SuspendLayout();
+            LicenseTabPage.SuspendLayout();
+            AboutTabPage.SuspendLayout();
+            tabControl1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -59,16 +62,56 @@
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
             // 
-            // tabControl1
+            // ThirdPartytabPage
             // 
-            tabControl1.Controls.Add(AboutTabPage);
-            tabControl1.Controls.Add(LicenseTabPage);
-            tabControl1.Controls.Add(ThanksToTabPage);
-            tabControl1.Location = new Point(0, 70);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(396, 141);
-            tabControl1.TabIndex = 5;
+            ThirdPartytabPage.Controls.Add(ThirdPartyRichTextBox);
+            ThirdPartytabPage.Location = new Point(4, 24);
+            ThirdPartytabPage.Name = "ThirdPartytabPage";
+            ThirdPartytabPage.Padding = new Padding(3);
+            ThirdPartytabPage.Size = new Size(388, 113);
+            ThirdPartytabPage.TabIndex = 3;
+            ThirdPartytabPage.Text = "3rd Party Licenses";
+            ThirdPartytabPage.UseVisualStyleBackColor = true;
+            // 
+            // ThanksToTabPage
+            // 
+            ThanksToTabPage.Controls.Add(ThanksToRichTextBox);
+            ThanksToTabPage.Location = new Point(4, 24);
+            ThanksToTabPage.Name = "ThanksToTabPage";
+            ThanksToTabPage.Padding = new Padding(3);
+            ThanksToTabPage.Size = new Size(388, 113);
+            ThanksToTabPage.TabIndex = 2;
+            ThanksToTabPage.Text = "Thanks To";
+            ThanksToTabPage.UseVisualStyleBackColor = true;
+            // 
+            // ThanksToRichTextBox
+            // 
+            ThanksToRichTextBox.Location = new Point(0, 0);
+            ThanksToRichTextBox.Name = "ThanksToRichTextBox";
+            ThanksToRichTextBox.ReadOnly = true;
+            ThanksToRichTextBox.Size = new Size(388, 113);
+            ThanksToRichTextBox.TabIndex = 0;
+            ThanksToRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
+            // 
+            // LicenseTabPage
+            // 
+            LicenseTabPage.Controls.Add(LicenseRichTextBox);
+            LicenseTabPage.Location = new Point(4, 24);
+            LicenseTabPage.Name = "LicenseTabPage";
+            LicenseTabPage.Padding = new Padding(3);
+            LicenseTabPage.Size = new Size(388, 113);
+            LicenseTabPage.TabIndex = 1;
+            LicenseTabPage.Text = "License";
+            LicenseTabPage.UseVisualStyleBackColor = true;
+            // 
+            // LicenseRichTextBox
+            // 
+            LicenseRichTextBox.Location = new Point(0, 0);
+            LicenseRichTextBox.Name = "LicenseRichTextBox";
+            LicenseRichTextBox.ReadOnly = true;
+            LicenseRichTextBox.Size = new Size(392, 113);
+            LicenseRichTextBox.TabIndex = 0;
+            LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE";
             // 
             // AboutTabPage
             // 
@@ -126,45 +169,26 @@
             label1.TabIndex = 5;
             label1.Text = "Version : ";
             // 
-            // LicenseTabPage
+            // tabControl1
             // 
-            LicenseTabPage.Controls.Add(LicenseRichTextBox);
-            LicenseTabPage.Location = new Point(4, 24);
-            LicenseTabPage.Name = "LicenseTabPage";
-            LicenseTabPage.Padding = new Padding(3);
-            LicenseTabPage.Size = new Size(388, 113);
-            LicenseTabPage.TabIndex = 1;
-            LicenseTabPage.Text = "License";
-            LicenseTabPage.UseVisualStyleBackColor = true;
+            tabControl1.Controls.Add(AboutTabPage);
+            tabControl1.Controls.Add(LicenseTabPage);
+            tabControl1.Controls.Add(ThanksToTabPage);
+            tabControl1.Controls.Add(ThirdPartytabPage);
+            tabControl1.Location = new Point(0, 70);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(396, 141);
+            tabControl1.TabIndex = 5;
             // 
-            // LicenseRichTextBox
+            // ThirdPartyRichTextBox
             // 
-            LicenseRichTextBox.Location = new Point(0, 0);
-            LicenseRichTextBox.Name = "LicenseRichTextBox";
-            LicenseRichTextBox.ReadOnly = true;
-            LicenseRichTextBox.Size = new Size(392, 113);
-            LicenseRichTextBox.TabIndex = 0;
-            LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE";
-            // 
-            // ThanksToTabPage
-            // 
-            ThanksToTabPage.Controls.Add(ThanksToRichTextBox);
-            ThanksToTabPage.Location = new Point(4, 24);
-            ThanksToTabPage.Name = "ThanksToTabPage";
-            ThanksToTabPage.Padding = new Padding(3);
-            ThanksToTabPage.Size = new Size(388, 113);
-            ThanksToTabPage.TabIndex = 2;
-            ThanksToTabPage.Text = "Thanks To";
-            ThanksToTabPage.UseVisualStyleBackColor = true;
-            // 
-            // ThanksToRichTextBox
-            // 
-            ThanksToRichTextBox.Location = new Point(0, 0);
-            ThanksToRichTextBox.Name = "ThanksToRichTextBox";
-            ThanksToRichTextBox.ReadOnly = true;
-            ThanksToRichTextBox.Size = new Size(388, 113);
-            ThanksToRichTextBox.TabIndex = 0;
-            ThanksToRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
+            ThirdPartyRichTextBox.Location = new Point(0, 0);
+            ThirdPartyRichTextBox.Name = "ThirdPartyRichTextBox";
+            ThirdPartyRichTextBox.ReadOnly = true;
+            ThirdPartyRichTextBox.Size = new Size(388, 113);
+            ThirdPartyRichTextBox.TabIndex = 1;
+            ThirdPartyRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/THIRD_PARTY_LICENSES.md";
             // 
             // About
             // 
@@ -188,25 +212,28 @@
             Load += About_Load;
             Shown += About_Shown;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            tabControl1.ResumeLayout(false);
+            ThirdPartytabPage.ResumeLayout(false);
+            ThanksToTabPage.ResumeLayout(false);
+            LicenseTabPage.ResumeLayout(false);
             AboutTabPage.ResumeLayout(false);
             AboutTabPage.PerformLayout();
-            LicenseTabPage.ResumeLayout(false);
-            ThanksToTabPage.ResumeLayout(false);
+            tabControl1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
         private PictureBox pictureBox1;
-        private TabControl tabControl1;
-        private TabPage AboutTabPage;
-        private TabPage LicenseTabPage;
-        private RichTextBox LicenseRichTextBox;
+        private TabPage ThirdPartytabPage;
         private TabPage ThanksToTabPage;
         private RichTextBox ThanksToRichTextBox;
+        private TabPage LicenseTabPage;
+        private RichTextBox LicenseRichTextBox;
+        private TabPage AboutTabPage;
         private LinkLabel gitHubRepoLinkLabel;
         private Label label3;
         private Label label2;
         private Label label1;
+        private TabControl tabControl1;
+        private RichTextBox ThirdPartyRichTextBox;
     }
 }

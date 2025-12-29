@@ -17,22 +17,18 @@ namespace Appium_Wizard
         private async void About_Load(object sender, EventArgs e)
         {
             label1.Text = "Version : " + VersionInfo.VersionNumber;
-
             try
             {
-                string dual = "This project is dual-licensed under the MIT and GPL 3.0 licenses.";
-                string MITLicense = await AboutText.GetLicenseText("MIT");
-                string GPLLicense = await AboutText.GetLicenseText("GPL");
-                string linebreak = "\n\n--------------------------------------------------------------------------\n\n";
-                string finalLicense = dual + linebreak + MITLicense + linebreak + GPLLicense;
-                LicenseRichTextBox.Text = finalLicense;
+                string licenseText = await AboutText.GetLicenseText();
+                LicenseRichTextBox.Text = licenseText;
+                string thirdPartyText = await AboutText.GetThirdPartyLicenseText();
+                ThirdPartyRichTextBox.Text = thirdPartyText;
                 var thanksTo = await AboutText.ExtractSections();
                 ThanksToRichTextBox.Text = thanksTo;
             }
             catch (Exception)
             {
-                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-MIT\n" +
-                                          "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE-GPL";
+                LicenseRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/LICENSE";
                 ThanksToRichTextBox.Text = "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
             }
         }
@@ -89,22 +85,47 @@ namespace Appium_Wizard
             }
         }
 
+        public static async Task<string> GetIconsContent()
+        {
+            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/ICONS.md";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return responseBody;
+                }
+                catch (HttpRequestException)
+                {
+                    return "https://github.com/mega6453/AppiumWizard/blob/master/ICONS.md";
+                }
+            }
+        }
+
         public async static Task<string> ExtractSections()
         {
             string readmeContent = await GetReadmeContent();
+            string iconsContent = await GetIconsContent();
 
             string thanksToPattern = @"## Thanks To\s*(.*?)\s*(##|$)";
-            string iconsPattern = @"## Icons\s*(.*?)\s*(##|$)";
 
             string thanksToSection = ExtractSection(readmeContent, thanksToPattern);
-            string iconsSection = ExtractSection(readmeContent, iconsPattern);
 
-            if (thanksToSection.Contains("Section not found") | iconsSection.Contains("Section not found"))
+            if (thanksToSection.Contains("Section not found"))
             {
                 return "https://github.com/mega6453/AppiumWizard/blob/master/README.md#thanks-to";
             }
-            string linebreak = "\n\n-----------------------------------------------------------------------";
-            return "Executables:\n"+thanksToSection + linebreak + "\n\nICONS:\n" + iconsSection;
+
+            if (iconsContent.StartsWith("https://"))
+            {
+                // If fetching icons failed, return the fallback URL
+                return "Executables:\n" + thanksToSection + "-----------------------------------------------------------------------ICONS:" + iconsContent;
+            }
+
+            string linebreak = "\n---------------------------------------------------------------------- - ";
+            return "Executables:\n" + thanksToSection + linebreak + "\nICONS:\n" + iconsContent;
         }
 
         private static string ExtractSection(string content, string pattern)
@@ -120,9 +141,28 @@ namespace Appium_Wizard
             }
         }
 
-        public static async Task<string> GetLicenseText(string licenseType)
+        public static async Task<string> GetLicenseText()
         {
-            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/LICENSE-"+licenseType;
+            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/LICENSE";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    return responseBody;
+                }
+                catch (HttpRequestException)
+                {
+                    return url;
+                }
+            }
+        }
+
+        public static async Task<string> GetThirdPartyLicenseText()
+        {
+            string url = "https://raw.githubusercontent.com/mega6453/AppiumWizard/refs/heads/master/THIRD_PARTY_LICENSES.md";
             using (HttpClient client = new HttpClient())
             {
                 try

@@ -54,19 +54,19 @@ namespace Appium_Wizard
 
         public static void SetEnvironmentVariable(string path)
         {
-            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
+            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process) ?? string.Empty;
             if (!currentPath.Contains(path))
             {
                 string newPath = currentPath + ";" + path;
-                Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.User);
-                string updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? string.Empty;
+                Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Process);
+                string updatedPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process) ?? string.Empty;
                 Console.WriteLine("Updated PATH: " + updatedPath);
             }
         }
 
         public static void SetAndroidHomeEnvironmentVariable()
         {
-            Environment.SetEnvironmentVariable("ANDROID_HOME", executablesFolderPath, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("ANDROID_HOME", executablesFolderPath, EnvironmentVariableTarget.Process);
         }
 
         public static int GetFreePort()

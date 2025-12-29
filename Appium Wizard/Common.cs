@@ -66,7 +66,22 @@ namespace Appium_Wizard
 
         public static void SetAndroidHomeEnvironmentVariable()
         {
+            CleanupAndroidHomeEnvironmentVariable();
             Environment.SetEnvironmentVariable("ANDROID_HOME", executablesFolderPath, EnvironmentVariableTarget.Process);
+        }
+
+        public static void CleanupAndroidHomeEnvironmentVariable()
+        {
+            // Get the ANDROID_HOME value from User level
+            string userAndroidHome = Environment.GetEnvironmentVariable("ANDROID_HOME", EnvironmentVariableTarget.User);
+
+            // Check if it exists and matches the executablesFolderPath
+            if (!string.IsNullOrEmpty(userAndroidHome) &&
+                userAndroidHome.Equals(executablesFolderPath, StringComparison.OrdinalIgnoreCase))
+            {
+                // Remove the User-level ANDROID_HOME by setting it to null
+                Environment.SetEnvironmentVariable("ANDROID_HOME", null, EnvironmentVariableTarget.User);
+            }
         }
 
         public static int GetFreePort()

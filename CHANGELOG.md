@@ -1,3 +1,8 @@
+# v8.5.0:
+1. License updated to Apache 2.0 to match with Appium.
+2. Fixed Android scrcpy screen mirroring element highlighting on top of other window issue.
+3. Object Spy performance improvements.
+   
 # v8.4.0:
 1. Scrcpy will be used for android screen mirroring by default for better performance and usability (Can change in settings).
 2. Test runner now supports repeating the steps execution for given duration.

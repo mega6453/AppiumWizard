@@ -2,9 +2,12 @@ Hey there! 👋 Thanks for checking out Appium Wizard.
 
 You’re welcome to:
 
-* Fix bugs 🐞
-* Add/Update features ✨
-* Improve docs 📝
+* 🧪 Report issues
+* 🚀 Suggest feature
+* 💬Create discussion
+* 🐞 Fix bugs
+* ✨ Add/Update features
+* 📝 Improve docs
 
 
 Just keep changes simple, follow the existing C# style, and test before submitting.

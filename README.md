@@ -113,11 +113,3 @@ This project is licensed under Apache-2.0.
 
 ## Troubleshooting Guide
 * [Troubleshooting Guide](./TROUBLESHOOTINGGUIDE.md)
-
-## Contributing to the Project
-* **Fork the Repo**: Click the "Fork" button at the top right of the repository page to create your own copy of the repository.
-* **Make Changes**: Clone your forked repository to your local machine, and make the necessary changes in a new branch. It's a good practice to give your branch a descriptive name related to the changes you're making.
-* **Test Your Changes**: Ensure your changes work as expected and do not introduce new issues. Add tests if applicable.
-* **Commit Your Changes**: Commit your changes with clear and descriptive commit messages.
-* **Push to Your Fork**: Push your changes to your forked repository on GitHub.
-* **Create a Pull Request**: Navigate to the original repository and click "New Pull Request." Provide a detailed description of the changes you made and why they are necessary.

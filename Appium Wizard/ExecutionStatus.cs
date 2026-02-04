@@ -237,6 +237,17 @@ namespace Appium_Wizard
                         screenControl.DrawArrow(screenControl, startX, startY, endX, endY);
                     }
 
+                    else if (data.Contains("POST /session/") && data.Contains("/execute/sync") && data.Contains("{\"script\":\"appiumwizard"))
+                    {
+                        var match = Regex.Match(data, @"appiumwizard:(.*?)""");
+
+                        if (match.Success)
+                        {
+                            statusText = match.Groups[1].Value;
+                            screenControl.UpdateStatusLabel(screenControl, statusText);
+                        }
+                    }
+
                     // Handling Responses
                     else if (data.Contains("Got response with status 200"))
                     {
@@ -247,7 +258,7 @@ namespace Appium_Wizard
                                 string json = GetOnlyJson(data);
                                 JObject jsonObject = JObject.Parse(json);
                                 string elementId = jsonObject["value"]["ELEMENT"].ToString();
-                                GetRectValues(url,elementId);
+                                GetRectValues(url, elementId);
                             }
                             screenControl.UpdateStatusLabel(screenControl, "");
                         }

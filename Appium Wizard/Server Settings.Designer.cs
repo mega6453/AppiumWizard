@@ -53,8 +53,14 @@
             debugRadioButton = new RadioButton();
             infoRadioButton = new RadioButton();
             errorRadioButton = new RadioButton();
+            skipOptionsGroupBox = new GroupBox();
+            skipServerInstallationCheckBox = new CheckBox();
+            skipDeviceInitializationCheckBox = new CheckBox();
+            skipLogcatCaptureCheckBox = new CheckBox();
+            skipUnlockCheckBox = new CheckBox();
             contextMenuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
+            skipOptionsGroupBox.SuspendLayout();
             SuspendLayout();
             // 
             // ServerArgsRichTextBox
@@ -293,7 +299,7 @@
             infoRadioButton.CheckedChanged += infoRadioButton_CheckedChanged;
             // 
             // errorRadioButton
-            // 
+            //
             errorRadioButton.AutoSize = true;
             errorRadioButton.Location = new Point(185, 13);
             errorRadioButton.Name = "errorRadioButton";
@@ -303,13 +309,71 @@
             errorRadioButton.Text = "error";
             errorRadioButton.UseVisualStyleBackColor = true;
             errorRadioButton.CheckedChanged += errorRadioButton_CheckedChanged;
-            // 
+            //
+            // skipOptionsGroupBox
+            //
+            skipOptionsGroupBox.Controls.Add(skipServerInstallationCheckBox);
+            skipOptionsGroupBox.Controls.Add(skipDeviceInitializationCheckBox);
+            skipOptionsGroupBox.Controls.Add(skipLogcatCaptureCheckBox);
+            skipOptionsGroupBox.Controls.Add(skipUnlockCheckBox);
+            skipOptionsGroupBox.Location = new Point(350, 44);
+            skipOptionsGroupBox.Name = "skipOptionsGroupBox";
+            skipOptionsGroupBox.Size = new Size(379, 103);
+            skipOptionsGroupBox.TabIndex = 20;
+            skipOptionsGroupBox.TabStop = false;
+            skipOptionsGroupBox.Text = "Skip Options (Auto-add to Default Capabilities)";
+            //
+            // skipServerInstallationCheckBox
+            //
+            skipServerInstallationCheckBox.AutoSize = true;
+            skipServerInstallationCheckBox.Location = new Point(10, 22);
+            skipServerInstallationCheckBox.Name = "skipServerInstallationCheckBox";
+            skipServerInstallationCheckBox.Size = new Size(188, 19);
+            skipServerInstallationCheckBox.TabIndex = 0;
+            skipServerInstallationCheckBox.Text = "skipServerInstallation";
+            skipServerInstallationCheckBox.UseVisualStyleBackColor = true;
+            skipServerInstallationCheckBox.CheckedChanged += SkipOption_CheckedChanged;
+            //
+            // skipDeviceInitializationCheckBox
+            //
+            skipDeviceInitializationCheckBox.AutoSize = true;
+            skipDeviceInitializationCheckBox.Location = new Point(10, 44);
+            skipDeviceInitializationCheckBox.Name = "skipDeviceInitializationCheckBox";
+            skipDeviceInitializationCheckBox.Size = new Size(204, 19);
+            skipDeviceInitializationCheckBox.TabIndex = 1;
+            skipDeviceInitializationCheckBox.Text = "skipDeviceInitialization";
+            skipDeviceInitializationCheckBox.UseVisualStyleBackColor = true;
+            skipDeviceInitializationCheckBox.CheckedChanged += SkipOption_CheckedChanged;
+            //
+            // skipLogcatCaptureCheckBox
+            //
+            skipLogcatCaptureCheckBox.AutoSize = true;
+            skipLogcatCaptureCheckBox.Location = new Point(10, 66);
+            skipLogcatCaptureCheckBox.Name = "skipLogcatCaptureCheckBox";
+            skipLogcatCaptureCheckBox.Size = new Size(156, 19);
+            skipLogcatCaptureCheckBox.TabIndex = 2;
+            skipLogcatCaptureCheckBox.Text = "skipLogcatCapture";
+            skipLogcatCaptureCheckBox.UseVisualStyleBackColor = true;
+            skipLogcatCaptureCheckBox.CheckedChanged += SkipOption_CheckedChanged;
+            //
+            // skipUnlockCheckBox
+            //
+            skipUnlockCheckBox.AutoSize = true;
+            skipUnlockCheckBox.Location = new Point(220, 22);
+            skipUnlockCheckBox.Name = "skipUnlockCheckBox";
+            skipUnlockCheckBox.Size = new Size(100, 19);
+            skipUnlockCheckBox.TabIndex = 3;
+            skipUnlockCheckBox.Text = "skipUnlock";
+            skipUnlockCheckBox.UseVisualStyleBackColor = true;
+            skipUnlockCheckBox.CheckedChanged += SkipOption_CheckedChanged;
+            //
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(734, 432);
+            Controls.Add(skipOptionsGroupBox);
             Controls.Add(groupBox1);
             Controls.Add(DefaultCapsLinkLabel);
             Controls.Add(resetButton);
@@ -339,6 +403,8 @@
             contextMenuStrip1.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            skipOptionsGroupBox.ResumeLayout(false);
+            skipOptionsGroupBox.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -367,5 +433,10 @@
         private RadioButton debugRadioButton;
         private RadioButton infoRadioButton;
         private RadioButton errorRadioButton;
+        private GroupBox skipOptionsGroupBox;
+        private CheckBox skipServerInstallationCheckBox;
+        private CheckBox skipDeviceInitializationCheckBox;
+        private CheckBox skipLogcatCaptureCheckBox;
+        private CheckBox skipUnlockCheckBox;
     }
 }

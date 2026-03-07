@@ -1464,7 +1464,7 @@ namespace Appium_Wizard
                 File.Move(finalIPAFile, destinationPath);
 
                 commonProgress?.UpdateStepLabel("Download WDA", "Cleaning up temporary files...", 95);
-                Task.Run(() =>
+                _ = Task.Run(() =>
                 {
                     try
                     {

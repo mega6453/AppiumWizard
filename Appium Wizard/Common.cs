@@ -1297,6 +1297,43 @@ namespace Appium_Wizard
             }
         }
 
+        public static async Task<string> GetLatestWebDriverAgentVersionFromGitHub()
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "Appium-Wizard");
+                    string url = "https://api.github.com/repos/appium/WebDriverAgent/releases/latest";
+                    var response = await client.GetAsync(url);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string jsonContent = await response.Content.ReadAsStringAsync();
+                        using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+                        {
+                            JsonElement root = doc.RootElement;
+                            if (root.TryGetProperty("tag_name", out JsonElement tagElement))
+                            {
+                                string tagName = tagElement.GetString();
+                                // Remove 'v' prefix if present (e.g., "v11.3.0" -> "11.3.0")
+                                if (!string.IsNullOrEmpty(tagName) && tagName.StartsWith("v"))
+                                {
+                                    return tagName.Substring(1);
+                                }
+                                return tagName ?? "versionNotFound";
+                            }
+                        }
+                    }
+                }
+                return "versionNotFound";
+            }
+            catch (Exception)
+            {
+                return "versionNotFound";
+            }
+        }
+
         public static void GetWebDriverAgentIPAFile()
         {
             string version = GetRequiredWebDriverAgentVersion();
@@ -1364,6 +1401,90 @@ namespace Appium_Wizard
             File.WriteAllText(filePath, updatedPlistContent);
         }
 
+        public static async Task<bool> DownloadWebDriverAgentIPAFile(string version, string destinationPath, CommonProgress? commonProgress = null)
+        {
+            try
+            {
+                commonProgress?.UpdateStepLabel("Download WDA", "Preparing download...", 5);
+
+                string url = "https://github.com/appium/WebDriverAgent/releases/download/v" + version + "/WebDriverAgentRunner-Runner.zip";
+                string tempFolder = Path.GetTempPath();
+                tempFolder = Path.Combine(tempFolder, "Appium_Wizard");
+                try
+                {
+                    Directory.Delete(tempFolder, true);
+                }
+                catch (Exception)
+                {
+                }
+                Directory.CreateDirectory(tempFolder);
+                string downloadedZip = tempFolder + "\\wdadownloaded.zip";
+
+                commonProgress?.UpdateStepLabel("Download WDA", $"Downloading WebDriverAgent v{version} from GitHub...", 10);
+
+                using (var client = new HttpClient())
+                {
+                    try
+                    {
+                        var response = await client.GetAsync(url);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return false;
+                        }
+
+                        using (var fs = new FileStream(downloadedZip, FileMode.Create))
+                        {
+                            await response.Content.CopyToAsync(fs);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Download complete. Extracting files...", 50);
+
+                string extractFolder = tempFolder + "\\Extracted";
+                string PayloadFolder = tempFolder + "\\Extracted\\Payload";
+                string finalIPAFile = tempFolder + "\\wda.ipa";
+                System.IO.Compression.ZipFile.ExtractToDirectory(downloadedZip, PayloadFolder);
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Updating version in plist file...", 70);
+                UpdateVersionInPlistFile(PayloadFolder + "\\WebDriverAgentRunner-Runner.app\\Info.plist", version);
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Creating IPA file...", 80);
+                System.IO.Compression.ZipFile.CreateFromDirectory(extractFolder, finalIPAFile);
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Saving to destination...", 90);
+                if (File.Exists(destinationPath))
+                {
+                    File.Delete(destinationPath);
+                }
+                File.Move(finalIPAFile, destinationPath);
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Cleaning up temporary files...", 95);
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        Directory.Delete(tempFolder, true);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                });
+
+                commonProgress?.UpdateStepLabel("Download WDA", "Download complete!", 100);
+                await Task.Delay(500);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
 
         public static Dictionary<string, Process> screenRecordingUDIDProcess = new Dictionary<string, Process>();

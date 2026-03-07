@@ -2185,6 +2185,20 @@ namespace Appium_Wizard
             }
         }
 
+        private void downloadWDAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DownloadWDA downloadWDAForm = new DownloadWDA();
+                downloadWDAForm.ShowDialog(this);
+                GoogleAnalytics.SendEvent("downloadWDAToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("downloadWDAToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
         private void openLogsButton_Click(object sender, EventArgs e)
         {
             try

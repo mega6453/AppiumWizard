@@ -32,9 +32,9 @@
             ScreenWebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             toolStrip1 = new ToolStrip();
             AlwaysOnTopToolStripButton = new ToolStripButton();
-            BackToolStripButton = new ToolStripButton();
-            HomeToolStripButton = new ToolStripButton();
-            recentAppsToolStripButton = new ToolStripButton();
+            navigationHomeSplitButton = new ToolStripSplitButton();
+            recentToolStripMenuItem = new ToolStripMenuItem();
+            backToolStripMenuItem = new ToolStripMenuItem();
             ControlCenterToolStripButton = new ToolStripButton();
             SettingsToolStripButton = new ToolStripButton();
             RecordButton = new ToolStripButton();
@@ -89,7 +89,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, BackToolStripButton, HomeToolStripButton, recentAppsToolStripButton, ControlCenterToolStripButton, SettingsToolStripButton, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, objectSpyButton, RecordAndStopRecordingSteps });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, navigationHomeSplitButton, ControlCenterToolStripButton, SettingsToolStripButton, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, objectSpyButton, RecordAndStopRecordingSteps });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -109,39 +109,34 @@
             AlwaysOnTopToolStripButton.ToolTipText = "Always on Top";
             AlwaysOnTopToolStripButton.Click += AlwaysOnTop_Click;
             // 
-            // BackToolStripButton
+            // navigationHomeSplitButton
             // 
-            BackToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            BackToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            BackToolStripButton.Image = Properties.Resources.left_arrow;
-            BackToolStripButton.ImageTransparentColor = Color.Magenta;
-            BackToolStripButton.Name = "BackToolStripButton";
-            BackToolStripButton.Size = new Size(28, 28);
-            BackToolStripButton.ToolTipText = "Back";
-            BackToolStripButton.Click += BackButton_Click;
+            navigationHomeSplitButton.Alignment = ToolStripItemAlignment.Right;
+            navigationHomeSplitButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            navigationHomeSplitButton.DropDownItems.AddRange(new ToolStripItem[] { recentToolStripMenuItem, backToolStripMenuItem });
+            navigationHomeSplitButton.Image = Properties.Resources.home;
+            navigationHomeSplitButton.ImageTransparentColor = Color.Magenta;
+            navigationHomeSplitButton.Name = "navigationHomeSplitButton";
+            navigationHomeSplitButton.Size = new Size(40, 28);
+            navigationHomeSplitButton.Text = "toolStripSplitButton1";
+            navigationHomeSplitButton.ToolTipText = "Home";
+            navigationHomeSplitButton.ButtonClick += navigationHomeSplitButton_ButtonClick;
             // 
-            // HomeToolStripButton
+            // recentToolStripMenuItem
             // 
-            HomeToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            HomeToolStripButton.BackColor = SystemColors.HighlightText;
-            HomeToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            HomeToolStripButton.Image = Properties.Resources.home;
-            HomeToolStripButton.ImageTransparentColor = Color.Magenta;
-            HomeToolStripButton.Name = "HomeToolStripButton";
-            HomeToolStripButton.Size = new Size(28, 28);
-            HomeToolStripButton.ToolTipText = "Home";
-            HomeToolStripButton.Click += HomeButton_Click;
+            recentToolStripMenuItem.Image = Properties.Resources.recentApps;
+            recentToolStripMenuItem.Name = "recentToolStripMenuItem";
+            recentToolStripMenuItem.Size = new Size(188, 30);
+            recentToolStripMenuItem.Text = "Recent";
+            recentToolStripMenuItem.Click += recentToolStripMenuItem_Click;
             // 
-            // recentAppsToolStripButton
+            // backToolStripMenuItem
             // 
-            recentAppsToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            recentAppsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            recentAppsToolStripButton.Image = Properties.Resources.recentApps;
-            recentAppsToolStripButton.ImageTransparentColor = Color.Magenta;
-            recentAppsToolStripButton.Name = "recentAppsToolStripButton";
-            recentAppsToolStripButton.Size = new Size(28, 28);
-            recentAppsToolStripButton.ToolTipText = "Recent Apps";
-            recentAppsToolStripButton.Click += recentAppsToolStripButton_Click;
+            backToolStripMenuItem.Image = Properties.Resources.left_arrow;
+            backToolStripMenuItem.Name = "backToolStripMenuItem";
+            backToolStripMenuItem.Size = new Size(188, 30);
+            backToolStripMenuItem.Text = "Back";
+            backToolStripMenuItem.Click += backToolStripMenuItem_Click;
             // 
             // ControlCenterToolStripButton
             // 
@@ -338,7 +333,7 @@
             // 
             playStepsToolStripMenuItem.Image = Properties.Resources.play;
             playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
-            playStepsToolStripMenuItem.Size = new Size(188, 30);
+            playStepsToolStripMenuItem.Size = new Size(127, 22);
             playStepsToolStripMenuItem.Text = "Play Steps";
             playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
             // 
@@ -346,7 +341,7 @@
             // 
             readMeToolStripMenuItem.Image = Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
-            readMeToolStripMenuItem.Size = new Size(188, 30);
+            readMeToolStripMenuItem.Size = new Size(127, 22);
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
@@ -403,10 +398,8 @@
 
         private Microsoft.Web.WebView2.WinForms.WebView2 ScreenWebView;
         private ToolStrip toolStrip1;
-        private ToolStripButton HomeToolStripButton;
         private ToolStripButton AlwaysOnTopToolStripButton;
         private ToolStripButton ControlCenterToolStripButton;
-        private ToolStripButton BackToolStripButton;
         private ToolStripDropDownButton toolStripDropDownButton1;
         private ToolStripMenuItem unlockToolStripMenuItem;
         private ToolStripButton ScreenshotToolStripButton;
@@ -416,7 +409,6 @@
         private ToolStripButton RecordButton;
         private ToolStripMenuItem manageAppsToolStripMenuItem;
         private ToolStripButton objectSpyButton;
-        private ToolStripButton recentAppsToolStripButton;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel;
         private ToolStripSplitButton RecordAndStopRecordingSteps;
@@ -434,5 +426,8 @@
         private ToolStripMenuItem copyAllInfoToolStripMenuItem;
         private ToolStripMenuItem copyUDIDToolStripMenuItem;
         private ToolStripMenuItem showDeviceInfoToolStripMenuItem;
+        private ToolStripSplitButton navigationHomeSplitButton;
+        private ToolStripMenuItem recentToolStripMenuItem;
+        private ToolStripMenuItem backToolStripMenuItem;
     }
 }

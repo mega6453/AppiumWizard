@@ -2571,6 +2571,40 @@ namespace Appium_Wizard
                 string processName = Path.GetFileNameWithoutExtension(exePath);
                 KillExeRunningFromAppiumWizardFolder(exePath, processName);
             }
+
+            // Also kill cmd.exe processes that are children of this application
+            KillChildCmdProcesses();
+        }
+
+        public static void KillChildCmdProcesses()
+        {
+            try
+            {
+                var currentProcessId = Process.GetCurrentProcess().Id;
+                foreach (var process in Process.GetProcessesByName("cmd"))
+                {
+                    try
+                    {
+                        // Check if this cmd.exe is a child of our process
+                        using (var searcher = new ManagementObjectSearcher(
+                            $"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {process.Id}"))
+                        {
+                            foreach (ManagementObject obj in searcher.Get())
+                            {
+                                var parentId = Convert.ToInt32(obj["ParentProcessId"]);
+                                if (parentId == currentProcessId)
+                                {
+                                    process.Kill();
+                                    process.WaitForExit(1000);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
         }
 
         public static string GetAppiumPeerDependencyVersionForInstalledUIAutomator(string version)

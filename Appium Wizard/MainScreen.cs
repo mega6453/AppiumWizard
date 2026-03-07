@@ -39,6 +39,8 @@ namespace Appium_Wizard
         private bool isInitialized = false;
         private Size lastFormSize = Size.Empty;
         private Timer resizeDebounceTimer;
+        private bool isCleanupComplete = false;
+        private bool isClosingInProgress = false;
 
         public MainScreen()
         {
@@ -80,7 +82,11 @@ namespace Appium_Wizard
         private async Task ConfigureWebView(int serverNumber, WebView2 webView, string defaultText)
         {
             serverNumberWebView[serverNumber] = webView;
-            await webView.EnsureCoreWebView2Async();
+
+            // Use a dedicated user data folder to isolate from Chrome
+            var userDataFolder = Path.Combine(Path.GetTempPath(), "AppiumWizard_WebView2");
+            var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+            await webView.EnsureCoreWebView2Async(env);
 
             webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
             webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
@@ -1957,12 +1963,33 @@ namespace Appium_Wizard
 
         private async void onFormClosing(object sender, FormClosingEventArgs e)
         {
+            // If cleanup is complete, allow the form to close
+            if (isCleanupComplete)
+            {
+                return;
+            }
+
+            // If cleanup is already in progress, cancel this close attempt
+            if (isClosingInProgress)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Cancel the form close and start cleanup
+            e.Cancel = true;
+            isClosingInProgress = true;
+
+            CommonProgress? commonProgress = null;
             try
             {
-                CommonProgress commonProgress = new CommonProgress();
+                // Show progress dialog
+                commonProgress = new CommonProgress();
                 commonProgress.Owner = this;
                 commonProgress.Show();
-                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Please wait while closing all resources and exiting...");
+                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Stopping timers...", 10);
+                Application.DoEvents();
+
                 List<Form> childFormsToClose = new List<Form>();
                 try
                 {
@@ -1970,10 +1997,16 @@ namespace Appium_Wizard
                     memoryCleanupTimer?.Stop();
                     memoryCleanupTimer?.Dispose();
 
-                    // Stop all log servers with cleanup
-                    Common.StopAllServers(); // This will use your new enhanced method
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Stopping all servers...", 20);
+                    Application.DoEvents();
 
-                    // Dispose WebView2 controls properly
+                    // Stop all log servers with cleanup
+                    Common.StopAllServers();
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Disposing WebView2 controls...", 40);
+                    Application.DoEvents();
+
+                    // Dispose WebView2 controls properly to prevent Chrome crashes
                     foreach (var kvp in serverNumberWebView)
                     {
                         var webView = kvp.Value;
@@ -1981,14 +2014,67 @@ namespace Appium_Wizard
                         {
                             try
                             {
+                                // Stop all navigation and clear content
+                                webView.CoreWebView2.Stop();
                                 webView.CoreWebView2.Navigate("about:blank");
-                                await Task.Delay(100); // Give it time to navigate
+                                await Task.Delay(200);
+                            }
+                            catch { }
+
+                            try
+                            {
+                                // Close DevTools if open
+                                if (webView.CoreWebView2.IsDefaultDownloadDialogOpen)
+                                {
+                                    webView.CoreWebView2.CloseDefaultDownloadDialog();
+                                }
                             }
                             catch { }
                         }
-                        webView?.Dispose();
+
+                        try
+                        {
+                            webView?.Dispose();
+                        }
+                        catch { }
                     }
                     serverNumberWebView.Clear();
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Cleaning up WebView2 processes...", 60);
+                    Application.DoEvents();
+
+                    // Kill any remaining WebView2 processes to prevent interference with Chrome
+                    await Task.Delay(300);
+                    try
+                    {
+                        var currentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+                        foreach (var process in System.Diagnostics.Process.GetProcessesByName("msedgewebview2"))
+                        {
+                            try
+                            {
+                                // Kill if it's a child process of this application
+                                using (var searcher = new System.Management.ManagementObjectSearcher(
+                                    $"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {process.Id}"))
+                                {
+                                    foreach (System.Management.ManagementObject obj in searcher.Get())
+                                    {
+                                        var parentId = Convert.ToInt32(obj["ParentProcessId"]);
+                                        if (parentId == currentProcessId)
+                                        {
+                                            process.Kill();
+                                            process.WaitForExit(1000);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Stopping running processes...", 70);
+                    Application.DoEvents();
 
                     // Clear server URL loaded tracking
                     serverUrlLoaded.Clear();
@@ -2008,11 +2094,19 @@ namespace Appium_Wizard
                     {
                         Common.KillProcessByPortNumber(item.Value);
                     }
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Killing cmd.exe processes...", 80);
+                    Application.DoEvents();
+
                     Common.KillAllExeFromAppiumWizardFolder();
                 }
                 catch (Exception)
                 {
                 }
+
+                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Closing child forms...", 90);
+                Application.DoEvents();
+
                 foreach (Form form in Application.OpenForms)
                 {
                     if (form != this && form != commonProgress)
@@ -2024,15 +2118,33 @@ namespace Appium_Wizard
                 {
                     formToClose.Close();
                 }
+
+                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Performing final cleanup...", 95);
+                Application.DoEvents();
+
                 GoogleAnalytics.SendEvent("App_Closed", "Closed");
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
+
+                commonProgress.UpdateStepLabel("Closing Appium Wizard", "Complete!", 100);
+                await Task.Delay(500);
                 commonProgress.Close();
             }
             catch (Exception ex)
             {
                 GoogleAnalytics.SendExceptionEvent("Exception_While_Closing_App", ex.Message);
+            }
+            finally
+            {
+                commonProgress?.Close();
+
+                // Mark cleanup as complete and close the form
+                isCleanupComplete = true;
+                isClosingInProgress = false;
+
+                // Close the form - this time it will be allowed
+                this.Close();
             }
         }
 

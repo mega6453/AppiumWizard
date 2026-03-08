@@ -1,3 +1,10 @@
+# v8.6.0:
+1. Download WDA IPA" feature added under Tools.
+2. Skip capabilities options added under Server Settings.
+3. Screen mirror buttons are merged by category.
+4. Allow only one instance of Appium Wizard to run.
+5. Custom status message can be displayed in the screen mirror using executescript.
+   
 # v8.5.0:
 1. License updated to Apache 2.0 to match with Appium.
 2. Fixed Android scrcpy screen mirroring element highlighting on top of other window issue.

@@ -319,12 +319,12 @@ namespace Appium_Wizard
         private void screenControlButtons(bool enable)
         {
             backToolStripMenuItem.Enabled = enable;
-            ControlCenterToolStripButton.Enabled = enable;
+            controlCenterToolStripMenuItem.Enabled = enable;            
             navigationHomeSplitButton.Enabled = enable;
-            ScreenshotToolStripButton.Enabled = enable;
-            SettingsToolStripButton.Enabled = enable;
+            TakeScreenshotToolStripSplitButton1.Enabled = enable;
+            launchSettingsToolStripMenuItem.Enabled = enable;
             MoreToolStripButton.Enabled = enable;
-            RecordButton.Enabled = enable;
+            recordScreenToolStripMenuItem.Enabled = enable;
             objectSpyButton.Enabled = enable;
             recentToolStripMenuItem.Enabled = enable;
             RecordAndStopRecordingSteps.Enabled = enable;
@@ -1017,58 +1017,6 @@ namespace Appium_Wizard
             GoogleAnalytics.SendEvent("UnlockScreen_Click");
         }
 
-        bool isRecordingScreen = false;
-        private DateTime recordingStartTime;
-        private const int MinimumRecordingDuration = 30;
-        private async void RecordButton_Click(object sender, EventArgs e)
-        {
-            if (!isRecordingScreen)
-            {
-                RecordButton.Image = Resources.record_inprogress;
-                recordingStartTime = DateTime.Now;
-                isRecordingScreen = true;
-
-                try
-                {
-                    Common common = new Common();
-                    await common.StartScreenRecording(udid, deviceName);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Failed to Record Scren", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-            }
-            else
-            {
-                TimeSpan recordingDuration = DateTime.Now - recordingStartTime;
-                if (recordingDuration.TotalSeconds >= MinimumRecordingDuration)
-                {
-                    RecordButton.Enabled = false;
-                    isRecordingScreen = false;
-                    try
-                    {
-                        Common common = new Common();
-                        await common.StopScreenRecording(udid);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    RecordButton.Image = Resources.record_button;
-                    RecordButton.Enabled = true;
-                    //MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    if (MainScreen.ScreenRecordingNotification)
-                    {
-                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show($"Please record for at least {MinimumRecordingDuration} seconds before stopping.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            GoogleAnalytics.SendEvent("RecordButton_Click");
-        }
 
         private InstalledAppsList installedAppsListForm;
         private async void manageAppsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1768,6 +1716,165 @@ namespace Appium_Wizard
                 }
             });
         }
+
+        bool isRecordingScreen = false;
+        private DateTime recordingStartTime;
+        private const int MinimumRecordingDuration = 30;
+        private async void recordScreenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!isRecordingScreen)
+            {
+                recordScreenToolStripMenuItem.Image = Resources.record_inprogress;
+                recordingStartTime = DateTime.Now;
+                isRecordingScreen = true;
+
+                try
+                {
+                    Common common = new Common();
+                    await common.StartScreenRecording(udid, deviceName);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Record Scren", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+            else
+            {
+                TimeSpan recordingDuration = DateTime.Now - recordingStartTime;
+                if (recordingDuration.TotalSeconds >= MinimumRecordingDuration)
+                {
+                    recordScreenToolStripMenuItem.Enabled = false;
+                    isRecordingScreen = false;
+                    try
+                    {
+                        Common common = new Common();
+                        await common.StopScreenRecording(udid);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    recordScreenToolStripMenuItem.Image = Resources.record_button;
+                    recordScreenToolStripMenuItem.Enabled = true;
+                    //MessageBox.Show("Screen Recording saved in Downloads folder.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (MainScreen.ScreenRecordingNotification)
+                    {
+                        Common.ShowNotification("Record Screen", "Screen Recording saved in Downloads folder.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"Please record for at least {MinimumRecordingDuration} seconds before stopping.", "Record Screen", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            GoogleAnalytics.SendEvent("RecordButton_Click");
+        }
+
+        private async void TakeScreenshotToolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        {
+            string downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string timestamp = DateTime.Now.ToString("dd-MMM-yyyy_hh.mmtt");
+            string filePath = Path.Combine(downloadPath, $"Screenshot_{deviceName}_{timestamp}.png");
+            if (OSType.Equals("Android"))
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        AndroidMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                GoogleAnalytics.SendEvent("Android_TakeScreenshot_ScreenControl");
+            }
+            else
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        iOSMethods.GetInstance().TakeScreenshot(udid, filePath);
+                    });
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Failed to Take Screenshot", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                GoogleAnalytics.SendEvent("iOS_TakeScreenshot_ScreenControl");
+            }
+            if (MainScreen.ScreenshotNotification)
+            {
+                Common.ShowNotification("Take Screenshot", "Screenshot saved in Downloads folder.");
+            }
+            //if (!isMessageDisplayed)
+            //{
+            //    isMessageDisplayed = true;
+            //    MessageBox.Show("Screenshot saved in Downloads folder.\nThis is a one time message for an application lifecycle.", "Take Screenshot", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //}
+        }
+
+        private async void launchSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await Task.Run(() =>
+            {
+                if (OSType.Equals("Android"))
+                {
+                    AndroidMethods.GetInstance().LaunchSettings(udid);
+                    GoogleAnalytics.SendEvent("Android_SettingsToolStripButton_Click");
+                }
+                else
+                {
+                    string url = "http://localhost:" + proxyPort;
+                    iOSAPIMethods.LaunchApp(url, sessionId, "com.apple.Preferences");
+                    GoogleAnalytics.SendEvent("iOS_SettingsToolStripButton_Click");
+                }
+            });
+        }
+
+        private async void controlCenterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await Task.Run(() =>
+            {
+                if (OSType.Equals("iOS"))
+                {
+                    if (isControlCenterOpen == false)
+                    {
+                        iOSAPIMethods.OpenControlCenter(URL, sessionId, width, height);
+                        //controlCenter.Text = "Close Control Center";
+                        isControlCenterOpen = true;
+                    }
+                    else
+                    {
+                        iOSAPIMethods.CloseControlCenter(URL, sessionId, width);
+                        //controlCenter.Text = "Open Control Center";
+                        isControlCenterOpen = false;
+                    }
+                    GoogleAnalytics.SendEvent("controlCenter_Click", "iOS");
+                }
+                else
+                {
+                    if (isControlCenterOpen == false)
+                    {
+                        AndroidMethods.GetInstance().OpenNotification(udid);
+                        //controlCenter.Text = "Close Control Center";
+                        isControlCenterOpen = true;
+                    }
+                    else
+                    {
+                        AndroidMethods.GetInstance().CloseNotification(udid);
+                        //controlCenter.Text = "Open Control Center";
+                        isControlCenterOpen = false;
+                    }
+                    GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
+                }
+            });
+        }
+
         //<<<------------------------------------------------------------------------------------------------------------>>>
     }
 

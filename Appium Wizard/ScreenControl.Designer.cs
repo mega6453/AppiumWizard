@@ -35,10 +35,8 @@
             navigationHomeSplitButton = new ToolStripSplitButton();
             recentToolStripMenuItem = new ToolStripMenuItem();
             backToolStripMenuItem = new ToolStripMenuItem();
-            ControlCenterToolStripButton = new ToolStripButton();
-            SettingsToolStripButton = new ToolStripButton();
-            RecordButton = new ToolStripButton();
-            ScreenshotToolStripButton = new ToolStripButton();
+            launchSettingsToolStripMenuItem = new ToolStripMenuItem();
+            controlCenterToolStripMenuItem = new ToolStripMenuItem();
             MoreToolStripButton = new ToolStripDropDownButton();
             UnlockScreen = new ToolStripMenuItem();
             manageAppsToolStripMenuItem = new ToolStripMenuItem();
@@ -58,8 +56,12 @@
             RecordAndStopRecordingSteps = new ToolStripSplitButton();
             playStepsToolStripMenuItem = new ToolStripMenuItem();
             readMeToolStripMenuItem = new ToolStripMenuItem();
+            TakeScreenshotToolStripSplitButton1 = new ToolStripSplitButton();
+            recordScreenToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
+            toolStripSplitButton1 = new ToolStripSeparator();
+            toolStripButton1 = new ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -89,7 +91,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, navigationHomeSplitButton, ControlCenterToolStripButton, SettingsToolStripButton, RecordButton, ScreenshotToolStripButton, MoreToolStripButton, objectSpyButton, RecordAndStopRecordingSteps });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSplitButton1, navigationHomeSplitButton, MoreToolStripButton, RecordAndStopRecordingSteps, TakeScreenshotToolStripSplitButton1, toolStripButton1, objectSpyButton });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -113,7 +115,7 @@
             // 
             navigationHomeSplitButton.Alignment = ToolStripItemAlignment.Right;
             navigationHomeSplitButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            navigationHomeSplitButton.DropDownItems.AddRange(new ToolStripItem[] { recentToolStripMenuItem, backToolStripMenuItem });
+            navigationHomeSplitButton.DropDownItems.AddRange(new ToolStripItem[] { recentToolStripMenuItem, backToolStripMenuItem, launchSettingsToolStripMenuItem, controlCenterToolStripMenuItem });
             navigationHomeSplitButton.Image = Properties.Resources.home;
             navigationHomeSplitButton.ImageTransparentColor = Color.Magenta;
             navigationHomeSplitButton.Name = "navigationHomeSplitButton";
@@ -126,7 +128,7 @@
             // 
             recentToolStripMenuItem.Image = Properties.Resources.recentApps;
             recentToolStripMenuItem.Name = "recentToolStripMenuItem";
-            recentToolStripMenuItem.Size = new Size(188, 30);
+            recentToolStripMenuItem.Size = new Size(158, 22);
             recentToolStripMenuItem.Text = "Recent";
             recentToolStripMenuItem.Click += recentToolStripMenuItem_Click;
             // 
@@ -134,55 +136,25 @@
             // 
             backToolStripMenuItem.Image = Properties.Resources.left_arrow;
             backToolStripMenuItem.Name = "backToolStripMenuItem";
-            backToolStripMenuItem.Size = new Size(188, 30);
+            backToolStripMenuItem.Size = new Size(158, 22);
             backToolStripMenuItem.Text = "Back";
             backToolStripMenuItem.Click += backToolStripMenuItem_Click;
             // 
-            // ControlCenterToolStripButton
+            // launchSettingsToolStripMenuItem
             // 
-            ControlCenterToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            ControlCenterToolStripButton.BackColor = SystemColors.ControlLightLight;
-            ControlCenterToolStripButton.CheckOnClick = true;
-            ControlCenterToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            ControlCenterToolStripButton.Image = Properties.Resources.toggle_button;
-            ControlCenterToolStripButton.ImageTransparentColor = Color.Magenta;
-            ControlCenterToolStripButton.Name = "ControlCenterToolStripButton";
-            ControlCenterToolStripButton.Size = new Size(28, 28);
-            ControlCenterToolStripButton.ToolTipText = "Control Center/Notifications";
-            ControlCenterToolStripButton.Click += controlCenter_Click;
+            launchSettingsToolStripMenuItem.Image = Properties.Resources.settings;
+            launchSettingsToolStripMenuItem.Name = "launchSettingsToolStripMenuItem";
+            launchSettingsToolStripMenuItem.Size = new Size(158, 22);
+            launchSettingsToolStripMenuItem.Text = "Launch Settings";
+            launchSettingsToolStripMenuItem.Click += launchSettingsToolStripMenuItem_Click;
             // 
-            // SettingsToolStripButton
+            // controlCenterToolStripMenuItem
             // 
-            SettingsToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            SettingsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            SettingsToolStripButton.Image = Properties.Resources.settings;
-            SettingsToolStripButton.ImageTransparentColor = Color.Magenta;
-            SettingsToolStripButton.Name = "SettingsToolStripButton";
-            SettingsToolStripButton.Size = new Size(28, 28);
-            SettingsToolStripButton.ToolTipText = "Settings";
-            SettingsToolStripButton.Click += SettingsToolStripButton_Click;
-            // 
-            // RecordButton
-            // 
-            RecordButton.Alignment = ToolStripItemAlignment.Right;
-            RecordButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            RecordButton.Image = Properties.Resources.record_button;
-            RecordButton.ImageTransparentColor = Color.Magenta;
-            RecordButton.Name = "RecordButton";
-            RecordButton.Size = new Size(28, 28);
-            RecordButton.ToolTipText = "Record Screen";
-            RecordButton.Click += RecordButton_Click;
-            // 
-            // ScreenshotToolStripButton
-            // 
-            ScreenshotToolStripButton.Alignment = ToolStripItemAlignment.Right;
-            ScreenshotToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            ScreenshotToolStripButton.Image = Properties.Resources.screenshot;
-            ScreenshotToolStripButton.ImageTransparentColor = Color.Magenta;
-            ScreenshotToolStripButton.Name = "ScreenshotToolStripButton";
-            ScreenshotToolStripButton.Size = new Size(28, 28);
-            ScreenshotToolStripButton.ToolTipText = "Take Screenshot";
-            ScreenshotToolStripButton.Click += Screenshot_Click;
+            controlCenterToolStripMenuItem.Image = Properties.Resources.toggle_button;
+            controlCenterToolStripMenuItem.Name = "controlCenterToolStripMenuItem";
+            controlCenterToolStripMenuItem.Size = new Size(158, 22);
+            controlCenterToolStripMenuItem.Text = "Control center";
+            controlCenterToolStripMenuItem.Click += controlCenterToolStripMenuItem_Click;
             // 
             // MoreToolStripButton
             // 
@@ -345,6 +317,27 @@
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
+            // TakeScreenshotToolStripSplitButton1
+            // 
+            TakeScreenshotToolStripSplitButton1.Alignment = ToolStripItemAlignment.Right;
+            TakeScreenshotToolStripSplitButton1.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            TakeScreenshotToolStripSplitButton1.DropDownItems.AddRange(new ToolStripItem[] { recordScreenToolStripMenuItem });
+            TakeScreenshotToolStripSplitButton1.Image = Properties.Resources.screenshot;
+            TakeScreenshotToolStripSplitButton1.ImageTransparentColor = Color.Magenta;
+            TakeScreenshotToolStripSplitButton1.Name = "TakeScreenshotToolStripSplitButton1";
+            TakeScreenshotToolStripSplitButton1.Size = new Size(40, 28);
+            TakeScreenshotToolStripSplitButton1.Text = "toolStripSplitButton1";
+            TakeScreenshotToolStripSplitButton1.ToolTipText = "Take Screenshot";
+            TakeScreenshotToolStripSplitButton1.ButtonClick += TakeScreenshotToolStripSplitButton1_ButtonClick;
+            // 
+            // recordScreenToolStripMenuItem
+            // 
+            recordScreenToolStripMenuItem.Image = Properties.Resources.record_button;
+            recordScreenToolStripMenuItem.Name = "recordScreenToolStripMenuItem";
+            recordScreenToolStripMenuItem.Size = new Size(149, 22);
+            recordScreenToolStripMenuItem.Text = "Record Screen";
+            recordScreenToolStripMenuItem.Click += recordScreenToolStripMenuItem_Click;
+            // 
             // statusStrip1
             // 
             statusStrip1.BackColor = SystemColors.Control;
@@ -366,6 +359,18 @@
             toolStripStatusLabel.Size = new Size(437, 17);
             toolStripStatusLabel.Spring = true;
             toolStripStatusLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // toolStripSplitButton1
+            // 
+            toolStripSplitButton1.Alignment = ToolStripItemAlignment.Right;
+            toolStripSplitButton1.Name = "toolStripSplitButton1";
+            toolStripSplitButton1.Size = new Size(6, 31);
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.Alignment = ToolStripItemAlignment.Right;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(6, 31);
             // 
             // ScreenControl
             // 
@@ -399,14 +404,10 @@
         private Microsoft.Web.WebView2.WinForms.WebView2 ScreenWebView;
         private ToolStrip toolStrip1;
         private ToolStripButton AlwaysOnTopToolStripButton;
-        private ToolStripButton ControlCenterToolStripButton;
         private ToolStripDropDownButton toolStripDropDownButton1;
         private ToolStripMenuItem unlockToolStripMenuItem;
-        private ToolStripButton ScreenshotToolStripButton;
-        private ToolStripButton SettingsToolStripButton;
         private ToolStripDropDownButton MoreToolStripButton;
         private ToolStripMenuItem UnlockScreen;
-        private ToolStripButton RecordButton;
         private ToolStripMenuItem manageAppsToolStripMenuItem;
         private ToolStripButton objectSpyButton;
         private StatusStrip statusStrip1;
@@ -429,5 +430,11 @@
         private ToolStripSplitButton navigationHomeSplitButton;
         private ToolStripMenuItem recentToolStripMenuItem;
         private ToolStripMenuItem backToolStripMenuItem;
+        private ToolStripSplitButton TakeScreenshotToolStripSplitButton1;
+        private ToolStripMenuItem recordScreenToolStripMenuItem;
+        private ToolStripMenuItem launchSettingsToolStripMenuItem;
+        private ToolStripMenuItem controlCenterToolStripMenuItem;
+        private ToolStripSeparator toolStripSplitButton1;
+        private ToolStripSeparator toolStripButton1;
     }
 }

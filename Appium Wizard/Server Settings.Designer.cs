@@ -65,7 +65,7 @@
             // 
             // ServerArgsRichTextBox
             // 
-            ServerArgsRichTextBox.Location = new Point(10, 102);
+            ServerArgsRichTextBox.Location = new Point(10, 115);
             ServerArgsRichTextBox.Margin = new Padding(2);
             ServerArgsRichTextBox.Name = "ServerArgsRichTextBox";
             ServerArgsRichTextBox.Size = new Size(719, 45);
@@ -77,7 +77,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            label2.Location = new Point(10, 240);
+            label2.Location = new Point(10, 253);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
             label2.Size = new Size(97, 15);
@@ -107,7 +107,7 @@
             // 
             // DefaultCapabilitiesRichTextBox
             // 
-            DefaultCapabilitiesRichTextBox.Location = new Point(10, 166);
+            DefaultCapabilitiesRichTextBox.Location = new Point(10, 179);
             DefaultCapabilitiesRichTextBox.Margin = new Padding(2);
             DefaultCapabilitiesRichTextBox.Name = "DefaultCapabilitiesRichTextBox";
             DefaultCapabilitiesRichTextBox.Size = new Size(719, 67);
@@ -118,7 +118,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(10, 85);
+            label6.Location = new Point(10, 99);
             label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new Size(69, 15);
@@ -128,7 +128,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(8, 149);
+            label7.Location = new Point(8, 162);
             label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
             label7.Size = new Size(109, 15);
@@ -139,7 +139,7 @@
             // 
             ServerArgsLink.AutoSize = true;
             ServerArgsLink.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-            ServerArgsLink.Location = new Point(90, 85);
+            ServerArgsLink.Location = new Point(90, 99);
             ServerArgsLink.Margin = new Padding(2, 0, 2, 0);
             ServerArgsLink.Name = "ServerArgsLink";
             ServerArgsLink.Size = new Size(60, 15);
@@ -151,7 +151,7 @@
             // FinalCommandRichTextBox
             // 
             FinalCommandRichTextBox.DetectUrls = false;
-            FinalCommandRichTextBox.Location = new Point(10, 257);
+            FinalCommandRichTextBox.Location = new Point(10, 270);
             FinalCommandRichTextBox.Margin = new Padding(2);
             FinalCommandRichTextBox.Name = "FinalCommandRichTextBox";
             FinalCommandRichTextBox.ReadOnly = true;
@@ -162,7 +162,7 @@
             // cancelButton
             // 
             cancelButton.AutoSize = true;
-            cancelButton.Location = new Point(292, 341);
+            cancelButton.Location = new Point(292, 350);
             cancelButton.Margin = new Padding(2);
             cancelButton.Name = "cancelButton";
             cancelButton.Size = new Size(78, 25);
@@ -174,7 +174,7 @@
             // applyButton
             // 
             applyButton.AutoSize = true;
-            applyButton.Location = new Point(396, 341);
+            applyButton.Location = new Point(396, 350);
             applyButton.Margin = new Padding(2);
             applyButton.Name = "applyButton";
             applyButton.Size = new Size(95, 25);
@@ -187,7 +187,7 @@
             // 
             label8.AutoSize = true;
             label8.ForeColor = Color.Chocolate;
-            label8.Location = new Point(195, 149);
+            label8.Location = new Point(195, 162);
             label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
             label8.Size = new Size(509, 15);
@@ -197,7 +197,7 @@
             // resetButton
             // 
             resetButton.AutoSize = true;
-            resetButton.Location = new Point(162, 342);
+            resetButton.Location = new Point(162, 351);
             resetButton.Margin = new Padding(2);
             resetButton.Name = "resetButton";
             resetButton.Size = new Size(103, 25);
@@ -227,7 +227,7 @@
             // 
             // sessionCapabilityToolStripMenuItem
             // 
-            sessionCapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            sessionCapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             sessionCapabilityToolStripMenuItem.Name = "sessionCapabilityToolStripMenuItem";
             sessionCapabilityToolStripMenuItem.Size = new Size(213, 30);
             sessionCapabilityToolStripMenuItem.Text = "Session Capability";
@@ -235,7 +235,7 @@
             // 
             // xCUITestCapabilityToolStripMenuItem
             // 
-            xCUITestCapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            xCUITestCapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             xCUITestCapabilityToolStripMenuItem.Name = "xCUITestCapabilityToolStripMenuItem";
             xCUITestCapabilityToolStripMenuItem.Size = new Size(213, 30);
             xCUITestCapabilityToolStripMenuItem.Text = "XCUITest Capability";
@@ -243,7 +243,7 @@
             // 
             // uIAutomator2CapabilityToolStripMenuItem
             // 
-            uIAutomator2CapabilityToolStripMenuItem.Image = Properties.Resources.link;
+            uIAutomator2CapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
             uIAutomator2CapabilityToolStripMenuItem.Name = "uIAutomator2CapabilityToolStripMenuItem";
             uIAutomator2CapabilityToolStripMenuItem.Size = new Size(213, 30);
             uIAutomator2CapabilityToolStripMenuItem.Text = "UIAutomator2 Capability";
@@ -253,7 +253,7 @@
             // 
             DefaultCapsLinkLabel.AutoSize = true;
             DefaultCapsLinkLabel.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-            DefaultCapsLinkLabel.Location = new Point(127, 149);
+            DefaultCapsLinkLabel.Location = new Point(127, 162);
             DefaultCapsLinkLabel.Margin = new Padding(2, 0, 2, 0);
             DefaultCapsLinkLabel.Name = "DefaultCapsLinkLabel";
             DefaultCapsLinkLabel.Size = new Size(60, 15);
@@ -277,7 +277,7 @@
             // debugRadioButton
             // 
             debugRadioButton.AutoSize = true;
-            debugRadioButton.Location = new Point(259, 13);
+            debugRadioButton.Location = new Point(226, 13);
             debugRadioButton.Name = "debugRadioButton";
             debugRadioButton.Size = new Size(59, 19);
             debugRadioButton.TabIndex = 22;
@@ -289,7 +289,7 @@
             // infoRadioButton
             // 
             infoRadioButton.AutoSize = true;
-            infoRadioButton.Location = new Point(117, 13);
+            infoRadioButton.Location = new Point(84, 13);
             infoRadioButton.Name = "infoRadioButton";
             infoRadioButton.Size = new Size(46, 19);
             infoRadioButton.TabIndex = 20;
@@ -299,9 +299,9 @@
             infoRadioButton.CheckedChanged += infoRadioButton_CheckedChanged;
             // 
             // errorRadioButton
-            //
+            // 
             errorRadioButton.AutoSize = true;
-            errorRadioButton.Location = new Point(185, 13);
+            errorRadioButton.Location = new Point(152, 13);
             errorRadioButton.Name = "errorRadioButton";
             errorRadioButton.Size = new Size(50, 19);
             errorRadioButton.TabIndex = 21;
@@ -309,64 +309,64 @@
             errorRadioButton.Text = "error";
             errorRadioButton.UseVisualStyleBackColor = true;
             errorRadioButton.CheckedChanged += errorRadioButton_CheckedChanged;
-            //
+            // 
             // skipOptionsGroupBox
-            //
+            // 
             skipOptionsGroupBox.Controls.Add(skipServerInstallationCheckBox);
             skipOptionsGroupBox.Controls.Add(skipDeviceInitializationCheckBox);
             skipOptionsGroupBox.Controls.Add(skipLogcatCaptureCheckBox);
             skipOptionsGroupBox.Controls.Add(skipUnlockCheckBox);
             skipOptionsGroupBox.Location = new Point(350, 44);
             skipOptionsGroupBox.Name = "skipOptionsGroupBox";
-            skipOptionsGroupBox.Size = new Size(379, 103);
+            skipOptionsGroupBox.Size = new Size(379, 66);
             skipOptionsGroupBox.TabIndex = 20;
             skipOptionsGroupBox.TabStop = false;
             skipOptionsGroupBox.Text = "Skip Options (Auto-add to Default Capabilities)";
-            //
+            // 
             // skipServerInstallationCheckBox
-            //
+            // 
             skipServerInstallationCheckBox.AutoSize = true;
             skipServerInstallationCheckBox.Location = new Point(10, 22);
             skipServerInstallationCheckBox.Name = "skipServerInstallationCheckBox";
-            skipServerInstallationCheckBox.Size = new Size(188, 19);
+            skipServerInstallationCheckBox.Size = new Size(137, 19);
             skipServerInstallationCheckBox.TabIndex = 0;
             skipServerInstallationCheckBox.Text = "skipServerInstallation";
             skipServerInstallationCheckBox.UseVisualStyleBackColor = true;
             skipServerInstallationCheckBox.CheckedChanged += SkipOption_CheckedChanged;
-            //
+            // 
             // skipDeviceInitializationCheckBox
-            //
+            // 
             skipDeviceInitializationCheckBox.AutoSize = true;
             skipDeviceInitializationCheckBox.Location = new Point(10, 44);
             skipDeviceInitializationCheckBox.Name = "skipDeviceInitializationCheckBox";
-            skipDeviceInitializationCheckBox.Size = new Size(204, 19);
+            skipDeviceInitializationCheckBox.Size = new Size(146, 19);
             skipDeviceInitializationCheckBox.TabIndex = 1;
             skipDeviceInitializationCheckBox.Text = "skipDeviceInitialization";
             skipDeviceInitializationCheckBox.UseVisualStyleBackColor = true;
             skipDeviceInitializationCheckBox.CheckedChanged += SkipOption_CheckedChanged;
-            //
+            // 
             // skipLogcatCaptureCheckBox
-            //
+            // 
             skipLogcatCaptureCheckBox.AutoSize = true;
-            skipLogcatCaptureCheckBox.Location = new Point(10, 66);
+            skipLogcatCaptureCheckBox.Location = new Point(220, 22);
             skipLogcatCaptureCheckBox.Name = "skipLogcatCaptureCheckBox";
-            skipLogcatCaptureCheckBox.Size = new Size(156, 19);
+            skipLogcatCaptureCheckBox.Size = new Size(125, 19);
             skipLogcatCaptureCheckBox.TabIndex = 2;
             skipLogcatCaptureCheckBox.Text = "skipLogcatCapture";
             skipLogcatCaptureCheckBox.UseVisualStyleBackColor = true;
             skipLogcatCaptureCheckBox.CheckedChanged += SkipOption_CheckedChanged;
-            //
+            // 
             // skipUnlockCheckBox
-            //
+            // 
             skipUnlockCheckBox.AutoSize = true;
-            skipUnlockCheckBox.Location = new Point(220, 22);
+            skipUnlockCheckBox.Location = new Point(220, 44);
             skipUnlockCheckBox.Name = "skipUnlockCheckBox";
-            skipUnlockCheckBox.Size = new Size(100, 19);
+            skipUnlockCheckBox.Size = new Size(84, 19);
             skipUnlockCheckBox.TabIndex = 3;
             skipUnlockCheckBox.Text = "skipUnlock";
             skipUnlockCheckBox.UseVisualStyleBackColor = true;
             skipUnlockCheckBox.CheckedChanged += SkipOption_CheckedChanged;
-            //
+            // 
             // Server_Settings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);

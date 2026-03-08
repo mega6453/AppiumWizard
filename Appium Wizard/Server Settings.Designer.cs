@@ -227,7 +227,7 @@
             // 
             // sessionCapabilityToolStripMenuItem
             // 
-            sessionCapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
+            sessionCapabilityToolStripMenuItem.Image = Properties.Resources.link;
             sessionCapabilityToolStripMenuItem.Name = "sessionCapabilityToolStripMenuItem";
             sessionCapabilityToolStripMenuItem.Size = new Size(213, 30);
             sessionCapabilityToolStripMenuItem.Text = "Session Capability";
@@ -235,7 +235,7 @@
             // 
             // xCUITestCapabilityToolStripMenuItem
             // 
-            xCUITestCapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
+            xCUITestCapabilityToolStripMenuItem.Image = Properties.Resources.link;
             xCUITestCapabilityToolStripMenuItem.Name = "xCUITestCapabilityToolStripMenuItem";
             xCUITestCapabilityToolStripMenuItem.Size = new Size(213, 30);
             xCUITestCapabilityToolStripMenuItem.Text = "XCUITest Capability";
@@ -243,7 +243,7 @@
             // 
             // uIAutomator2CapabilityToolStripMenuItem
             // 
-            uIAutomator2CapabilityToolStripMenuItem.Image = Appium_Wizard.Properties.Resources.link;
+            uIAutomator2CapabilityToolStripMenuItem.Image = Properties.Resources.link;
             uIAutomator2CapabilityToolStripMenuItem.Name = "uIAutomator2CapabilityToolStripMenuItem";
             uIAutomator2CapabilityToolStripMenuItem.Size = new Size(213, 30);
             uIAutomator2CapabilityToolStripMenuItem.Text = "UIAutomator2 Capability";

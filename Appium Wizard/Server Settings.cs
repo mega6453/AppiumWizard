@@ -60,6 +60,21 @@ namespace Appium_Wizard
                 logLevelFromDB = Database.QueryDataFromlogLevelTable()[serverNumber];
                 SelectRadioButtonBasedOnValue(logLevelFromDB);
             }
+
+            // Load skip options
+            try
+            {
+                if (Database.QueryDataFromSkipOptionsTable().ContainsKey(serverNumber))
+                {
+                    string skipOptionsFromDB = Database.QueryDataFromSkipOptionsTable()[serverNumber];
+                    LoadSkipOptionsFromString(skipOptionsFromDB);
+                }
+            }
+            catch (Exception)
+            {
+                // Table might not exist yet, ignore
+            }
+
             ServerArgsRichTextBox.Text = argsCommandFromDB;
             DefaultCapabilitiesRichTextBox.Text = capsCommandFromDB;
 
@@ -75,6 +90,24 @@ namespace Appium_Wizard
             }
             FinalCommandRichTextBox.Text = finalCommandFromDB.Replace("\n", string.Empty);
             isFormInitialized = true;
+        }
+
+        private void LoadSkipOptionsFromString(string skipOptions)
+        {
+            skipServerInstallationCheckBox.Checked = skipOptions.Contains("skipServerInstallation");
+            skipDeviceInitializationCheckBox.Checked = skipOptions.Contains("skipDeviceInitialization");
+            skipLogcatCaptureCheckBox.Checked = skipOptions.Contains("skipLogcatCapture");
+            skipUnlockCheckBox.Checked = skipOptions.Contains("skipUnlock");
+        }
+
+        private string GetSkipOptionsString()
+        {
+            List<string> skipOptions = new List<string>();
+            if (skipServerInstallationCheckBox.Checked) skipOptions.Add("skipServerInstallation");
+            if (skipDeviceInitializationCheckBox.Checked) skipOptions.Add("skipDeviceInitialization");
+            if (skipLogcatCaptureCheckBox.Checked) skipOptions.Add("skipLogcatCapture");
+            if (skipUnlockCheckBox.Checked) skipOptions.Add("skipUnlock");
+            return string.Join(",", skipOptions);
         }
 
         private void SelectRadioButtonBasedOnValue(string value)
@@ -114,9 +147,20 @@ namespace Appium_Wizard
         {
             serverArgsText = ServerArgsRichTextBox.Text;
             string defaultCapabilitiesText = DefaultCapabilitiesRichTextBox.Text;
+
+            // Get skip options
+            string skipOptions = GetSkipOptionsJson();
+
             if (string.IsNullOrEmpty(defaultCapabilitiesText))
             {
-                updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+                if (string.IsNullOrEmpty(skipOptions))
+                {
+                    updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort""}}""";
+                }
+                else
+                {
+                    updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{skipOptions}}}""";
+                }
             }
             else
             {
@@ -128,10 +172,50 @@ namespace Appium_Wizard
                 {
                     defaultCapabilitiesText = defaultCapabilitiesText.Substring(0, defaultCapabilitiesText.Length - 1);
                 }
-                updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{defaultCapabilitiesText}}}""";
+
+                if (string.IsNullOrEmpty(skipOptions))
+                {
+                    updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{defaultCapabilitiesText}}}""";
+                }
+                else
+                {
+                    updatedCapabilities = $@"-dc ""{{""appium:webDriverAgentUrl"":""http://localhost:webDriverAgentProxyPort"",{skipOptions},{defaultCapabilitiesText}}}""";
+                }
             }
             serverCLICommand = $@"appium --port {portNumber} {serverArgsText} {updatedCapabilities}";
             FinalCommandRichTextBox.Text = serverCLICommand.Replace("\n", string.Empty);
+        }
+
+        private string GetSkipOptionsJson()
+        {
+            List<string> skipOptions = new List<string>();
+
+            if (skipServerInstallationCheckBox.Checked)
+            {
+                skipOptions.Add(@"""appium:skipServerInstallation"":true");
+            }
+            if (skipDeviceInitializationCheckBox.Checked)
+            {
+                skipOptions.Add(@"""appium:skipDeviceInitialization"":true");
+            }
+            if (skipLogcatCaptureCheckBox.Checked)
+            {
+                skipOptions.Add(@"""appium:skipLogcatCapture"":true");
+            }
+            if (skipUnlockCheckBox.Checked)
+            {
+                skipOptions.Add(@"""appium:skipUnlock"":true");
+            }
+
+            return string.Join(",", skipOptions);
+        }
+
+        private void SkipOption_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isFormInitialized)
+            {
+                UpdateFinalCommand();
+            }
         }
 
 
@@ -149,6 +233,17 @@ namespace Appium_Wizard
             Database.UpdateDataIntoServerCapsTable(serverNumber, DefaultCapabilitiesRichTextBox.Text);
             Database.UpdateDataIntoServerFinalCommandTable(serverNumber, finalCommand);
             UpdateLogLevel(serverNumber);
+
+            // Save skip options
+            try
+            {
+                Database.UpdateDataIntoSkipOptionsTable(serverNumber, GetSkipOptionsString());
+            }
+            catch (Exception)
+            {
+                // Table might not exist yet, ignore
+            }
+
             MessageBox.Show("Please Stop and Start the Server to use the updated command.", "Restart Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             GoogleAnalytics.SendEvent("applyButton_Click");
             this.Close();

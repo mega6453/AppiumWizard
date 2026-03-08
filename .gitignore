@@ -11,6 +11,9 @@
 /*.suo
 /*.sln.docstates
 
+# Claude Code files
+.claude/
+
 # NuGet Packages
 *.nuget.props
 *.nuget.targets

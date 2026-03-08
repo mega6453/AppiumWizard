@@ -38,7 +38,7 @@ namespace Appium_Wizard
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool useScrcpy = false;
 
-        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy=true)
+        public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
             InitializeComponent();
             this.OSType = os;
@@ -79,7 +79,7 @@ namespace Appium_Wizard
             }
             else
             {
-                tempSessionId = session;            
+                tempSessionId = session;
                 URL = "http://" + IPAddress + ":" + proxyPort;
                 ScreenWebView = new WebView2();
                 if (deviceSessionId.ContainsKey(udid))
@@ -133,7 +133,7 @@ namespace Appium_Wizard
                 });
                 Logger.Info("Initialization completed");
                 this.KeyPreview = true;
-            }            
+            }
         }
 
         public void UpdateStatusLabel(ScreenControl screenControl, string actualText)
@@ -170,7 +170,7 @@ namespace Appium_Wizard
             InitializeWebView();
             if (OSType.Equals("iOS"))
             {
-                BackToolStripButton.Visible = false;
+                backToolStripMenuItem.Visible = false;
             }
             toolStrip1.Refresh();
             statusStrip1.Refresh();
@@ -318,15 +318,15 @@ namespace Appium_Wizard
 
         private void screenControlButtons(bool enable)
         {
-            BackToolStripButton.Enabled = enable;
+            backToolStripMenuItem.Enabled = enable;
             ControlCenterToolStripButton.Enabled = enable;
-            HomeToolStripButton.Enabled = enable;
+            navigationHomeSplitButton.Enabled = enable;
             ScreenshotToolStripButton.Enabled = enable;
             SettingsToolStripButton.Enabled = enable;
             MoreToolStripButton.Enabled = enable;
             RecordButton.Enabled = enable;
             objectSpyButton.Enabled = enable;
-            recentAppsToolStripButton.Enabled = enable;
+            recentToolStripMenuItem.Enabled = enable;
             RecordAndStopRecordingSteps.Enabled = enable;
         }
 
@@ -1702,6 +1702,71 @@ namespace Appium_Wizard
             {
                 scrcpyOverlayForm.SetRectangle(null);
             }
+        }
+
+        private async void backToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Back",
+                });
+            }
+            await Task.Run(() =>
+            {
+                AndroidMethods.GetInstance().Back(udid);
+            });
+            GoogleAnalytics.SendEvent("BackButton_Click");
+        }
+
+        private async void recentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    if (isAndroid)
+                    {
+                        AndroidMethods.GetInstance().ShowRecentApps(udid);
+                    }
+                    else
+                    {
+                        int startX = width / 2, startY = height; int endX = startX, endY = (int)(height - (height * 0.1)); ;
+                        iOSAPIMethods.Swipe(URL, sessionId, startX, startY, endX, endY, 500);
+                    }
+                });
+                GoogleAnalytics.SendEvent("recentAppsToolStripButton_Click", OSType);
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("recentAppsToolStripButton_Click", exception.Message);
+            }
+        }
+
+        private async void navigationHomeSplitButton_ButtonClick(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                recordedActions.Add(new ScreenAction
+                {
+                    ActionType = "Home",
+                });
+            }
+
+            await Task.Run(() =>
+            {
+                if (OSType.Equals("iOS"))
+                {
+                    iOSAPIMethods.GoToHome(proxyPort);
+                    GoogleAnalytics.SendEvent("HomeButton_Click", "iOS");
+                }
+                else
+                {
+                    AndroidMethods.GetInstance().GoToHome(udid);
+                    GoogleAnalytics.SendEvent("HomeButton_Click", "Android");
+                }
+            });
         }
         //<<<------------------------------------------------------------------------------------------------------------>>>
     }

@@ -748,5 +748,52 @@ namespace Appium_Wizard
             }
         }
 
+        public static Dictionary<string, string> QueryDataFromSkipOptionsTable()
+        {
+            string defaultSkipOptions = "";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand("SELECT * FROM SkipOptions", connection))
+                {
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var Server1 = reader.IsDBNull(0) ? defaultSkipOptions : reader.GetString(0);
+                            var Server2 = reader.IsDBNull(1) ? defaultSkipOptions : reader.GetString(1);
+                            var Server3 = reader.IsDBNull(2) ? defaultSkipOptions : reader.GetString(2);
+                            var Server4 = reader.IsDBNull(3) ? defaultSkipOptions : reader.GetString(3);
+                            var Server5 = reader.IsDBNull(4) ? defaultSkipOptions : reader.GetString(4);
+
+                            result["Server1"] = Server1;
+                            result["Server2"] = Server2;
+                            result["Server3"] = Server3;
+                            result["Server4"] = Server4;
+                            result["Server5"] = Server5;
+                        }
+                    }
+                }
+                connection.Close();
+                return result;
+            }
+        }
+
+        public static void UpdateDataIntoSkipOptionsTable(string serverNumber, string skipOptions)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (SQLiteCommand command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = "UPDATE SkipOptions SET ('" + serverNumber + "') = ('" + skipOptions + "')";
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                }
+                connection.Close();
+            }
+        }
+
     }
 }

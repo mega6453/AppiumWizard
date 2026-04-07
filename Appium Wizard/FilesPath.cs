@@ -24,5 +24,7 @@
         public static string FFMpegFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\FFMpeg\\";
         public static string logsFilesPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Logs\\";
         public static string scrcpy = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\scrcpy\\scrcpy.exe";
+        public static string ddiDownloaderFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\ddi-downloader.exe";
+        public static string devImagesPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\devimages\\";
     }
 }

@@ -28,6 +28,7 @@ namespace Appium_Wizard
         public static bool useScrcpy;
         //public static List<string> UDIDPreInstalledWDA = new List<string>();
         public static Dictionary<string, string> UDIDPreInstalledWDA = new Dictionary<string, string>();
+        public static HashSet<string> UDIDsUsingRunWDA = new HashSet<string>(); // Devices that should use runwda command instead of launch
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private Timer uncheckTimer; private Timer highlightTimer;
         public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();

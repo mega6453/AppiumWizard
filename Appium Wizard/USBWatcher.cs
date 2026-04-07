@@ -258,12 +258,13 @@ namespace Appium_Wizard
                                         Database.UpdateDataInDevicesTable(udid, "Connection", "");
                                     }
                                 }
-                                if (ScreenControl.webview2.ContainsKey(udid))
-                                {
-                                    var control = ScreenControl.udidScreenControl[udid];
-                                    control.LoadDeviceDisconnected(udid);
-                                }
-                                else if (ScreenControl.udidScreenControl.ContainsKey(udid))
+                                //if (ScreenControl.webview2.ContainsKey(udid))
+                                //{
+                                //    var control = ScreenControl.udidScreenControl[udid];
+                                //    control.LoadDeviceDisconnected(udid);
+                                //}
+                                //else if (ScreenControl.udidScreenControl.ContainsKey(udid))
+                                if (ScreenControl.udidScreenControl.ContainsKey(udid))
                                 {
                                     var control = ScreenControl.udidScreenControl[udid];
                                     control.Close();

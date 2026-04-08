@@ -2,18 +2,20 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Appium Wizard"
-#define MyAppVersion "8.6.0"
+#define MyAppVersion "8.6.1"
 #define MyAppPublisher "Meganathan C"
 #define MyAppExeName "Appium Wizard.exe"
 
 [Setup]
-AlwaysRestart = no 
+AlwaysRestart = no
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
 AppName={#MyAppName}
 UninstallDisplayName = Appium Wizard
 UninstallDisplayIcon={app}\{#MyAppExeName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
+AppPublisherURL=https://github.com/mega6453/AppiumWizard
+AppSupportURL=https://github.com/mega6453/AppiumWizard
 DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
@@ -21,11 +23,15 @@ LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
 PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=..\output
 OutputBaseFilename=AppiumWizard
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+ArchitecturesInstallIn64BitMode=x64
+DisableWelcomePage=no
+SignedUninstaller=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

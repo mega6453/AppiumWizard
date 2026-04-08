@@ -26,13 +26,18 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=..\output
 OutputBaseFilename=AppiumWizard
-Compression=lzma2/fast
+Compression=none
 SolidCompression=no
 WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64
 DisableWelcomePage=no
 SignedUninstaller=no
 SetupMutex=AppiumWizardSetupMutex
+SetupLogging=yes
+UsePreviousAppDir=no
+CloseApplications=no
+DirExistsWarning=no
+DiskSpanning=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

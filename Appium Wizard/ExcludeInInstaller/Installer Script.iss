@@ -14,8 +14,6 @@ UninstallDisplayName = Appium Wizard
 UninstallDisplayIcon={app}\{#MyAppExeName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL=https://github.com/mega6453/AppiumWizard
-AppSupportURL=https://github.com/mega6453/AppiumWizard
 DefaultDirName={autopf}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
@@ -23,21 +21,11 @@ LicenseFile=License.txt
 InfoBeforeFile=Information.txt
 SetupIconFile=appiumlogo.ico
 PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=..\output
 OutputBaseFilename=AppiumWizard
-Compression=none
-SolidCompression=no
+Compression=lzma
+SolidCompression=yes
 WizardStyle=modern
-ArchitecturesInstallIn64BitMode=x64
-DisableWelcomePage=no
-SignedUninstaller=no
-SetupMutex=AppiumWizardSetupMutex
-SetupLogging=yes
-UsePreviousAppDir=no
-CloseApplications=no
-DirExistsWarning=no
-DiskSpanning=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

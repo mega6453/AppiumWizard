@@ -408,7 +408,7 @@ namespace Appium_Wizard
                                     MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
-                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent...", 70);
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent, Please enter passcode if it asks...", 70);
 
                                 // Use runwda command directly (more stable than launch command)
                                 Logger.Info("Using runwda command to start WebDriverAgent");

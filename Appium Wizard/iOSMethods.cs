@@ -1965,7 +1965,7 @@ namespace Appium_Wizard
                         {
                             break;
                         }
-                        commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
+                        commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner, Please enter passcode if it asks...\nRetry " + count + "/5.");
                         iOSMethods.GetInstance().KillWDA(udid);
                         iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
                         commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");

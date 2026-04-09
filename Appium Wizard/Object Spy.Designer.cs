@@ -54,6 +54,7 @@
             addUniqueXpathToFilterToolStripMenuItem1 = new ToolStripMenuItem();
             coordLabel = new Label();
             helpButton = new Button();
+            downloadXmlButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
@@ -265,6 +266,17 @@
             helpButton.UseVisualStyleBackColor = true;
             helpButton.Click += helpButton_Click;
             // 
+            // downloadXmlButton
+            // 
+            downloadXmlButton.AutoSize = true;
+            downloadXmlButton.Location = new Point(475, 8);
+            downloadXmlButton.Name = "downloadXmlButton";
+            downloadXmlButton.Size = new Size(98, 25);
+            downloadXmlButton.TabIndex = 16;
+            downloadXmlButton.Text = "Download XML";
+            downloadXmlButton.UseVisualStyleBackColor = true;
+            downloadXmlButton.Click += downloadXmlButton_Click;
+            // 
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -273,6 +285,7 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1214, 592);
+            Controls.Add(downloadXmlButton);
             Controls.Add(helpButton);
             Controls.Add(coordLabel);
             Controls.Add(filterLabel);
@@ -328,5 +341,6 @@
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem1;
         private Label coordLabel;
         private Button helpButton;
+        private Button downloadXmlButton;
     }
 }

@@ -1211,6 +1211,37 @@ namespace Appium_Wizard
             MessageBox.Show(message, "Object Spy - BETA", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private void downloadXmlButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(xmlContent))
+            {
+                MessageBox.Show("No XML content available to save. Please refresh the screen first.", "No Content", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
+                saveFileDialog.DefaultExt = "xml";
+                saveFileDialog.FileName = $"page_source_{DateTime.Now:yyyyMMdd_HHmmss}.xml";
+                saveFileDialog.Title = "Save XML Hierarchy";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        File.WriteAllText(saveFileDialog.FileName, xmlContent);
+                        MessageBox.Show($"XML saved successfully to:\n{saveFileDialog.FileName}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Error saving XML file");
+                        MessageBox.Show($"Error saving XML file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
         private void Object_Spy_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (isAndroid)

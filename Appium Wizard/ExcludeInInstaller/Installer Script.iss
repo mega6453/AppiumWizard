@@ -2,12 +2,12 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Appium Wizard"
-#define MyAppVersion "8.6.0"
+#define MyAppVersion "8.6.1"
 #define MyAppPublisher "Meganathan C"
 #define MyAppExeName "Appium Wizard.exe"
 
 [Setup]
-AlwaysRestart = no 
+AlwaysRestart = no
 AppId={{408E2B01-BCF1-40E3-8F27-F11B32572D03}
 AppName={#MyAppName}
 UninstallDisplayName = Appium Wizard

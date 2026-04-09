@@ -919,7 +919,83 @@ namespace Appium_Wizard
         {
             if (isGo)
             {
-                return ExecuteCommand("image auto", udid);
+                // First, check if personalized DDI already exists (for iOS 17+/26+)
+                string personalizedDdiPath = FilesPath.devImagesPath + "iOS_DDI\\Restore";
+                bool hasPersonalizedDDI = Directory.Exists(personalizedDdiPath);
+
+                if (hasPersonalizedDDI)
+                {
+                    // Personalized DDI exists, check if it's valid
+                    var dmgFiles = Directory.GetFiles(personalizedDdiPath, "*.dmg");
+                    var plistFiles = Directory.GetFiles(personalizedDdiPath, "BuildManifest.plist");
+
+                    if (dmgFiles.Length > 0 && plistFiles.Length > 0)
+                    {
+                        Logger.Info("Found existing personalized DDI at: " + personalizedDdiPath + ". Attempting to mount directly.");
+
+                        // Try mounting the personalized DDI directly
+                        string output = ExecuteCommand("image mount --path=\"" + personalizedDdiPath + "\"", udid);
+
+                        if (output.Contains("\"level\":\"info\",\"msg\":\"ok\"") || output.Contains("successfully mounted"))
+                        {
+                            Logger.Info("Personalized DDI mounted successfully");
+                            return output;
+                        }
+                        else if (output.Contains("DeviceLocked"))
+                        {
+                            Logger.Info("Device is locked. Please unlock and retry.");
+                            return output;
+                        }
+                        else
+                        {
+                            Logger.Warn("Failed to mount existing personalized DDI. Output: " + output);
+                            // Continue to try image auto as fallback
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warn("Personalized DDI folder exists but files are incomplete. Will try to re-download.");
+                    }
+                }
+
+                // Try standard image auto command
+                Logger.Info("Trying standard image auto command");
+                string autoOutput = ExecuteCommand("image auto", udid);
+
+                // Check if it succeeded
+                if (autoOutput.Contains("\"level\":\"info\",\"msg\":\"ok\"") || autoOutput.Contains("successfully mounted"))
+                {
+                    Logger.Info("Standard DDI mounted successfully");
+                    return autoOutput;
+                }
+
+                // Check if mounting failed due to identity mismatch (iOS 17+ / iOS 26.3+ personalized DDI issue)
+                if (autoOutput.Contains("could not find identity") || autoOutput.Contains("findIdentity: failed"))
+                {
+                    Logger.Info("Standard DDI mounting failed with identity mismatch. Attempting to download personalized DDI for iOS 17+/26+...");
+
+                    // Download personalized DDI using ddi-downloader.exe
+                    personalizedDdiPath = DownloadPersonalizedDDI();
+
+                    if (!string.IsNullOrEmpty(personalizedDdiPath) && Directory.Exists(personalizedDdiPath))
+                    {
+                        Logger.Info("Personalized DDI downloaded. Attempting to mount from: " + personalizedDdiPath);
+
+                        // Mount the personalized DDI
+                        autoOutput = ExecuteCommand("image mount --path=\"" + personalizedDdiPath + "\"", udid);
+
+                        if (autoOutput.Contains("DeviceLocked"))
+                        {
+                            Logger.Info("Device is locked. Please unlock and retry.");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Error("Failed to download personalized DDI");
+                    }
+                }
+
+                return autoOutput;
             }
             else
             {
@@ -929,6 +1005,111 @@ namespace Appium_Wizard
                     Logger.Info("MountImage : pymd3 does not exist");
                 }
                 return output;
+            }
+        }
+
+        private string DownloadPersonalizedDDI()
+        {
+            try
+            {
+                if (!File.Exists(FilesPath.ddiDownloaderFilePath))
+                {
+                    Logger.Error("ddi-downloader.exe not found at: " + FilesPath.ddiDownloaderFilePath);
+                    return null;
+                }
+
+                // Ensure devimages directory exists
+                if (!Directory.Exists(FilesPath.devImagesPath))
+                {
+                    Directory.CreateDirectory(FilesPath.devImagesPath);
+                }
+
+                string outputPath = FilesPath.devImagesPath + "iOS_DDI";
+
+                // If DDI already exists, check if it's valid before re-downloading
+                string restorePath = Path.Combine(outputPath, "Restore");
+                if (Directory.Exists(restorePath))
+                {
+                    // Check if required files exist
+                    var dmgFiles = Directory.GetFiles(restorePath, "*.dmg");
+                    var plistFiles = Directory.GetFiles(restorePath, "BuildManifest.plist");
+
+                    if (dmgFiles.Length > 0 && plistFiles.Length > 0)
+                    {
+                        Logger.Info("Personalized DDI already exists at: " + restorePath);
+                        return restorePath;
+                    }
+                    else
+                    {
+                        Logger.Info("Existing DDI is incomplete, re-downloading...");
+                        Directory.Delete(outputPath, true);
+                    }
+                }
+
+                Logger.Info("Downloading personalized DDI to: " + outputPath);
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = FilesPath.ddiDownloaderFilePath,
+                    Arguments = "--output \"" + outputPath + "\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WorkingDirectory = FilesPath.iOSFilesPath
+                };
+
+                Process process = new Process();
+                process.StartInfo = startInfo;
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit(120000); // Wait up to 2 minutes for download
+
+                Logger.Info("DDI Downloader output: " + output);
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Logger.Error("DDI Downloader error: " + error);
+                }
+
+                if (process.ExitCode != 0)
+                {
+                    Logger.Error("DDI Downloader exited with code: " + process.ExitCode);
+                    return null;
+                }
+
+                // The ddi-downloader creates the structure compatible with go-ios
+                // It should create: iOS_DDI/Restore/ with the necessary files
+                if (Directory.Exists(restorePath))
+                {
+                    // Verify the required files exist
+                    var dmgFiles = Directory.GetFiles(restorePath, "*.dmg");
+                    var plistFiles = Directory.GetFiles(restorePath, "BuildManifest.plist");
+
+                    if (dmgFiles.Length > 0 && plistFiles.Length > 0)
+                    {
+                        Logger.Info("Successfully downloaded personalized DDI with " + dmgFiles.Length + " DMG file(s)");
+                        return restorePath;
+                    }
+                    else
+                    {
+                        Logger.Error("DDI download completed but required files (DMG/BuildManifest) not found");
+                        return null;
+                    }
+                }
+                else
+                {
+                    Logger.Error("DDI download completed but Restore folder not found");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to download personalized DDI");
+                return null;
             }
         }
 
@@ -1403,6 +1584,7 @@ namespace Appium_Wizard
         private Process pyAsyncProcess;
         private StringBuilder outputBuffer;
         public static Dictionary<int, int>? PortProcessId;
+        public static Dictionary<string, Process>? RunWDAProcesses; // Tracks runwda processes by UDID
         public enum iOSExecutable { go, py }
         public static bool isGo;
         public static bool is17Plus;
@@ -1411,6 +1593,7 @@ namespace Appium_Wizard
         {
             InitializeProcess();
             PortProcessId = new Dictionary<int, int>();
+            RunWDAProcesses = new Dictionary<string, Process>();
         }
 
         public static iOSAsyncMethods GetInstance()
@@ -1782,7 +1965,7 @@ namespace Appium_Wizard
                         {
                             break;
                         }
-                        commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner...\nRetry " + count + "/5.");
+                        commonProgress.UpdateStepLabel("Restarting WebDriverAgentRunner, Please enter passcode if it asks...\nRetry " + count + "/5.");
                         iOSMethods.GetInstance().KillWDA(udid);
                         iOSMethods.GetInstance().RunWebDriverAgentQuick(udid);
                         commonProgress.UpdateStepLabel("Please enter Passcode on your iPhone if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.\nRetry " + count + "/5.");
@@ -1803,6 +1986,190 @@ namespace Appium_Wizard
             catch (Exception)
             {
                 return "unhandled";
+            }
+        }
+
+        /// <summary>
+        /// Runs WebDriverAgent using the 'runwda' command which keeps the process running continuously.
+        /// This is more stable than 'launch' command for devices where WDA closes after a few seconds.
+        /// The process is tracked and can be killed when the device is closed.
+        /// </summary>
+        public string RunWebDriverAgentWithRunWDA(CommonProgress commonProgress, string udid, int port)
+        {
+            try
+            {
+                Logger.Info("RunWebDriverAgentWithRunWDA called for UDID: " + udid);
+
+                // Check if WDA is already running
+                string sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    Logger.Info("WDA already running with session: " + sessionId);
+                    return sessionId;
+                }
+
+                // Check if runwda process is already running for this device
+                if (RunWDAProcesses != null && RunWDAProcesses.ContainsKey(udid))
+                {
+                    Process existingProcess = RunWDAProcesses[udid];
+                    if (existingProcess != null && !existingProcess.HasExited)
+                    {
+                        Logger.Info("RunWDA process already running for UDID: " + udid);
+                        // Wait for WDA to become available
+                        sessionId = WaitForWDASession(port, 30);
+                        return sessionId;
+                    }
+                    else
+                    {
+                        // Process has exited, remove it
+                        RunWDAProcesses.Remove(udid);
+                    }
+                }
+
+                // Check if WDA is installed
+                bool isInstalled = iOSMethods.GetInstance().iSWDAInstalled(udid);
+                if (!isInstalled)
+                {
+                    Logger.Info("WDA not installed for UDID: " + udid);
+                    return "WDA Not Installed";
+                }
+
+                // Create and start the runwda process
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = FilesPath.iOSServerFilePath,
+                    Arguments = "runwda --udid=" + udid + " --env USE_PORT=" + "8100",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                Process runWDAProcess = new Process();
+                runWDAProcess.StartInfo = startInfo;
+
+                // Set up output handlers to monitor WDA status
+                runWDAProcess.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        Logger.Debug("RunWDA Output: " + e.Data);
+                        if (e.Data.Contains("authorized\":true") || e.Data.Contains("ServerURLHere"))
+                        {
+                            Logger.Info("WDA authorization detected");
+                        }
+                    }
+                };
+
+                runWDAProcess.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        Logger.Debug("RunWDA Error: " + e.Data);
+                        if (e.Data.Contains("Could not start service"))
+                        {
+                            Logger.Error("Developer mode disabled");
+                        }
+                    }
+                };
+
+                Logger.Info("Starting runwda process for UDID: " + udid);
+                runWDAProcess.Start();
+                runWDAProcess.BeginOutputReadLine();
+                runWDAProcess.BeginErrorReadLine();
+
+                // Store the process reference
+                if (RunWDAProcesses == null)
+                {
+                    RunWDAProcesses = new Dictionary<string, Process>();
+                }
+                RunWDAProcesses[udid] = runWDAProcess;
+
+                Logger.Info("RunWDA process started with PID: " + runWDAProcess.Id);
+
+                // Wait for WDA to start and create session
+                //commonProgress.UpdateStepLabel("Waiting for WebDriverAgent to start using runwda command...", 75);
+                sessionId = WaitForWDASession(port, 30);
+
+                if (sessionId.Equals("nosession"))
+                {
+                    Logger.Warn("Failed to get WDA session after starting runwda");
+                    // Check if process is still running
+                    if (runWDAProcess.HasExited)
+                    {
+                        Logger.Error("RunWDA process exited unexpectedly with code: " + runWDAProcess.ExitCode);
+                        RunWDAProcesses.Remove(udid);
+                    }
+                }
+                else
+                {
+                    Logger.Info("Successfully got WDA session: " + sessionId);
+                    iOSAPIMethods.GoToHome(port);
+                }
+
+                return sessionId;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Exception in RunWebDriverAgentWithRunWDA");
+                return "unhandled";
+            }
+        }
+
+        /// <summary>
+        /// Waits for WDA to become available and returns the session ID
+        /// </summary>
+        private string WaitForWDASession(int port, int timeoutSeconds)
+        {
+            string sessionId = "nosession";
+            int attempts = timeoutSeconds / 2; // Check every 2 seconds
+            int count = 0;
+
+            while (sessionId.Equals("nosession") && count < attempts)
+            {
+                Thread.Sleep(2000);
+                sessionId = iOSAPIMethods.CreateWDASession(port);
+                if (!sessionId.Equals("nosession"))
+                {
+                    Logger.Info("WDA session created: " + sessionId);
+                    break;
+                }
+                count++;
+                Logger.Debug("Waiting for WDA session... Attempt " + (count + 1) + "/" + attempts);
+            }
+
+            if (sessionId.Equals("nosession"))
+            {
+                // Try one more time to check if WDA is already running
+                sessionId = iOSMethods.GetInstance().IsWDARunning(port);
+            }
+
+            return sessionId;
+        }
+
+        /// <summary>
+        /// Stops the runwda process for a specific device
+        /// </summary>
+        public void StopRunWDAProcess(string udid)
+        {
+            try
+            {
+                if (RunWDAProcesses != null && RunWDAProcesses.ContainsKey(udid))
+                {
+                    Process process = RunWDAProcesses[udid];
+                    if (process != null && !process.HasExited)
+                    {
+                        Logger.Info("Stopping RunWDA process for UDID: " + udid);
+                        process.Kill();
+                        process.WaitForExit(5000);
+                        Logger.Info("RunWDA process stopped");
+                    }
+                    RunWDAProcesses.Remove(udid);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to stop RunWDA process for UDID: " + udid);
             }
         }
 

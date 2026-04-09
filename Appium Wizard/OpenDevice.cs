@@ -339,6 +339,13 @@ namespace Appium_Wizard
                                 }
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
+
+                                // Handle personalized DDI download for iOS 17+/26+
+                                if (output.Contains("Downloading personalized DDI"))
+                                {
+                                    commonProgress.UpdateStepLabel(title, "Downloading personalized developer disk image for iOS 17+/26+. This may take a few minutes...", 65);
+                                }
+
                                 if (output.Contains("MountImage: failed to get signature from Apple"))
                                 {
                                     commonProgress.Close();
@@ -346,9 +353,36 @@ namespace Appium_Wizard
                                     MessageBox.Show("Mounting image failed. Please check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
+
+                                // Check for identity mismatch error (fallback if personalized DDI also failed)
+                                if ((output.Contains("could not find identity") || output.Contains("findIdentity: failed")) && output.Contains("Failed to download personalized DDI"))
+                                {
+                                    commonProgress.Close();
+                                    isScreenServerStarted = false;
+                                    MessageBox.Show("Failed to mount developer disk image. The personalized DDI download failed.\nPlease check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
                                 if (!iOSMethods.GetInstance().isImageMounted(udid))
                                 {
-                                    iOSMethods.GetInstance().MountImage(udid);
+                                    Logger.Info("Image not mounted after first attempt, trying again...");
+                                    commonProgress.UpdateStepLabel(title, "Developer disk image not mounted. Retrying mount...", 62);
+                                    var retryOutput = iOSMethods.GetInstance().MountImage(udid);
+                                    Logger.Info("Retry mount output: " + retryOutput);
+
+                                    // Wait a bit for mount to complete
+                                    Thread.Sleep(2000);
+
+                                    // Check again if mounted
+                                    if (!iOSMethods.GetInstance().isImageMounted(udid))
+                                    {
+                                        commonProgress.Close();
+                                        isScreenServerStarted = false;
+                                        Logger.Error("Failed to mount developer disk image after retry. Output: " + retryOutput);
+                                        MessageBox.Show("Failed to mount developer disk image.\n\nPossible causes:\n1. Device was restarted (DDI gets unmounted on restart)\n2. Internet connection issue (for iOS 17+/26+ personalized DDI)\n3. DDI files corrupted\n\nSolution:\n- Ensure device is unlocked\n- Check internet connection\n- Try again\n\nIf issue persists, delete the folder:\n" + FilesPath.devImagesPath + "iOS_DDI\nand try again to re-download the DDI.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return;
+                                    }
+                                    Logger.Info("Image mounted successfully after retry");
                                 }
                                 if (deviceVersion >= version17Plus)
                                 {
@@ -374,8 +408,12 @@ namespace Appium_Wizard
                                     MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
-                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent... Please enter passcode in your iPhone, if it asks...\nOnce you see Automation Running, Go to home screen to reduce the retry.", 70);
-                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgent(commonProgress, udid, proxyPort);
+                                commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent, Please enter passcode if it asks...", 70);
+
+                                // Use runwda command directly (more stable than launch command)
+                                Logger.Info("Using runwda command to start WebDriverAgent");
+                                WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgentWithRunWDA(commonProgress, udid, proxyPort);
+
                                 Logger.Info("WDAsessionId:" + WDAsessionId);
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
@@ -402,7 +440,7 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unable to launch WebDriverAgent on your iPhone. Please enter passcode on your " + deviceName + " when it asks.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    MessageBox.Show("Unable to launch WebDriverAgent using runwda command.\n\nPlease:\n1. Enter passcode on your " + deviceName + " when it asks\n2. Ensure Developer Mode is enabled\n3. Unlock your device before opening\n\nNote: If you see WDA running on your device, try going to the home screen and reopening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (string.IsNullOrEmpty(WDAsessionId) | WDAsessionId.Equals("unhandled"))

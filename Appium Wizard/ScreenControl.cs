@@ -731,6 +731,20 @@ namespace Appium_Wizard
             }
             udidScreenControl.Remove(udid);
             webview2.Remove(udid);
+
+            // Stop runwda process if running for this device
+            if (OSType.Equals("iOS"))
+            {
+                try
+                {
+                    iOSAsyncMethods.GetInstance().StopRunWDAProcess(udid);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to stop RunWDA process during form closing");
+                }
+            }
+
             //Hide();
             //try
             //{

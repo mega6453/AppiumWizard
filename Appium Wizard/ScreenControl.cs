@@ -40,6 +40,10 @@ namespace Appium_Wizard
         private DateTime lastStatusUpdateTime = DateTime.MinValue;
         private string lastStatusText = "";
 
+        // Per-instance execution status settings
+        public bool ShowExecutionStatusText { get; set; } = true;
+        public bool ShowExecutionDrawing { get; set; } = true;
+
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
             InitializeComponent();
@@ -142,6 +146,12 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if status text is enabled for this instance
+                if (!screenControl.ShowExecutionStatusText)
+                {
+                    return;
+                }
+
                 // Throttle rapid updates to prevent UI thread overload
                 // Skip if same text is being set within 30ms (prevents backlog during rapid element finds)
                 var now = DateTime.Now;
@@ -926,6 +936,12 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawRectangleOnScrcpy(x, y, width, height);
@@ -955,6 +971,12 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawArrowOnScrcpy(startX, startY, endX, endY, 10);
@@ -982,6 +1004,12 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawDotOnScrcpy(x, y, 5);
@@ -1936,6 +1964,33 @@ namespace Appium_Wizard
                     GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
                 }
             });
+        }
+
+        private void showStatusTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Toggle the status text display setting for this screen control instance
+            ShowExecutionStatusText = showStatusTextToolStripMenuItem.Checked;
+
+            // Clear status text if disabled
+            if (!ShowExecutionStatusText)
+            {
+                if (!toolStripStatusLabel.IsDisposed)
+                {
+                    toolStripStatusLabel.Text = "";
+                }
+            }
+        }
+
+        private void showDrawingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Toggle the drawing display setting for this screen control instance
+            ShowExecutionDrawing = showDrawingToolStripMenuItem.Checked;
+
+            // Clear any existing drawings if disabled
+            if (!ShowExecutionDrawing)
+            {
+                ClearDrawing();
+            }
         }
 
         //<<<------------------------------------------------------------------------------------------------------------>>>

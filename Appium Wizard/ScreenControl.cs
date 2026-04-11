@@ -37,6 +37,8 @@ namespace Appium_Wizard
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool useScrcpy = false;
+        private DateTime lastStatusUpdateTime = DateTime.MinValue;
+        private string lastStatusText = "";
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
@@ -140,11 +142,46 @@ namespace Appium_Wizard
         {
             try
             {
-                BeginInvoke(new Action(() =>
+                // Throttle rapid updates to prevent UI thread overload
+                // Skip if same text is being set within 30ms (prevents backlog during rapid element finds)
+                var now = DateTime.Now;
+                if (actualText == lastStatusText && (now - lastStatusUpdateTime).TotalMilliseconds < 30)
                 {
-                    toolStripStatusLabel.Text = actualText;
-                    toolStripStatusLabel.ToolTipText = actualText;
-                }));
+                    return;
+                }
+
+                lastStatusText = actualText;
+                lastStatusUpdateTime = now;
+
+                // Truncate very long text (like UiSelector) to avoid UI rendering overhead
+                string displayText = actualText;
+                string tooltipText = actualText;
+                if (actualText.Length > 100)
+                {
+                    displayText = actualText.Substring(0, 97) + "...";
+                }
+
+                // Use fire-and-forget pattern to avoid queuing up UI thread
+                // This prevents backlog when there are rapid element finds
+                if (!screenControl.IsDisposed && screenControl.IsHandleCreated)
+                {
+                    try
+                    {
+                        screenControl.BeginInvoke(new Action(() =>
+                        {
+                            try
+                            {
+                                if (!toolStripStatusLabel.IsDisposed)
+                                {
+                                    toolStripStatusLabel.Text = displayText;
+                                    toolStripStatusLabel.ToolTipText = tooltipText;
+                                }
+                            }
+                            catch { }
+                        }));
+                    }
+                    catch { }
+                }
             }
             catch (Exception)
             {
@@ -892,8 +929,12 @@ namespace Appium_Wizard
                 if (useScrcpy)
                 {
                     DrawRectangleOnScrcpy(x, y, width, height);
-                    await Task.Delay(1000);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {
@@ -917,8 +958,12 @@ namespace Appium_Wizard
                 if (useScrcpy)
                 {
                     DrawArrowOnScrcpy(startX, startY, endX, endY, 10);
-                    await Task.Delay(1000);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {
@@ -940,8 +985,12 @@ namespace Appium_Wizard
                 if (useScrcpy)
                 {
                     DrawDotOnScrcpy(x, y, 5);
-                    await Task.Delay(500);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(500);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {

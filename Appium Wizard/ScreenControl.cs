@@ -1,5 +1,6 @@
 ﻿using Appium_Wizard.Appium_Wizard;
 using Appium_Wizard.Properties;
+using Microsoft.VisualBasic;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using NLog;
@@ -1274,57 +1275,159 @@ namespace Appium_Wizard
             playStepsToolStripMenuItem.Enabled = false;
             await Task.Run(() =>
             {
-                foreach (var action in recordedActions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case "Click on coordinates":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().Tap(udid, action.X, action.Y);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.Tap(URL, sessionId, action.X, action.Y);
-                            }
-                            break;
-
-                        case "Send Text Without Element":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().SendText(udid, action.Text);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.SendText(URL, sessionId, action.Text);
-                            }
-                            break;
-
-                        case "Home":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().GoToHome(udid);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.GoToHome(proxyPort);
-                            }
-                            break;
-
-                        case "Back":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().Back(udid);
-                            }
-                            break;
-                    }
-
-                    //await Task.Delay(500); // Add delay between actions
-                }
+                ExecuteRecordedActions();
             });
             MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent("Steps playback completed", OSType);
             playStepsToolStripMenuItem.Enabled = true;
+        }
+
+        private async void playStepsWithRepetitionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                MessageBox.Show("Recording is in progress. Please stop the recording and then play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (recordedActions.Count <= 1)
+            {
+                MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Prompt user for number of repetitions using InputBox
+            string input = Interaction.InputBox("Enter the number of times to repeat the steps:", "Play Steps - Repetitions", "1");
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return; // User cancelled
+            }
+
+            if (!int.TryParse(input, out int repetitions) || repetitions <= 0)
+            {
+                MessageBox.Show("Please enter a valid positive number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            playStepsToolStripMenuItem.Enabled = false;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Enabled = false;
+
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    ExecuteRecordedActions();
+                }
+            });
+
+            MessageBox.Show($"Steps playback completed ({repetitions} repetition(s)).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent($"Steps playback completed with {repetitions} repetitions", OSType);
+
+            playStepsToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Enabled = true;
+        }
+
+        private async void playStepsWithDurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                MessageBox.Show("Recording is in progress. Please stop the recording and then play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (recordedActions.Count <= 1)
+            {
+                MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Prompt user for duration in seconds using InputBox
+            string input = Interaction.InputBox("Enter the duration in seconds to repeat the steps:", "Play Steps - Duration", "60");
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return; // User cancelled
+            }
+
+            if (!int.TryParse(input, out int durationSeconds) || durationSeconds <= 0)
+            {
+                MessageBox.Show("Please enter a valid positive number of seconds.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            playStepsToolStripMenuItem.Enabled = false;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Enabled = false;
+
+            int executionCount = 0;
+            await Task.Run(() =>
+            {
+                var startTime = DateTime.Now;
+                var endTime = startTime.AddSeconds(durationSeconds);
+
+                while (DateTime.Now < endTime)
+                {
+                    ExecuteRecordedActions();
+                    executionCount++;
+                }
+            });
+
+            MessageBox.Show($"Steps playback completed ({executionCount} execution(s) in {durationSeconds} seconds).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent($"Steps playback completed with {durationSeconds}s duration", OSType);
+
+            playStepsToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Enabled = true;
+        }
+
+        private void ExecuteRecordedActions()
+        {
+            foreach (var action in recordedActions)
+            {
+                switch (action.ActionType)
+                {
+                    case "Click on coordinates":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Tap(udid, action.X, action.Y);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.Tap(URL, sessionId, action.X, action.Y);
+                        }
+                        break;
+
+                    case "Send Text Without Element":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().SendText(udid, action.Text);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.SendText(URL, sessionId, action.Text);
+                        }
+                        break;
+
+                    case "Home":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().GoToHome(udid);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.GoToHome(proxyPort);
+                        }
+                        break;
+
+                    case "Back":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Back(udid);
+                        }
+                        break;
+                }
+            }
         }
 
         private void RecordAndStopRecordingSteps_ButtonClick(object sender, EventArgs e)

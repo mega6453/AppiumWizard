@@ -58,6 +58,8 @@
             objectSpyButton = new ToolStripButton();
             RecordAndStopRecordingSteps = new ToolStripSplitButton();
             playStepsToolStripMenuItem = new ToolStripMenuItem();
+            playStepsWithRepetitionsToolStripMenuItem = new ToolStripMenuItem();
+            playStepsWithDurationToolStripMenuItem = new ToolStripMenuItem();
             readMeToolStripMenuItem = new ToolStripMenuItem();
             TakeScreenshotToolStripSplitButton1 = new ToolStripSplitButton();
             recordScreenToolStripMenuItem = new ToolStripMenuItem();
@@ -326,21 +328,37 @@
             // 
             RecordAndStopRecordingSteps.Alignment = ToolStripItemAlignment.Right;
             RecordAndStopRecordingSteps.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            RecordAndStopRecordingSteps.DropDownItems.AddRange(new ToolStripItem[] { playStepsToolStripMenuItem, readMeToolStripMenuItem });
+            RecordAndStopRecordingSteps.DropDownItems.AddRange(new ToolStripItem[] { playStepsToolStripMenuItem, playStepsWithRepetitionsToolStripMenuItem, playStepsWithDurationToolStripMenuItem, readMeToolStripMenuItem });
             RecordAndStopRecordingSteps.Image = Properties.Resources.RecordSteps;
             RecordAndStopRecordingSteps.ImageTransparentColor = Color.Magenta;
             RecordAndStopRecordingSteps.Name = "RecordAndStopRecordingSteps";
             RecordAndStopRecordingSteps.Size = new Size(40, 28);
             RecordAndStopRecordingSteps.ToolTipText = "Record and Playback";
             RecordAndStopRecordingSteps.ButtonClick += RecordAndStopRecordingSteps_ButtonClick;
-            // 
+            //
             // playStepsToolStripMenuItem
-            // 
+            //
             playStepsToolStripMenuItem.Image = Properties.Resources.play;
             playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
-            playStepsToolStripMenuItem.Size = new Size(127, 22);
+            playStepsToolStripMenuItem.Size = new Size(220, 22);
             playStepsToolStripMenuItem.Text = "Play Steps";
             playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
+            //
+            // playStepsWithRepetitionsToolStripMenuItem
+            //
+            playStepsWithRepetitionsToolStripMenuItem.Image = Properties.Resources.play;
+            playStepsWithRepetitionsToolStripMenuItem.Name = "playStepsWithRepetitionsToolStripMenuItem";
+            playStepsWithRepetitionsToolStripMenuItem.Size = new Size(220, 22);
+            playStepsWithRepetitionsToolStripMenuItem.Text = "Play Steps (Repetitions)";
+            playStepsWithRepetitionsToolStripMenuItem.Click += playStepsWithRepetitionsToolStripMenuItem_Click;
+            //
+            // playStepsWithDurationToolStripMenuItem
+            //
+            playStepsWithDurationToolStripMenuItem.Image = Properties.Resources.play;
+            playStepsWithDurationToolStripMenuItem.Name = "playStepsWithDurationToolStripMenuItem";
+            playStepsWithDurationToolStripMenuItem.Size = new Size(220, 22);
+            playStepsWithDurationToolStripMenuItem.Text = "Play Steps (Duration)";
+            playStepsWithDurationToolStripMenuItem.Click += playStepsWithDurationToolStripMenuItem_Click;
             // 
             // readMeToolStripMenuItem
             // 
@@ -447,6 +465,8 @@
         private ToolStripStatusLabel toolStripStatusLabel;
         private ToolStripSplitButton RecordAndStopRecordingSteps;
         private ToolStripMenuItem playStepsToolStripMenuItem;
+        private ToolStripMenuItem playStepsWithRepetitionsToolStripMenuItem;
+        private ToolStripMenuItem playStepsWithDurationToolStripMenuItem;
         private ToolStripMenuItem readMeToolStripMenuItem;
         private ToolStripMenuItem infoToolStripMenuItem;
         private ToolStripMenuItem copyProxyPortToolStripMenuItem1;

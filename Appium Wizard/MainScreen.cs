@@ -2312,6 +2312,56 @@ namespace Appium_Wizard
             }
         }
 
+        private void adbCommandsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string adbPath = Path.GetDirectoryName(FilesPath.adbFilePath);
+                string windowTitle = "ADB Commands - Appium Wizard";
+                string cmdArguments = $"/K \"title {windowTitle} && cd /d \"{adbPath}\" && adb\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    WorkingDirectory = adbPath
+                };
+                Process.Start(psi);
+                GoogleAnalytics.SendEvent("adbCommandsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("adbCommandsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void iOSCommandsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string iOSServerPath = Path.GetDirectoryName(FilesPath.iOSServerFilePath);
+                string windowTitle = "iOS Commands - Appium Wizard";
+                string cmdArguments = $"/K \"title {windowTitle} && cd /d \"{iOSServerPath}\" && doskey ios=iOSServer.exe $* && iOSServer.exe\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    WorkingDirectory = iOSServerPath
+                };
+                Process.Start(psi);
+                GoogleAnalytics.SendEvent("iOSCommandsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("iOSCommandsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
         private void openLogsButton_Click(object sender, EventArgs e)
         {
             try

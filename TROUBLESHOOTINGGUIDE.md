@@ -1,3 +1,7 @@
+## Test execution slow?
+* In the device screen control window -> More -> Execution status settings -> Disable both the options and check the test execution performance. If that's not fixing the issue, then mostly it's not related to appium wizard.
+* Try updating appium server/drivers/appium wizard.
+  
 ## Appium Server not starting?
 * Go to Server->Troubleshooter and fix if there's any issue shown.
 * If you have installed appium manually other than appium wizard, there's a chance that it may conflict with the custom installed server/drivers. In that case, try Re-Installing everything using Troubleshooter(Enable Show progress window, to see what's the actual issue while installing).

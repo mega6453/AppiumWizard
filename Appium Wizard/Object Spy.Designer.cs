@@ -36,6 +36,7 @@
             Property = new ColumnHeader();
             Value = new ColumnHeader();
             filterTextbox = new RichTextBox();
+            searchModeComboBox = new ComboBox();
             refreshButton = new Button();
             elementNumberTextbox = new TextBox();
             label1 = new Label();
@@ -111,10 +112,21 @@
             // 
             Value.Text = "Value";
             Value.Width = 500;
-            // 
+            //
+            // searchModeComboBox
+            //
+            searchModeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            searchModeComboBox.FormattingEnabled = true;
+            searchModeComboBox.Items.AddRange(new object[] { "XPath", "Free Text" });
+            searchModeComboBox.Location = new Point(361, 508);
+            searchModeComboBox.Name = "searchModeComboBox";
+            searchModeComboBox.Size = new Size(100, 23);
+            searchModeComboBox.TabIndex = 3;
+            searchModeComboBox.SelectedIndexChanged += searchModeComboBox_SelectedIndexChanged;
+            //
             // filterTextbox
-            // 
-            filterTextbox.Location = new Point(361, 524);
+            //
+            filterTextbox.Location = new Point(361, 537);
             filterTextbox.Name = "filterTextbox";
             filterTextbox.Size = new Size(642, 50);
             filterTextbox.TabIndex = 4;
@@ -237,10 +249,10 @@
             addUniqueXpathToFilterToolStripMenuItem.Click += addUniqueXpathToFilterToolStripMenuItem_Click;
             // 
             // filterLabel
-            // 
+            //
             filterLabel.AutoSize = true;
             filterLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            filterLabel.Location = new Point(359, 508);
+            filterLabel.Location = new Point(467, 511);
             filterLabel.Name = "filterLabel";
             filterLabel.Size = new Size(132, 15);
             filterLabel.TabIndex = 13;
@@ -337,6 +349,7 @@
             Controls.Add(label1);
             Controls.Add(elementNumberTextbox);
             Controls.Add(refreshButton);
+            Controls.Add(searchModeComboBox);
             Controls.Add(filterTextbox);
             Controls.Add(listView1);
             Controls.Add(treeView1);
@@ -365,6 +378,7 @@
         private ColumnHeader Property;
         private ColumnHeader Value;
         private RichTextBox filterTextbox;
+        private ComboBox searchModeComboBox;
         private Button refreshButton;
         private TextBox elementNumberTextbox;
         private Label label1;

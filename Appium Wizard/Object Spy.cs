@@ -38,6 +38,9 @@ namespace Appium_Wizard
 
         private async void Object_Spy_Load(object sender, EventArgs e)
         {
+            // Initialize search mode to XPath
+            searchModeComboBox.SelectedIndex = 0; // XPath
+
             if (isAndroid)
             {
                 string messageTitle = "Object Spy - " + deviceName;
@@ -650,6 +653,22 @@ namespace Appium_Wizard
         private List<TreeNode> matchingNodes = new List<TreeNode>();
         private int currentIndex = -1;
 
+        private void searchModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Update the label text based on selected mode
+            if (searchModeComboBox.SelectedIndex == 0) // XPath
+            {
+                filterLabel.Text = "Filter (XPath Validator)";
+            }
+            else // Free Text
+            {
+                filterLabel.Text = "Filter (Free Text Search)";
+            }
+
+            // Re-run the filter with the current text
+            xpathTextbox_TextChanged(sender, e);
+        }
+
         private void xpathTextbox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -670,17 +689,41 @@ namespace Appium_Wizard
                     elementNumberTextbox.Text = "0";
                     return;
                 }
-                XmlNodeList selectedXmlNodes;
-                try
-                {
-                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
-                }
-                catch (Exception ex)
-                {
-                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
-                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
-                }
 
+                XmlNodeList selectedXmlNodes;
+
+                // Check the search mode
+                if (searchModeComboBox.SelectedIndex == 0) // XPath mode
+                {
+                    try
+                    {
+                        selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                    }
+                    catch (Exception ex)
+                    {
+                        filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
+                        selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                    }
+                }
+                else // Free Text mode
+                {
+                    // Search for text in common text attributes
+                    // Build XPath to search in text, content-desc, name, value, and label attributes
+                    string escapedText = filterText.Replace("'", "&apos;");
+                    string freeTextXPath = $"//*[contains(@text, '{escapedText}') or contains(@content-desc, '{escapedText}') or contains(@name, '{escapedText}') or contains(@value, '{escapedText}') or contains(@label, '{escapedText}')]";
+
+                    try
+                    {
+                        selectedXmlNodes = xmlDoc.SelectNodes(freeTextXPath);
+                    }
+                    catch (Exception)
+                    {
+                        filterTextbox.ForeColor = Color.Red;
+                        TotalElementCount.Text = "0";
+                        elementNumberTextbox.Text = "0";
+                        return;
+                    }
+                }
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -914,6 +957,9 @@ namespace Appium_Wizard
         private void addToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //GoogleAnalytics.SendEvent("Object_Spy_ListView_AddToFilter", os);
+            // Switch to XPath mode since we're adding XPath predicates
+            searchModeComboBox.SelectedIndex = 0;
+
             if (listView1.SelectedItems.Count > 1) // multiple row selected
             {
                 var predicates = new List<string>();
@@ -1105,6 +1151,8 @@ namespace Appium_Wizard
             //GoogleAnalytics.SendEvent("Object_Spy_TreeView_AddToFilter", os);
             if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
             {
+                // Switch to XPath mode since we're adding an XPath
+                searchModeComboBox.SelectedIndex = 0;
                 string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
                 filterTextbox.Text = uniqueXPath;
                 treeView1.SelectedNode = treeView1.SelectedNode;
@@ -1162,6 +1210,8 @@ namespace Appium_Wizard
             {
                 clickedElement = FindElementByCoordinates(clickedX, clickedY);
             }
+            // Switch to XPath mode since we're adding an XPath
+            searchModeComboBox.SelectedIndex = 0;
             string uniqueXPath = GenerateUniqueXPath(clickedElement);
             filterTextbox.Text = uniqueXPath;
         }

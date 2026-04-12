@@ -191,6 +191,17 @@ namespace Appium_Wizard
                     {
                         string updateMessage = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
                         ShowMessage(updateMessage);
+
+                        // Check for mandatory update
+                        if (releaseInfo.ContainsKey("body"))
+                        {
+                            string releaseNotes = releaseInfo["body"];
+                            if (releaseNotes.Contains("", StringComparison.OrdinalIgnoreCase) ||
+                                releaseNotes.Contains("(Mandatory Update)", StringComparison.OrdinalIgnoreCase))
+                            {
+                                ShowMandatoryUpdateNotification(latestVersion, releaseNotes);
+                            }
+                        }
                     }
                 }
                 var result = Database.QueryDataFromNotificationsTable();
@@ -353,6 +364,47 @@ namespace Appium_Wizard
             };
 
             Controls.Add(tableLayoutPanel1);
+        }
+
+        private void ShowMandatoryUpdateNotification(string version, string releaseNotes)
+        {
+            try
+            {
+                string message = $"⚠️ CRITICAL UPDATE AVAILABLE ⚠️\n\n" +
+                                $"Appium Wizard version {version} is a mandatory update with critical fixes.\n\n" +
+                                $"Release Notes:\n{releaseNotes}\n\n" +
+                                $"It is strongly recommended to update to this version.\n\n" +
+                                $"Would you like to open the download page now?";
+
+                var result = MessageBox.Show(message, "Critical Update Required", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "https://github.com/mega6453/AppiumWizard/releases/latest",
+                            UseShellExecute = true
+                        });
+                        GoogleAnalytics.SendEvent("Mandatory_Update_Download_Opened", version);
+                    }
+                    catch (Exception ex)
+                    {
+                        GoogleAnalytics.SendExceptionEvent("ShowMandatoryUpdateNotification_OpenBrowser", ex.Message);
+                        MessageBox.Show("Could not open browser. Please visit: https://github.com/mega6453/AppiumWizard/releases/latest",
+                                      "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    GoogleAnalytics.SendEvent("Mandatory_Update_Dismissed", version);
+                }
+            }
+            catch (Exception ex)
+            {
+                GoogleAnalytics.SendExceptionEvent("ShowMandatoryUpdateNotification", ex.Message);
+            }
         }
 
         private void MainScreen_Shown(object sender, EventArgs e)

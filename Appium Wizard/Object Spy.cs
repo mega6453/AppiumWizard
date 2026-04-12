@@ -228,7 +228,7 @@ namespace Appium_Wizard
                         Console.WriteLine($"Checking Android node: {node.Name}, Bounds: [{elementX}, {elementY}, {x2}, {y2}], Point: ({x}, {y})");
 
                         // Validate bounds
-                        if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                        if (elementX >= 0 && elementY >= 0 && elementWidth > 0 && elementHeight > 0)
                         {
                             return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
                         }
@@ -253,7 +253,7 @@ namespace Appium_Wizard
                     Console.WriteLine($"Checking node: {node.Name}, Bounds: [{elementX}, {elementY}, {elementWidth}, {elementHeight}], Point: ({x}, {y})");
 
                     // Validate bounds
-                    if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                    if (elementX >= 0 && elementY >= 0 && elementWidth > 0 && elementHeight > 0)
                     {
                         return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
                     }
@@ -707,10 +707,12 @@ namespace Appium_Wizard
                 }
                 else // Free Text mode
                 {
-                    // Search for text in common text attributes
+                    // Search for text in common text attributes (case-insensitive)
                     // Build XPath to search in text, content-desc, name, value, and label attributes
-                    string escapedText = filterText.Replace("'", "&apos;");
-                    string freeTextXPath = $"//*[contains(@text, '{escapedText}') or contains(@content-desc, '{escapedText}') or contains(@name, '{escapedText}') or contains(@value, '{escapedText}') or contains(@label, '{escapedText}')]";
+                    string escapedText = filterText.Replace("'", "&apos;").ToLower();
+                    string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    string lower = "abcdefghijklmnopqrstuvwxyz";
+                    string freeTextXPath = $"//*[contains(translate(@text, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@content-desc, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@name, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@value, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@label, '{upper}', '{lower}'), '{escapedText}')]";
 
                     try
                     {

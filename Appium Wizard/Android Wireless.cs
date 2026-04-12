@@ -258,5 +258,12 @@
             AndroidWirelessManual androidWirelessManual = new AndroidWirelessManual(this);
             androidWirelessManual.ShowDialog();
         }
+
+        private void QRCodeButton_Click(object sender, EventArgs e)
+        {
+            AndroidWirelessQR androidWirelessQR = new AndroidWirelessQR(mainScreen, this);
+            androidWirelessQR.ShowDialog();
+            GoogleAnalytics.SendEvent("QRCodeButton_Click");
+        }
     }
 }

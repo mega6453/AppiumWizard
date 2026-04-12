@@ -38,6 +38,7 @@
             columnHeader2 = new ColumnHeader();
             PairButton = new Button();
             ManualButton = new Button();
+            QRCodeButton = new Button();
             SuspendLayout();
             // 
             // label1
@@ -57,15 +58,15 @@
             label2.Location = new Point(8, 36);
             label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(434, 45);
+            label2.Size = new Size(470, 45);
             label2.TabIndex = 1;
-            label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging > Pair device with pairing code.\r\n3. Click any one of the below options.";
+            label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging.\r\n3. Click any one of the below options to pair your device.";
             label2.TextAlign = ContentAlignment.MiddleLeft;
-            // 
+            //
             // FindDeviceButton
-            // 
+            //
             FindDeviceButton.AutoSize = true;
-            FindDeviceButton.Location = new Point(112, 95);
+            FindDeviceButton.Location = new Point(24, 95);
             FindDeviceButton.Margin = new Padding(2);
             FindDeviceButton.Name = "FindDeviceButton";
             FindDeviceButton.Size = new Size(118, 25);
@@ -122,11 +123,11 @@
             PairButton.Text = "Pair";
             PairButton.UseVisualStyleBackColor = true;
             PairButton.Click += PairButton_Click;
-            // 
+            //
             // ManualButton
-            // 
+            //
             ManualButton.AutoSize = true;
-            ManualButton.Location = new Point(246, 95);
+            ManualButton.Location = new Point(352, 95);
             ManualButton.Margin = new Padding(2);
             ManualButton.Name = "ManualButton";
             ManualButton.Size = new Size(102, 25);
@@ -134,6 +135,18 @@
             ManualButton.Text = "Pair Manually";
             ManualButton.UseVisualStyleBackColor = true;
             ManualButton.Click += ManualButton_Click;
+            //
+            // QRCodeButton
+            //
+            QRCodeButton.AutoSize = true;
+            QRCodeButton.Location = new Point(158, 95);
+            QRCodeButton.Margin = new Padding(2);
+            QRCodeButton.Name = "QRCodeButton";
+            QRCodeButton.Size = new Size(178, 25);
+            QRCodeButton.TabIndex = 10;
+            QRCodeButton.Text = "Pair with QR Code (Easiest)";
+            QRCodeButton.UseVisualStyleBackColor = true;
+            QRCodeButton.Click += QRCodeButton_Click;
             // 
             // AndroidWireless
             // 
@@ -141,6 +154,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(489, 275);
+            Controls.Add(QRCodeButton);
             Controls.Add(ManualButton);
             Controls.Add(PairButton);
             Controls.Add(listView1);
@@ -173,5 +187,6 @@
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
         private Button ManualButton;
+        private Button QRCodeButton;
     }
 }

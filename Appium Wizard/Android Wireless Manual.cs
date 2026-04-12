@@ -19,6 +19,15 @@ namespace Appium_Wizard
             ConnectIPTextBox.Select(ConnectIPTextBox.Text.Length, 0);
         }
 
+        public AndroidWirelessManual(AndroidWireless androidWireless, string pairingIP, string pairingPort, string pairingCode) : this(androidWireless)
+        {
+            // Pre-fill with provided values
+            PairingIPTextBox.Text = pairingIP;
+            PairPortNumberTextbox.Text = pairingPort;
+            PairingCodeTextbox.Text = pairingCode;
+            ConnectIPTextBox.Text = pairingIP;
+        }
+
         private void CancelButton_Click(object sender, EventArgs e)
         {
             Close();

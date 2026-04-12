@@ -45,6 +45,8 @@
             listViewContextMenuStrip = new ContextMenuStrip(components);
             copyXpathToolStripMenuItem = new ToolStripMenuItem();
             addToFilterToolStripMenuItem = new ToolStripMenuItem();
+            copyKeyToolStripMenuItem = new ToolStripMenuItem();
+            copyValueToolStripMenuItem = new ToolStripMenuItem();
             treeViewContextMenuStrip = new ContextMenuStrip(components);
             copyUniqueXpathToolStripMenuItem = new ToolStripMenuItem();
             addUniqueXpathToFilterToolStripMenuItem = new ToolStripMenuItem();
@@ -55,6 +57,8 @@
             coordLabel = new Label();
             helpButton = new Button();
             downloadXmlButton = new Button();
+            copyXmlButton = new Button();
+            expandCollapseButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             listViewContextMenuStrip.SuspendLayout();
             treeViewContextMenuStrip.SuspendLayout();
@@ -177,27 +181,41 @@
             nextButton.Text = ">";
             nextButton.UseVisualStyleBackColor = true;
             nextButton.Click += nextButton_Click;
-            // 
+            //
             // listViewContextMenuStrip
-            // 
-            listViewContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyXpathToolStripMenuItem, addToFilterToolStripMenuItem });
+            //
+            listViewContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyXpathToolStripMenuItem, addToFilterToolStripMenuItem, copyKeyToolStripMenuItem, copyValueToolStripMenuItem });
             listViewContextMenuStrip.Name = "contextMenuStrip1";
-            listViewContextMenuStrip.Size = new Size(140, 48);
-            // 
+            listViewContextMenuStrip.Size = new Size(180, 92);
+            //
             // copyXpathToolStripMenuItem
-            // 
+            //
             copyXpathToolStripMenuItem.Name = "copyXpathToolStripMenuItem";
-            copyXpathToolStripMenuItem.Size = new Size(139, 22);
+            copyXpathToolStripMenuItem.Size = new Size(179, 22);
             copyXpathToolStripMenuItem.Text = "Copy XPath";
             copyXpathToolStripMenuItem.Click += copyXpathToolStripMenuItem_Click;
-            // 
+            //
             // addToFilterToolStripMenuItem
-            // 
+            //
             addToFilterToolStripMenuItem.Name = "addToFilterToolStripMenuItem";
-            addToFilterToolStripMenuItem.Size = new Size(139, 22);
+            addToFilterToolStripMenuItem.Size = new Size(179, 22);
             addToFilterToolStripMenuItem.Text = "Add to Filter";
             addToFilterToolStripMenuItem.Click += addToFilterToolStripMenuItem_Click;
-            // 
+            //
+            // copyKeyToolStripMenuItem
+            //
+            copyKeyToolStripMenuItem.Name = "copyKeyToolStripMenuItem";
+            copyKeyToolStripMenuItem.Size = new Size(179, 22);
+            copyKeyToolStripMenuItem.Text = "Copy Key";
+            copyKeyToolStripMenuItem.Click += copyKeyToolStripMenuItem_Click;
+            //
+            // copyValueToolStripMenuItem
+            //
+            copyValueToolStripMenuItem.Name = "copyValueToolStripMenuItem";
+            copyValueToolStripMenuItem.Size = new Size(179, 22);
+            copyValueToolStripMenuItem.Text = "Copy Value";
+            copyValueToolStripMenuItem.Click += copyValueToolStripMenuItem_Click;
+            //
             // treeViewContextMenuStrip
             // 
             treeViewContextMenuStrip.Items.AddRange(new ToolStripItem[] { copyUniqueXpathToolStripMenuItem, addUniqueXpathToFilterToolStripMenuItem });
@@ -271,12 +289,34 @@
             downloadXmlButton.AutoSize = true;
             downloadXmlButton.Location = new Point(475, 8);
             downloadXmlButton.Name = "downloadXmlButton";
-            downloadXmlButton.Size = new Size(98, 25);
+            downloadXmlButton.Size = new Size(110, 25);
             downloadXmlButton.TabIndex = 16;
             downloadXmlButton.Text = "Download XML";
             downloadXmlButton.UseVisualStyleBackColor = true;
             downloadXmlButton.Click += downloadXmlButton_Click;
-            // 
+            //
+            // copyXmlButton
+            //
+            copyXmlButton.AutoSize = true;
+            copyXmlButton.Location = new Point(600, 8);
+            copyXmlButton.Name = "copyXmlButton";
+            copyXmlButton.Size = new Size(84, 25);
+            copyXmlButton.TabIndex = 17;
+            copyXmlButton.Text = "Copy XML";
+            copyXmlButton.UseVisualStyleBackColor = true;
+            copyXmlButton.Click += copyXmlButton_Click;
+            //
+            // expandCollapseButton
+            //
+            expandCollapseButton.AutoSize = true;
+            expandCollapseButton.Location = new Point(700, 8);
+            expandCollapseButton.Name = "expandCollapseButton";
+            expandCollapseButton.Size = new Size(84, 25);
+            expandCollapseButton.TabIndex = 18;
+            expandCollapseButton.Text = "Expand All";
+            expandCollapseButton.UseVisualStyleBackColor = true;
+            expandCollapseButton.Click += expandCollapseButton_Click;
+            //
             // Object_Spy
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -285,6 +325,8 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1214, 592);
+            Controls.Add(expandCollapseButton);
+            Controls.Add(copyXmlButton);
             Controls.Add(downloadXmlButton);
             Controls.Add(helpButton);
             Controls.Add(coordLabel);
@@ -332,6 +374,8 @@
         private ContextMenuStrip listViewContextMenuStrip;
         private ToolStripMenuItem addToFilterToolStripMenuItem;
         private ToolStripMenuItem copyXpathToolStripMenuItem;
+        private ToolStripMenuItem copyKeyToolStripMenuItem;
+        private ToolStripMenuItem copyValueToolStripMenuItem;
         private ContextMenuStrip treeViewContextMenuStrip;
         private ToolStripMenuItem copyUniqueXpathToolStripMenuItem;
         private ToolStripMenuItem addUniqueXpathToFilterToolStripMenuItem;
@@ -342,5 +386,7 @@
         private Label coordLabel;
         private Button helpButton;
         private Button downloadXmlButton;
+        private Button copyXmlButton;
+        private Button expandCollapseButton;
     }
 }

@@ -1242,6 +1242,60 @@ namespace Appium_Wizard
             }
         }
 
+        private void copyXmlButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(xmlContent))
+            {
+                MessageBox.Show("No XML content available to copy. Please refresh the screen first.", "No Content", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Clipboard.SetText(xmlContent);
+                MessageBox.Show("XML copied to clipboard successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error copying XML to clipboard");
+                MessageBox.Show($"Error copying XML to clipboard:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void copyKeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string property = selectedItem.Text;
+                Clipboard.SetText(property);
+            }
+        }
+
+        private void copyValueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string value = selectedItem.SubItems[1].Text;
+                Clipboard.SetText(value);
+            }
+        }
+
+        private void expandCollapseButton_Click(object sender, EventArgs e)
+        {
+            if (expandCollapseButton.Text == "Expand All")
+            {
+                treeView1.ExpandAll();
+                expandCollapseButton.Text = "Collapse All";
+            }
+            else
+            {
+                treeView1.CollapseAll();
+                expandCollapseButton.Text = "Expand All";
+            }
+        }
+
         private void Object_Spy_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (isAndroid)

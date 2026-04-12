@@ -1,3 +1,17 @@
+# v9.0.0:
+1. Fixed an issue that slowed down the Android execution for certain types of locators.
+2. Added an option to disable the execution status and drawing in the Screen Control window. Disable it, if you face performance issue in the test execution.
+3. Fixed an issue where the Android screen blacked out after being idle for some time when using the scrcpy option.
+4. Added the ability to play recorded steps for a specified number of times and for a given duration in the Screen Control window.
+5. Added options to use ADB and iOS commands from the command line under Tools.
+6. Object Spy improvements(copy xml, copy key/value, free text search, etc.).
+7. Minor improvements.
+
+# v8.6.1:
+1. Fixes issue that in some PCs unable to install the Appium Wizard(Issue with v8.6.0)
+2. Fixes issue that some iPhone devices were not opening in Appium Wizard.
+3. Added option in the Object Spy to download the page source as XML.
+
 # v8.6.0:
 1. Download WDA IPA" feature added under Tools.
 2. Skip capabilities options added under Server Settings.

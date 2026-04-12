@@ -34,6 +34,7 @@ namespace Appium_Wizard
         public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();
         public static Dictionary<string, float> udidScreenDensity = new Dictionary<string, float>(); // for android
         private Timer memoryCleanupTimer;
+        private Dictionary<int, Timer> webViewReloadTimers = new Dictionary<int, Timer>();
         private const int MEMORY_CLEANUP_INTERVAL = 300000; // 5 minutes
         private Screen currentScreen;
         private float currentDpi = 96f;
@@ -100,14 +101,26 @@ namespace Appium_Wizard
 
             // 👇 Add blank-page detection with timer
             var reloadTimer = new Timer { Interval = 3000 }; // check every 3s
+            webViewReloadTimers[serverNumber] = reloadTimer; // Store timer for cleanup
+
             reloadTimer.Tick += async (s, e) =>
             {
                 try
                 {
+                    // Check if webView is still valid before accessing
+                    if (webView == null || webView.IsDisposed || webView.CoreWebView2 == null)
+                    {
+                        reloadTimer.Stop();
+                        return;
+                    }
+
                     string content = await webView.CoreWebView2.ExecuteScriptAsync("document.body.innerText");
                     if (string.IsNullOrWhiteSpace(content) || content == "\"\"")
                     {
-                        webView.Reload();
+                        if (webView != null && !webView.IsDisposed)
+                        {
+                            webView.Reload();
+                        }
                     }
                     else
                     {
@@ -116,7 +129,7 @@ namespace Appium_Wizard
                 }
                 catch
                 {
-                    // ignore errors (can happen if not ready)
+                    // ignore errors (can happen if not ready or during shutdown)
                 }
             };
 
@@ -404,6 +417,21 @@ namespace Appium_Wizard
             catch (Exception ex)
             {
                 GoogleAnalytics.SendExceptionEvent("ShowMandatoryUpdateNotification", ex.Message);
+            }
+        }
+
+        private void SafeCloseProgress(CommonProgress commonProgress)
+        {
+            try
+            {
+                if (commonProgress != null && !commonProgress.IsDisposed)
+                {
+                    commonProgress.Close();
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore exceptions when closing progress dialog during app shutdown
             }
         }
 
@@ -1801,7 +1829,7 @@ namespace Appium_Wizard
 
                     if (isUpdateAvailable)
                     {
-                        commonProgress.Close();
+                        SafeCloseProgress(commonProgress);
                         var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes:\n" + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (result == DialogResult.Yes)
                         {
@@ -1827,25 +1855,25 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        commonProgress.Close();
+                        SafeCloseProgress(commonProgress);
                         MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    commonProgress.Close();
+                    SafeCloseProgress(commonProgress);
                     MessageBox.Show("Failed to check update - Go to https://github.com/mega6453/AppiumWizard and check manually.", "Check for Updates...");
                     GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
                 }
             }
             else
             {
-                commonProgress.Close();
+                SafeCloseProgress(commonProgress);
                 MessageBox.Show("Internet connection not available. Please connect to internet and try again.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click", "No_Internet");
             }
-            commonProgress.Close();
+            SafeCloseProgress(commonProgress);
         }
 
         private async void updaterToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2055,6 +2083,21 @@ namespace Appium_Wizard
 
                     // Stop all log servers with cleanup
                     Common.StopAllServers();
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Stopping WebView timers...", 35);
+                    Application.DoEvents();
+
+                    // Stop all WebView reload timers first
+                    foreach (var kvp in webViewReloadTimers)
+                    {
+                        try
+                        {
+                            kvp.Value?.Stop();
+                            kvp.Value?.Dispose();
+                        }
+                        catch { }
+                    }
+                    webViewReloadTimers.Clear();
 
                     commonProgress.UpdateStepLabel("Closing Appium Wizard", "Disposing WebView2 controls...", 40);
                     Application.DoEvents();
@@ -2577,7 +2620,21 @@ namespace Appium_Wizard
             }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
-            serverNumberWebView[serverNumber].Reload();
+
+            // Safely reload WebView if it still exists and is not disposed
+            if (serverNumberWebView.ContainsKey(serverNumber) &&
+                serverNumberWebView[serverNumber] != null &&
+                !serverNumberWebView[serverNumber].IsDisposed)
+            {
+                try
+                {
+                    serverNumberWebView[serverNumber].Reload();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // WebView was disposed during shutdown, ignore
+                }
+            }
         }
 
 
@@ -2613,7 +2670,21 @@ namespace Appium_Wizard
                     openLogsButton.Visible = false;
                 }
             }
-            serverNumberWebView[serverNumber].Reload();
+
+            // Safely reload WebView if it still exists and is not disposed
+            if (serverNumberWebView.ContainsKey(serverNumber) &&
+                serverNumberWebView[serverNumber] != null &&
+                !serverNumberWebView[serverNumber].IsDisposed)
+            {
+                try
+                {
+                    serverNumberWebView[serverNumber].Reload();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // WebView was disposed during shutdown, ignore
+                }
+            }
         }
 
         public void UpdateTabText(int serverNumber, int portNumber, bool start)
@@ -2826,14 +2897,21 @@ namespace Appium_Wizard
                 foreach (var kvp in serverNumberWebView)
                 {
                     var webView = kvp.Value;
-                    if (webView?.CoreWebView2 != null)
+                    if (webView?.CoreWebView2 != null && !webView.IsDisposed)
                     {
-                        // Clear any accumulated DOM content
-                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
-                            "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
+                        try
+                        {
+                            // Clear any accumulated DOM content
+                            await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
+                                "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
 
-                        // Trigger garbage collection in WebView2
-                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
+                            // Trigger garbage collection in WebView2
+                            await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            // WebView was disposed, skip
+                        }
                     }
                 }
 
@@ -2865,9 +2943,11 @@ namespace Appium_Wizard
                     WorkingDirectory = serverInstalledPath
                 };
                 Process.Start(psi);
+                GoogleAnalytics.SendEvent("showCMDToolStripMenuItem_Click");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                GoogleAnalytics.SendExceptionEvent("showCMDToolStripMenuItem_Click", ex.Message);
             }
         }
 

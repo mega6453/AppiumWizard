@@ -23,6 +23,13 @@ namespace Appium_Wizard
         {
             this.screenControl = screenControl;
             screenDensity = screenControl.screenDensity;
+
+            // Early exit if both status text and drawing are disabled - no need to process anything
+            if (!screenControl.ShowExecutionStatusText && !screenControl.ShowExecutionDrawing)
+            {
+                return;
+            }
+
             try
             {
                 string statusText;
@@ -278,7 +285,11 @@ namespace Appium_Wizard
 
                                     if (!string.IsNullOrEmpty(elementId) && !string.IsNullOrEmpty(url))
                                     {
-                                        GetRectValues(url, elementId);
+                                        // Only fetch rect values if drawing is enabled (avoids expensive HTTP calls to UIAutomator2/WDA)
+                                        if (screenControl.ShowExecutionDrawing)
+                                        {
+                                            GetRectValues(url, elementId);
+                                        }
                                     }
                                 }
                             }

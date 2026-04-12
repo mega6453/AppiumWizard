@@ -262,7 +262,7 @@ namespace Appium_Wizard
                 server5WebView.Size = size;
                 openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             }
-            GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
+            // App version is now tracked as a user property set in LoadingScreen
         }
 
         private void PerformInitialLayout()

@@ -42,6 +42,10 @@ namespace Appium_Wizard
                 Logger.Error(e, "Exception in getting port number");
             }
             string clientId = Database.QueryDataFromGUIDTable();
+
+            // Set app version as user property for analytics segmentation
+            GoogleAnalytics.SetUserProperty("app_version", VersionInfo.VersionNumber);
+
             if (clientId.Equals("Empty"))
             {
                 Guid guid = Guid.NewGuid();

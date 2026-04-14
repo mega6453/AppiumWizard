@@ -24,32 +24,27 @@ jobs:
         APISecret: ${{ secrets.GOOGLEANALYTICSAPISECRET }}
         MeasurementId: ${{ secrets.GOOGLEANALYTICSMEASUREMENTID }}
       run: |
-        $googleAnalyticsFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\GoogleAnalytics.cs"
-        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSAPISECRET}",   "$env:APISecret" | Set-Content -Path $googleAnalyticsFilePath
-        (Get-Content -Path $googleAnalyticsFilePath) -replace "{GOOGLEANALYTICSMEASUREMENTID}",  "$env:MeasurementId" | Set-Content -Path $googleAnalyticsFilePath
+        $file = "$env:GITHUB_WORKSPACE\Appium Wizard\GoogleAnalytics.cs"
+        (Get-Content $file) -replace "{GOOGLEANALYTICSAPISECRET}", "$env:APISecret" | Set-Content $file
+        (Get-Content $file) -replace "{GOOGLEANALYTICSMEASUREMENTID}", "$env:MeasurementId" | Set-Content $file
       
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
 
-    # - name: Setup MSBuild.exe
-    #   uses: microsoft/setup-msbuild@v1.0.2
+    - name: Restore
+      run: dotnet restore "Appium Wizard"
 
-    - name: Restore the application
-      run: dotnet restore $env:Solution_Name
-      env:
-        Solution_Name: Appium Wizard
-
-    # - name: Build the solution
-    #   run: dotnet publish -r win-x64 $env:Solution_Name /p:Configuration=$env:Configuration /p:SelfContained=true /p:PublishSingleFile=true /p:ReadyToRun=true /p:IncludeNativeLibrariesForSelfExtract=true
-    #   env:
-    #     Configuration: ${{ matrix.configuration }}
-    
+    # ✅ FIXED (no single file → avoids temp extraction issue)
     - name: Build and publish app
-      run: dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:ReadyToRun=true   
+      run: dotnet publish "Appium Wizard" -c Release -r win-x64 --self-contained true
 
-    - name: Archive artifacts
+    # 🧪 Debug (optional but useful)
+    - name: Debug publish folder
+      run: dir "Appium Wizard/bin/Release/net8.0-windows10.0.17763.0/win-x64/publish"
+
+    - name: Archive publish output
       uses: actions/upload-artifact@v4
       with:
         name: app
@@ -57,40 +52,31 @@ jobs:
         
     - name: Install Chocolatey
       run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
     - name: Install Inno Setup
-      run: |
-        choco install innosetup -y
+      run: choco install innosetup -y
 
-       
-    - name: Compile and generate EXE file
+    # ✅ CRITICAL FIX: set correct working directory
+    - name: Compile Installer
       run: |
-        ISCC /Q "${{ env.SCRIPT_PATH }}"
-      env:
-        SCRIPT_PATH: "Appium Wizard/bin/Release/net8.0-windows10.0.17763.0/win-x64/publish/ExcludeInInstaller/Installer Script.iss"  
-
-    # - name: Zip the EXE file
-    #   run: |
-    #     $exePath = "Appium Wizard/bin/Release/net6.0-windows/win-x64/publish/output/AppiumWizard.exe"
-    #     $zipPath = Join-Path (Split-Path $exePath) "AppiumWizard.zip"
-    #     Compress-Archive -Path $exePath -DestinationPath $zipPath
+        cd "Appium Wizard/bin/Release/net8.0-windows10.0.17763.0/win-x64/publish/ExcludeInInstaller"
+        ISCC /Q "Installer Script.iss"
 
     - name: Get Version
       id: get_version
-      run: |
-        $versionFilePath = "$env:GITHUB_WORKSPACE\Appium Wizard\VersionInfo.cs"
-        $version = Select-String -Pattern 'VersionNumber\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
-        $releaseNotes = Select-String -Pattern 'ReleaseNotes\s*=\s*"(.*)";' -Path $versionFilePath | ForEach-Object { $_.Matches.Groups[1].Value }
-        echo "::set-output name=version::$version"
-        echo "::set-output name=releasenotes::$releaseNotes"
       shell: pwsh
-      env:
-        Solution_Name: Appium Wizard
-        DOTNET_ROOT: C:\Program Files\dotnet
-        
-    - name: Upload AppiumWizard.exe artifact
+      run: |
+        $file = "$env:GITHUB_WORKSPACE\Appium Wizard\VersionInfo.cs"
+        $version = Select-String -Pattern 'VersionNumber\s*=\s*"(.*)";' -Path $file | % { $_.Matches.Groups[1].Value }
+        $notes = Select-String -Pattern 'ReleaseNotes\s*=\s*"(.*)";' -Path $file | % { $_.Matches.Groups[1].Value }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "releasenotes=$notes" >> $env:GITHUB_OUTPUT
+
+    # ✅ FIXED PATH (relative, not hardcoded D:\a\...)
+    - name: Upload Installer EXE
       uses: actions/upload-artifact@v4
       with:
         name: AppiumWizard
-        path: D:\a\AppiumWizard\AppiumWizard\Appium Wizard\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\output\AppiumWizard.exe
+        path: "Appium Wizard/bin/Release/net8.0-windows10.0.17763.0/win-x64/publish/ExcludeInInstaller/output/AppiumWizard.exe"

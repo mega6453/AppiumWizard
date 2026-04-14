@@ -73,6 +73,13 @@ namespace Appium_Wizard
             Hide();
             Database.InsertDataIntoDevicesTable(DeviceName.Replace("'", "''"), OSType, OSVersion, Model, "Online", udid, Width, Height, Connection, IPAddress);
             mainScreen.addToList(DeviceName, OSVersion, udid, OSType, Model, "Online", Connection, IPAddress);
+
+            // Update user properties to track primary device (most recently added)
+            string deviceOsType = OSType.ToLower().Contains("ios") ? "iOS" : "Android";
+            GoogleAnalytics.SetUserProperty("primary_device_os", deviceOsType);
+            GoogleAnalytics.SetUserProperty("primary_device_model", Model);
+            GoogleAnalytics.SetUserProperty("primary_device_os_version", OSVersion);
+
             if (OSType.ToLower().Contains("ios"))
             {
                 Dictionary<string, string> dic = new Dictionary<string, string>();

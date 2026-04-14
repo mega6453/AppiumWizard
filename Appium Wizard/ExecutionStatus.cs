@@ -17,11 +17,19 @@ namespace Appium_Wizard
         static string url = "";
         int x, y, width, height, screenDensity;
         ScreenControl screenControl;
+        private static long lastRectCallTicks = 0;  // Thread-safe debouncing
 
         public void UpdateScreenControl(ScreenControl screenControl, string data)
         {
             this.screenControl = screenControl;
             screenDensity = screenControl.screenDensity;
+
+            // Early exit if both status text and drawing are disabled - no need to process anything
+            if (!screenControl.ShowExecutionStatusText && !screenControl.ShowExecutionDrawing)
+            {
+                return;
+            }
+
             try
             {
                 string statusText;
@@ -36,18 +44,19 @@ namespace Appium_Wizard
                         if (match.Success)
                         {
                             url = match.Value;
+                            System.Diagnostics.Debug.WriteLine($"Extracted URL: {url}");
                         }
                         string json = GetOnlyJson(data);
                         try
                         {
-                            if (IsValidJson(json))
+                            if (!string.IsNullOrEmpty(json) && json.Length > 2)
                             {
                                 var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                                if (dictionary.ContainsKey("selector"))
+                                if (dictionary != null && dictionary.ContainsKey("selector"))
                                 {
                                     element = dictionary["selector"];
                                 }
-                                else if (dictionary.ContainsKey("value"))
+                                else if (dictionary != null && dictionary.ContainsKey("value"))
                                 {
                                     element = dictionary["value"];
                                 }
@@ -55,8 +64,9 @@ namespace Appium_Wizard
                                 screenControl.UpdateStatusLabel(screenControl, statusText);
                             }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            System.Diagnostics.Debug.WriteLine($"Find element parsing error: {ex.Message}");
                         }
                     }
                     // Handling for Click
@@ -76,7 +86,8 @@ namespace Appium_Wizard
                         string json = GetOnlyJson(data);
                         try
                         {
-                            if (IsValidJson(json))
+                            // Skip double JSON parsing - just try to deserialize directly
+                            if (!string.IsNullOrEmpty(json) && json.Length > 2)
                             {
                                 var jsonObject = JsonConvert.DeserializeObject<dynamic>(json);
                                 text = jsonObject.text;
@@ -253,18 +264,40 @@ namespace Appium_Wizard
                     {
                         try
                         {
-                            if (data.Contains("value") && data.Contains("ELEMENT") && data.Contains("sessionId"))
+                            if (data.Contains("value") && (data.Contains("ELEMENT") || data.Contains("element-6066")))
                             {
                                 string json = GetOnlyJson(data);
-                                JObject jsonObject = JObject.Parse(json);
-                                string elementId = jsonObject["value"]["ELEMENT"].ToString();
-                                GetRectValues(url, elementId);
+                                if (!string.IsNullOrEmpty(json) && json.Length > 10)
+                                {
+                                    JObject jsonObject = JObject.Parse(json);
+                                    string elementId = null;
+
+                                    // Try JSONWP format first (old format)
+                                    if (jsonObject["value"]?["ELEMENT"] != null)
+                                    {
+                                        elementId = jsonObject["value"]["ELEMENT"].ToString();
+                                    }
+                                    // Try W3C format (new format)
+                                    else if (jsonObject["value"]?["element-6066-11e4-a52e-4f735466cecf"] != null)
+                                    {
+                                        elementId = jsonObject["value"]["element-6066-11e4-a52e-4f735466cecf"].ToString();
+                                    }
+
+                                    if (!string.IsNullOrEmpty(elementId) && !string.IsNullOrEmpty(url))
+                                    {
+                                        // Only fetch rect values if drawing is enabled (avoids expensive HTTP calls to UIAutomator2/WDA)
+                                        if (screenControl.ShowExecutionDrawing)
+                                        {
+                                            GetRectValues(url, elementId);
+                                        }
+                                    }
+                                }
                             }
                             screenControl.UpdateStatusLabel(screenControl, "");
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-
+                            System.Diagnostics.Debug.WriteLine($"Response parsing failed: {ex.Message}");
                         }
                     }
                 }
@@ -275,42 +308,80 @@ namespace Appium_Wizard
         }
 
 
-        private void GetRectValues(string url, string elementId)
+        private async void GetRectValues(string url, string elementId)
         {
-            var result = AppiumServerSetup.ElementInfo(url, elementId);
-            if (result.Count != 0 && result != null)
+            // Smart Debouncing - Skip if called too frequently
+            long currentTicks = DateTime.Now.Ticks;
+            long lastTicks = Interlocked.Read(ref lastRectCallTicks);
+
+            // Skip if called within 150ms (prevents pile-up during rapid element finds)
+            if (new TimeSpan(currentTicks - lastTicks).TotalMilliseconds < 150)
             {
-                if (screenControl.isAndroid)
+                System.Diagnostics.Debug.WriteLine($"GetRectValues skipped - debouncing");
+                return;
+            }
+
+            Interlocked.Exchange(ref lastRectCallTicks, currentTicks);
+
+            System.Diagnostics.Debug.WriteLine($"GetRectValues called - URL: {url}, ElementID: {elementId}");
+
+            try
+            {
+                // True Async - no thread blocking
+                var result = await AppiumServerSetup.ElementInfoAsync(url, elementId);
+                System.Diagnostics.Debug.WriteLine($"ElementInfo result count: {result?.Count}");
+
+                if (result != null && result.Count != 0)
                 {
-                    x = (int)(result["x"] / (screenDensity / 160f));
-                    y = (int)(result["y"] / (screenDensity / 160f));
-                    width = (int)(result["width"] / (screenDensity / 160f));
-                    height = (int)(result["height"] / (screenDensity / 160f));
+                    if (screenControl.isAndroid)
+                    {
+                        x = (int)(result["x"] / (screenDensity / 160f));
+                        y = (int)(result["y"] / (screenDensity / 160f));
+                        width = (int)(result["width"] / (screenDensity / 160f));
+                        height = (int)(result["height"] / (screenDensity / 160f));
+                    }
+                    else
+                    {
+                        x = result["x"];
+                        y = result["y"];
+                        width = result["width"];
+                        height = result["height"];
+                    }
+                    System.Diagnostics.Debug.WriteLine($"Drawing rectangle at: {x},{y} size: {width}x{height}");
+                    screenControl.DrawRectangle(screenControl, x, y, width, height);
                 }
-                else
-                {
-                    x = result["x"];
-                    y = result["y"];
-                    width = result["width"];
-                    height = result["height"];
-                }
-                screenControl.DrawRectangle(screenControl, x, y, width, height);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetRectValues exception: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
         public static string GetOnlyJson(string text)
         {
-            Match match = Regex.Match(text, @"\{.*\}");
-            string output;
-            if (match.Success)
+            // Fast string-based extraction instead of regex (much faster for UiSelector)
+            int firstBrace = text.IndexOf('{');
+            if (firstBrace == -1)
             {
-                output = match.Value;
+                return "No JSON found in the string";
             }
-            else
+
+            // Find matching closing brace
+            int braceCount = 0;
+            for (int i = firstBrace; i < text.Length; i++)
             {
-                output = "No JSON found in the string";
+                if (text[i] == '{') braceCount++;
+                else if (text[i] == '}')
+                {
+                    braceCount--;
+                    if (braceCount == 0)
+                    {
+                        return text.Substring(firstBrace, i - firstBrace + 1);
+                    }
+                }
             }
-            return output;
+
+            return "No JSON found in the string";
         }
 
         public static string GetValueFromJson(string data, string expected)

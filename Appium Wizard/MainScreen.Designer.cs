@@ -63,6 +63,9 @@ namespace Appium_Wizard
             signIPAToolStripMenuItem = new ToolStripMenuItem();
             testRunnerToolStripMenuItem = new ToolStripMenuItem();
             downloadWDAToolStripMenuItem = new ToolStripMenuItem();
+            openCMDToolStripMenuItem = new ToolStripMenuItem();
+            adbCommandsToolStripMenuItem = new ToolStripMenuItem();
+            iOSCommandsToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             iOSProxyToolStripMenuItem = new ToolStripMenuItem();
             iOSExecutorToolStripMenuItem = new ToolStripMenuItem();
@@ -365,9 +368,9 @@ namespace Appium_Wizard
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem, downloadWDAToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inspectorToolStripMenuItem1, iOSProfileManagementToolStripMenuItem, signIPAToolStripMenuItem, testRunnerToolStripMenuItem, downloadWDAToolStripMenuItem, openCMDToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            toolsToolStripMenuItem.Size = new Size(46, 20);
+            toolsToolStripMenuItem.Size = new Size(47, 20);
             toolsToolStripMenuItem.Text = "Tools";
             // 
             // inspectorToolStripMenuItem1
@@ -410,6 +413,33 @@ namespace Appium_Wizard
             downloadWDAToolStripMenuItem.Text = "Download WDA";
             downloadWDAToolStripMenuItem.ToolTipText = "Downloads the WebDriverAgentRunner IPA file from official Github repository.";
             downloadWDAToolStripMenuItem.Click += downloadWDAToolStripMenuItem_Click;
+            // 
+            // openCMDToolStripMenuItem
+            // 
+            openCMDToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { adbCommandsToolStripMenuItem, iOSCommandsToolStripMenuItem });
+            openCMDToolStripMenuItem.Image = Properties.Resources.terminal;
+            openCMDToolStripMenuItem.Name = "openCMDToolStripMenuItem";
+            openCMDToolStripMenuItem.Size = new Size(211, 30);
+            openCMDToolStripMenuItem.Text = "Open CMD";
+            openCMDToolStripMenuItem.ToolTipText = "Opens command prompt with ADB or iOS server commands.";
+            // 
+            // adbCommandsToolStripMenuItem
+            // 
+            adbCommandsToolStripMenuItem.Image = Properties.Resources.android;
+            adbCommandsToolStripMenuItem.Name = "adbCommandsToolStripMenuItem";
+            adbCommandsToolStripMenuItem.Size = new Size(188, 30);
+            adbCommandsToolStripMenuItem.Text = "ADB Commands";
+            adbCommandsToolStripMenuItem.ToolTipText = "Opens CMD in ADB path and displays available ADB commands.";
+            adbCommandsToolStripMenuItem.Click += adbCommandsToolStripMenuItem_Click;
+            // 
+            // iOSCommandsToolStripMenuItem
+            // 
+            iOSCommandsToolStripMenuItem.Image = Properties.Resources.apple;
+            iOSCommandsToolStripMenuItem.Name = "iOSCommandsToolStripMenuItem";
+            iOSCommandsToolStripMenuItem.Size = new Size(188, 30);
+            iOSCommandsToolStripMenuItem.Text = "iOS Commands";
+            iOSCommandsToolStripMenuItem.ToolTipText = "Opens CMD in iOS server path and displays available iOS server commands.";
+            iOSCommandsToolStripMenuItem.Click += iOSCommandsToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
@@ -1224,5 +1254,8 @@ namespace Appium_Wizard
         private ToolStripMenuItem androidScreenMirroringToolStripMenuItem;
         private ToolStripMenuItem useScrcpyMenuItem;
         private ToolStripMenuItem useUiAutomator2ToolStripMenuItem;
+        private ToolStripMenuItem openCMDToolStripMenuItem;
+        private ToolStripMenuItem adbCommandsToolStripMenuItem;
+        private ToolStripMenuItem iOSCommandsToolStripMenuItem;
     }
 }

@@ -2,7 +2,7 @@
 {
     public static class VersionInfo
     {
-        public const string VersionNumber = "8.6.1";
-        public const string ReleaseNotes = "Some iPhones not working fix";
+        public const string VersionNumber = "9.0.0";
+        public const string ReleaseNotes = "Execution speed issue fix";
     }
 }

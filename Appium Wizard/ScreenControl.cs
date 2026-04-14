@@ -1,5 +1,6 @@
 ﻿using Appium_Wizard.Appium_Wizard;
 using Appium_Wizard.Properties;
+using Microsoft.VisualBasic;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using NLog;
@@ -37,6 +38,12 @@ namespace Appium_Wizard
         public string deviceSerialNumber;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public bool useScrcpy = false;
+        private DateTime lastStatusUpdateTime = DateTime.MinValue;
+        private string lastStatusText = "";
+
+        // Per-instance execution status settings
+        public bool ShowExecutionStatusText { get; set; } = true;
+        public bool ShowExecutionDrawing { get; set; } = true;
 
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
@@ -140,11 +147,52 @@ namespace Appium_Wizard
         {
             try
             {
-                BeginInvoke(new Action(() =>
+                // Check if status text is enabled for this instance
+                if (!screenControl.ShowExecutionStatusText)
                 {
-                    toolStripStatusLabel.Text = actualText;
-                    toolStripStatusLabel.ToolTipText = actualText;
-                }));
+                    return;
+                }
+
+                // Throttle rapid updates to prevent UI thread overload
+                // Skip if same text is being set within 30ms (prevents backlog during rapid element finds)
+                var now = DateTime.Now;
+                if (actualText == lastStatusText && (now - lastStatusUpdateTime).TotalMilliseconds < 30)
+                {
+                    return;
+                }
+
+                lastStatusText = actualText;
+                lastStatusUpdateTime = now;
+
+                // Truncate very long text (like UiSelector) to avoid UI rendering overhead
+                string displayText = actualText;
+                string tooltipText = actualText;
+                if (actualText.Length > 100)
+                {
+                    displayText = actualText.Substring(0, 97) + "...";
+                }
+
+                // Use fire-and-forget pattern to avoid queuing up UI thread
+                // This prevents backlog when there are rapid element finds
+                if (!screenControl.IsDisposed && screenControl.IsHandleCreated)
+                {
+                    try
+                    {
+                        screenControl.BeginInvoke(new Action(() =>
+                        {
+                            try
+                            {
+                                if (!toolStripStatusLabel.IsDisposed)
+                                {
+                                    toolStripStatusLabel.Text = displayText;
+                                    toolStripStatusLabel.ToolTipText = tooltipText;
+                                }
+                            }
+                            catch { }
+                        }));
+                    }
+                    catch { }
+                }
             }
             catch (Exception)
             {
@@ -889,11 +937,21 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawRectangleOnScrcpy(x, y, width, height);
-                    await Task.Delay(1000);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {
@@ -914,11 +972,21 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawArrowOnScrcpy(startX, startY, endX, endY, 10);
-                    await Task.Delay(1000);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {
@@ -937,11 +1005,21 @@ namespace Appium_Wizard
         {
             try
             {
+                // Check if drawing is enabled for this instance
+                if (!screenControl.ShowExecutionDrawing)
+                {
+                    return;
+                }
+
                 if (useScrcpy)
                 {
                     DrawDotOnScrcpy(x, y, 5);
-                    await Task.Delay(500);
-                    ClearDrawing();
+                    // Non-blocking delay - clear drawing after a short time without blocking execution
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(500);
+                        ClearDrawing();
+                    });
                 }
                 else
                 {
@@ -1197,57 +1275,159 @@ namespace Appium_Wizard
             playStepsToolStripMenuItem.Enabled = false;
             await Task.Run(() =>
             {
-                foreach (var action in recordedActions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case "Click on coordinates":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().Tap(udid, action.X, action.Y);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.Tap(URL, sessionId, action.X, action.Y);
-                            }
-                            break;
-
-                        case "Send Text Without Element":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().SendText(udid, action.Text);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.SendText(URL, sessionId, action.Text);
-                            }
-                            break;
-
-                        case "Home":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().GoToHome(udid);
-                            }
-                            else
-                            {
-                                iOSAPIMethods.GoToHome(proxyPort);
-                            }
-                            break;
-
-                        case "Back":
-                            if (isAndroid)
-                            {
-                                AndroidMethods.GetInstance().Back(udid);
-                            }
-                            break;
-                    }
-
-                    //await Task.Delay(500); // Add delay between actions
-                }
+                ExecuteRecordedActions();
             });
             MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent("Steps playback completed", OSType);
             playStepsToolStripMenuItem.Enabled = true;
+        }
+
+        private async void playStepsWithRepetitionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                MessageBox.Show("Recording is in progress. Please stop the recording and then play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (recordedActions.Count <= 1)
+            {
+                MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Prompt user for number of repetitions using InputBox
+            string input = Interaction.InputBox("Enter the number of times to repeat the steps:", "Play Steps - Repetitions", "1");
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return; // User cancelled
+            }
+
+            if (!int.TryParse(input, out int repetitions) || repetitions <= 0)
+            {
+                MessageBox.Show("Please enter a valid positive number.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            playStepsToolStripMenuItem.Enabled = false;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Enabled = false;
+
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    ExecuteRecordedActions();
+                }
+            });
+
+            MessageBox.Show($"Steps playback completed ({repetitions} repetition(s)).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent($"Steps playback completed with {repetitions} repetitions", OSType);
+
+            playStepsToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Enabled = true;
+        }
+
+        private async void playStepsWithDurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isRecordingSteps)
+            {
+                MessageBox.Show("Recording is in progress. Please stop the recording and then play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (recordedActions.Count <= 1)
+            {
+                MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Prompt user for duration in seconds using InputBox
+            string input = Interaction.InputBox("Enter the duration in seconds to repeat the steps:", "Play Steps - Duration", "60");
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return; // User cancelled
+            }
+
+            if (!int.TryParse(input, out int durationSeconds) || durationSeconds <= 0)
+            {
+                MessageBox.Show("Please enter a valid positive number of seconds.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            playStepsToolStripMenuItem.Enabled = false;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Enabled = false;
+
+            int executionCount = 0;
+            await Task.Run(() =>
+            {
+                var startTime = DateTime.Now;
+                var endTime = startTime.AddSeconds(durationSeconds);
+
+                while (DateTime.Now < endTime)
+                {
+                    ExecuteRecordedActions();
+                    executionCount++;
+                }
+            });
+
+            MessageBox.Show($"Steps playback completed ({executionCount} execution(s) in {durationSeconds} seconds).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            GoogleAnalytics.SendEvent($"Steps playback completed with {durationSeconds}s duration", OSType);
+
+            playStepsToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Enabled = true;
+        }
+
+        private void ExecuteRecordedActions()
+        {
+            foreach (var action in recordedActions)
+            {
+                switch (action.ActionType)
+                {
+                    case "Click on coordinates":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Tap(udid, action.X, action.Y);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.Tap(URL, sessionId, action.X, action.Y);
+                        }
+                        break;
+
+                    case "Send Text Without Element":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().SendText(udid, action.Text);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.SendText(URL, sessionId, action.Text);
+                        }
+                        break;
+
+                    case "Home":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().GoToHome(udid);
+                        }
+                        else
+                        {
+                            iOSAPIMethods.GoToHome(proxyPort);
+                        }
+                        break;
+
+                    case "Back":
+                        if (isAndroid)
+                        {
+                            AndroidMethods.GetInstance().Back(udid);
+                        }
+                        break;
+                }
+            }
         }
 
         private void RecordAndStopRecordingSteps_ButtonClick(object sender, EventArgs e)
@@ -1887,6 +2067,33 @@ namespace Appium_Wizard
                     GoogleAnalytics.SendEvent("controlCenter_Click", "Android");
                 }
             });
+        }
+
+        private void showStatusTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Toggle the status text display setting for this screen control instance
+            ShowExecutionStatusText = showStatusTextToolStripMenuItem.Checked;
+
+            // Clear status text if disabled
+            if (!ShowExecutionStatusText)
+            {
+                if (!toolStripStatusLabel.IsDisposed)
+                {
+                    toolStripStatusLabel.Text = "";
+                }
+            }
+        }
+
+        private void showDrawingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Toggle the drawing display setting for this screen control instance
+            ShowExecutionDrawing = showDrawingToolStripMenuItem.Checked;
+
+            // Clear any existing drawings if disabled
+            if (!ShowExecutionDrawing)
+            {
+                ClearDrawing();
+            }
         }
 
         //<<<------------------------------------------------------------------------------------------------------------>>>

@@ -38,6 +38,9 @@ namespace Appium_Wizard
 
         private async void Object_Spy_Load(object sender, EventArgs e)
         {
+            // Initialize search mode to XPath
+            searchModeComboBox.SelectedIndex = 0; // XPath
+
             if (isAndroid)
             {
                 string messageTitle = "Object Spy - " + deviceName;
@@ -225,7 +228,7 @@ namespace Appium_Wizard
                         Console.WriteLine($"Checking Android node: {node.Name}, Bounds: [{elementX}, {elementY}, {x2}, {y2}], Point: ({x}, {y})");
 
                         // Validate bounds
-                        if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                        if (elementX >= 0 && elementY >= 0 && elementWidth > 0 && elementHeight > 0)
                         {
                             return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
                         }
@@ -250,7 +253,7 @@ namespace Appium_Wizard
                     Console.WriteLine($"Checking node: {node.Name}, Bounds: [{elementX}, {elementY}, {elementWidth}, {elementHeight}], Point: ({x}, {y})");
 
                     // Validate bounds
-                    if (elementX > 0 && elementY > 0 && elementHeight > 0 && elementHeight > 0)
+                    if (elementX >= 0 && elementY >= 0 && elementWidth > 0 && elementHeight > 0)
                     {
                         return x >= elementX && x <= (elementX + elementWidth) && y >= elementY && y <= (elementY + elementHeight);
                     }
@@ -650,6 +653,22 @@ namespace Appium_Wizard
         private List<TreeNode> matchingNodes = new List<TreeNode>();
         private int currentIndex = -1;
 
+        private void searchModeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Update the label text based on selected mode
+            if (searchModeComboBox.SelectedIndex == 0) // XPath
+            {
+                filterLabel.Text = "Filter (XPath Validator)";
+            }
+            else // Free Text
+            {
+                filterLabel.Text = "Filter (Free Text Search)";
+            }
+
+            // Re-run the filter with the current text
+            xpathTextbox_TextChanged(sender, e);
+        }
+
         private void xpathTextbox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -670,17 +689,43 @@ namespace Appium_Wizard
                     elementNumberTextbox.Text = "0";
                     return;
                 }
-                XmlNodeList selectedXmlNodes;
-                try
-                {
-                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
-                }
-                catch (Exception ex)
-                {
-                    filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
-                    selectedXmlNodes = xmlDoc.SelectNodes(filterText);
-                }
 
+                XmlNodeList selectedXmlNodes;
+
+                // Check the search mode
+                if (searchModeComboBox.SelectedIndex == 0) // XPath mode
+                {
+                    try
+                    {
+                        selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                    }
+                    catch (Exception ex)
+                    {
+                        filterText = filterText.Replace("='", "=\"").Replace("']", "\"]").Replace("['", "[\"").Replace("' and ", "\" and ");
+                        selectedXmlNodes = xmlDoc.SelectNodes(filterText);
+                    }
+                }
+                else // Free Text mode
+                {
+                    // Search for text in common text attributes (case-insensitive)
+                    // Build XPath to search in text, content-desc, name, value, and label attributes
+                    string escapedText = filterText.Replace("'", "&apos;").ToLower();
+                    string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    string lower = "abcdefghijklmnopqrstuvwxyz";
+                    string freeTextXPath = $"//*[contains(translate(@text, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@content-desc, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@name, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@value, '{upper}', '{lower}'), '{escapedText}') or contains(translate(@label, '{upper}', '{lower}'), '{escapedText}')]";
+
+                    try
+                    {
+                        selectedXmlNodes = xmlDoc.SelectNodes(freeTextXPath);
+                    }
+                    catch (Exception)
+                    {
+                        filterTextbox.ForeColor = Color.Red;
+                        TotalElementCount.Text = "0";
+                        elementNumberTextbox.Text = "0";
+                        return;
+                    }
+                }
 
                 matchingNodes.Clear();
                 currentIndex = -1;
@@ -914,6 +959,9 @@ namespace Appium_Wizard
         private void addToFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //GoogleAnalytics.SendEvent("Object_Spy_ListView_AddToFilter", os);
+            // Switch to XPath mode since we're adding XPath predicates
+            searchModeComboBox.SelectedIndex = 0;
+
             if (listView1.SelectedItems.Count > 1) // multiple row selected
             {
                 var predicates = new List<string>();
@@ -1105,6 +1153,8 @@ namespace Appium_Wizard
             //GoogleAnalytics.SendEvent("Object_Spy_TreeView_AddToFilter", os);
             if (treeView1.SelectedNode != null && treeView1.SelectedNode.Tag is XmlNode selectedXmlNode)
             {
+                // Switch to XPath mode since we're adding an XPath
+                searchModeComboBox.SelectedIndex = 0;
                 string uniqueXPath = GenerateUniqueXPath(selectedXmlNode);
                 filterTextbox.Text = uniqueXPath;
                 treeView1.SelectedNode = treeView1.SelectedNode;
@@ -1162,6 +1212,8 @@ namespace Appium_Wizard
             {
                 clickedElement = FindElementByCoordinates(clickedX, clickedY);
             }
+            // Switch to XPath mode since we're adding an XPath
+            searchModeComboBox.SelectedIndex = 0;
             string uniqueXPath = GenerateUniqueXPath(clickedElement);
             filterTextbox.Text = uniqueXPath;
         }
@@ -1239,6 +1291,60 @@ namespace Appium_Wizard
                         MessageBox.Show($"Error saving XML file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+            }
+        }
+
+        private void copyXmlButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(xmlContent))
+            {
+                MessageBox.Show("No XML content available to copy. Please refresh the screen first.", "No Content", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                Clipboard.SetText(xmlContent);
+                MessageBox.Show("XML copied to clipboard successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error copying XML to clipboard");
+                MessageBox.Show($"Error copying XML to clipboard:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void copyKeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string property = selectedItem.Text;
+                Clipboard.SetText(property);
+            }
+        }
+
+        private void copyValueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                string value = selectedItem.SubItems[1].Text;
+                Clipboard.SetText(value);
+            }
+        }
+
+        private void expandCollapseButton_Click(object sender, EventArgs e)
+        {
+            if (expandCollapseButton.Text == "Expand All")
+            {
+                treeView1.ExpandAll();
+                expandCollapseButton.Text = "Collapse All";
+            }
+            else
+            {
+                treeView1.CollapseAll();
+                expandCollapseButton.Text = "Expand All";
             }
         }
 

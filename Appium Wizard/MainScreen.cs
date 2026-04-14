@@ -34,6 +34,7 @@ namespace Appium_Wizard
         public static Dictionary<int, WebView2> serverNumberWebView = new Dictionary<int, WebView2>();
         public static Dictionary<string, float> udidScreenDensity = new Dictionary<string, float>(); // for android
         private Timer memoryCleanupTimer;
+        private Dictionary<int, Timer> webViewReloadTimers = new Dictionary<int, Timer>();
         private const int MEMORY_CLEANUP_INTERVAL = 300000; // 5 minutes
         private Screen currentScreen;
         private float currentDpi = 96f;
@@ -100,14 +101,26 @@ namespace Appium_Wizard
 
             // 👇 Add blank-page detection with timer
             var reloadTimer = new Timer { Interval = 3000 }; // check every 3s
+            webViewReloadTimers[serverNumber] = reloadTimer; // Store timer for cleanup
+
             reloadTimer.Tick += async (s, e) =>
             {
                 try
                 {
+                    // Check if webView is still valid before accessing
+                    if (webView == null || webView.IsDisposed || webView.CoreWebView2 == null)
+                    {
+                        reloadTimer.Stop();
+                        return;
+                    }
+
                     string content = await webView.CoreWebView2.ExecuteScriptAsync("document.body.innerText");
                     if (string.IsNullOrWhiteSpace(content) || content == "\"\"")
                     {
-                        webView.Reload();
+                        if (webView != null && !webView.IsDisposed)
+                        {
+                            webView.Reload();
+                        }
                     }
                     else
                     {
@@ -116,7 +129,7 @@ namespace Appium_Wizard
                 }
                 catch
                 {
-                    // ignore errors (can happen if not ready)
+                    // ignore errors (can happen if not ready or during shutdown)
                 }
             };
 
@@ -191,6 +204,17 @@ namespace Appium_Wizard
                     {
                         string updateMessage = "Appium Wizard new version " + latestVersion + " is available for update. Go to \"Help -> Check for updates\" to open the download page.";
                         ShowMessage(updateMessage);
+
+                        // Check for mandatory update
+                        if (releaseInfo.ContainsKey("body"))
+                        {
+                            string releaseNotes = releaseInfo["body"];
+                            if (releaseNotes.Contains("", StringComparison.OrdinalIgnoreCase) ||
+                                releaseNotes.Contains("(Mandatory Update)", StringComparison.OrdinalIgnoreCase))
+                            {
+                                ShowMandatoryUpdateNotification(latestVersion, releaseNotes);
+                            }
+                        }
                     }
                 }
                 var result = Database.QueryDataFromNotificationsTable();
@@ -262,7 +286,7 @@ namespace Appium_Wizard
                 server5WebView.Size = size;
                 openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             }
-            GoogleAnalytics.SendEvent("App_Version", VersionInfo.VersionNumber);
+            // App version is now tracked as a user property set in LoadingScreen
         }
 
         private void PerformInitialLayout()
@@ -353,6 +377,62 @@ namespace Appium_Wizard
             };
 
             Controls.Add(tableLayoutPanel1);
+        }
+
+        private void ShowMandatoryUpdateNotification(string version, string releaseNotes)
+        {
+            try
+            {
+                string message = $"⚠️ CRITICAL UPDATE AVAILABLE ⚠️\n\n" +
+                                $"Appium Wizard version {version} is a mandatory update with critical fixes.\n\n" +
+                                $"Release Notes:\n{releaseNotes}\n\n" +
+                                $"It is strongly recommended to update to this version.\n\n" +
+                                $"Would you like to open the download page now?";
+
+                var result = MessageBox.Show(message, "Critical Update Required", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "https://github.com/mega6453/AppiumWizard/releases/latest",
+                            UseShellExecute = true
+                        });
+                        GoogleAnalytics.SendEvent("Mandatory_Update_Download_Opened", version);
+                    }
+                    catch (Exception ex)
+                    {
+                        GoogleAnalytics.SendExceptionEvent("ShowMandatoryUpdateNotification_OpenBrowser", ex.Message);
+                        MessageBox.Show("Could not open browser. Please visit: https://github.com/mega6453/AppiumWizard/releases/latest",
+                                      "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    GoogleAnalytics.SendEvent("Mandatory_Update_Dismissed", version);
+                }
+            }
+            catch (Exception ex)
+            {
+                GoogleAnalytics.SendExceptionEvent("ShowMandatoryUpdateNotification", ex.Message);
+            }
+        }
+
+        private void SafeCloseProgress(CommonProgress commonProgress)
+        {
+            try
+            {
+                if (commonProgress != null && !commonProgress.IsDisposed)
+                {
+                    commonProgress.Close();
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore exceptions when closing progress dialog during app shutdown
+            }
         }
 
         private void MainScreen_Shown(object sender, EventArgs e)
@@ -1749,7 +1829,7 @@ namespace Appium_Wizard
 
                     if (isUpdateAvailable)
                     {
-                        commonProgress.Close();
+                        SafeCloseProgress(commonProgress);
                         var result = MessageBox.Show("Appium Wizard new version " + tagName + " is available.\n\nRelease Notes:\n" + releaseNotes + " \n\nWould you like to open the download page now?", "Check for Updates...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (result == DialogResult.Yes)
                         {
@@ -1775,25 +1855,25 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        commonProgress.Close();
+                        SafeCloseProgress(commonProgress);
                         MessageBox.Show("No new updates available at this moment. Please check again later.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    commonProgress.Close();
+                    SafeCloseProgress(commonProgress);
                     MessageBox.Show("Failed to check update - Go to https://github.com/mega6453/AppiumWizard and check manually.", "Check for Updates...");
                     GoogleAnalytics.SendExceptionEvent("checkForUpdatesToolStripMenuItem_Click", ex.Message);
                 }
             }
             else
             {
-                commonProgress.Close();
+                SafeCloseProgress(commonProgress);
                 MessageBox.Show("Internet connection not available. Please connect to internet and try again.", "Check for Updates...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 GoogleAnalytics.SendEvent("checkForUpdatesToolStripMenuItem_Click", "No_Internet");
             }
-            commonProgress.Close();
+            SafeCloseProgress(commonProgress);
         }
 
         private async void updaterToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2003,6 +2083,21 @@ namespace Appium_Wizard
 
                     // Stop all log servers with cleanup
                     Common.StopAllServers();
+
+                    commonProgress.UpdateStepLabel("Closing Appium Wizard", "Stopping WebView timers...", 35);
+                    Application.DoEvents();
+
+                    // Stop all WebView reload timers first
+                    foreach (var kvp in webViewReloadTimers)
+                    {
+                        try
+                        {
+                            kvp.Value?.Stop();
+                            kvp.Value?.Dispose();
+                        }
+                        catch { }
+                    }
+                    webViewReloadTimers.Clear();
 
                     commonProgress.UpdateStepLabel("Closing Appium Wizard", "Disposing WebView2 controls...", 40);
                     Application.DoEvents();
@@ -2312,6 +2407,56 @@ namespace Appium_Wizard
             }
         }
 
+        private void adbCommandsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string adbPath = Path.GetDirectoryName(FilesPath.adbFilePath);
+                string windowTitle = "ADB Commands - Appium Wizard";
+                string cmdArguments = $"/K \"title {windowTitle} && cd /d \"{adbPath}\" && adb\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    WorkingDirectory = adbPath
+                };
+                Process.Start(psi);
+                GoogleAnalytics.SendEvent("adbCommandsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("adbCommandsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void iOSCommandsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string iOSServerPath = Path.GetDirectoryName(FilesPath.iOSServerFilePath);
+                string windowTitle = "iOS Commands - Appium Wizard";
+                string cmdArguments = $"/K \"title {windowTitle} && cd /d \"{iOSServerPath}\" && doskey ios=iOSServer.exe $* && iOSServer.exe\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdArguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                    WorkingDirectory = iOSServerPath
+                };
+                Process.Start(psi);
+                GoogleAnalytics.SendEvent("iOSCommandsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendExceptionEvent("iOSCommandsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
         private void openLogsButton_Click(object sender, EventArgs e)
         {
             try
@@ -2475,7 +2620,21 @@ namespace Appium_Wizard
             }
             openLogsButton.Location = new Point(tabControl1.Right - openLogsButton.Width, tabControl1.Top);
             openLogsButton.Text = text;
-            serverNumberWebView[serverNumber].Reload();
+
+            // Safely reload WebView if it still exists and is not disposed
+            if (serverNumberWebView.ContainsKey(serverNumber) &&
+                serverNumberWebView[serverNumber] != null &&
+                !serverNumberWebView[serverNumber].IsDisposed)
+            {
+                try
+                {
+                    serverNumberWebView[serverNumber].Reload();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // WebView was disposed during shutdown, ignore
+                }
+            }
         }
 
 
@@ -2511,7 +2670,21 @@ namespace Appium_Wizard
                     openLogsButton.Visible = false;
                 }
             }
-            serverNumberWebView[serverNumber].Reload();
+
+            // Safely reload WebView if it still exists and is not disposed
+            if (serverNumberWebView.ContainsKey(serverNumber) &&
+                serverNumberWebView[serverNumber] != null &&
+                !serverNumberWebView[serverNumber].IsDisposed)
+            {
+                try
+                {
+                    serverNumberWebView[serverNumber].Reload();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // WebView was disposed during shutdown, ignore
+                }
+            }
         }
 
         public void UpdateTabText(int serverNumber, int portNumber, bool start)
@@ -2724,14 +2897,21 @@ namespace Appium_Wizard
                 foreach (var kvp in serverNumberWebView)
                 {
                     var webView = kvp.Value;
-                    if (webView?.CoreWebView2 != null)
+                    if (webView?.CoreWebView2 != null && !webView.IsDisposed)
                     {
-                        // Clear any accumulated DOM content
-                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
-                            "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
+                        try
+                        {
+                            // Clear any accumulated DOM content
+                            await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("Runtime.evaluate",
+                                "{\"expression\":\"if(document.getElementById('content')) { document.getElementById('content').textContent = document.getElementById('content').textContent.split('\\\\n').slice(-500).join('\\\'); }\"}");
 
-                        // Trigger garbage collection in WebView2
-                        await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
+                            // Trigger garbage collection in WebView2
+                            await webView.CoreWebView2.CallDevToolsProtocolMethodAsync("HeapProfiler.collectGarbage", "{}");
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            // WebView was disposed, skip
+                        }
                     }
                 }
 
@@ -2763,9 +2943,11 @@ namespace Appium_Wizard
                     WorkingDirectory = serverInstalledPath
                 };
                 Process.Start(psi);
+                GoogleAnalytics.SendEvent("showCMDToolStripMenuItem_Click");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                GoogleAnalytics.SendExceptionEvent("showCMDToolStripMenuItem_Click", ex.Message);
             }
         }
 

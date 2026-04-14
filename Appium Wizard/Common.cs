@@ -1800,10 +1800,44 @@ namespace Appium_Wizard
         {
             try
             {
-                return await Task.Run(() => listener.GetContext(), token);
+                // Check if cancellation was requested before attempting to get context
+                if (token.IsCancellationRequested)
+                {
+                    return null;
+                }
+
+                // Check if listener is still listening
+                if (!listener.IsListening)
+                {
+                    return null;
+                }
+
+                return await Task.Run(() =>
+                {
+                    try
+                    {
+                        return listener.GetContext();
+                    }
+                    catch (HttpListenerException)
+                    {
+                        // Listener was stopped
+                        return null;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Listener was disposed
+                        return null;
+                    }
+                }, token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Task was cancelled
+                return null;
             }
             catch (Exception)
             {
+                // Any other exception during shutdown
                 return null;
             }
         }
@@ -2065,6 +2099,9 @@ namespace Appium_Wizard
                 {
                     // Cancel the token first
                     serverTokens[serverNumber].Cancel();
+
+                    // Give a brief moment for the GetContext to detect cancellation
+                    Thread.Sleep(100);
 
                     // Stop and close the listener
                     if (serverListeners[serverNumber].IsListening)

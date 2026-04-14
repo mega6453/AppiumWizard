@@ -7,11 +7,14 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Forms;
+    using NLog;
 
     namespace Appium_Wizard
     {
         public class ScrcpyEmbedder : IDisposable
         {
+            private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
             // Add these Win32 API calls at the top of ScrcpyEmbedder class
             [DllImport("user32.dll")]
             static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -79,6 +82,11 @@
 
             private Process scrcpyProcess;
             private Panel hostPanel;
+            private System.Windows.Forms.Timer processMonitorTimer;
+            private string currentUdid;
+            private int restartAttempts = 0;
+            private const int MaxRestartAttempts = 5;
+            private bool isRestarting = false;
 
             /// <summary>
             /// Gets the Panel control that hosts the embedded scrcpy window.
@@ -117,6 +125,9 @@
                 {
                     if (scrcpyProcess != null && !scrcpyProcess.HasExited)
                         throw new InvalidOperationException("Scrcpy is already running.");
+
+                    // Store the udid for potential restarts
+                    currentUdid = udid;
 
                     ScrcpyArguments = ScrcpyArguments + " -s "+udid;
 
@@ -167,6 +178,9 @@
                     // Embed the scrcpy window inside the panel
                     EmbedWindow(scrcpyHandle);
 
+                    // Start process monitoring
+                    StartProcessMonitoring();
+
                     return true;
                 }
                 catch (Exception ex)
@@ -176,6 +190,194 @@
                 }
             }
 
+            private void StartProcessMonitoring()
+            {
+                try
+                {
+                    processMonitorTimer = new System.Windows.Forms.Timer();
+                    processMonitorTimer.Interval = 2000; // Check every 2 seconds
+                    processMonitorTimer.Tick += OnProcessMonitorTick;
+                    processMonitorTimer.Start();
+                    Logger.Info("Scrcpy process monitoring started");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to start process monitoring");
+                }
+            }
+
+            private void OnProcessMonitorTick(object sender, EventArgs e)
+            {
+                try
+                {
+                    if (scrcpyProcess != null && scrcpyProcess.HasExited && !isRestarting)
+                    {
+                        int exitCode = scrcpyProcess.ExitCode;
+                        Logger.Warn($"Scrcpy process exited. Exit code: {exitCode}. Attempting automatic restart...");
+
+                        // Try to read error output
+                        try
+                        {
+                            string error = scrcpyProcess.StandardError.ReadToEnd();
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                Logger.Warn($"Scrcpy error output: {error}");
+                            }
+                        }
+                        catch (Exception readEx)
+                        {
+                            Logger.Error(readEx, "Failed to read scrcpy error output");
+                        }
+
+                        // Check if we should attempt restart
+                        if (restartAttempts < MaxRestartAttempts)
+                        {
+                            restartAttempts++;
+                            Logger.Info($"Restart attempt {restartAttempts}/{MaxRestartAttempts}");
+
+                            // Attempt automatic restart
+                            _ = RestartScrcpyAsync();
+                        }
+                        else
+                        {
+                            // Max restart attempts reached, stop monitoring and show error
+                            Logger.Error($"Max restart attempts ({MaxRestartAttempts}) reached. Stopping automatic restart.");
+                            processMonitorTimer?.Stop();
+
+                            // Change panel color to indicate failure
+                            if (hostPanel != null && !hostPanel.IsDisposed)
+                            {
+                                if (hostPanel.InvokeRequired)
+                                {
+                                    hostPanel.Invoke(new Action(() =>
+                                    {
+                                        hostPanel.BackColor = Color.DarkRed;
+                                    }));
+                                }
+                                else
+                                {
+                                    hostPanel.BackColor = Color.DarkRed;
+                                }
+                            }
+
+                            ShowError($"Screen mirroring failed after {MaxRestartAttempts} restart attempts.\n\nPlease check:\n- Device is still connected\n- USB debugging is enabled\n- Device screen is not locked");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error in process monitoring tick");
+                }
+            }
+
+            private async Task RestartScrcpyAsync()
+            {
+                isRestarting = true;
+
+                try
+                {
+                    Logger.Info("Restarting scrcpy...");
+
+                    // Stop the monitoring timer temporarily
+                    processMonitorTimer?.Stop();
+
+                    // Clean up old process
+                    if (scrcpyProcess != null)
+                    {
+                        try
+                        {
+                            scrcpyProcess.Dispose();
+                        }
+                        catch { }
+                        scrcpyProcess = null;
+                    }
+
+                    // Wait a bit before restarting
+                    await Task.Delay(1000);
+
+                    // Rebuild the arguments (clear any previous appended udid)
+                    string baseArgs = "--max-size 1080 --window-title=\"scrcpy_embed\" --stay-awake --disable-screensaver --window-x=-2000 --window-y=-2000";
+                    ScrcpyArguments = baseArgs + " -s " + currentUdid;
+
+                    // Start new scrcpy process
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = ScrcpyPath,
+                        Arguments = ScrcpyArguments,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    scrcpyProcess = new Process { StartInfo = psi };
+                    bool started = scrcpyProcess.Start();
+
+                    if (!started)
+                    {
+                        Logger.Error("Failed to restart scrcpy process");
+                        isRestarting = false;
+                        processMonitorTimer?.Start();
+                        return;
+                    }
+
+                    // Wait for scrcpy to initialize and create its window
+                    IntPtr scrcpyHandle = IntPtr.Zero;
+                    for (int attempts = 0; attempts < 50; attempts++)
+                    {
+                        await Task.Delay(200);
+
+                        if (scrcpyProcess.HasExited)
+                        {
+                            Logger.Error($"Scrcpy exited during restart with code: {scrcpyProcess.ExitCode}");
+                            isRestarting = false;
+                            processMonitorTimer?.Start();
+                            return;
+                        }
+
+                        scrcpyHandle = FindScrcpyWindow();
+                        if (scrcpyHandle != IntPtr.Zero)
+                            break;
+                    }
+
+                    if (scrcpyHandle == IntPtr.Zero)
+                    {
+                        Logger.Error("Could not find scrcpy window after restart");
+                        isRestarting = false;
+                        processMonitorTimer?.Start();
+                        return;
+                    }
+
+                    // Re-embed the window
+                    EmbedWindow(scrcpyHandle);
+
+                    Logger.Info("Scrcpy restarted successfully");
+
+                    // Reset restart attempts on successful restart
+                    restartAttempts = 0;
+
+                    // Restart monitoring
+                    processMonitorTimer?.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error during scrcpy restart");
+                    processMonitorTimer?.Start();
+                }
+                finally
+                {
+                    isRestarting = false;
+                }
+            }
+
+            /// <summary>
+            /// Resets the restart attempt counter (useful after successful manual operations)
+            /// </summary>
+            public void ResetRestartCounter()
+            {
+                restartAttempts = 0;
+                Logger.Info("Restart counter reset");
+            }
 
             /// <summary>
             /// Stops the scrcpy process and cleans up.
@@ -184,14 +386,30 @@
             {
                 try
                 {
+                    // Stop the monitoring timer first
+                    if (processMonitorTimer != null)
+                    {
+                        processMonitorTimer.Stop();
+                        processMonitorTimer.Dispose();
+                        processMonitorTimer = null;
+                        Logger.Info("Process monitoring stopped");
+                    }
+
                     if (scrcpyProcess != null && !scrcpyProcess.HasExited)
                     {
                         scrcpyProcess.Kill();
                         scrcpyProcess.Dispose();
                         scrcpyProcess = null;
+                        Logger.Info("Scrcpy process stopped");
                     }
+
+                    // Reset restart counter when stopping
+                    restartAttempts = 0;
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error stopping scrcpy");
+                }
             }
 
             private async Task ResizeParentFormToScrcpyWindow(IntPtr scrcpyHandle)
@@ -376,6 +594,13 @@
             public void Dispose()
             {
                 Stop();
+
+                if (processMonitorTimer != null)
+                {
+                    processMonitorTimer.Dispose();
+                    processMonitorTimer = null;
+                }
+
                 if (hostPanel != null)
                 {
                     hostPanel.Dispose();

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Appium Wizard"
-#define MyAppVersion "8.6.1"
+#define MyAppVersion "9.0.0"
 #define MyAppPublisher "Meganathan C"
 #define MyAppExeName "Appium Wizard.exe"
 

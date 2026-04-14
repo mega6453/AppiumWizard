@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
@@ -20,6 +21,10 @@ namespace Appium_Wizard
         public static bool UpdateStatusInScreenFlag = true;
         public static Dictionary<int, int> serverNumberWDAPortNumber = new Dictionary<int, int>();
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        // Cache for element rect values - reduces HTTP calls
+        private static Dictionary<string, Tuple<Dictionary<string, int>, long>> rectCache = new Dictionary<string, Tuple<Dictionary<string, int>, long>>();
+        private static readonly object rectCacheLock = new object();
         string appiumLogLevel, updatedCommand;
         public void StartAppiumServer(int appiumPort, int serverNumber, string command = "appium --allow-cors --allow-insecure=adb_shell")
         {
@@ -651,18 +656,62 @@ namespace Appium_Wizard
             }
         }
 
-        public static Dictionary<string, int> ElementInfo(string url, string elementId)
+        // True Async HTTP with Caching - Non-blocking
+        public static async Task<Dictionary<string, int>> ElementInfoAsync(string url, string elementId)
         {
             Dictionary<string, int> rectangleDict = new Dictionary<string, int>();
+
+            // OPTION 4: Check cache first (1.5 second expiration)
+            string cacheKey = $"{url}_{elementId}";
+            long currentTicks = DateTime.Now.Ticks;
+
+            lock (rectCacheLock)
+            {
+                if (rectCache.ContainsKey(cacheKey))
+                {
+                    var cached = rectCache[cacheKey];
+                    long cachedTicks = cached.Item2;
+                    double ageSeconds = new TimeSpan(currentTicks - cachedTicks).TotalSeconds;
+
+                    // Return cached value if less than 1.5 seconds old
+                    if (ageSeconds < 1.5)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ElementInfo - Cache HIT for {elementId} (age: {ageSeconds:F2}s)");
+                        return cached.Item1;
+                    }
+                    else
+                    {
+                        // Remove stale entry
+                        rectCache.Remove(cacheKey);
+                        System.Diagnostics.Debug.WriteLine($"ElementInfo - Cache EXPIRED for {elementId} (age: {ageSeconds:F2}s)");
+                    }
+                }
+
+                // Clean up very old cache entries (> 5 seconds)
+                var expiredKeys = rectCache.Where(kvp => new TimeSpan(currentTicks - kvp.Value.Item2).TotalSeconds > 5)
+                                           .Select(kvp => kvp.Key)
+                                           .ToList();
+                foreach (var key in expiredKeys)
+                {
+                    rectCache.Remove(key);
+                }
+            }
+
+            // Cache miss - make HTTP call
+            System.Diagnostics.Debug.WriteLine($"ElementInfo - Cache MISS for {elementId}, making HTTP call");
+
             try
             {
                 var options = new RestClientOptions(url)
                 {
-                    //Timeout = TimeSpan.FromSeconds(5),
+                    MaxTimeout = 500 // 500ms timeout
                 };
                 var client = new RestClient(options);
                 var request = new RestRequest(elementId + "/rect", Method.Get);
-                RestResponse response = client.Execute(request);
+
+                // TRUE ASYNC - Does not block thread pool
+                RestResponse response = await client.ExecuteAsync(request);
+
                 if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
                 {
                     var jsonObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
@@ -678,12 +727,38 @@ namespace Appium_Wizard
                         { "width", width },
                         { "height", height }
                     };
+
+                    // Store in cache with current timestamp
+                    lock (rectCacheLock)
+                    {
+                        rectCache[cacheKey] = new Tuple<Dictionary<string, int>, long>(rectangleDict, currentTicks);
+                        System.Diagnostics.Debug.WriteLine($"ElementInfo - Cached rect for {elementId}");
+                    }
                 }
                 return rectangleDict;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"ElementInfoAsync failed: {ex.Message}");
                 return rectangleDict;
+            }
+        }
+
+        // Keep sync version for backward compatibility (if used elsewhere)
+        public static Dictionary<string, int> ElementInfo(string url, string elementId)
+        {
+            // Use Task.Run to avoid potential deadlocks from sync-over-async
+            return Task.Run(() => ElementInfoAsync(url, elementId)).GetAwaiter().GetResult();
+        }
+
+        // Clear the rect cache (useful when screen changes significantly)
+        public static void ClearRectCache()
+        {
+            lock (rectCacheLock)
+            {
+                int count = rectCache.Count;
+                rectCache.Clear();
+                System.Diagnostics.Debug.WriteLine($"Cleared rect cache ({count} entries)");
             }
         }
 

@@ -39,13 +39,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; ✅ Explicit file inclusion (NO wildcard parent include)
-Source: "{#MySourcePath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Appium Wizard.exe"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: "{#MySourcePath}\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\Resources\*"; DestDir: "{app}\Resources\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-Source: "{#MySourcePath}\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
-
+Source: "..\runtimes\*"; DestDir: "{app}\runtimes\"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; 👉 Add more folders here ONLY if needed (explicitly)
 
 [UninstallDelete]

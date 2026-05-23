@@ -29,3 +29,11 @@
 * Restart the device.
 * Delete and add the device again.
 * Restart Appium Wizard.
+
+## IPA Signing fails:
+* Check if the "zsign.exe" file exist in the following path : C:\Users\{username}\AppData\Local\Programs\Appium Wizard\Resources\iOS
+* If not exist, Windows defender deleted the zsign executable file which is needed for Signing IPA.
+* You need to add the zsign file or the whole appium wizard folder in the windows defender exclusion list.
+* Download the zsign executable from here - https://github.com/mega6453/AppiumWizard/blob/master/Appium%20Wizard/Resources/iOS/zsign.exe
+* Copy the executable to the folder : C:\Users\{username}\AppData\Local\Programs\Appium Wizard\Resources\iOS
+* Add the file path or foler to the windows defender exclusion list.

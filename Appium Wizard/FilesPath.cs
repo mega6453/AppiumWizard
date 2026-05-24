@@ -26,5 +26,6 @@
         public static string scrcpy = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\Executables\\scrcpy\\scrcpy.exe";
         public static string ddiDownloaderFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\ddi-downloader.exe";
         public static string devImagesPath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\devimages\\";
+        public static string zsignFilePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\Resources\\iOS\\zsign.exe";
     }
 }

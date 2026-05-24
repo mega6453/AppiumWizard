@@ -72,3 +72,10 @@
 /Appium Wizard/obj/Appium Wizard.csproj.nuget.dgspec.json
 /Appium Wizard/obj/Appium Wizard.csproj.nuget.g.props
 /Appium Wizard/obj/project.assets.json
+/Appium Wizard/Properties/PublishProfiles/FolderProfile.pubxml
+/Appium Wizard/Properties/PublishProfiles/FolderProfile.pubxml.user
+/Appium Wizard/obj/publish/win-x64/project.assets.json
+/Appium Wizard/obj/publish/win-x64/Appium Wizard.csproj.nuget.dgspec.json
+/Appium Wizard/obj/publish/win-x64/Appium Wizard.csproj.nuget.g.props
+/Appium Wizard/obj/publish/win-x64/Appium Wizard.csproj.nuget.g.targets
+/Appium Wizard/Appium Wizard.csproj.user

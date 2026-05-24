@@ -30,7 +30,7 @@
 * Delete and add the device again.
 * Restart Appium Wizard.
 
-## IPA Signing Fails
+## IPA Signing Fails or Unable to install WebDriverAgentRunner error while opening device?
 * Check if the `zsign.exe` file exists in the following path:
   ```
   C:\Users\{username}\AppData\Local\Programs\Appium Wizard\Resources\iOS

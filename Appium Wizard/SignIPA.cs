@@ -15,6 +15,17 @@ namespace Appium_Wizard
 
         private void SignIPA_Load(object sender, EventArgs e)
         {
+            if (!IsZsignWorking())
+            {
+                var result = MessageBox.Show("zsign could not be accessed (it may have been removed by antivirus). Would you like to open the Troubleshooting Guide?", "zsign Not Available", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    Process.Start(new ProcessStartInfo("https://github.com/mega6453/AppiumWizard/blob/master/TROUBLESHOOTINGGUIDE.md") { UseShellExecute = true });
+                }
+                Close();
+                return;
+            }
+
             int index = 0;
             foreach (var item in profilesList)
             {
@@ -152,6 +163,27 @@ namespace Appium_Wizard
                     string filePath = saveFileDialog.FileName;
                     OutputPathTextBox.Text = filePath;
                 }
+            }
+        }
+
+        private bool IsZsignWorking()
+        {
+            try
+            {
+                var process = new Process();
+                process.StartInfo.FileName = FilesPath.zsignFilePath;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                return !string.IsNullOrWhiteSpace(output);
+            }
+            catch
+            {
+                return false;
             }
         }
 

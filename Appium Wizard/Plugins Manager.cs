@@ -15,6 +15,7 @@ namespace Appium_Wizard
     public partial class Plugins : Form
     {
         string selectedPlugin, selectedVersion;
+
         public Plugins()
         {
             InitializeComponent();
@@ -53,6 +54,10 @@ namespace Appium_Wizard
             await Task.Run(() =>
             {
                 result = Common.GetListOfInstalledPlugins();
+                if (result.TryGetValue("inspector", out string value) && !value.Equals("NotInstalled"))
+                {
+                    MainScreen.isInspectorPluginInstalled = true;
+                }
             });
             listView1.Items.Clear();
 
@@ -75,12 +80,12 @@ namespace Appium_Wizard
             commonProgress.Owner = this;
             if (showProgressCheckBox1.Checked)
             {
-                commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin " + selectedPlugin + "..." +
+                commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin - " + selectedPlugin + "..." +
                                                "\n\nPlease close the cmd window once the execution completed to continue here...");
             }
             else
             {
-                commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin " + selectedPlugin + "...");
+                commonProgress.UpdateStepLabel("Install Plugin", "Please wait while installing plugin - " + selectedPlugin + "...");
             }
             await Task.Run(() =>
             {
@@ -215,6 +220,11 @@ namespace Appium_Wizard
             {
                 MessageBox.Show("Checking this box will display the CMD window where the plugin installation/updation execution occurs. You must manually close the CMD window once the execution is completed to continue accessing the Appium wizard.", "Show execution status", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void Plugins_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            MessageBox.Show("Restart the Appium server for the plugin installation or uninstallation to take effect.", "Restart Appium Server", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

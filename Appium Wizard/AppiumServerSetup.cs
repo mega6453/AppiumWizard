@@ -60,6 +60,14 @@ namespace Appium_Wizard
             {
                 command = command + " --port " + appiumPort;
             }
+            var pluginList = Common.GetListOfInstalledPlugins();
+            if (pluginList.TryGetValue("inspector", out string value) && !value.Equals("NotInstalled"))
+            {
+                if (!command.Contains("--use-plugins=inspector"))
+                {
+                    command = command + " --use-plugins=inspector";
+                }
+            }
             appiumLogLevel = Database.QueryDataFromlogLevelTable()["Server" + serverNumber];
             if (!command.Contains(" --log "))
             {
@@ -186,7 +194,7 @@ namespace Appium_Wizard
                     data = Regex.Replace(data, @"<sup>\(1\)</sup>", "");
                     if (portServerNumberAndFilePath.ContainsKey(serverNumber))
                     {
-                        if (data.Contains("No plugins have been installed.") || data.Contains("No plugins activated."))
+                        if (data.Contains("No plugins have been installed.") || data.Contains("No plugins activated.") || (data.Contains("[Appium]") && data.Contains("(ACTIVE)")))
                         {
                             serverStarted = true;
                             InitializeLogWriter(serverNumber, portServerNumberAndFilePath[serverNumber].Item2);

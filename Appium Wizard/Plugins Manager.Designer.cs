@@ -218,6 +218,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Plugins Manager";
+            FormClosed += Plugins_FormClosed;
             Load += Plugins_Load;
             Shown += Plugins_Shown;
             ResumeLayout(false);

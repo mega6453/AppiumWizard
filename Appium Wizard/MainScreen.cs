@@ -43,6 +43,7 @@ namespace Appium_Wizard
         private Timer resizeDebounceTimer;
         private bool isCleanupComplete = false;
         private bool isClosingInProgress = false;
+        public static bool isInspectorPluginInstalled;
 
         public MainScreen()
         {
@@ -70,6 +71,7 @@ namespace Appium_Wizard
                 releaseInfo = Common.GetLatestReleaseInfo();
             }
             InitializeWebViews();
+            isInspectorPluginInstalled = LoadingScreen.isInspectorPluginInstalled;
         }
         string defaultText = "Appium Server Not Running. Go to Server->Config to start the server...";
         private async void InitializeWebViews()
@@ -1346,18 +1348,121 @@ namespace Appium_Wizard
         {
             try
             {
-                ProcessStartInfo psInfo = new ProcessStartInfo
+                if (!isInspectorPluginInstalled)
                 {
-                    FileName = "https://inspector.appiumpro.com/",
-                    UseShellExecute = true
-                };
-                Process.Start(psInfo);
+                    MessageBox.Show("Inspector plugin not installed. Please install the plugin from Server->Plugins Manager and restart the appium sever.",
+                                  "Inspector plugin not found",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!AppiumServerSetup.portServerNumberAndFilePath.Any())
+                {
+                    MessageBox.Show("No active Appium server found. Please start a server first.",
+                                  "No Server Found",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning);
+                    return;
+                }
+
+                int selectedPort;
+
+                if (AppiumServerSetup.portServerNumberAndFilePath.Count == 1)
+                {
+                    // Only one server running, open directly without asking
+                    selectedPort = AppiumServerSetup.portServerNumberAndFilePath.First().Value.Item1;
+                }
+                else
+                {
+                    // Multiple servers running, let user pick one
+                    using (var form = new Form())
+                    {
+                        form.Text = "Select Server";
+                        form.Size = new Size(400, 250);
+                        form.StartPosition = FormStartPosition.CenterParent;
+                        form.FormBorderStyle = FormBorderStyle.FixedDialog;
+                        form.MaximizeBox = false;
+                        form.MinimizeBox = false;
+                        form.Padding = new Padding(10);
+
+                        var label = new Label
+                        {
+                            Text = "Select a server to open Inspector:",
+                            AutoSize = true,
+                            Location = new Point(15, 15)
+                        };
+
+                        var comboBox = new ComboBox
+                        {
+                            DropDownStyle = ComboBoxStyle.DropDownList,
+                            Location = new Point(15, 40),
+                            Width = 355,
+                            Height = 30
+                        };
+
+                        // Populate dropdown with server options
+                        foreach (var server in AppiumServerSetup.portServerNumberAndFilePath)
+                        {
+                            comboBox.Items.Add($"Server {server.Key} - Port {server.Value.Item1}");
+                        }
+                        comboBox.SelectedIndex = 0;
+
+                        var okButton = new Button
+                        {
+                            Text = "Open Inspector",
+                            Location = new Point(195, 110),
+                            Width = 175,
+                            Height = 35,
+                            DialogResult = DialogResult.OK,
+                            BackColor = Color.FromArgb(0, 122, 204),
+                            ForeColor = Color.White,
+                            FlatStyle = FlatStyle.Flat
+                        };
+
+                        var cancelButton = new Button
+                        {
+                            Text = "Cancel",
+                            Location = new Point(15, 110),
+                            Width = 175,
+                            Height = 35,
+                            DialogResult = DialogResult.Cancel,
+                            FlatStyle = FlatStyle.Flat
+                        };
+
+                        form.Controls.Add(label);
+                        form.Controls.Add(comboBox);
+                        form.Controls.Add(okButton);
+                        form.Controls.Add(cancelButton);
+                        form.AcceptButton = okButton;
+                        form.CancelButton = cancelButton;
+
+                        if (form.ShowDialog() != DialogResult.OK) return;
+
+                        // Get selected server port
+                        var selectedServerNumber = AppiumServerSetup.portServerNumberAndFilePath
+                            .Keys.ElementAt(comboBox.SelectedIndex);
+                        selectedPort = AppiumServerSetup.portServerNumberAndFilePath[selectedServerNumber].Item1;
+                    }
+                }
+
+                OpenInspector(selectedPort);
                 GoogleAnalytics.SendEvent("InspectorToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent("InspectorToolStripMenuItem_Click", exception.Message);
             }
+        }
+
+        private void OpenInspector(int portNumber)
+        {
+            ProcessStartInfo psInfo = new ProcessStartInfo
+            {
+                FileName = $"http://127.0.0.1:{portNumber}/inspector",
+                UseShellExecute = true
+            };
+            Process.Start(psInfo);
         }
 
         private void xCUITestToolStripMenuItem_Click(object sender, EventArgs e)

@@ -9,6 +9,8 @@ namespace Appium_Wizard
         public static int appiumPort = 4723;
         public static bool isServerStarted;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        public static bool isInspectorPluginInstalled;
+
         public LoadingScreen()
         {
             MainScreen mainForm = new MainScreen();
@@ -135,7 +137,12 @@ namespace Appium_Wizard
             UpdateStepLabel("Starting Appium Server...");
             Database.UpdateDataIntoFirstTimeRunTable("No");
             await ExecuteBackgroundMethod();
-            UpdateStepLabel("Loading Modules...");            
+            UpdateStepLabel("Loading Modules...");
+            var pluginList = Common.GetListOfInstalledPlugins();
+            if (pluginList.TryGetValue("inspector", out string value) && !value.Equals("NotInstalled"))
+            {
+                isInspectorPluginInstalled = true;
+            }
             Common.DeleteLogFiles();
             MainScreen mainForm = new MainScreen();
             UpdateStepLabel("Initializing User Interface...");

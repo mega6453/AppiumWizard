@@ -93,6 +93,7 @@ namespace Appium_Wizard
             cLIArgumentsToolStripMenuItem = new ToolStripMenuItem();
             otherDocsToolStripMenuItem = new ToolStripMenuItem();
             iOSNativeAppsBundleToolStripMenuItem = new ToolStripMenuItem();
+            downloadITunesToolStripMenuItem = new ToolStripMenuItem();
             troubleshootToolStripMenuItem = new ToolStripMenuItem();
             reportAnIssueToolStripMenuItem = new ToolStripMenuItem();
             openLogsFolderToolstripMenuItem = new ToolStripMenuItem();
@@ -138,6 +139,7 @@ namespace Appium_Wizard
             OpenDropDownButton = new Button();
             openContextMenuStrip = new ContextMenuStrip(components);
             reInitializeDeviceToolStripMenuItem = new ToolStripMenuItem();
+            downloadPlatformToolsToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -306,7 +308,7 @@ namespace Appium_Wizard
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(2, 2, 0, 2);
-            menuStrip1.Size = new Size(1440, 24);
+            menuStrip1.Size = new Size(1284, 24);
             menuStrip1.TabIndex = 10;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -377,7 +379,7 @@ namespace Appium_Wizard
             // 
             inspectorToolStripMenuItem1.Image = Properties.Resources.inspector;
             inspectorToolStripMenuItem1.Name = "inspectorToolStripMenuItem1";
-            inspectorToolStripMenuItem1.Size = new Size(211, 30);
+            inspectorToolStripMenuItem1.Size = new Size(203, 22);
             inspectorToolStripMenuItem1.Text = "Inspector";
             inspectorToolStripMenuItem1.Click += inspectorToolStripMenuItem_Click;
             // 
@@ -385,7 +387,7 @@ namespace Appium_Wizard
             // 
             iOSProfileManagementToolStripMenuItem.Image = Properties.Resources.management;
             iOSProfileManagementToolStripMenuItem.Name = "iOSProfileManagementToolStripMenuItem";
-            iOSProfileManagementToolStripMenuItem.Size = new Size(211, 30);
+            iOSProfileManagementToolStripMenuItem.Size = new Size(203, 22);
             iOSProfileManagementToolStripMenuItem.Text = "iOS Profile Management";
             iOSProfileManagementToolStripMenuItem.Click += iOSProfileManagementToolStripMenuItem_Click;
             // 
@@ -393,7 +395,7 @@ namespace Appium_Wizard
             // 
             signIPAToolStripMenuItem.Image = Properties.Resources.digital_signature;
             signIPAToolStripMenuItem.Name = "signIPAToolStripMenuItem";
-            signIPAToolStripMenuItem.Size = new Size(211, 30);
+            signIPAToolStripMenuItem.Size = new Size(203, 22);
             signIPAToolStripMenuItem.Text = "IPA Signer";
             signIPAToolStripMenuItem.Click += signIPAToolStripMenuItem_Click;
             // 
@@ -401,7 +403,7 @@ namespace Appium_Wizard
             // 
             testRunnerToolStripMenuItem.Image = Properties.Resources.runner;
             testRunnerToolStripMenuItem.Name = "testRunnerToolStripMenuItem";
-            testRunnerToolStripMenuItem.Size = new Size(211, 30);
+            testRunnerToolStripMenuItem.Size = new Size(203, 22);
             testRunnerToolStripMenuItem.Text = "Test Runner";
             testRunnerToolStripMenuItem.Click += testRunnerToolStripMenuItem_Click;
             // 
@@ -409,7 +411,7 @@ namespace Appium_Wizard
             // 
             downloadWDAToolStripMenuItem.Image = Properties.Resources.wda;
             downloadWDAToolStripMenuItem.Name = "downloadWDAToolStripMenuItem";
-            downloadWDAToolStripMenuItem.Size = new Size(211, 30);
+            downloadWDAToolStripMenuItem.Size = new Size(203, 22);
             downloadWDAToolStripMenuItem.Text = "Download WDA";
             downloadWDAToolStripMenuItem.ToolTipText = "Downloads the WebDriverAgentRunner IPA file from official Github repository.";
             downloadWDAToolStripMenuItem.Click += downloadWDAToolStripMenuItem_Click;
@@ -419,7 +421,7 @@ namespace Appium_Wizard
             openCMDToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { adbCommandsToolStripMenuItem, iOSCommandsToolStripMenuItem });
             openCMDToolStripMenuItem.Image = Properties.Resources.terminal;
             openCMDToolStripMenuItem.Name = "openCMDToolStripMenuItem";
-            openCMDToolStripMenuItem.Size = new Size(211, 30);
+            openCMDToolStripMenuItem.Size = new Size(203, 22);
             openCMDToolStripMenuItem.Text = "Open CMD";
             openCMDToolStripMenuItem.ToolTipText = "Opens command prompt with ADB or iOS server commands.";
             // 
@@ -427,7 +429,7 @@ namespace Appium_Wizard
             // 
             adbCommandsToolStripMenuItem.Image = Properties.Resources.android;
             adbCommandsToolStripMenuItem.Name = "adbCommandsToolStripMenuItem";
-            adbCommandsToolStripMenuItem.Size = new Size(188, 30);
+            adbCommandsToolStripMenuItem.Size = new Size(162, 22);
             adbCommandsToolStripMenuItem.Text = "ADB Commands";
             adbCommandsToolStripMenuItem.ToolTipText = "Opens CMD in ADB path and displays available ADB commands.";
             adbCommandsToolStripMenuItem.Click += adbCommandsToolStripMenuItem_Click;
@@ -436,7 +438,7 @@ namespace Appium_Wizard
             // 
             iOSCommandsToolStripMenuItem.Image = Properties.Resources.apple;
             iOSCommandsToolStripMenuItem.Name = "iOSCommandsToolStripMenuItem";
-            iOSCommandsToolStripMenuItem.Size = new Size(188, 30);
+            iOSCommandsToolStripMenuItem.Size = new Size(162, 22);
             iOSCommandsToolStripMenuItem.Text = "iOS Commands";
             iOSCommandsToolStripMenuItem.ToolTipText = "Opens CMD in iOS server path and displays available iOS server commands.";
             iOSCommandsToolStripMenuItem.Click += iOSCommandsToolStripMenuItem_Click;
@@ -533,7 +535,7 @@ namespace Appium_Wizard
             appiumDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { capabilitiesToolStripMenuItem, settingsAPIToolStripMenuItem, pluginsToolStripMenuItem, xCUITestToolStripMenuItem, uIAutomatorToolStripMenuItem, serverSecurityToolStripMenuItem, cLIArgumentsToolStripMenuItem });
             appiumDocsToolStripMenuItem.Image = Properties.Resources.doc;
             appiumDocsToolStripMenuItem.Name = "appiumDocsToolStripMenuItem";
-            appiumDocsToolStripMenuItem.Size = new Size(247, 22);
+            appiumDocsToolStripMenuItem.Size = new Size(255, 30);
             appiumDocsToolStripMenuItem.Text = "Appium Docs";
             // 
             // capabilitiesToolStripMenuItem
@@ -642,25 +644,33 @@ namespace Appium_Wizard
             // 
             // otherDocsToolStripMenuItem
             // 
-            otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem });
-            otherDocsToolStripMenuItem.Image = Properties.Resources.doc;
+            otherDocsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { iOSNativeAppsBundleToolStripMenuItem, downloadITunesToolStripMenuItem, downloadPlatformToolsToolStripMenuItem });
+            otherDocsToolStripMenuItem.Image = Properties.Resources.link;
             otherDocsToolStripMenuItem.Name = "otherDocsToolStripMenuItem";
-            otherDocsToolStripMenuItem.Size = new Size(247, 22);
-            otherDocsToolStripMenuItem.Text = "Other Docs";
+            otherDocsToolStripMenuItem.Size = new Size(255, 30);
+            otherDocsToolStripMenuItem.Text = "Helpful Links";
             // 
             // iOSNativeAppsBundleToolStripMenuItem
             // 
             iOSNativeAppsBundleToolStripMenuItem.Image = Properties.Resources.link;
             iOSNativeAppsBundleToolStripMenuItem.Name = "iOSNativeAppsBundleToolStripMenuItem";
-            iOSNativeAppsBundleToolStripMenuItem.Size = new Size(218, 22);
+            iOSNativeAppsBundleToolStripMenuItem.Size = new Size(226, 30);
             iOSNativeAppsBundleToolStripMenuItem.Text = "iOS Native Apps Bundle IDs";
             iOSNativeAppsBundleToolStripMenuItem.Click += iOSNativeAppsBundleToolStripMenuItem_Click;
+            // 
+            // downloadITunesToolStripMenuItem
+            // 
+            downloadITunesToolStripMenuItem.Image = Properties.Resources.link;
+            downloadITunesToolStripMenuItem.Name = "downloadITunesToolStripMenuItem";
+            downloadITunesToolStripMenuItem.Size = new Size(226, 30);
+            downloadITunesToolStripMenuItem.Text = "Download iTunes";
+            downloadITunesToolStripMenuItem.Click += downloadITunesToolStripMenuItem_Click;
             // 
             // troubleshootToolStripMenuItem
             // 
             troubleshootToolStripMenuItem.Image = Properties.Resources.guide;
             troubleshootToolStripMenuItem.Name = "troubleshootToolStripMenuItem";
-            troubleshootToolStripMenuItem.Size = new Size(247, 22);
+            troubleshootToolStripMenuItem.Size = new Size(255, 30);
             troubleshootToolStripMenuItem.Text = "Troubleshooting Guide";
             troubleshootToolStripMenuItem.Click += fAQToolStripMenuItem_Click;
             // 
@@ -668,7 +678,7 @@ namespace Appium_Wizard
             // 
             reportAnIssueToolStripMenuItem.Image = Properties.Resources.bug;
             reportAnIssueToolStripMenuItem.Name = "reportAnIssueToolStripMenuItem";
-            reportAnIssueToolStripMenuItem.Size = new Size(247, 22);
+            reportAnIssueToolStripMenuItem.Size = new Size(255, 30);
             reportAnIssueToolStripMenuItem.Text = "Report an Issue | Feature Request";
             reportAnIssueToolStripMenuItem.Click += reportAnIssueToolStripMenuItem_Click;
             // 
@@ -676,7 +686,7 @@ namespace Appium_Wizard
             // 
             openLogsFolderToolstripMenuItem.Image = Properties.Resources.log;
             openLogsFolderToolstripMenuItem.Name = "openLogsFolderToolstripMenuItem";
-            openLogsFolderToolstripMenuItem.Size = new Size(247, 22);
+            openLogsFolderToolstripMenuItem.Size = new Size(255, 30);
             openLogsFolderToolstripMenuItem.Text = "Open Logs folder";
             openLogsFolderToolstripMenuItem.Click += openLogsFolderToolstripMenuItem_Click;
             // 
@@ -684,7 +694,7 @@ namespace Appium_Wizard
             // 
             startADiscussionToolStripMenuItem.Image = Properties.Resources.Discussion;
             startADiscussionToolStripMenuItem.Name = "startADiscussionToolStripMenuItem";
-            startADiscussionToolStripMenuItem.Size = new Size(247, 22);
+            startADiscussionToolStripMenuItem.Size = new Size(255, 30);
             startADiscussionToolStripMenuItem.Text = "Start a Discussion";
             startADiscussionToolStripMenuItem.Click += startADiscussionToolStripMenuItem_Click;
             // 
@@ -692,7 +702,7 @@ namespace Appium_Wizard
             // 
             checkForUpdatesToolStripMenuItem.Image = Properties.Resources.update;
             checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            checkForUpdatesToolStripMenuItem.Size = new Size(247, 22);
+            checkForUpdatesToolStripMenuItem.Size = new Size(255, 30);
             checkForUpdatesToolStripMenuItem.Text = "Check for Updates...";
             checkForUpdatesToolStripMenuItem.Click += checkForUpdatesToolStripMenuItem_Click;
             // 
@@ -700,7 +710,7 @@ namespace Appium_Wizard
             // 
             changeLogToolStripMenuItem.Image = Properties.Resources.changelog;
             changeLogToolStripMenuItem.Name = "changeLogToolStripMenuItem";
-            changeLogToolStripMenuItem.Size = new Size(247, 22);
+            changeLogToolStripMenuItem.Size = new Size(255, 30);
             changeLogToolStripMenuItem.Text = "Changelog";
             changeLogToolStripMenuItem.Click += changeLogToolStripMenuItem_Click;
             // 
@@ -708,7 +718,7 @@ namespace Appium_Wizard
             // 
             readMeToolStripMenuItem.Image = Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
-            readMeToolStripMenuItem.Size = new Size(247, 22);
+            readMeToolStripMenuItem.Size = new Size(255, 30);
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
@@ -716,7 +726,7 @@ namespace Appium_Wizard
             // 
             aboutToolStripMenuItem.Image = Properties.Resources.information;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(247, 22);
+            aboutToolStripMenuItem.Size = new Size(255, 30);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -1094,12 +1104,20 @@ namespace Appium_Wizard
             reInitializeDeviceToolStripMenuItem.Text = "Re-Initialize Device";
             reInitializeDeviceToolStripMenuItem.Click += reInitializeDeviceToolStripMenuItem_Click;
             // 
+            // downloadPlatformToolsToolStripMenuItem
+            // 
+            downloadPlatformToolsToolStripMenuItem.Image = Properties.Resources.link;
+            downloadPlatformToolsToolStripMenuItem.Name = "downloadPlatformToolsToolStripMenuItem";
+            downloadPlatformToolsToolStripMenuItem.Size = new Size(226, 30);
+            downloadPlatformToolsToolStripMenuItem.Text = "Download Platform Tools";
+            downloadPlatformToolsToolStripMenuItem.Click += downloadPlatformToolsToolStripMenuItem_Click;
+            // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1440, 641);
+            ClientSize = new Size(1284, 641);
             Controls.Add(OpenDropDownButton);
             Controls.Add(openLogsButton);
             Controls.Add(mandatorymsglabel);
@@ -1257,5 +1275,7 @@ namespace Appium_Wizard
         private ToolStripMenuItem openCMDToolStripMenuItem;
         private ToolStripMenuItem adbCommandsToolStripMenuItem;
         private ToolStripMenuItem iOSCommandsToolStripMenuItem;
+        private ToolStripMenuItem downloadITunesToolStripMenuItem;
+        private ToolStripMenuItem downloadPlatformToolsToolStripMenuItem;
     }
 }

@@ -3283,6 +3283,42 @@ namespace Appium_Wizard
             }
         }
 
+        private void downloadITunesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://support.apple.com/en-us/docs/software/pl296",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("downloadITunesToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("downloadITunesToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
+        private void downloadPlatformToolsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessStartInfo psInfo = new ProcessStartInfo
+                {
+                    FileName = "https://developer.android.com/tools/releases/platform-tools",
+                    UseShellExecute = true
+                };
+                Process.Start(psInfo);
+                GoogleAnalytics.SendEvent("downloadPlatformToolsToolStripMenuItem_Click");
+            }
+            catch (Exception exception)
+            {
+                GoogleAnalytics.SendEvent("downloadPlatformToolsToolStripMenuItem_Click", exception.Message);
+            }
+        }
+
         [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
         private struct RECT
         {

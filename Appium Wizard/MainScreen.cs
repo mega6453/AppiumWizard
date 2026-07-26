@@ -1775,9 +1775,9 @@ namespace Appium_Wizard
                 if (saveFileDialog.FileName != "")
                 {
                     CommonProgress commonProgress = new CommonProgress();
-                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Owner = this;
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     string filePath = saveFileDialog.FileName;
                     try
                     {
@@ -1808,9 +1808,9 @@ namespace Appium_Wizard
                 if (saveFileDialog.FileName != "")
                 {
                     CommonProgress commonProgress = new CommonProgress();
-                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     commonProgress.Owner = this;
                     commonProgress.Show();
+                    commonProgress.UpdateStepLabel("Take Screenshot", "Please wait while taking screenshot of " + selectedDeviceName + "...");
                     string filePath = saveFileDialog.FileName;
                     filePath = "\"" + filePath + "\"";
                     try

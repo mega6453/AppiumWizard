@@ -1465,25 +1465,6 @@ namespace Appium_Wizard
             Process.Start(psInfo);
         }
 
-        //private void inspectorToolStripMenuItem_Click(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        var portNumber = AppiumServerSetup.portServerNumberAndFilePath[1].Item1;
-        //        ProcessStartInfo psInfo = new ProcessStartInfo
-        //        {
-        //            FileName = "127.0.0.1:"+ portNumber + "/inspector",
-        //            UseShellExecute = true
-        //        };
-        //        Process.Start(psInfo);
-        //        GoogleAnalytics.SendEvent("InspectorToolStripMenuItem_Click");
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        GoogleAnalytics.SendExceptionEvent("InspectorToolStripMenuItem_Click", exception.Message);
-        //    }
-        //}
-
         private void xCUITestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try

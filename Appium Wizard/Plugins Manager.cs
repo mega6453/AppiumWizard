@@ -15,7 +15,6 @@ namespace Appium_Wizard
     public partial class Plugins : Form
     {
         string selectedPlugin, selectedVersion;
-        bool isAnyChangeInPlugin;
 
         public Plugins()
         {

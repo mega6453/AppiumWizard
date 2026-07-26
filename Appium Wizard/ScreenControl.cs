@@ -58,7 +58,7 @@ namespace Appium_Wizard
             this.proxyPort = proxyPort;
             this.deviceModel = deviceModel;
             this.useScrcpy = useScrcpy;
-            udidScreenControl.Add(udid, this);
+            udidScreenControl.TryAdd(udid, this);
             this.screenPort = screenPort;
             if (devicePorts.ContainsKey(udid))
             {
@@ -1260,6 +1260,7 @@ namespace Appium_Wizard
             }
         }
 
+        bool isPlaying; bool stopExecution;
         private async void playStepsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (isRecordingSteps)
@@ -1272,14 +1273,30 @@ namespace Appium_Wizard
                 MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            playStepsToolStripMenuItem.Enabled = false;
+            if (isPlaying)
+            {
+                stopExecution = true;
+                return;
+            }
+            //playStepsToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Enabled = false;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
+            playStepsToolStripMenuItem.Image = Resources.stop_button;
+            playStepsToolStripMenuItem.Text = "Stop execution";
+            isPlaying = true;
             await Task.Run(() =>
             {
                 ExecuteRecordedActions();
             });
+            isPlaying = false;
+            stopExecution = false;
             MessageBox.Show("Steps playback completed.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent("Steps playback completed", OSType);
             playStepsToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Enabled = true;
+            playStepsToolStripMenuItem.Image = Resources.play;
+            playStepsToolStripMenuItem.Text = "Play Steps";
         }
 
         private async void playStepsWithRepetitionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1292,6 +1309,11 @@ namespace Appium_Wizard
             if (recordedActions.Count <= 1)
             {
                 MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (isPlaying)
+            {
+                stopExecution = true;
                 return;
             }
 
@@ -1310,23 +1332,32 @@ namespace Appium_Wizard
             }
 
             playStepsToolStripMenuItem.Enabled = false;
-            playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
             playStepsWithDurationToolStripMenuItem.Enabled = false;
-
+            playStepsWithRepetitionsToolStripMenuItem.Image = Resources.stop_button;
+            playStepsWithRepetitionsToolStripMenuItem.Text = "Stop execution";
+            isPlaying = true;
             await Task.Run(() =>
             {
                 for (int i = 0; i < repetitions; i++)
                 {
+                    if (stopExecution)
+                    {
+                        repetitions = i;
+                        break;
+                    }
                     ExecuteRecordedActions();
                 }
             });
-
+            isPlaying = false;
+            stopExecution = false;
             MessageBox.Show($"Steps playback completed ({repetitions} repetition(s)).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent($"Steps playback completed with {repetitions} repetitions", OSType);
 
             playStepsToolStripMenuItem.Enabled = true;
             playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
             playStepsWithDurationToolStripMenuItem.Enabled = true;
+            playStepsWithRepetitionsToolStripMenuItem.Image = Resources.play;
+            playStepsWithRepetitionsToolStripMenuItem.Text = "Play Steps (Repetitions)";
         }
 
         private async void playStepsWithDurationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1339,6 +1370,11 @@ namespace Appium_Wizard
             if (recordedActions.Count <= 1)
             {
                 MessageBox.Show("No steps recorded to play.", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (isPlaying)
+            {
+                stopExecution = true;
                 return;
             }
 
@@ -1358,7 +1394,9 @@ namespace Appium_Wizard
 
             playStepsToolStripMenuItem.Enabled = false;
             playStepsWithRepetitionsToolStripMenuItem.Enabled = false;
-            playStepsWithDurationToolStripMenuItem.Enabled = false;
+            playStepsWithDurationToolStripMenuItem.Image = Resources.stop_button;
+            playStepsWithDurationToolStripMenuItem.Text = "Stop execution";
+            isPlaying = true;
 
             int executionCount = 0;
             await Task.Run(() =>
@@ -1368,23 +1406,34 @@ namespace Appium_Wizard
 
                 while (DateTime.Now < endTime)
                 {
+                    if (stopExecution)
+                    {
+                        break;   
+                    }
                     ExecuteRecordedActions();
                     executionCount++;
                 }
             });
-
+            isPlaying = false;
+            stopExecution = false;
             MessageBox.Show($"Steps playback completed ({executionCount} execution(s) in {durationSeconds} seconds).", "Play Steps", MessageBoxButtons.OK, MessageBoxIcon.Information);
             GoogleAnalytics.SendEvent($"Steps playback completed with {durationSeconds}s duration", OSType);
 
             playStepsToolStripMenuItem.Enabled = true;
             playStepsWithRepetitionsToolStripMenuItem.Enabled = true;
             playStepsWithDurationToolStripMenuItem.Enabled = true;
+            playStepsWithDurationToolStripMenuItem.Image = Resources.play;
+            playStepsWithDurationToolStripMenuItem.Text = "Play Steps (Duration)";
         }
 
         private void ExecuteRecordedActions()
         {
             foreach (var action in recordedActions)
             {
+                if (stopExecution)
+                {
+                    break;
+                }
                 switch (action.ActionType)
                 {
                     case "Click on coordinates":

@@ -61,14 +61,33 @@ namespace Appium_Wizard
                             string udidFromList = Regex.Replace(item.SubItems[4].Text, "[^a-zA-Z0-9]", "");
                             if (udidFromList.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                string OS = item.SubItems[2].Text;
                                 string udid = item.SubItems[4].Text;
+                                string OS = item.SubItems[2].Text;
                                 string version = item.SubItems[1].Text;
+                                await Task.Run(() =>
+                                {
+                                    if (OS.Equals("iOS"))
+                                    {
+                                        var deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(udid);
+                                        version = deviceInfo["ProductVersion"]?.ToString() ?? "";
+                                    }
+                                    else
+                                    {
+                                        var deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(udid);
+                                        if (deviceInfo.ContainsKey("ro.build.version.release"))
+                                        {
+                                            version = deviceInfo["ro.build.version.release"]?.ToString() ?? "";
+                                        }
+                                    }
+                                });             
+                                
                                 string deviceName = item.SubItems[0].Text;
                                 string OSVersion = OS + " " + version;
                                 item.SubItems[3].Text = "Online";
                                 item.SubItems[5].Text = "USB";
+                                Database.UpdateDataInDevicesTable(udid, "Version", version);
                                 Database.UpdateDataInDevicesTable(udid, "Connection", "USB");
+                                MainScreen.main?.RefreshDeviceListView();
                                 if (MainScreen.DeviceConnectedNotification)
                                 {
                                     Common.ShowNotification("Device Connected", deviceName + " connected.");

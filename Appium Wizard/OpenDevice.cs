@@ -81,15 +81,7 @@ namespace Appium_Wizard
                 commonProgress.UpdateStepLabel(title, "Initializing...", 5);
                 if (OSType.Equals("Android"))
                 {
-                    if (!MainScreen.useScrcpy)
-                    {
-                        await SetupAndroidScreenMirroringUsingUiAutomator();
-                    }
-                    else
-                    {
-                        await SetupAndroidScreenMirroringUsingScrcpy();
-                        isScreenServerStarted = true; //use scrcpy
-                    }
+                    await SetupAndroidScreenMirroring();
                 }
                 else
                 {
@@ -521,7 +513,7 @@ namespace Appium_Wizard
         }
 
         public static Dictionary<string, string> deviceSessionId = new Dictionary<string, string>();
-        private async Task SetupAndroidScreenMirroringUsingUiAutomator()
+        private async Task SetupAndroidScreenMirroring()
         {
             await Task.Run(() =>
             {
@@ -552,8 +544,16 @@ namespace Appium_Wizard
                 catch (Exception e)
                 {
                     Logger.Error(e, "Error installing uiautomator");
-                    MessageBox.Show(e.Message, "Error installing UIAutomator", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    isScreenServerStarted = false;
+                    if (MainScreen.useScrcpy)
+                    {
+                        MessageBox.Show(e.Message, "Screen mirroring will work but Object spy won't work.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isScreenServerStarted = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show(e.Message, "Error installing UIAutomator, Please try again.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isScreenServerStarted = false;
+                    }
                     return;
                 }
                 try
@@ -569,17 +569,20 @@ namespace Appium_Wizard
                         proxyPort = Common.GetFreePort(8221, 8299);
                         AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
                     }
-                    int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
-                    if (forwardedScreenPort != -1)
+                    if (!MainScreen.useScrcpy)// Setup screen port only for UIAutomator (scrcpy handles screen mirroring directly)
                     {
-                        screenServerPort = forwardedScreenPort;
-                    }
-                    else
-                    {
-                        commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...", 60);
-                        screenServerPort = Common.GetFreePort();
-                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
-                    }
+                        int forwardedScreenPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
+                        if (forwardedScreenPort != -1)
+                        {
+                            screenServerPort = forwardedScreenPort;
+                        }
+                        else
+                        {
+                            commonProgress.UpdateStepLabel(title, "Setting up Proxy Server...", 60);
+                            screenServerPort = Common.GetFreePort();
+                            AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
+                        }
+                    }                    
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...", 70);
                     bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
                     if (!IsUIAutomatorRunning)
@@ -612,7 +615,7 @@ namespace Appium_Wizard
                                 isSessionCreated = false;
                             }
                         }
-                        if (!isSessionCreated & !isItValidSession)
+                        if (isSessionCreated && !isItValidSession)
                         {
                             commonProgress.UpdateStepLabel(title, "Restarting UIAutomator...", 80);
                             AndroidMethods.GetInstance().StopUIAutomator(udid);
@@ -633,7 +636,15 @@ namespace Appium_Wizard
                     }
                     else
                     {
-                        isScreenServerStarted = false;
+                        if (MainScreen.useScrcpy)
+                        {
+                            MessageBox.Show("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            isScreenServerStarted = true;
+                        }
+                        else
+                        {
+                            isScreenServerStarted = false;
+                        }
                     }
                     if (isScreenServerStarted)
                     {
@@ -641,7 +652,10 @@ namespace Appium_Wizard
                         if (!deviceDetails.ContainsKey(udid))
                         {
                             keyValuePairs.Add("proxyPort", proxyPort);
-                            keyValuePairs.Add("screenPort", screenServerPort);
+                            if (!MainScreen.useScrcpy)
+                            {
+                                keyValuePairs.Add("screenPort", screenServerPort);
+                            }
                             deviceDetails.Add(udid, keyValuePairs);
                         }
                     }
@@ -649,77 +663,16 @@ namespace Appium_Wizard
                 }
                 catch (Exception e)
                 {
-                    isScreenServerStarted = false;
-                    MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            });
-        }
-
-        private async Task SetupAndroidScreenMirroringUsingScrcpy()
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    string message = "Please wait while setting up screen mirroring...";
-                    try
+                    if (MainScreen.useScrcpy)
                     {
-                        MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                        MessageBox.Show("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        isScreenServerStarted = true;
                     }
-                    catch (Exception)
+                    else
                     {
-                    }
-                    commonProgress.UpdateStepLabel(title, message, 5);
-                    proxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
-                    if (proxyPort == -1)
-                    {
-                        commonProgress.UpdateStepLabel(title, message, 10);
-                        proxyPort = Common.GetFreePort(8221, 8299);
-                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                    }
-                    screenServerPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 7810);
-                    if (screenServerPort == -1)
-                    {
-                        commonProgress.UpdateStepLabel(title, message, 15);
-                        screenServerPort = Common.GetFreePort(8221, 8299);
-                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
-                    }
-                    commonProgress.UpdateStepLabel(title, message, 20);
-                    UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                    if (UIAutomatorSessionId.Equals("nosession"))
-                    {
-                        commonProgress.UpdateStepLabel(title, message, 30);
-                        bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
-                        Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
-                        if (!isUIAutomatorInstalled)
-                        {
-                            commonProgress.UpdateStepLabel(title, message, 40);
-                            AndroidMethods.GetInstance().InstallUIAutomator(udid);
-                            commonProgress.UpdateStepLabel(title, message, 50);
-                        }
-                        commonProgress.UpdateStepLabel(title, message, 60);
-                        bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                        if (!isRunning)
-                        {
-                            commonProgress.UpdateStepLabel(title, message, 70);
-                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                            Task.Delay(1000);
-                        }
-                        commonProgress.UpdateStepLabel(title, message, 80);
-                        UIAutomatorSessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                        if (UIAutomatorSessionId.Equals("nosession"))
-                        {
-                            UIAutomatorSessionId = AndroidAPIMethods.CreateSession(proxyPort);
-                        }
-                    }
-                    commonProgress.UpdateStepLabel(title, message, 90);
-
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Error installing uiautomator");
-                    MessageBox.Show(e.Message, "Screen mirroring will work but Object spy won't work.", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                        isScreenServerStarted = false;
+                        MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }                    
                 }
             });
         }

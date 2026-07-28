@@ -523,12 +523,15 @@ namespace Appium_Wizard
                 try
                 {
                     commonProgress.UpdateStepLabel(title, "Getting screen density...", 5);
-                    try
+                    if (!MainScreen.useScrcpy)
                     {
-                        MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
-                    }
-                    catch (Exception)
-                    {
+                        try
+                        {
+                            MainScreen.udidScreenDensity[udid] = AndroidMethods.GetInstance().GetScreenDensity(udid);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 10);
                     AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
@@ -609,13 +612,13 @@ namespace Appium_Wizard
                         if (isSessionCreated)
                         {
                             string androidId = AppiumServerSetup.GetAndroidId(proxyPort, sessionIdAvailableForAutomation);
-                            isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(androidId);
+                            isItValidSession = AppiumServerSetup.isExpectedDataAvailableInSessionDetails(udid,androidId);
                             if (isItValidSession == false)
                             {
                                 isSessionCreated = false;
                             }
                         }
-                        if (isSessionCreated && !isItValidSession)
+                        if (!isItValidSession)
                         {
                             commonProgress.UpdateStepLabel(title, "Restarting UIAutomator...", 80);
                             AndroidMethods.GetInstance().StopUIAutomator(udid);

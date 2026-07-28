@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -170,18 +171,27 @@ namespace Appium_Wizard
             }
         }
 
-        string deviceUDID = "none"; string currentSessionId = "none"; string currentUDID = "none";
-        string currentPlatformName = "none";
         //int proxyPort = 0;
         int screenDensity = 0;
-        Dictionary<string, string> sessionIdUDID = new Dictionary<string, string>();
+        public static ConcurrentDictionary<string, string> sessionIdUDID = new ConcurrentDictionary<string, string>();
+        // Per-serverNumber state, since a single AppiumServerSetup instance's OutputDataReceived
+        // handler can be invoked concurrently for multiple devices/processes.
+        private static readonly ConcurrentDictionary<int, string> deviceUDIDByServer = new ConcurrentDictionary<int, string>();
+        private static readonly ConcurrentDictionary<int, string> currentSessionIdByServer = new ConcurrentDictionary<int, string>();
+        private static readonly ConcurrentDictionary<int, string> currentUDIDByServer = new ConcurrentDictionary<int, string>();
+        private static readonly ConcurrentDictionary<int, string> currentPlatformNameByServer = new ConcurrentDictionary<int, string>();
+        private static readonly ConcurrentDictionary<int, string> proxiedUDIDByServer = new ConcurrentDictionary<int, string>();
         ExecutionStatus executionStatus = new ExecutionStatus();
-        string proxiedUDID = "";
         private DateTime lastExecutionTime = DateTime.MinValue;
         bool isWelcomeDisplayed;
         string appiumWarning;
         public void AppiumServer_OutputDataReceived(object sender, DataReceivedEventArgs e, int serverNumber, int webDriverAgentProxyPort)
         {
+            string deviceUDID = deviceUDIDByServer.GetOrAdd(serverNumber, "none");
+            string currentSessionId = currentSessionIdByServer.GetOrAdd(serverNumber, "none");
+            string currentUDID = currentUDIDByServer.GetOrAdd(serverNumber, "none");
+            string currentPlatformName = currentPlatformNameByServer.GetOrAdd(serverNumber, "none");
+            string proxiedUDID = proxiedUDIDByServer.GetOrAdd(serverNumber, "");
             try
             {
                 if (!string.IsNullOrEmpty(e.Data))
@@ -304,7 +314,7 @@ namespace Appium_Wizard
                             if (match1.Success)
                             {
                                 currentSessionId = match1.Groups[1].Value;
-                                sessionIdUDID.Add(currentSessionId, currentUDID);
+                                sessionIdUDID[currentSessionId] = currentUDID;
                                 if (MainScreen.udidProxyPort.ContainsKey(deviceUDID))
                                 {
                                     MainScreen.udidProxyPort[currentUDID] = webDriverAgentProxyPort;
@@ -381,7 +391,7 @@ namespace Appium_Wizard
                                 if (sessionIdUDID.ContainsKey(sessionId))
                                 {
                                     udid = sessionIdUDID[sessionId];
-                                    sessionIdUDID.Remove(sessionId);
+                                    sessionIdUDID.TryRemove(sessionId, out _);
                                     if (MainScreen.DeviceInfo.ContainsKey(udid))
                                     {
                                         string name = MainScreen.DeviceInfo[udid].Item1;
@@ -453,6 +463,14 @@ namespace Appium_Wizard
             }
             catch (Exception)
             {
+            }
+            finally
+            {
+                deviceUDIDByServer[serverNumber] = deviceUDID;
+                currentSessionIdByServer[serverNumber] = currentSessionId;
+                currentUDIDByServer[serverNumber] = currentUDID;
+                currentPlatformNameByServer[serverNumber] = currentPlatformName;
+                proxiedUDIDByServer[serverNumber] = proxiedUDID;
             }
         }
 
@@ -555,8 +573,9 @@ namespace Appium_Wizard
             }
         }
 
-        public static bool isExpectedDataAvailableInSessionDetails(string data)
+        public static bool isExpectedDataAvailableInSessionDetails(string udid, string data)
         {
+            string sessionId = sessionIdUDID.FirstOrDefault(x => x.Value == udid).Key;
             Dictionary<string, string> readPortData = Database.QueryDataFromPortNumberTable();
             int port = 0;
             for (int i = 1; i <= 5; i++)
@@ -574,38 +593,15 @@ namespace Appium_Wizard
                 {
                     continue;
                 }
-                var options = new RestClientOptions("http://localhost:" + port)
+
+                string androidId = GetAndroidIdFromAppiumServer(port, sessionId);
+                if (androidId.Equals(data))
                 {
-                    Timeout = TimeSpan.FromSeconds(5),
-                };
-                var client = new RestClient(options);
-                var request = new RestRequest("/sessions", Method.Get);
-                RestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
-                if (response.StatusCode == HttpStatusCode.OK && response.Content != null)
-                {
-                    if (response.Content.Equals("{\"value\":[]}"))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        JObject responseObj = JObject.Parse(response.Content);
-                        string sessionId = responseObj["value"]?[0]?["id"]?.ToString() ?? string.Empty;
-                        string androidId = GetAndroidIdFromAppiumServer(port, sessionId);
-                        if (androidId.Equals(data))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
+                    return true;
                 }
                 else
                 {
-                    return false;
+                    continue;
                 }
 
             }
@@ -635,14 +631,14 @@ namespace Appium_Wizard
         {
             try
             {
-                var options = new RestClientOptions("http://localhost:" + appiumPort)
+                var options = new RestClientOptions("http://127.0.0.1:"+appiumPort)
                 {
                     Timeout = TimeSpan.FromSeconds(5),
                 };
                 var client = new RestClient(options);
-                var request = new RestRequest("/session/" + appiumSessionId + "/execute", Method.Post);
+                var request = new RestRequest("/session/"+appiumSessionId+"/execute/sync", Method.Post);
                 request.AddHeader("Content-Type", "application/json");
-                var body = @"{""script"":""mobile:deviceInfo"",""args"":[]}";
+                var body = @"{""script"":""mobile:deviceInfo"",""args"": []}";
                 request.AddStringBody(body, DataFormat.Json);
                 RestResponse response = client.Execute(request);
                 Console.WriteLine(response.Content);

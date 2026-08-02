@@ -1446,23 +1446,13 @@ namespace Appium_Wizard
                     }
                 }
 
-                OpenInspector(selectedPort);
+                Common.OpenInspector(selectedPort);
                 GoogleAnalytics.SendEvent("InspectorToolStripMenuItem_Click");
             }
             catch (Exception exception)
             {
                 GoogleAnalytics.SendExceptionEvent("InspectorToolStripMenuItem_Click", exception.Message);
             }
-        }
-
-        private void OpenInspector(int portNumber)
-        {
-            ProcessStartInfo psInfo = new ProcessStartInfo
-            {
-                FileName = $"http://127.0.0.1:{portNumber}/inspector",
-                UseShellExecute = true
-            };
-            Process.Start(psInfo);
         }
 
         private void xCUITestToolStripMenuItem_Click(object sender, EventArgs e)

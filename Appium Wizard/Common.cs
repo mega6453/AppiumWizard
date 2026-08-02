@@ -2676,5 +2676,11 @@ namespace Appium_Wizard
 
             return null; // Return null if not found or error
         }
+
+        public static void OpenInspector(int portNumber)
+        {
+            InspectorForm inspectorForm = new InspectorForm($"http://127.0.0.1:{portNumber}/inspector");
+            inspectorForm.Show();
+        }
     }
 }

@@ -367,7 +367,7 @@ namespace Appium_Wizard
         private void screenControlButtons(bool enable)
         {
             backToolStripMenuItem.Enabled = enable;
-            controlCenterToolStripMenuItem.Enabled = enable;            
+            controlCenterToolStripMenuItem.Enabled = enable;
             navigationHomeSplitButton.Enabled = enable;
             TakeScreenshotToolStripSplitButton1.Enabled = enable;
             launchSettingsToolStripMenuItem.Enabled = enable;
@@ -1408,7 +1408,7 @@ namespace Appium_Wizard
                 {
                     if (stopExecution)
                     {
-                        break;   
+                        break;
                     }
                     ExecuteRecordedActions();
                     executionCount++;
@@ -2143,6 +2143,16 @@ namespace Appium_Wizard
             {
                 ClearDrawing();
             }
+        }
+
+        private void appium_inspector_Click(object sender, EventArgs e)
+        {
+            //ProcessStartInfo psInfo = new ProcessStartInfo
+            //{
+            //    FileName = $"http://127.0.0.1:{portNumber}/inspector",
+            //    UseShellExecute = true
+            //};
+            //Process.Start(psInfo);
         }
 
         //<<<------------------------------------------------------------------------------------------------------------>>>

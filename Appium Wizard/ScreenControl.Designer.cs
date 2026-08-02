@@ -32,6 +32,7 @@
             ScreenWebView = new Microsoft.Web.WebView2.WinForms.WebView2();
             toolStrip1 = new ToolStrip();
             AlwaysOnTopToolStripButton = new ToolStripButton();
+            toolStripSplitButton1 = new ToolStripSeparator();
             navigationHomeSplitButton = new ToolStripSplitButton();
             recentToolStripMenuItem = new ToolStripMenuItem();
             backToolStripMenuItem = new ToolStripMenuItem();
@@ -55,7 +56,6 @@
             executionStatusSettingsToolStripMenuItem = new ToolStripMenuItem();
             showStatusTextToolStripMenuItem = new ToolStripMenuItem();
             showDrawingToolStripMenuItem = new ToolStripMenuItem();
-            objectSpyButton = new ToolStripButton();
             RecordAndStopRecordingSteps = new ToolStripSplitButton();
             playStepsToolStripMenuItem = new ToolStripMenuItem();
             playStepsWithRepetitionsToolStripMenuItem = new ToolStripMenuItem();
@@ -63,10 +63,11 @@
             readMeToolStripMenuItem = new ToolStripMenuItem();
             TakeScreenshotToolStripSplitButton1 = new ToolStripSplitButton();
             recordScreenToolStripMenuItem = new ToolStripMenuItem();
+            toolStripButton1 = new ToolStripSeparator();
+            objectSpyButton = new ToolStripButton();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
-            toolStripSplitButton1 = new ToolStripSeparator();
-            toolStripButton1 = new ToolStripSeparator();
+            appium_inspector = new ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)ScreenWebView).BeginInit();
             toolStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -96,7 +97,7 @@
             toolStrip1.BackColor = SystemColors.ControlLightLight;
             toolStrip1.Dock = DockStyle.Bottom;
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSplitButton1, navigationHomeSplitButton, MoreToolStripButton, RecordAndStopRecordingSteps, TakeScreenshotToolStripSplitButton1, toolStripButton1, objectSpyButton });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { AlwaysOnTopToolStripButton, toolStripSplitButton1, navigationHomeSplitButton, MoreToolStripButton, RecordAndStopRecordingSteps, TakeScreenshotToolStripSplitButton1, toolStripButton1, objectSpyButton, appium_inspector });
             toolStrip1.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
             toolStrip1.Location = new Point(0, 346);
             toolStrip1.Name = "toolStrip1";
@@ -115,6 +116,12 @@
             AlwaysOnTopToolStripButton.Size = new Size(28, 28);
             AlwaysOnTopToolStripButton.ToolTipText = "Always on Top";
             AlwaysOnTopToolStripButton.Click += AlwaysOnTop_Click;
+            // 
+            // toolStripSplitButton1
+            // 
+            toolStripSplitButton1.Alignment = ToolStripItemAlignment.Right;
+            toolStripSplitButton1.Name = "toolStripSplitButton1";
+            toolStripSplitButton1.Size = new Size(6, 31);
             // 
             // navigationHomeSplitButton
             // 
@@ -175,7 +182,7 @@
             // 
             UnlockScreen.Image = Properties.Resources.Unlock;
             UnlockScreen.Name = "UnlockScreen";
-            UnlockScreen.Size = new Size(149, 22);
+            UnlockScreen.Size = new Size(213, 30);
             UnlockScreen.Text = "Unlock Screen";
             UnlockScreen.Click += UnlockScreen_Click;
             // 
@@ -183,7 +190,7 @@
             // 
             manageAppsToolStripMenuItem.Image = Properties.Resources.application;
             manageAppsToolStripMenuItem.Name = "manageAppsToolStripMenuItem";
-            manageAppsToolStripMenuItem.Size = new Size(149, 22);
+            manageAppsToolStripMenuItem.Size = new Size(213, 30);
             manageAppsToolStripMenuItem.Text = "Manage Apps";
             manageAppsToolStripMenuItem.Click += manageAppsToolStripMenuItem_Click;
             // 
@@ -192,7 +199,7 @@
             deviceInfoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showDeviceInfoToolStripMenuItem, copySerialNumberToolStripMenuItem, copyUDIDToolStripMenuItem, copyModelNumberToolStripMenuItem, copyOSVersionToolStripMenuItem, copyAllInfoToolStripMenuItem });
             deviceInfoToolStripMenuItem.Image = Properties.Resources.information;
             deviceInfoToolStripMenuItem.Name = "deviceInfoToolStripMenuItem";
-            deviceInfoToolStripMenuItem.Size = new Size(149, 22);
+            deviceInfoToolStripMenuItem.Size = new Size(213, 30);
             deviceInfoToolStripMenuItem.Text = "Device Info";
             // 
             // showDeviceInfoToolStripMenuItem
@@ -248,7 +255,7 @@
             infoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { copyProxyPortToolStripMenuItem1, copyScreenPortToolStripMenuItem1, copySessionIDToolStripMenuItem1, copySessionURLToolStripMenuItem1 });
             infoToolStripMenuItem.Image = Properties.Resources.information;
             infoToolStripMenuItem.Name = "infoToolStripMenuItem";
-            infoToolStripMenuItem.Size = new Size(149, 22);
+            infoToolStripMenuItem.Size = new Size(213, 30);
             infoToolStripMenuItem.Text = "Other Info";
             // 
             // copyProxyPortToolStripMenuItem1
@@ -282,47 +289,36 @@
             copySessionURLToolStripMenuItem1.Size = new Size(168, 22);
             copySessionURLToolStripMenuItem1.Text = "Copy Session URL";
             copySessionURLToolStripMenuItem1.Click += copySessionURLToolStripMenuItem_Click;
-            //
+            // 
             // executionStatusSettingsToolStripMenuItem
-            //
+            // 
             executionStatusSettingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showStatusTextToolStripMenuItem, showDrawingToolStripMenuItem });
             executionStatusSettingsToolStripMenuItem.Name = "executionStatusSettingsToolStripMenuItem";
-            executionStatusSettingsToolStripMenuItem.Size = new Size(225, 22);
+            executionStatusSettingsToolStripMenuItem.Size = new Size(213, 30);
             executionStatusSettingsToolStripMenuItem.Text = "Execution Status Settings";
             executionStatusSettingsToolStripMenuItem.ToolTipText = "Configure visual feedback during test execution";
-            //
+            // 
             // showStatusTextToolStripMenuItem
-            //
+            // 
             showStatusTextToolStripMenuItem.Checked = true;
             showStatusTextToolStripMenuItem.CheckOnClick = true;
             showStatusTextToolStripMenuItem.CheckState = CheckState.Checked;
             showStatusTextToolStripMenuItem.Name = "showStatusTextToolStripMenuItem";
-            showStatusTextToolStripMenuItem.Size = new Size(175, 22);
+            showStatusTextToolStripMenuItem.Size = new Size(162, 22);
             showStatusTextToolStripMenuItem.Text = "Show Status Text";
             showStatusTextToolStripMenuItem.ToolTipText = "Display execution status text in the status bar. Disable this if you experience delays during test execution.";
             showStatusTextToolStripMenuItem.Click += showStatusTextToolStripMenuItem_Click;
-            //
+            // 
             // showDrawingToolStripMenuItem
-            //
+            // 
             showDrawingToolStripMenuItem.Checked = true;
             showDrawingToolStripMenuItem.CheckOnClick = true;
             showDrawingToolStripMenuItem.CheckState = CheckState.Checked;
             showDrawingToolStripMenuItem.Name = "showDrawingToolStripMenuItem";
-            showDrawingToolStripMenuItem.Size = new Size(175, 22);
+            showDrawingToolStripMenuItem.Size = new Size(162, 22);
             showDrawingToolStripMenuItem.Text = "Show Drawing";
             showDrawingToolStripMenuItem.ToolTipText = "Show visual feedback (rectangles, dots, arrows) on screen during element interactions. Disable this if you experience delays during test execution.";
             showDrawingToolStripMenuItem.Click += showDrawingToolStripMenuItem_Click;
-            //
-            // objectSpyButton
-            // 
-            objectSpyButton.Alignment = ToolStripItemAlignment.Right;
-            objectSpyButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            objectSpyButton.Image = Properties.Resources.search;
-            objectSpyButton.ImageTransparentColor = Color.Magenta;
-            objectSpyButton.Name = "objectSpyButton";
-            objectSpyButton.Size = new Size(28, 28);
-            objectSpyButton.ToolTipText = "Object Spy";
-            objectSpyButton.Click += objectSpyButton_Click;
             // 
             // RecordAndStopRecordingSteps
             // 
@@ -335,28 +331,28 @@
             RecordAndStopRecordingSteps.Size = new Size(40, 28);
             RecordAndStopRecordingSteps.ToolTipText = "Record and Playback";
             RecordAndStopRecordingSteps.ButtonClick += RecordAndStopRecordingSteps_ButtonClick;
-            //
+            // 
             // playStepsToolStripMenuItem
-            //
+            // 
             playStepsToolStripMenuItem.Image = Properties.Resources.play;
             playStepsToolStripMenuItem.Name = "playStepsToolStripMenuItem";
-            playStepsToolStripMenuItem.Size = new Size(220, 22);
+            playStepsToolStripMenuItem.Size = new Size(197, 22);
             playStepsToolStripMenuItem.Text = "Play Steps";
             playStepsToolStripMenuItem.Click += playStepsToolStripMenuItem_Click;
-            //
+            // 
             // playStepsWithRepetitionsToolStripMenuItem
-            //
+            // 
             playStepsWithRepetitionsToolStripMenuItem.Image = Properties.Resources.play;
             playStepsWithRepetitionsToolStripMenuItem.Name = "playStepsWithRepetitionsToolStripMenuItem";
-            playStepsWithRepetitionsToolStripMenuItem.Size = new Size(220, 22);
+            playStepsWithRepetitionsToolStripMenuItem.Size = new Size(197, 22);
             playStepsWithRepetitionsToolStripMenuItem.Text = "Play Steps (Repetitions)";
             playStepsWithRepetitionsToolStripMenuItem.Click += playStepsWithRepetitionsToolStripMenuItem_Click;
-            //
+            // 
             // playStepsWithDurationToolStripMenuItem
-            //
+            // 
             playStepsWithDurationToolStripMenuItem.Image = Properties.Resources.play;
             playStepsWithDurationToolStripMenuItem.Name = "playStepsWithDurationToolStripMenuItem";
-            playStepsWithDurationToolStripMenuItem.Size = new Size(220, 22);
+            playStepsWithDurationToolStripMenuItem.Size = new Size(197, 22);
             playStepsWithDurationToolStripMenuItem.Text = "Play Steps (Duration)";
             playStepsWithDurationToolStripMenuItem.Click += playStepsWithDurationToolStripMenuItem_Click;
             // 
@@ -364,7 +360,7 @@
             // 
             readMeToolStripMenuItem.Image = Properties.Resources.readme;
             readMeToolStripMenuItem.Name = "readMeToolStripMenuItem";
-            readMeToolStripMenuItem.Size = new Size(127, 22);
+            readMeToolStripMenuItem.Size = new Size(197, 22);
             readMeToolStripMenuItem.Text = "Read me";
             readMeToolStripMenuItem.Click += readMeToolStripMenuItem_Click;
             // 
@@ -389,6 +385,23 @@
             recordScreenToolStripMenuItem.Text = "Record Screen";
             recordScreenToolStripMenuItem.Click += recordScreenToolStripMenuItem_Click;
             // 
+            // toolStripButton1
+            // 
+            toolStripButton1.Alignment = ToolStripItemAlignment.Right;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(6, 31);
+            // 
+            // objectSpyButton
+            // 
+            objectSpyButton.Alignment = ToolStripItemAlignment.Right;
+            objectSpyButton.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            objectSpyButton.Image = Properties.Resources.search;
+            objectSpyButton.ImageTransparentColor = Color.Magenta;
+            objectSpyButton.Name = "objectSpyButton";
+            objectSpyButton.Size = new Size(28, 28);
+            objectSpyButton.ToolTipText = "Object Spy";
+            objectSpyButton.Click += objectSpyButton_Click;
+            // 
             // statusStrip1
             // 
             statusStrip1.BackColor = SystemColors.Control;
@@ -411,17 +424,15 @@
             toolStripStatusLabel.Spring = true;
             toolStripStatusLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // toolStripSplitButton1
+            // appium_inspector
             // 
-            toolStripSplitButton1.Alignment = ToolStripItemAlignment.Right;
-            toolStripSplitButton1.Name = "toolStripSplitButton1";
-            toolStripSplitButton1.Size = new Size(6, 31);
-            // 
-            // toolStripButton1
-            // 
-            toolStripButton1.Alignment = ToolStripItemAlignment.Right;
-            toolStripButton1.Name = "toolStripButton1";
-            toolStripButton1.Size = new Size(6, 31);
+            appium_inspector.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            appium_inspector.Image = Properties.Resources.inspector;
+            appium_inspector.ImageTransparentColor = Color.Magenta;
+            appium_inspector.Name = "appium_inspector";
+            appium_inspector.Size = new Size(28, 28);
+            appium_inspector.Text = "Appium Inspector";
+            appium_inspector.Click += appium_inspector_Click;
             // 
             // ScreenControl
             // 
@@ -492,5 +503,6 @@
         private ToolStripMenuItem controlCenterToolStripMenuItem;
         private ToolStripSeparator toolStripSplitButton1;
         private ToolStripSeparator toolStripButton1;
+        private ToolStripButton appium_inspector;
     }
 }

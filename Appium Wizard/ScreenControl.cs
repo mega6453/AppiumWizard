@@ -45,6 +45,10 @@ namespace Appium_Wizard
         public bool ShowExecutionStatusText { get; set; } = true;
         public bool ShowExecutionDrawing { get; set; } = true;
 
+        // Size the form is locked to once SetupScreenSharing() sets it (see MinimumSize/
+        // MaximumSize there, which stop Windows Snap from resizing the window on drag/drop).
+        private Size _lockedSize = Size.Empty;
+
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
             InitializeComponent();
@@ -215,6 +219,15 @@ namespace Appium_Wizard
             this.ClientSize = new Size(width, height + toolStrip1.Height + statusStrip1.Height);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Text = deviceName + "[v" + OSVersion + "]";
+            _lockedSize = this.Size;
+            // Windows Snap resizes a window by calling SetWindowPos directly — that bypasses
+            // SetBoundsCore (which only intercepts .NET-initiated resizes), so it can't be
+            // stopped there. Snap does, however, compute its target rect within the window's
+            // Minimum/MaximumSize constraints. Pinning both to the same locked size leaves no
+            // size for Windows to snap into, so dropping the window on a snap zone only moves
+            // it instead of resizing it.
+            this.MinimumSize = _lockedSize;
+            this.MaximumSize = _lockedSize;
             InitializeWebView();
             if (OSType.Equals("iOS"))
             {

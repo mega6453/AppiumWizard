@@ -69,7 +69,10 @@ namespace Appium_Wizard
                                     if (OS.Equals("iOS"))
                                     {
                                         var deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(udid);
-                                        version = deviceInfo["ProductVersion"]?.ToString() ?? "";
+                                        if (deviceInfo.ContainsKey("ProductVersion"))
+                                        {
+                                            version = deviceInfo["ProductVersion"]?.ToString() ?? "";
+                                        }
                                     }
                                     else
                                     {

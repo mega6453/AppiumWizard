@@ -932,6 +932,7 @@ namespace Appium_Wizard
                     if (dmgFiles.Length > 0 && plistFiles.Length > 0)
                     {
                         Logger.Info("Found existing personalized DDI at: " + personalizedDdiPath + ". Attempting to mount directly.");
+                        NormalizeDDIStructure(personalizedDdiPath);
 
                         // Try mounting the personalized DDI directly
                         string output = ExecuteCommand("image mount --path=\"" + personalizedDdiPath + "\"", udid);
@@ -963,20 +964,18 @@ namespace Appium_Wizard
                 string autoOutput = ExecuteCommand("image auto", udid);
 
                 // Check if it succeeded
-                if (autoOutput.Contains("\"level\":\"info\",\"msg\":\"ok\"") || autoOutput.Contains("successfully mounted"))
+                if (autoOutput.Contains("success mounting image") || autoOutput.Contains("\"level\":\"info\",\"msg\":\"ok\"") || autoOutput.Contains("successfully mounted"))
                 {
                     Logger.Info("Standard DDI mounted successfully");
                     return autoOutput;
                 }
-
+                else
                 // Check if mounting failed due to identity mismatch (iOS 17+ / iOS 26.3+ personalized DDI issue)
-                if (autoOutput.Contains("could not find identity") || autoOutput.Contains("findIdentity: failed"))
                 {
                     Logger.Info("Standard DDI mounting failed with identity mismatch. Attempting to download personalized DDI for iOS 17+/26+...");
 
                     // Download personalized DDI using ddi-downloader.exe
                     personalizedDdiPath = DownloadPersonalizedDDI();
-
                     if (!string.IsNullOrEmpty(personalizedDdiPath) && Directory.Exists(personalizedDdiPath))
                     {
                         Logger.Info("Personalized DDI downloaded. Attempting to mount from: " + personalizedDdiPath);
@@ -1037,6 +1036,7 @@ namespace Appium_Wizard
                     if (dmgFiles.Length > 0 && plistFiles.Length > 0)
                     {
                         Logger.Info("Personalized DDI already exists at: " + restorePath);
+                        NormalizeDDIStructure(restorePath);
                         return restorePath;
                     }
                     else
@@ -1092,6 +1092,7 @@ namespace Appium_Wizard
                     if (dmgFiles.Length > 0 && plistFiles.Length > 0)
                     {
                         Logger.Info("Successfully downloaded personalized DDI with " + dmgFiles.Length + " DMG file(s)");
+                        NormalizeDDIStructure(restorePath);
                         return restorePath;
                     }
                     else
@@ -1110,6 +1111,56 @@ namespace Appium_Wizard
             {
                 Logger.Error(ex, "Failed to download personalized DDI");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// ddi-downloader.exe saves the DMG/trustcache under their real filenames (e.g. 022-22107-072.dmg,
+        /// Firmware\022-22107-072.dmg.trustcache), but BuildManifest.plist's PersonalizedDMG/LoadableTrustCache
+        /// entries hard-code Path="Image.dmg"/"Image.dmg.trustcache" at the Restore folder root - which is what
+        /// go-ios resolves against for "image mount --path=". Copy the files to the names the manifest expects.
+        /// </summary>
+        private void NormalizeDDIStructure(string restorePath)
+        {
+            try
+            {
+                string imageDmgPath = Path.Combine(restorePath, "Image.dmg");
+                if (!File.Exists(imageDmgPath))
+                {
+                    var dmgFiles = Directory.GetFiles(restorePath, "*.dmg");
+                    string sourceDmg = dmgFiles.FirstOrDefault(f => !Path.GetFileName(f).Equals("Image.dmg", StringComparison.OrdinalIgnoreCase));
+                    if (sourceDmg != null)
+                    {
+                        Logger.Info("NormalizeDDIStructure - copying " + Path.GetFileName(sourceDmg) + " to Image.dmg");
+                        File.Copy(sourceDmg, imageDmgPath, true);
+                    }
+                }
+
+                string imageTrustcachePath = Path.Combine(restorePath, "Image.dmg.trustcache");
+                if (!File.Exists(imageTrustcachePath))
+                {
+                    string sourceTrustcache = Directory.GetFiles(restorePath, "*.dmg.trustcache")
+                        .FirstOrDefault(f => !Path.GetFileName(f).Equals("Image.dmg.trustcache", StringComparison.OrdinalIgnoreCase));
+
+                    if (sourceTrustcache == null)
+                    {
+                        string firmwareFolder = Path.Combine(restorePath, "Firmware");
+                        if (Directory.Exists(firmwareFolder))
+                        {
+                            sourceTrustcache = Directory.GetFiles(firmwareFolder, "*.dmg.trustcache").FirstOrDefault();
+                        }
+                    }
+
+                    if (sourceTrustcache != null)
+                    {
+                        Logger.Info("NormalizeDDIStructure - copying " + Path.GetFileName(sourceTrustcache) + " to Image.dmg.trustcache");
+                        File.Copy(sourceTrustcache, imageTrustcachePath, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "NormalizeDDIStructure failed for: " + restorePath);
             }
         }
 

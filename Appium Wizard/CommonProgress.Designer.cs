@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CommonProgress));
             commonProgressLabel = new Label();
             progressBar1 = new ProgressBar();
+            cancelButton = new Button();
             SuspendLayout();
             // 
             // commonProgressLabel
@@ -49,14 +50,26 @@
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(673, 34);
             progressBar1.TabIndex = 3;
-            // 
+            //
+            // cancelButton
+            //
+            cancelButton.Location = new Point(578, 170);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(120, 40);
+            cancelButton.TabIndex = 4;
+            cancelButton.Text = "Cancel";
+            cancelButton.UseVisualStyleBackColor = true;
+            cancelButton.Visible = false;
+            cancelButton.Click += cancelButton_Click;
+            //
             // CommonProgress
-            // 
+            //
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(728, 176);
+            ClientSize = new Size(728, 226);
             ControlBox = false;
+            Controls.Add(cancelButton);
             Controls.Add(progressBar1);
             Controls.Add(commonProgressLabel);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -75,5 +88,6 @@
 
         private Label commonProgressLabel;
         private ProgressBar progressBar1;
+        private Button cancelButton;
     }
 }

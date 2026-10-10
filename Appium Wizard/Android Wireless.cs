@@ -253,6 +253,13 @@
             GoogleAnalytics.SendEvent("AndroidWireless_Shown");
         }
 
+        private void QRButton_Click(object sender, EventArgs e)
+        {
+            AndroidWirelessQR androidWirelessQR = new AndroidWirelessQR(this);
+            androidWirelessQR.ShowDialog();
+            GoogleAnalytics.SendEvent("QRButton_Click");
+        }
+
         private void ManualButton_Click(object sender, EventArgs e)
         {
             AndroidWirelessManual androidWirelessManual = new AndroidWirelessManual(this);

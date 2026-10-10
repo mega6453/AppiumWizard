@@ -38,12 +38,13 @@
             columnHeader2 = new ColumnHeader();
             PairButton = new Button();
             ManualButton = new Button();
+            QRButton = new Button();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             label1.Location = new Point(8, 13);
             label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
@@ -65,7 +66,7 @@
             // FindDeviceButton
             // 
             FindDeviceButton.AutoSize = true;
-            FindDeviceButton.Location = new Point(112, 95);
+            FindDeviceButton.Location = new Point(180, 95);
             FindDeviceButton.Margin = new Padding(2);
             FindDeviceButton.Name = "FindDeviceButton";
             FindDeviceButton.Size = new Size(118, 25);
@@ -77,7 +78,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic, GraphicsUnit.Point);
+            label3.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
             label3.ForeColor = Color.Red;
             label3.Location = new Point(8, 254);
             label3.Margin = new Padding(2, 0, 2, 0);
@@ -126,7 +127,7 @@
             // ManualButton
             // 
             ManualButton.AutoSize = true;
-            ManualButton.Location = new Point(246, 95);
+            ManualButton.Location = new Point(311, 95);
             ManualButton.Margin = new Padding(2);
             ManualButton.Name = "ManualButton";
             ManualButton.Size = new Size(102, 25);
@@ -135,12 +136,25 @@
             ManualButton.UseVisualStyleBackColor = true;
             ManualButton.Click += ManualButton_Click;
             // 
+            // QRButton
+            // 
+            QRButton.AutoSize = true;
+            QRButton.Location = new Point(61, 95);
+            QRButton.Margin = new Padding(2);
+            QRButton.Name = "QRButton";
+            QRButton.Size = new Size(111, 25);
+            QRButton.TabIndex = 10;
+            QRButton.Text = "Pair with QR code";
+            QRButton.UseVisualStyleBackColor = true;
+            QRButton.Click += QRButton_Click;
+            // 
             // AndroidWireless
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(489, 275);
+            Controls.Add(QRButton);
             Controls.Add(ManualButton);
             Controls.Add(PairButton);
             Controls.Add(listView1);
@@ -173,5 +187,6 @@
         private ColumnHeader columnHeader1;
         private ColumnHeader columnHeader2;
         private Button ManualButton;
+        private Button QRButton;
     }
 }

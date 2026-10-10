@@ -24,15 +24,16 @@
 
         private async void FindDevices()
         {
+            string findingText = "Looking for Android devices over Wi-Fi...\n\nOn the phone, open Developer options > Wireless debugging > Pair device with pairing code and keep that screen open.";
             int retryCount = 0;
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Show();
-            commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...",10);
+            commonProgress.UpdateStepLabel("Android Wireless device", findingText,10);
             listOfDevices.Clear();
             await Task.Run(() => {
                 listOfDevices = AndroidMethods.GetInstance().FindPairingReadyDevicesOverWiFi();
             });
-            commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...",30);
+            commonProgress.UpdateStepLabel("Android Wireless device", findingText,30);
             while (listOfDevices.Count == 0 && retryCount <= 5)
             {
                 await Task.Run(() => {
@@ -40,7 +41,7 @@
                 });
                 await Task.Delay(1000);                
                 retryCount++;
-                commonProgress.UpdateStepLabel("Android Wireless device", "Looking for Android devices over Wi-Fi...", 30+(retryCount*10));
+                commonProgress.UpdateStepLabel("Android Wireless device", findingText, 30+(retryCount*10));
             }
             listView1.Items.Clear();
             foreach (var pair in listOfDevices)

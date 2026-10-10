@@ -60,7 +60,7 @@
             label2.Name = "label2";
             label2.Size = new Size(434, 45);
             label2.TabIndex = 1;
-            label2.Text = "1. Connect your Android 11+ Phone and your PC to same network.\r\n2. Go to Developer options > Wireless debugging > Pair device with pairing code.\r\n3. Click any one of the below options.";
+            label2.Text = "1. Connect your Android 11+ phone and PC to the same network.\r\n2. On the phone, go to Developer options > Wireless debugging.\r\n3. Choose a pairing option below (QR code, automatic, or manual).";
             label2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // FindDeviceButton

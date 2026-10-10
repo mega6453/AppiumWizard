@@ -77,17 +77,30 @@ namespace Appium_Wizard
             try
             {
                 commonProgress.Owner = MainScreen.main;
+                commonProgress.EnableCancel();
                 commonProgress.Show();
                 commonProgress.UpdateStepLabel(title, "Initializing...", 5);
-                if (OSType.Equals("Android"))
+                Task work = OSType.Equals("Android") ? SetupAndroidScreenMirroring() : ExecuteiOSBackgroundMethod();
+                if (await Task.WhenAny(work, commonProgress.CancelRequested) != work)
                 {
-                    await SetupAndroidScreenMirroring();
+                    // Cancelled: give the running step a short time to finish, then give up on it.
+                    // An abandoned step keeps running but stops at its next StopIfCancelled check.
+                    if (await Task.WhenAny(work, Task.Delay(CancelGracePeriodMs)) != work)
+                    {
+                        Logger.Warn("Current step did not finish within grace period after cancel, abandoning : " + udid);
+                    }
                 }
                 else
                 {
-                    await ExecuteiOSBackgroundMethod();
+                    await work;
                 }
-                if (isScreenServerStarted)
+                if (commonProgress.IsCancelled)
+                {
+                    Logger.Info("Opening device cancelled by user : " + udid);
+                    isScreenServerStarted = false;
+                    commonProgress.Close();
+                }
+                else if (isScreenServerStarted)
                 {
                     commonProgress.UpdateStepLabel(title, "Screen server started...", 90);
                     InitializeScreenControl(commonProgress);
@@ -95,13 +108,39 @@ namespace Appium_Wizard
                 else
                 {
                     commonProgress.Close();
-                    // MessageBox.Show("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // ShowMessage("Please restart device and try again.", "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception)
             {
             }
             return isScreenServerStarted;
+        }
+
+        // How long to wait for the running step after Cancel before closing the popup anyway.
+        private const int CancelGracePeriodMs = 10000;
+
+        // Suppresses dialogs once the user cancelled, so leftover steps don't pop up errors.
+        private DialogResult ShowMessage(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            if (commonProgress.IsCancelled)
+            {
+                Logger.Info("Suppressed message after cancel: " + caption + " - " + text);
+                return DialogResult.No;
+            }
+            return MessageBox.Show(text, caption, buttons, icon);
+        }
+
+        // Step-boundary check; returns true if the user cancelled and the caller should stop.
+        private bool StopIfCancelled()
+        {
+            if (!commonProgress.IsCancelled)
+            {
+                return false;
+            }
+            Logger.Info("Opening device cancelled by user, stopping : " + udid);
+            isScreenServerStarted = false;
+            return true;
         }
 
         public static Dictionary<string, Dictionary<object, object>> deviceDetails = new Dictionary<string, Dictionary<object, object>>();
@@ -119,10 +158,11 @@ namespace Appium_Wizard
                     var deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
                     if (!deviceList.Contains(udid))
                     {
-                        MessageBox.Show("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ShowMessage("Device not found. Please re-connect the device and try again.", "Device Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         isScreenServerStarted = false;
                         return;
                     }
+                    if (StopIfCancelled()) return;
                     if (deviceDetails.ContainsKey(udid))
                     {
                         Logger.Info("deviceDetails.ContainsKey : " + udid);
@@ -151,8 +191,10 @@ namespace Appium_Wizard
                         Common.KillProcessByPortNumber(screenServerPort);
                         iOSAsyncMethods.GetInstance().StartiProxyServer(udid, proxyPort, 8100, screenServerPort, 9100);
                     }
+                    if (StopIfCancelled()) return;
                     commonProgress.UpdateStepLabel(title, "Checking if WebDriverAgent already running...", 15);
                     WDAsessionId = iOSAPIMethods.GetWDASessionID("http://localhost:" + proxyPort);
+                    if (StopIfCancelled()) return;
                     if (!WDAsessionId.Equals("nosession"))
                     {
                         if (width == 0 | height == 0)
@@ -163,7 +205,7 @@ namespace Appium_Wizard
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
-                                MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                ShowMessage("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return;
                             }
                             width = screenSize.Item1;
@@ -205,6 +247,7 @@ namespace Appium_Wizard
                                 wdaCheck = true;  // considering WDA available, so that it won't try to install again and not throw error saying no profile found.
                             }
                         }
+                        if (StopIfCancelled()) return;
                         if (wdaCheck | profileCheck)
                         {
                             keyValuePairs = new Dictionary<object, object>();
@@ -224,11 +267,12 @@ namespace Appium_Wizard
                                 installedNow = iOSMethods.GetInstance().InstallWDA(udid);
                                 installationTried = true;
                             }
+                            if (StopIfCancelled()) return;
                             if (!installedNow && installationTried)
                             {
                                 commonProgress.Close();
                                 isScreenServerStarted = false;
-                                MessageBox.Show("Unable to Install WebDriverAgentRunner. Go to Tools->iOS profile management -> Delete all the profiles, add again and then try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                ShowMessage("Unable to Install WebDriverAgentRunner. Go to Tools->iOS profile management -> Delete all the profiles, add again and then try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return;
                             }
                             if (installedNow)
@@ -239,6 +283,7 @@ namespace Appium_Wizard
                             {
                                 isRunning = iOSAPIMethods.IsWDARunning(proxyPort);
                             }
+                            if (StopIfCancelled()) return;
                             if (isRunning)
                             {
                                 commonProgress.UpdateStepLabel(title, "Getting device screen size...", 80);
@@ -247,27 +292,27 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 width = screenSize.Item1;
                                 height = screenSize.Item2;
                                 commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                                 isScreenServerStarted = true;
-                                keyValuePairs.Add("proxyPort", proxyPort);
-                                keyValuePairs.Add("screenPort", screenServerPort);
-                                keyValuePairs.Add("sessionId", WDAsessionId);
-                                keyValuePairs.Add("width", width);
-                                keyValuePairs.Add("height", height);
+                                keyValuePairs["proxyPort"] = proxyPort;
+                                keyValuePairs["screenPort"] = screenServerPort;
+                                keyValuePairs["sessionId"] = WDAsessionId;
+                                keyValuePairs["width"] = width;
+                                keyValuePairs["height"] = height;
                                 deviceDetails.Remove(udid);
-                                deviceDetails.Add(udid, keyValuePairs);
+                                deviceDetails[udid] = keyValuePairs;
                                 if (MainScreen.udidProxyPort.ContainsKey(udid))
                                 {
                                     MainScreen.udidProxyPort[udid] = proxyPort;
                                 }
                                 else
                                 {
-                                    MainScreen.udidProxyPort.Add(udid, proxyPort);
+                                    MainScreen.udidProxyPort[udid] = proxyPort;
                                 }
                                 if (MainScreen.udidScreenPort.ContainsKey(udid))
                                 {
@@ -275,7 +320,7 @@ namespace Appium_Wizard
                                 }
                                 else
                                 {
-                                    MainScreen.udidScreenPort.Add(udid, screenServerPort);
+                                    MainScreen.udidScreenPort[udid] = screenServerPort;
                                 }
                             }
                             else
@@ -288,6 +333,7 @@ namespace Appium_Wizard
                                     Logger.Info("device version >= 17.0.0 , so creating tunnel");
                                     commonProgress.UpdateStepLabel(title, "Please wait while creating tunnel, This may take few seconds...", 50);
                                     bool isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelGo(false);
+                                    if (StopIfCancelled()) return;
                                     if (isTunnelStarted)
                                     {
                                         Logger.Info("tunnel started");
@@ -296,7 +342,7 @@ namespace Appium_Wizard
                                     }
                                     else
                                     {
-                                        var result = MessageBox.Show("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                                        var result = ShowMessage("Tunnel creation failed. Running with admin rights may work. Do you want to try with admin privilege?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                                         if (result == DialogResult.Yes)
                                         {
                                             Logger.Info("Clicked yes to create tunnel with admin rights.");
@@ -304,7 +350,7 @@ namespace Appium_Wizard
                                             {
                                                 iOSMethods.GetInstance().ShowPymd3MissingMessage();
                                                 isScreenServerStarted = false;
-                                                MessageBox.Show("Please try again after extracting the fallback tool.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                ShowMessage("Please try again after extracting the fallback tool.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                                 return;
                                             }
                                             isTunnelStarted = iOSAsyncMethods.GetInstance().CreateTunnelPy();
@@ -318,7 +364,7 @@ namespace Appium_Wizard
                                             {
                                                 commonProgress.Close();
                                                 isScreenServerStarted = false;
-                                                MessageBox.Show("Tunnel creation failed.\n\nIf Admin permission not given, Please provide admin permission when system prompts.\n\nIf Admin permission given, Please try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                ShowMessage("Tunnel creation failed.\n\nIf Admin permission not given, Please provide admin permission when system prompts.\n\nIf Admin permission given, Please try again after restarting Appium Wizard/System.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                                 return;
                                             }
                                         }
@@ -329,8 +375,10 @@ namespace Appium_Wizard
                                         }
                                     }
                                 }
+                                if (StopIfCancelled()) return;
                                 commonProgress.UpdateStepLabel(title, "Mounting developer disk image. Please wait, this may take some time...", 60);
                                 var output = iOSMethods.GetInstance().MountImage(udid);
+                                if (StopIfCancelled()) return;
 
                                 // Handle personalized DDI download for iOS 17+/26+
                                 if (output.Contains("Downloading personalized DDI"))
@@ -342,7 +390,7 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Mounting image failed. Please check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Mounting image failed. Please check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
 
@@ -351,7 +399,7 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Failed to mount developer disk image. The personalized DDI download failed.\nPlease check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Failed to mount developer disk image. The personalized DDI download failed.\nPlease check your internet connection and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
 
@@ -364,6 +412,7 @@ namespace Appium_Wizard
 
                                     // Wait a bit for mount to complete
                                     Thread.Sleep(2000);
+                                    if (StopIfCancelled()) return;
 
                                     // Check again if mounted
                                     if (!iOSMethods.GetInstance().isImageMounted(udid))
@@ -371,7 +420,7 @@ namespace Appium_Wizard
                                         commonProgress.Close();
                                         isScreenServerStarted = false;
                                         Logger.Error("Failed to mount developer disk image after retry. Output: " + retryOutput);
-                                        MessageBox.Show("Failed to mount developer disk image.\n\nPossible causes:\n1. Device was restarted (DDI gets unmounted on restart)\n2. Internet connection issue (for iOS 17+/26+ personalized DDI)\n3. DDI files corrupted\n\nSolution:\n- Ensure device is unlocked\n- Check internet connection\n- Try again\n\nIf issue persists, delete the folder:\n" + FilesPath.devImagesPath + "iOS_DDI\nand try again to re-download the DDI.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        ShowMessage("Failed to mount developer disk image.\n\nPossible causes:\n1. Device was restarted (DDI gets unmounted on restart)\n2. Internet connection issue (for iOS 17+/26+ personalized DDI)\n3. DDI files corrupted\n\nSolution:\n- Ensure device is unlocked\n- Check internet connection\n- Try again\n\nIf issue persists, delete the folder:\n" + FilesPath.devImagesPath + "iOS_DDI\nand try again to re-download the DDI.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
                                     Logger.Info("Image mounted successfully after retry");
@@ -382,7 +431,7 @@ namespace Appium_Wizard
                                     {
                                         commonProgress.Close();
                                         isScreenServerStarted = false;
-                                        MessageBox.Show("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        ShowMessage("Tunnel creation failed, Unable to continue. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
                                 }
@@ -390,16 +439,17 @@ namespace Appium_Wizard
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 if (output.Contains("Developer Mode is disabled") | output.Contains("Could not start service:com.apple.testmanagerd.lockdown.secure"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
+                                if (StopIfCancelled()) return;
                                 commonProgress.UpdateStepLabel(title, "Starting WebDriverAgent, Please enter passcode if it asks...", 70);
 
                                 // Use runwda command directly (more stable than launch command)
@@ -407,39 +457,40 @@ namespace Appium_Wizard
                                 WDAsessionId = iOSAsyncMethods.GetInstance().RunWebDriverAgentWithRunWDA(commonProgress, udid, proxyPort);
 
                                 Logger.Info("WDAsessionId:" + WDAsessionId);
+                                if (StopIfCancelled()) return;
                                 if (WDAsessionId.Equals("Enable Developer Mode"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Please enable Developer Mode in your " + deviceName + " and try again.\nGo to Settings->Privacy & Security->Developer Mode->Turn ON.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (WDAsessionId.Equals("Password Protected"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Please Unlock your " + deviceName + " and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (WDAsessionId.Equals("WDA Not Installed"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("WebDriverAgent Not Installed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (WDAsessionId.Equals("nosession") | WDAsessionId.Equals("Timed out") | WDAsessionId.Equals("nosession passcode required"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unable to launch WebDriverAgent using runwda command.\n\nPlease:\n1. Enter passcode on your " + deviceName + " when it asks\n2. Ensure Developer Mode is enabled\n3. Unlock your device before opening\n\nNote: If you see WDA running on your device, try going to the home screen and reopening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Unable to launch WebDriverAgent using runwda command.\n\nPlease:\n1. Enter passcode on your " + deviceName + " when it asks\n2. Ensure Developer Mode is enabled\n3. Unlock your device before opening\n\nNote: If you see WDA running on your device, try going to the home screen and reopening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (string.IsNullOrEmpty(WDAsessionId) | WDAsessionId.Equals("unhandled"))
                                 {
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unhandled Exception - Try launching WebDriverAgent manually and try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Unhandled Exception - Try launching WebDriverAgent manually and try opening the device.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                                 else if (!WDAsessionId.Equals("nosession"))
@@ -451,27 +502,27 @@ namespace Appium_Wizard
                                     {
                                         commonProgress.Close();
                                         isScreenServerStarted = false;
-                                        MessageBox.Show("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        ShowMessage("Unable to get Screen Size. Please restart device and Appium Wizard and then try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                         return;
                                     }
                                     width = screenSize.Item1;
                                     height = screenSize.Item2;
                                     commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                                     isScreenServerStarted = true;
-                                    keyValuePairs.Add("proxyPort", proxyPort);
-                                    keyValuePairs.Add("screenPort", screenServerPort);
-                                    keyValuePairs.Add("sessionId", WDAsessionId);
-                                    keyValuePairs.Add("width", width);
-                                    keyValuePairs.Add("height", height);
+                                    keyValuePairs["proxyPort"] = proxyPort;
+                                    keyValuePairs["screenPort"] = screenServerPort;
+                                    keyValuePairs["sessionId"] = WDAsessionId;
+                                    keyValuePairs["width"] = width;
+                                    keyValuePairs["height"] = height;
                                     deviceDetails.Remove(udid);
-                                    deviceDetails.Add(udid, keyValuePairs);
+                                    deviceDetails[udid] = keyValuePairs;
                                 }
                                 else
                                 {
                                     iOSAsyncMethods.GetInstance().CloseTunnel();
                                     commonProgress.Close();
                                     isScreenServerStarted = false;
-                                    MessageBox.Show("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    ShowMessage("Unhandled Exception", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return;
                                 }
                             }
@@ -480,7 +531,7 @@ namespace Appium_Wizard
                         {
                             commonProgress.Close();
                             isScreenServerStarted = false;
-                            MessageBox.Show("No pre-installed WebDriverAgent found, and no provisioning profile is available for the device " + deviceName + "(" + udid + ").\n\nOption 1 : Install WDA manually and configure to use pre-installed WDA by right clicking on the device in the list.\n\nOption 2 : Add a provisioning profile in Tools → iOS Profile Management so that AppiumWizard can install the WDA automatically.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ShowMessage("No pre-installed WebDriverAgent found, and no provisioning profile is available for the device " + deviceName + "(" + udid + ").\n\nOption 1 : Install WDA manually and configure to use pre-installed WDA by right clicking on the device in the list.\n\nOption 2 : Add a provisioning profile in Tools → iOS Profile Management so that AppiumWizard can install the WDA automatically.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                     }
@@ -489,9 +540,11 @@ namespace Appium_Wizard
                 {
                     commonProgress.Close();
                     isScreenServerStarted = false;
-                    MessageBox.Show("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowMessage("Exception : " + e, "Failed to Start Screen Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+
+                if (StopIfCancelled()) return;
 
                 if (MainScreen.udidProxyPort.ContainsKey(udid))
                 {
@@ -499,7 +552,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    MainScreen.udidProxyPort.Add(udid, proxyPort);
+                    MainScreen.udidProxyPort[udid] = proxyPort;
                 }
                 if (MainScreen.udidScreenPort.ContainsKey(udid))
                 {
@@ -507,7 +560,7 @@ namespace Appium_Wizard
                 }
                 else
                 {
-                    MainScreen.udidScreenPort.Add(udid, screenServerPort);
+                    MainScreen.udidScreenPort[udid] = screenServerPort;
                 }
             });
         }
@@ -533,11 +586,14 @@ namespace Appium_Wizard
                         {
                         }
                     }
+                    if (StopIfCancelled()) return;
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 10);
                     AndroidMethods.GetInstance().UninstallOtherInstrumentationApps(udid);
+                    if (StopIfCancelled()) return;
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator installation...", 15);
                     bool isUIAutomatorInstalled = AndroidMethods.GetInstance().isUIAutomatorInstalled(udid, true, 10000);
                     Logger.Info("isUIAutomatorInstalled : " + isUIAutomatorInstalled);
+                    if (StopIfCancelled()) return;
                     if (!isUIAutomatorInstalled)
                     {
                         commonProgress.UpdateStepLabel(title, "Installing UIAutomator...", 30);
@@ -549,19 +605,20 @@ namespace Appium_Wizard
                     Logger.Error(e, "Error installing uiautomator");
                     if (MainScreen.useScrcpy)
                     {
-                        MessageBox.Show(e.Message, "Screen mirroring will work but Object spy won't work.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ShowMessage(e.Message, "Screen mirroring will work but Object spy won't work.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         isScreenServerStarted = true;
                     }
                     else
                     {
-                        MessageBox.Show(e.Message, "Error installing UIAutomator, Please try again.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ShowMessage(e.Message, "Error installing UIAutomator, Please try again.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         isScreenServerStarted = false;
                     }
                     return;
                 }
+                if (StopIfCancelled()) return;
                 try
                 {
-                    int forwardedProxyPort = AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
+                    int forwardedProxyPort =AndroidMethods.GetInstance().GetForwardedPort(udid, 6790);
                     if (forwardedProxyPort != -1)
                     {
                         proxyPort = forwardedProxyPort;
@@ -586,6 +643,7 @@ namespace Appium_Wizard
                             AndroidMethods.GetInstance().StartAndroidProxyServer(screenServerPort, 7810, udid);
                         }
                     }                    
+                    if (StopIfCancelled()) return;
                     commonProgress.UpdateStepLabel(title, "Checking UIAutomator running status...", 70);
                     bool IsUIAutomatorRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
                     if (!IsUIAutomatorRunning)
@@ -626,9 +684,10 @@ namespace Appium_Wizard
                             sessionIdCreatedForScreenServer = AndroidAPIMethods.CreateSession(proxyPort);
                         }
                     }
+                    if (StopIfCancelled()) return;
                     if (sessionIdCreatedForScreenServer != string.Empty)
                     {
-                        deviceSessionId.Add(udid, sessionIdCreatedForScreenServer);
+                        deviceSessionId[udid] = sessionIdCreatedForScreenServer;
                         UIAutomatorSessionId = sessionIdCreatedForScreenServer;
                         isScreenServerStarted = true;
                     }
@@ -641,7 +700,7 @@ namespace Appium_Wizard
                     {
                         if (MainScreen.useScrcpy)
                         {
-                            MessageBox.Show("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ShowMessage("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             isScreenServerStarted = true;
                         }
                         else
@@ -654,12 +713,12 @@ namespace Appium_Wizard
                         commonProgress.UpdateStepLabel(title, "Starting device screen streaming...", 85);
                         if (!deviceDetails.ContainsKey(udid))
                         {
-                            keyValuePairs.Add("proxyPort", proxyPort);
+                            keyValuePairs["proxyPort"] = proxyPort;
                             if (!MainScreen.useScrcpy)
                             {
-                                keyValuePairs.Add("screenPort", screenServerPort);
+                                keyValuePairs["screenPort"] = screenServerPort;
                             }
-                            deviceDetails.Add(udid, keyValuePairs);
+                            deviceDetails.TryAdd(udid, keyValuePairs);
                         }
                     }
                     Thread.Sleep(2000);
@@ -668,13 +727,13 @@ namespace Appium_Wizard
                 {
                     if (MainScreen.useScrcpy)
                     {
-                        MessageBox.Show("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ShowMessage("Screen mirroring will work but Object spy won't work.", "Screen mirroring", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         isScreenServerStarted = true;
                     }
                     else
                     {
                         isScreenServerStarted = false;
-                        MessageBox.Show(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        ShowMessage(e.Message, "Failed starting screen server", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }                    
                 }
             });

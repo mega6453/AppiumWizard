@@ -18,10 +18,46 @@ namespace Appium_Wizard
             commonProgressLabel.MaximumSize = new Size(availableWidth, 0);
         }
 
+        public bool IsCancelled { get; private set; }
+
+        private readonly TaskCompletionSource cancelRequested = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // Completes when the user clicks Cancel.
+        public Task CancelRequested => cancelRequested.Task;
+
+        // Awaits work, but returns false if the user cancels. After Cancel, the running work gets
+        // graceMs to finish; if it doesn't, it is abandoned (it keeps running in the background).
+        public async Task<bool> RunCancellable(Task work, int graceMs = 10000)
+        {
+            if (await Task.WhenAny(work, CancelRequested) == work)
+            {
+                await work;
+                return true;
+            }
+            await Task.WhenAny(work, Task.Delay(graceMs));
+            return false;
+        }
+
+        public void EnableCancel()
+        {
+            cancelButton.Visible = true;
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            IsCancelled = true;
+            cancelButton.Enabled = false;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            commonProgressLabel.ForeColor = Color.Black;
+            commonProgressLabel.Text = "Cancelling... Please wait for the current step to finish.";
+            commonProgressLabel.Refresh();
+            cancelRequested.TrySetResult();
+        }
+
         public void UpdateStepLabel(string title, string stepText, int progressPercent = 50)
         {
             Logger.Debug(stepText);
-            if (!this.Visible)
+            if (!this.Visible || IsCancelled)
             {
                 return;
             }
@@ -61,6 +97,10 @@ namespace Appium_Wizard
         public void UpdateStepLabel(string stepText)
         {
             Logger.Debug(stepText);
+            if (IsCancelled)
+            {
+                return;
+            }
             if (this.InvokeRequired)
             {
                 this.Invoke((MethodInvoker)delegate

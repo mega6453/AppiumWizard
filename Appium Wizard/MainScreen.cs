@@ -902,16 +902,21 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
+            commonProgress.EnableCancel();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Detect iOS Device", "Looking for iOS device...", 10);
             List<string> deviceList = new List<string>();
             Dictionary<string, object> deviceInfo = new Dictionary<string, object>();
             try
             {
-                await Task.Run(() =>
+                if (!await commonProgress.RunCancellable(Task.Run(() =>
                 {
                     deviceList = iOSMethods.GetInstance().GetListOfDevicesUDID();
-                });
+                })))
+                {
+                    commonProgress.Close();
+                    return;
+                }
 
                 if (deviceList.Contains("ITunes not installed"))
                 {
@@ -956,19 +961,27 @@ namespace Appium_Wizard
                             if (!isDeviceAlreadyAdded(deviceList[i]))
                             {
                                 DeviceInformation deviceInformation = new DeviceInformation(main);
-                                await Task.Run(() =>
+                                if (!await commonProgress.RunCancellable(Task.Run(() =>
                                 {
                                     deviceInfo = iOSMethods.GetInstance().GetDeviceInformation(deviceList[i]);
-                                });
+                                })))
+                                {
+                                    commonProgress.Close();
+                                    return;
+                                }
                                 commonProgress.UpdateStepLabel("Detect iOS Device", "Getting iOS device information...", 70);
                                 if (deviceInfo.Count > 0)
                                 {
                                     try
                                     {
-                                        await Task.Run(() =>
+                                        if (!await commonProgress.RunCancellable(Task.Run(() =>
                                         {
                                             Model = iOSMethods.GetInstance().GetDeviceModel(deviceInfo["ProductType"]?.ToString() ?? "");
-                                        });
+                                        })))
+                                        {
+                                            commonProgress.Close();
+                                            return;
+                                        }
                                     }
                                     catch (Exception)
                                     {
@@ -1039,16 +1052,21 @@ namespace Appium_Wizard
         {
             CommonProgress commonProgress = new CommonProgress();
             commonProgress.Owner = this;
+            commonProgress.EnableCancel();
             commonProgress.Show();
             commonProgress.UpdateStepLabel("Detect Android Device", "Looking for Android device...", 10);
             List<string> deviceList = new List<string>();
             Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
             try
             {
-                await Task.Run(() =>
+                if (!await commonProgress.RunCancellable(Task.Run(() =>
                 {
                     deviceList = AndroidMethods.GetInstance().GetListOfDevicesUDID();
-                });
+                })))
+                {
+                    commonProgress.Close();
+                    return;
+                }
                 int count = deviceList.Count;
                 if (count == 0)
                 {
@@ -1063,10 +1081,14 @@ namespace Appium_Wizard
                         if (!isDeviceAlreadyAdded(deviceList[i]))
                         {
                             DeviceInformation deviceInformation = new DeviceInformation(main);
-                            await Task.Run(() =>
+                            if (!await commonProgress.RunCancellable(Task.Run(() =>
                             {
                                 deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(deviceList[i]);
-                            });
+                            })))
+                            {
+                                commonProgress.Close();
+                                return;
+                            }
                             if (deviceInfo.Count > 0)
                             {
                                 commonProgress.UpdateStepLabel("Detect Android Device", "Getting Android device information...", 75);

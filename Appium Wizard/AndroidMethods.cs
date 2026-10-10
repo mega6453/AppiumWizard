@@ -480,6 +480,14 @@ namespace Appium_Wizard
             return address;
         }
 
+        public string FindPairingAddressByServiceName(string serviceName)
+        {
+            string output = ExecuteCommand("mdns services");
+            string pattern = Regex.Escape(serviceName) + @"\s+_adb-tls-pairing\._tcp\.\s+(\d+\.\d+\.\d+\.\d+):(\d+)";
+            Match match = Regex.Match(output, pattern);
+            return match.Success ? match.Groups[1].Value + ":" + match.Groups[2].Value : string.Empty;
+        }
+
         public string PairAndroidWirelessly(string address, string PairingCode)
         {
             return ExecuteCommand(" pair " + address + " " + PairingCode);

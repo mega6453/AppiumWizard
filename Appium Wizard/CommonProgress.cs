@@ -25,6 +25,19 @@ namespace Appium_Wizard
         // Completes when the user clicks Cancel.
         public Task CancelRequested => cancelRequested.Task;
 
+        // Awaits work, but returns false if the user cancels. After Cancel, the running work gets
+        // graceMs to finish; if it doesn't, it is abandoned (it keeps running in the background).
+        public async Task<bool> RunCancellable(Task work, int graceMs = 10000)
+        {
+            if (await Task.WhenAny(work, CancelRequested) == work)
+            {
+                await work;
+                return true;
+            }
+            await Task.WhenAny(work, Task.Delay(graceMs));
+            return false;
+        }
+
         public void EnableCancel()
         {
             cancelButton.Visible = true;

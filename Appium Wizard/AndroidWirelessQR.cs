@@ -54,6 +54,29 @@ namespace Appium_Wizard
             await PairAndConnect();
         }
 
+        private static async Task<List<int>> ScanOpenPorts(string ip, int startPort, int endPort, CancellationToken token)
+        {
+            var open = new System.Collections.Concurrent.ConcurrentBag<int>();
+            using var gate = new SemaphoreSlim(400);
+            var tasks = Enumerable.Range(startPort, endPort - startPort + 1).Select(async port =>
+            {
+                await gate.WaitAsync();
+                try
+                {
+                    if (token.IsCancellationRequested) return;
+                    using var client = new System.Net.Sockets.TcpClient();
+                    using var timeout = CancellationTokenSource.CreateLinkedTokenSource(token);
+                    timeout.CancelAfter(500);
+                    await client.ConnectAsync(ip, port, timeout.Token);
+                    open.Add(port);
+                }
+                catch { }
+                finally { gate.Release(); }
+            });
+            await Task.WhenAll(tasks);
+            return open.OrderBy(p => p).ToList();
+        }
+
         private async Task PairAndConnect()
         {
             var token = cts.Token;
@@ -98,23 +121,69 @@ namespace Appium_Wizard
             {
                 return;
             }
-            if (!output.Contains("Successfully paired"))
-            {
-                MessageBox.Show("Unable to pair the device.\n1.Make sure the device is on the same network as this PC.\n2.Restart Wireless debugging and try again.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Close();
-                return;
-            }
-
-            statusLabel.Text = "Paired. Looking for the device address...";
             string ip = pairingAddress.Split(':')[0];
+            bool paired = output.Contains("Successfully paired");
             string connectAddress = string.Empty;
-            for (int i = 0; i < 15 && string.IsNullOrEmpty(connectAddress) && !token.IsCancellationRequested; i++)
+            if (!paired)
             {
-                List<string> addresses = await Task.Run(() => AndroidMethods.GetInstance().FindConnectReadyDevicesOverWiFi());
-                connectAddress = addresses.FirstOrDefault(a => a.StartsWith(ip + ":")) ?? string.Empty;
+                // The phone may already trust this PC (listed under Paired devices), in which case
+                // re-pairing can fail even though the device is connectable.
+                statusLabel.Text = "Pairing failed. Checking if the device is already paired...";
+                List<string> existing = await Task.Run(() => AndroidMethods.GetInstance().FindConnectReadyDevicesOverWiFi());
+                string candidate = existing.FirstOrDefault(a => a.StartsWith(ip + ":")) ?? string.Empty;
+                if (!string.IsNullOrEmpty(candidate))
+                {
+                    string connectOutput = await Task.Run(() => AndroidMethods.GetInstance().ConnectToAndroidWirelessly(candidate));
+                    if (connectOutput.Contains("connected to"))
+                    {
+                        connectAddress = candidate;
+                    }
+                }
+                if (token.IsCancellationRequested || IsDisposed)
+                {
+                    return;
+                }
                 if (string.IsNullOrEmpty(connectAddress))
                 {
-                    try { await Task.Delay(1000, token); } catch (TaskCanceledException) { }
+                    MessageBox.Show("Unable to pair the device.\n1.Make sure the device is on the same network as this PC.\n2.If this PC is already listed under Paired devices on the phone, tap it and choose 'Forget', then try again.\n3.Restart Wireless debugging and try again.", "Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
+            }
+            else
+            {
+                statusLabel.Text = "Paired. Looking for the device address...";
+                for (int i = 0; i < 30 && string.IsNullOrEmpty(connectAddress) && !token.IsCancellationRequested; i++)
+                {
+                    // adb may auto-connect a freshly paired phone without it showing up in mDNS.
+                    connectAddress = await Task.Run(() => AndroidMethods.GetInstance().FindConnectedAddressByIp(ip));
+                    if (string.IsNullOrEmpty(connectAddress))
+                    {
+                        List<string> addresses = await Task.Run(() => AndroidMethods.GetInstance().FindConnectReadyDevicesOverWiFi());
+                        connectAddress = addresses.FirstOrDefault(a => a.StartsWith(ip + ":")) ?? string.Empty;
+                    }
+                    if (string.IsNullOrEmpty(connectAddress) && i < 29)
+                    {
+                        try { await Task.Delay(1000, token); } catch (TaskCanceledException) { }
+                    }
+                    // mDNS is unreliable on some networks; after a few tries, probe the phone's ports directly.
+                    if (string.IsNullOrEmpty(connectAddress) && i == 4)
+                    {
+                        statusLabel.Text = "Paired. Scanning the phone for the Wireless debugging port...";
+                        string pairingPort = pairingAddress.Split(':')[1];
+                        List<int> openPorts = await ScanOpenPorts(ip, 30000, 50000, token);
+                        foreach (int port in openPorts.Where(p => p.ToString() != pairingPort))
+                        {
+                            if (token.IsCancellationRequested) break;
+                            string candidate = ip + ":" + port;
+                            string connectOutput = await Task.Run(() => AndroidMethods.GetInstance().ConnectToAndroidWirelessly(candidate));
+                            if (connectOutput.Contains("connected to"))
+                            {
+                                connectAddress = candidate;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             if (token.IsCancellationRequested || IsDisposed)

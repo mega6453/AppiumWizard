@@ -480,6 +480,13 @@ namespace Appium_Wizard
             return address;
         }
 
+        public string FindConnectedAddressByIp(string ip)
+        {
+            string output = ExecuteCommand("devices");
+            Match match = Regex.Match(output, Regex.Escape(ip) + @":(\d+)\s+device");
+            return match.Success ? ip + ":" + match.Groups[1].Value : string.Empty;
+        }
+
         public string FindPairingAddressByServiceName(string serviceName)
         {
             string output = ExecuteCommand("mdns services");

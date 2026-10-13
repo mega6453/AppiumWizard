@@ -575,6 +575,9 @@ namespace Appium_Wizard
                 string sessionIdAvailableForAutomation = string.Empty;
                 try
                 {
+                    // A locked wireless device may have dropped its adb connection; reconnect before setup.
+                    AndroidMethods.GetInstance().EnsureWirelessDeviceConnected(udid, 3,
+                        message => commonProgress.UpdateStepLabel(title, message, 3));
                     commonProgress.UpdateStepLabel(title, "Getting screen density...", 5);
                     if (!MainScreen.useScrcpy)
                     {

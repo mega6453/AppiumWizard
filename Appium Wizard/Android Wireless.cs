@@ -145,9 +145,18 @@
             else
             {
                 Dictionary<string, string> deviceInfo = new Dictionary<string, string>();
-                await Task.Run(() => {
-                    deviceInfo = AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress);
-                });
+                // Right after connecting, the device can briefly be offline and return no properties.
+                const int maxAttempts = 8;
+                for (int attempt = 1; attempt <= maxAttempts; attempt++)
+                {
+                    deviceInfo = await Task.Run(() => AndroidAsyncMethods.GetInstance().GetDeviceInformation(connectIPAddress));
+                    if (deviceInfo.ContainsKey("ro.serialno") || attempt == maxAttempts)
+                    {
+                        break;
+                    }
+                    commonProgress.UpdateStepLabel("Android Wireless device", "Waiting for the device to respond (" + attempt + "/" + maxAttempts + ")...", 50 + attempt * 3);
+                    await Task.Delay(1000);
+                }
                 commonProgress.UpdateStepLabel("Android Wireless device", "Connecting to Android device over Wi-Fi...", 75);
                 DeviceInformation deviceInformation = new DeviceInformation(mainScreen);
                 if (deviceInfo.ContainsKey("ro.serialno"))
@@ -244,7 +253,7 @@
                 else
                 {
                     commonProgress.Close();
-                    MessageBox.Show("No Android Device available.\nPlease check if the device is on the same network as this PC.\nGo to Developer options > Wireless debugging > Pair device with pairing code > Find Devices again.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No Android Device available.\n1.Turn Wireless debugging off and on again in Developer options, then try again.\n2.Check if the device is on the same network as this PC.", "Add Android Device Over Wi-Fi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -252,6 +261,7 @@
         private void AndroidWireless_Shown(object sender, EventArgs e)
         {
             GoogleAnalytics.SendEvent("AndroidWireless_Shown");
+            ActiveControl = QRButton;
         }
 
         private void QRButton_Click(object sender, EventArgs e)

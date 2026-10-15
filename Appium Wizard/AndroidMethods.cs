@@ -410,6 +410,162 @@ namespace Appium_Wizard
             return ExecuteCommand(" connect " + connectAddress);
         }
 
+        // Android picks a new Wireless debugging port every time the phone locks or Wi-Fi sleeps, so the
+        // IP:port saved for a device goes stale. This maps the saved address to the current one and is
+        // applied to every adb command (see ResolveAddress).
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> wirelessAddressAlias = new();
+        private static readonly object wirelessReconnectLock = new object();
+
+        public static string ResolveAddress(string udid)
+        {
+            return udid != null && wirelessAddressAlias.TryGetValue(udid, out string current) ? current : udid;
+        }
+
+        // Rewrites "-s <savedAddress>" in an adb argument string to the device's current address.
+        internal static string ResolveArguments(string arguments)
+        {
+            if (arguments == null || wirelessAddressAlias.IsEmpty)
+            {
+                return arguments;
+            }
+            foreach (var pair in wirelessAddressAlias)
+            {
+                arguments = arguments.Replace("-s " + pair.Key + " ", "-s " + pair.Value + " ");
+                if (arguments.EndsWith("-s " + pair.Key))
+                {
+                    arguments = arguments.Substring(0, arguments.Length - pair.Key.Length) + pair.Value;
+                }
+            }
+            return arguments;
+        }
+
+        // Makes sure a wireless (IP:port) device is online, rediscovering its port if it changed.
+        // Returns the address adb currently knows the device by, or the original one if it can't be found.
+        public string EnsureWirelessDeviceConnected(string udid, int attempts = 3, Action<string> onStatus = null)
+        {
+            if (string.IsNullOrEmpty(udid) || !udid.Contains(':'))
+            {
+                return udid;
+            }
+            // Fast path: already online, so no need to queue behind a reconnect in progress.
+            string resolved = ResolveAddress(udid);
+            if (GetListOfDevicesUDID().Contains(resolved))
+            {
+                return resolved;
+            }
+            onStatus?.Invoke("Wi-Fi connection was lost. Reconnecting to the device, this can take up to 20 seconds...");
+            lock (wirelessReconnectLock)
+            {
+                string ip = udid.Split(':')[0];
+                for (int i = 0; i < attempts; i++)
+                {
+                    string current = ResolveAddress(udid);
+                    if (GetListOfDevicesUDID().Contains(current))
+                    {
+                        return current;
+                    }
+                    Logger.Info("Wireless device " + udid + " (current " + current + ") is not online, looking for it again. Attempt " + (i + 1));
+
+                    // adb may already be connected on a new port (e.g. auto-reconnect through mDNS).
+                    string found = FindConnectedAddressByIp(ip);
+                    if (string.IsNullOrEmpty(found))
+                    {
+                        // Stale "offline" entries for this phone confuse adb, so drop them first.
+                        DisconnectOfflineEntries(ip);
+                        // Closed ports refuse instantly, so scanning is far cheaper than trying
+                        // stale mDNS/saved addresses (each refused "adb connect" takes seconds).
+                        found = ScanForConnectAddress(ip);
+                    }
+                    if (!string.IsNullOrEmpty(found))
+                    {
+                        Thread.Sleep(1000);
+                        if (GetListOfDevicesUDID().Contains(found))
+                        {
+                            if (!found.Equals(udid))
+                            {
+                                Logger.Info("Wireless device " + udid + " moved to " + found);
+                                wirelessAddressAlias[udid] = found;
+                            }
+                            else
+                            {
+                                wirelessAddressAlias.TryRemove(udid, out _);
+                            }
+                            return found;
+                        }
+                    }
+                    Thread.Sleep(1500);
+                }
+                return ResolveAddress(udid);
+            }
+        }
+
+        private void DisconnectOfflineEntries(string ip)
+        {
+            try
+            {
+                string output = ExecuteCommand("devices");
+                foreach (Match match in Regex.Matches(output, Regex.Escape(ip) + @":\d+(?=\s+offline)"))
+                {
+                    ExecuteCommand(" disconnect " + match.Value, true, 5000);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to clear offline wireless entries");
+            }
+        }
+
+        // Ports that were open but refused to act as adb, such as 39391 on this phone.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, byte> nonAdbPorts = new();
+
+        private static async Task<List<int>> ScanOpenPortsAsync(string ip, int startPort, int endPort)
+        {
+            var open = new System.Collections.Concurrent.ConcurrentBag<int>();
+            using var gate = new SemaphoreSlim(1000);
+            var tasks = Enumerable.Range(startPort, endPort - startPort + 1).Select(async port =>
+            {
+                await gate.WaitAsync();
+                try
+                {
+                    using var client = new System.Net.Sockets.TcpClient();
+                    using var timeout = new CancellationTokenSource(300);
+                    await client.ConnectAsync(ip, port, timeout.Token);
+                    open.Add(port);
+                }
+                catch { }
+                finally { gate.Release(); }
+            });
+            await Task.WhenAll(tasks);
+            return open.OrderBy(p => p).ToList();
+        }
+
+        private string ScanForConnectAddress(string ip)
+        {
+            try
+            {
+                var sw = Stopwatch.StartNew();
+                var open = ScanOpenPortsAsync(ip, 30000, 50000).GetAwaiter().GetResult();
+                Logger.Info("Open ports on " + ip + " : " + string.Join(",", open) + " (scan took " + sw.ElapsedMilliseconds + " ms)");
+                // Ports that were open but never accepted an adb connection go last.
+                foreach (int port in open.OrderBy(p => nonAdbPorts.ContainsKey(p)).ThenBy(p => p))
+                {
+                    string candidate = ip + ":" + port;
+                    string output = ExecuteCommand(" connect " + candidate, true, 4000);
+                    Logger.Info("adb connect " + candidate + " : " + output.Trim());
+                    if (output.Contains("connected to"))
+                    {
+                        return candidate;
+                    }
+                    nonAdbPorts[port] = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Port scan for wireless device failed");
+            }
+            return string.Empty;
+        }
+
         public void ConnectToAndroidWirelessly(string udid, string IPAddress, string Port)
         {
             ExecuteCommand("-s " + udid + " connect " + IPAddress + ":" + Port);
@@ -647,6 +803,7 @@ namespace Appium_Wizard
         {
             try
             {
+                arguments = ResolveArguments(arguments);
                 adbProcess.StartInfo.Arguments = arguments;
                 adbProcess.Start();
                 bool processExited = false;
@@ -784,7 +941,7 @@ namespace Appium_Wizard
                 var processStartInfo = new ProcessStartInfo
                 {
                     FileName = adbFilePath,
-                    Arguments = "-s " + udid + " forward --list",
+                    Arguments = "-s " + ResolveAddress(udid) + " forward --list",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -911,7 +1068,7 @@ namespace Appium_Wizard
         {
             try
             {
-                adbAsyncProcess.StartInfo.Arguments = arguments;
+                adbAsyncProcess.StartInfo.Arguments = AndroidMethods.ResolveArguments(arguments);
                 adbAsyncProcess.Start();
             }
             catch (Exception ex)
@@ -951,7 +1108,7 @@ namespace Appium_Wizard
         {
             try
             {
-                adbAsyncProcess.StartInfo.Arguments = arguments;
+                adbAsyncProcess.StartInfo.Arguments = AndroidMethods.ResolveArguments(arguments);
                 StringBuilder outputBuilder = new StringBuilder();
                 StringBuilder errorBuilder = new StringBuilder();
 

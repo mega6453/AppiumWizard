@@ -49,6 +49,63 @@ namespace Appium_Wizard
         // MaximumSize there, which stop Windows Snap from resizing the window on drag/drop).
         private Size _lockedSize = Size.Empty;
 
+        // Set when the form closes so the UIAutomator2 session loop stops polling the device.
+        private volatile bool sessionLoopStopped = false;
+
+        // UIAutomator2 mode: set while the device connection is down so a "Reconnecting" message replaces the stream.
+        private volatile bool connectionLost = false;
+        private Label reconnectLabel;
+
+        // Polls the MJPEG stream until it starts sending data, or the timeout (seconds) passes.
+        private void WaitForStream(int timeoutSeconds)
+        {
+            var deadline = DateTime.Now.AddSeconds(timeoutSeconds);
+            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(3) };
+            while (DateTime.Now < deadline && !sessionLoopStopped)
+            {
+                try
+                {
+                    using var response = client.GetAsync($"http://{IPAddress}:{screenPort}", HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Logger.Info("Screen stream is ready again");
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+                Thread.Sleep(1000);
+            }
+            Logger.Warn("Screen stream did not become ready within " + timeoutSeconds + "s");
+        }
+
+        // WebView2 is a native window and draws over WinForms controls, so swap it out instead of overlaying.
+        private void ShowReconnecting(bool show)
+        {
+            try
+            {
+                if (IsDisposed || reconnectLabel == null || ScreenWebView == null)
+                {
+                    return;
+                }
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new Action(() => ShowReconnecting(show)));
+                    return;
+                }
+                ScreenWebView.Visible = !show;
+                reconnectLabel.Visible = show;
+                if (show)
+                {
+                    reconnectLabel.BringToFront();
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public ScreenControl(string os, string Version, string udid, int width, int height, string session, string selectedDeviceName, int proxyPort, int screenPort, string deviceModel, bool useScrcpy = true)
         {
             InitializeComponent();
@@ -109,19 +166,44 @@ namespace Appium_Wizard
                 {
                     webview2[udid] = ScreenWebView;
                 }
+                reconnectLabel = new Label
+                {
+                    Location = new Point(0, 0),
+                    Size = new Size(width, height),
+                    ForeColor = Color.White,
+                    BackColor = Color.Black,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new Font("Segoe UI", 11f),
+                    Text = "Connection to the device was lost.\nReconnecting, please wait...\n\nThis can take up to 20 seconds.",
+                    Visible = false
+                };
+                Controls.Add(reconnectLabel);
                 Task.Run(() =>
                 {
-                    while (true)
+                    while (!sessionLoopStopped)
                     {
                         sessionId = GetSessionID();
                         sessionURL = URL + "/session/" + sessionId;
+                        // Back online after a drop: always reload the stream, even if the session id is unchanged,
+                        // because the port forwards were re-created and the old stream connection is dead.
+                        bool recovered = connectionLost && !sessionId.Equals("nosession");
+                        if (recovered)
+                        {
+                            // The stream server needs a few seconds after the session is recreated; reloading earlier gives a blank page.
+                            WaitForStream(20);
+                            connectionLost = false;
+                        }
                         if (OSType.Equals("Android"))
                         {
                             try
                             {
                                 BeginInvoke(new Action(() =>
                                 {
-                                    if (tempSessionId != sessionId)
+                                    if (recovered)
+                                    {
+                                        ShowReconnecting(false);
+                                    }
+                                    if (recovered || tempSessionId != sessionId)
                                     {
                                         try
                                         {
@@ -281,7 +363,8 @@ namespace Appium_Wizard
                                 </style>
                             </head>
                             <body>
-                                <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}>
+                                <img src=""{imageUrl}"" alt=""Screen Mirroring failed"" width={imageWidth} height={imageHeight}
+                                     onerror=""setTimeout(function(){{ this.src='{imageUrl}?t=' + Date.now(); }}.bind(this), 1500)"">
                             </body>
                         </html>
                     ";
@@ -639,23 +722,43 @@ namespace Appium_Wizard
                     sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
                     if (sessionId.Equals("nosession"))
                     {
+                        if (!connectionLost)
+                        {
+                            connectionLost = true;
+                            ShowReconnecting(true);
+                        }
+                        // A locked wireless device can drop its adb connection; bring it back before restarting UIAutomator.
+                        // If its port changed, the alias map makes every later "-s udid" command use the new address.
+                        AndroidMethods.GetInstance().EnsureWirelessDeviceConnected(udid);
+                        if (!AndroidMethods.GetInstance().GetListOfDevicesUDID().Contains(AndroidMethods.ResolveAddress(udid)))
+                        {
+                            return "nosession";
+                        }
+                        // adb forward rules are lost with the connection, so always re-create them.
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
 
-                        bool isRunning = AndroidMethods.GetInstance().IsUIAutomatorRunning(udid);
-                        if (!isRunning)
+                        // After a connection drop the UIAutomator process can still be alive but no longer serve the
+                        // screen stream, so always restart it fully instead of reusing it.
+                        Logger.Info("Restarting UIAutomator after connection loss : " + udid);
+                        AndroidMethods.GetInstance().StopUIAutomator(udid);
+                        AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
+                        AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
+
+                        // The server needs a few seconds to start accepting session requests.
+                        sessionId = "nosession";
+                        for (int i = 0; i < 10 && sessionId.Equals("nosession") && !sessionLoopStopped; i++)
                         {
-                            AndroidAsyncMethods.GetInstance().StartUIAutomatorServer(udid);
-                            AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                            AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                        }
-                        else
-                        {
-                            AndroidMethods.GetInstance().StartAndroidProxyServer(proxyPort, 6790, udid);
-                            AndroidMethods.GetInstance().StartAndroidProxyServer(screenPort, 7810, udid);
-                            sessionId = AndroidAPIMethods.GetSessionID(proxyPort);
-                        }
-                        if (sessionId.Equals("nosession"))
-                        {
-                            sessionId = CreateSession();
+                            Thread.Sleep(1500);
+                            try
+                            {
+                                sessionId = CreateSession();
+                            }
+                            catch (Exception)
+                            {
+                                sessionId = "nosession";
+                            }
                         }
                         return sessionId;
                     }
@@ -786,6 +889,7 @@ namespace Appium_Wizard
 
         private void ScreenControl_FormClosing(object sender, FormClosingEventArgs e)
         {
+            sessionLoopStopped = true;
             if (useScrcpy)
             {
                 scrcpyEmbedder.Dispose();

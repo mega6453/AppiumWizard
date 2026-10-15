@@ -85,7 +85,7 @@
             private System.Windows.Forms.Timer processMonitorTimer;
             private string currentUdid;
             private int restartAttempts = 0;
-            private const int MaxRestartAttempts = 5;
+            private const int MaxRestartAttempts = 15;
             private bool isRestarting = false;
 
             /// <summary>
@@ -117,6 +117,41 @@
                     //Dock = DockStyle.Fill,
                     BackColor = Color.Black
                 };
+
+                statusLabel = new Label
+                {
+                    Dock = DockStyle.Fill,
+                    ForeColor = Color.White,
+                    BackColor = Color.Black,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new Font("Segoe UI", 11f),
+                    Visible = false
+                };
+                hostPanel.Controls.Add(statusLabel);
+            }
+
+            private Label statusLabel;
+
+            // Shows (or hides, when message is null) a message over the panel while scrcpy is reconnecting.
+            private void SetStatusMessage(string message)
+            {
+                if (hostPanel == null || hostPanel.IsDisposed || statusLabel == null)
+                    return;
+                if (hostPanel.InvokeRequired)
+                {
+                    hostPanel.BeginInvoke(new Action(() => SetStatusMessage(message)));
+                    return;
+                }
+                if (message == null)
+                {
+                    statusLabel.Visible = false;
+                }
+                else
+                {
+                    statusLabel.Text = message;
+                    statusLabel.Visible = true;
+                    statusLabel.BringToFront();
+                }
             }
 
             public async Task<bool> StartAsync(string udid)
@@ -129,7 +164,10 @@
                     // Store the udid for potential restarts
                     currentUdid = udid;
 
-                    ScrcpyArguments = ScrcpyArguments + " -s "+udid;
+                    // Wireless devices may have dropped the adb link (e.g. after the screen was locked).
+                    string resolvedUdid = await Task.Run(() => AndroidMethods.GetInstance().EnsureWirelessDeviceConnected(udid));
+
+                    ScrcpyArguments = ScrcpyArguments + " -s " + resolvedUdid;
 
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
@@ -277,6 +315,7 @@
                 try
                 {
                     Logger.Info("Restarting scrcpy...");
+                    SetStatusMessage("Connection to the device was lost.\nReconnecting, please wait...\n\nThis can take up to 20 seconds.");
 
                     // Stop the monitoring timer temporarily
                     processMonitorTimer?.Stop();
@@ -295,9 +334,13 @@
                     // Wait a bit before restarting
                     await Task.Delay(1000);
 
+                    // Bring a dropped wireless adb connection back before relaunching scrcpy
+                    string udidToReconnect = currentUdid;
+                    string resolvedUdid = await Task.Run(() => AndroidMethods.GetInstance().EnsureWirelessDeviceConnected(udidToReconnect, 5));
+
                     // Rebuild the arguments (clear any previous appended udid)
                     string baseArgs = "--max-size 1080 --window-title=\"scrcpy_embed\" --stay-awake --disable-screensaver --window-x=-2000 --window-y=-2000";
-                    ScrcpyArguments = baseArgs + " -s " + currentUdid;
+                    ScrcpyArguments = baseArgs + " -s " + resolvedUdid;
 
                     // Start new scrcpy process
                     ProcessStartInfo psi = new ProcessStartInfo
@@ -367,6 +410,7 @@
                 finally
                 {
                     isRestarting = false;
+                    SetStatusMessage(null);
                 }
             }
 
